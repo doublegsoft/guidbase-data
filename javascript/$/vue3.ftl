@@ -73,14 +73,49 @@ import ${js.nameType(namespace)}Datepicker from '@/components/${namespace}-datep
   </#list>
 </#macro>
 
-<#macro print_page_layout widget indent=0>
-  <#list widget.widgets as child>
-    <#if child.type == "entry_form">
-    <#elseif child.type == "view_form">
-    <#elseif child.type == "select" && !child.readonly>
-${""?left_pad(indent)}<${namespace}-dropdown />
-    <#elseif child.type == "date" && !child.readonly>
-${""?left_pad(indent)}<${namespace}-datepicker />    
-    </#if>
+<#macro print_page_layout page indent=0>
+  <#list page.children as child>
+<@print_layout_widget widget=child indent=indent />
   </#list>
+</#macro>
+
+<#macro print_layout_widget widget indent=0>
+  <#if widget.type == "entry_form">
+<@print_layout_entry_form widget=widget indent=indent+2 />    
+  <#elseif widget.type == "view_form">
+  <#elseif widget.type == "group">
+<@print_layout_group widget=widget indent=indent+2 />
+  <#elseif widget.type == "select" && !widget.readonly>
+${""?left_pad(indent)}<${namespace}-dropdown />
+  <#elseif widget.type == "date" && !widget.readonly>
+${""?left_pad(indent)}<${namespace}-datepicker />    
+  <#elseif widget.type == "date" && !widget.readonly>
+${""?left_pad(indent)}<${namespace}-datepicker />    
+  <#else>
+${""?left_pad(indent)}<input class="${namespace}-input" placeholder="请输入${widget.title}">
+  </#if>
+</#macro>
+
+<#macro print_layout_entry_form widget indent=0>
+${""?left_pad(indent)}<div id="form${js.nameType(widget.id)}">
+  <#list widget.children as child>
+<@print_layout_widget widget=child indent=indent+2 />  
+  </#list>
+${""?left_pad(indent)}</div>
+</#macro>
+
+<#macro print_layout_group widget indent=0>
+  <#if widget.container.type == "entry_form">
+${""?left_pad(indent)}<div class="${namespace}-panel">
+${""?left_pad(indent)}  <div class="${namespace}-panel-head">${widget.title!"标题"}</div>
+${""?left_pad(indent)}  <div class="${namespace}-form">
+    <#list widget.children as child>
+${""?left_pad(indent)}    <div class="${namespace}-field">
+${""?left_pad(indent)}      <label class="${namespace}-field-label">${widget.title!"biaoti"}</label>
+<@print_layout_widget widget=child indent=indent+6 />
+${""?left_pad(indent)}    </div>
+    </#list>
+${""?left_pad(indent)}  </div>      
+${""?left_pad(indent)}</div>  
+  </#if>
 </#macro>

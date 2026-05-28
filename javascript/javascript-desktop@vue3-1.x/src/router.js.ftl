@@ -8,7 +8,7 @@ const router = createRouter({
     component: () => import('@/pages/login/login.vue'),
 <#list app.pages as page>    
   },{
-    path: '/${js.nameFile(page.id)}',
+    path: '/${js.nameFile(page.module)}/${js.nameFile(page.id)}',
     name: '${js.nameFile(page.id)}',
     component: () => import('@/pages/${js.nameFile(page.module)}/${js.nameFile(page.id)}.vue'),
 </#list>

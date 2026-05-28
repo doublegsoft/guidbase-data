@@ -65,9 +65,9 @@ const route = useRoute()
 const isLoginPage = computed(() => route.path === '/login')
 
 const modules = MODULE_LIST;
-const activeModule = ref('customer')
-const activeId     = ref('account')
-const activePath   = ref('/customer/account')
+const activeModule = ref(modules[0].key)
+const activeId     = ref(MENUS[modules[0].key].sections[0].items[0].id)
+const activePath   = ref(MENUS[modules[0].key].sections[0].items[0].path)
 const breadPage    = ref('账户 (Account)')
 const clock        = ref('')
 const username     = ref(localStorage.getItem('username') || '张伟')
