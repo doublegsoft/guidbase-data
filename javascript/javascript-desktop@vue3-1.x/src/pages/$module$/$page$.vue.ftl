@@ -1,6 +1,7 @@
 <#import "/$/vue3.ftl" as vue3>
 <#import "/$/guidbase4js.ftl" as guidbase4js>
 <template>
+<@vue3.print_page_layout widget=pageDef />
 </template>
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'

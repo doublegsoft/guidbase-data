@@ -64,15 +64,23 @@ const { loading: isSubmitting, run: handleSubmit } = useAsyncLock(save${js.nameT
     <#if visited_types[widget.type]??><#continue></#if>
     <#if widget.type == 'entry_form'>
 import { useAsyncLock } from '@/composables/useAsyncLock'
+    <#elseif widget.type == "select" && !widget.readonly>
+import ${js.nameType(namespace)}Dropdown from '@/components/${namespace}-dropdown.vue'  
+    <#elseif widget.type == "date" && !widget.readonly>
+import ${js.nameType(namespace)}Datepicker from '@/components/${namespace}-datepicker.vue'  
     </#if>
     <#local visited_types += {widget.type: widget} />
   </#list>
 </#macro>
 
-<#macro print_page_layout page indent=0>
-  <#list page.widgets as widget>
-    <#if widget.type == 'entry_form'>
-    <#elseif widget.type == 'view_form'>
+<#macro print_page_layout widget indent=0>
+  <#list widget.widgets as child>
+    <#if child.type == "entry_form">
+    <#elseif child.type == "view_form">
+    <#elseif child.type == "select" && !child.readonly>
+${""?left_pad(indent)}<${namespace}-dropdown />
+    <#elseif child.type == "date" && !child.readonly>
+${""?left_pad(indent)}<${namespace}-datepicker />    
     </#if>
   </#list>
 </#macro>

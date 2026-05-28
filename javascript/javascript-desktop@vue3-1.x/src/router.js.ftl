@@ -6,7 +6,7 @@ const router = createRouter({
 <#list app.pages as page>    
     path: '/${js.nameFile(page.id)}',
     name: '${js.nameFile(page.id)}',
-    component: () => import('@/pages/${js.nameFile(page.module)}/${js.nameFile(page.id)}.vue')
+    component: () => import('@/pages/${js.nameFile(page.module)}/${js.nameFile(page.id)}.vue'),
   <#if page?index != 0>
   },{
   </#if>  
