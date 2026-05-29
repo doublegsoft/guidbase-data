@@ -88,11 +88,13 @@ import ${js.nameType(namespace)}Datepicker from '@/components/${namespace}-datep
   <#elseif widget.type == "select" && !widget.readonly>
 ${""?left_pad(indent)}<${namespace}-dropdown />
   <#elseif widget.type == "date" && !widget.readonly>
-${""?left_pad(indent)}<${namespace}-datepicker />    
+${""?left_pad(indent)}<${namespace}-datepicker data-test="${js.nameVariable(widget.id)}" v-model="${js.nameVariable(widget.id)}" />    
   <#elseif widget.type == "date" && !widget.readonly>
-${""?left_pad(indent)}<${namespace}-datepicker />    
+${""?left_pad(indent)}<${namespace}-datepicker data-test="${js.nameVariable(widget.id)}" v-model="${js.nameVariable(widget.id)}" />    
+  <#elseif widget.type == "longtext" && !widget.readonly>
+${""?left_pad(indent)}<textarea class="${namespace}-textarea" data-test="${js.nameVariable(widget.id)}" placeholder="请输入${widget.title}"></textarea>  
   <#else>
-${""?left_pad(indent)}<input class="${namespace}-input" placeholder="请输入${widget.title}">
+${""?left_pad(indent)}<input class="${namespace}-input" data-test="${js.nameVariable(widget.id)}" v-model="${js.nameVariable(widget.id)}" placeholder="请输入${widget.title}">
   </#if>
 </#macro>
 
@@ -107,15 +109,17 @@ ${""?left_pad(indent)}</div>
 <#macro print_layout_group widget indent=0>
   <#if widget.container.type == "entry_form">
 ${""?left_pad(indent)}<div class="${namespace}-panel">
-${""?left_pad(indent)}  <div class="${namespace}-panel-head">${widget.title!"标题"}</div>
+${""?left_pad(indent)}  <div class="${namespace}-panel-head">${widget.title}</div>
+  <#list widget.children as child>
 ${""?left_pad(indent)}  <div class="${namespace}-form">
-    <#list widget.children as child>
+    <#list child.children as grandchild>
 ${""?left_pad(indent)}    <div class="${namespace}-field">
-${""?left_pad(indent)}      <label class="${namespace}-field-label">${widget.title!"biaoti"}</label>
-<@print_layout_widget widget=child indent=indent+6 />
+${""?left_pad(indent)}      <label class="${namespace}-field-label">${grandchild.title}</label>
+<@print_layout_widget widget=grandchild indent=indent+6 />
 ${""?left_pad(indent)}    </div>
     </#list>
-${""?left_pad(indent)}  </div>      
+${""?left_pad(indent)}  </div>
+  </#list>    
 ${""?left_pad(indent)}</div>  
   </#if>
 </#macro>

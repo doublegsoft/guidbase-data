@@ -540,7 +540,7 @@ html, body {
 /* Label */
 .${namespace}-field-label {
   width: 80px;
-  text-align: right;
+  /*text-align: right;*/
   color: var(--${namespace}-text-muted);
   flex-shrink: 0;
   white-space: nowrap;

@@ -1,2 +1,0 @@
-goto("http://localhost:5173")
-
