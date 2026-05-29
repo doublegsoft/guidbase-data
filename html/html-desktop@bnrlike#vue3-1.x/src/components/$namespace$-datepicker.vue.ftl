@@ -1,459 +1,532 @@
 <template>
-  <div class="${namespace}-dp" :class="{ '${namespace}-dp--disabled': disabled }" ref="rootEl">
-    <input
-      class="${namespace}-dp-input"
-      type="text"
-      :value="displayValue"
-      :placeholder="placeholder"
-      :disabled="disabled"
-      readonly
-      @click="togglePanel"
-      @keydown.escape="closePanel"
-    />
-    <button
-      class="${namespace}-dp-trigger"
-      type="button"
-      :disabled="disabled"
-      @click.stop="togglePanel"
-      tabindex="-1"
-    >&#x1F4C5;</button>
-
-    <div v-if="open" class="${namespace}-dp-panel" @click.stop>
-      <!-- Header: month / year navigation -->
-      <div class="${namespace}-dp-header">
-        <button class="${namespace}-dp-nav" type="button" @click="prevMonth">&lsaquo;</button>
-        <span class="${namespace}-dp-header-label">{{ headerLabel }}</span>
-        <button class="${namespace}-dp-nav" type="button" @click="nextMonth">&rsaquo;</button>
-      </div>
-
-      <!-- Weekday labels -->
-      <div class="${namespace}-dp-weekdays">
-        <span v-for="w in weekdays" :key="w" class="${namespace}-dp-weekday">{{ w }}</span>
-      </div>
-
-      <!-- Day grid -->
-      <div class="${namespace}-dp-days">
-        <button
-          v-for="(d, i) in days"
-          :key="i"
-          class="${namespace}-dp-day"
-          :class="dayClass(d)"
-          :disabled="d.type === 'other'"
-          type="button"
-          @click="selectDay(d)"
-        >{{ d.label }}</button>
-      </div>
-
-      <!-- Footer: today / clear -->
-      <div class="${namespace}-dp-footer">
-        <button class="${namespace}-dp-btn" type="button" @click="setToday">今天</button>
-        <button class="${namespace}-dp-btn" type="button" @click="clearValue">清除</button>
-      </div>
+  <div class="${namespace}-dp" :class="{[`${namespace}-dp--${r"${size}"}`]: size, '${namespace}-dp--open': open, '${namespace}-dp--disabled': disabled, '${namespace}-dp--has-value': hasValue}" ref="rootEl">
+    <div class="${namespace}-dp__trigger" :class="{'${namespace}-dp__trigger--ph': !hasValue}" @click="toggle" @keydown="onKeydown" tabindex="0">
+      {{ displayText }}
     </div>
+    <span class="${namespace}-dp__clear" @click.stop="clear">&times;</span>
+
+    <Teleport to="body">
+      <div v-if="open" class="${namespace}-dp__panel ${namespace}-dp__panel--open" :style="panelStyle" ref="panelEl" @click.stop>
+        <div class="${namespace}-dp__head">
+          <div class="${namespace}-dp__nav" @click="step(-1, true)">&laquo;</div>
+          <div class="${namespace}-dp__nav" @click="step(-1, false)">&lsaquo;</div>
+          <div class="${namespace}-dp__title" @click="drillUp">{{ titleText }}</div>
+          <div class="${namespace}-dp__nav" @click="step(1, false)">&rsaquo;</div>
+          <div class="${namespace}-dp__nav" @click="step(1, true)">&raquo;</div>
+        </div>
+
+        <template v-if="view === 'day'">
+          <div class="${namespace}-dp__weekdays">
+            <div class="${namespace}-dp__wd" v-for="w in weekdays" :key="w">{{ w }}</div>
+          </div>
+          <div class="${namespace}-dp__days">
+            <div v-for="d in dayCells" :key="d.ymd"
+              class="${namespace}-dp__day"
+              :class="{
+                '${namespace}-dp__day--other': d.isOther,
+                '${namespace}-dp__day--weekend': d.isWeekend,
+                '${namespace}-dp__day--today': d.isToday,
+                '${namespace}-dp__day--selected': d.isSelected,
+                '${namespace}-dp__day--disabled': d.isDisabled
+              }"
+              @click="pickDay(d)">{{ d.day }}</div>
+          </div>
+        </template>
+
+        <div v-if="view === 'month'" class="${namespace}-dp__my-grid">
+          <div v-for="m in 12" :key="m"
+            class="${namespace}-dp__my-item"
+            :class="{
+              '${namespace}-dp__my-item--selected': isMonthSelected(m - 1),
+              '${namespace}-dp__my-item--current': isMonthCurrent(m - 1)
+            }"
+            @click="pickMonth(m - 1)">{{ m }}月</div>
+        </div>
+
+        <div v-if="view === 'year'" class="${namespace}-dp__my-grid">
+          <div v-for="yr in yearRange" :key="yr"
+            class="${namespace}-dp__my-item"
+            :class="{
+              '${namespace}-dp__my-item--selected': yr === selectedYear,
+              '${namespace}-dp__my-item--current': yr === currentYear
+            }"
+            @click="pickYear(yr)">{{ yr }}</div>
+        </div>
+
+        <div class="${namespace}-dp__footer">
+          <span class="${namespace}-dp__today-btn" @click="pickToday">今天</span>
+          <span class="${namespace}-dp__clear-btn" @click="clear">清除</span>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 
 const props = defineProps({
-  modelValue: { type: String, default: null },
-  placeholder: { type: String, default: '请选择日期' },
-  disabled: { type: Boolean, default: false },
+  modelValue:  { type: String,  default: null },
+  placeholder: { type: String,  default: '请选择日期' },
+  disabled:    { type: Boolean, default: false },
+  size:        { type: String,  default: '' },
+  format:      { type: String,  default: 'YYYY-MM-DD' },
+  minDate:     { type: String,  default: null },
+  maxDate:     { type: String,  default: null },
 })
 
 const emit = defineEmits(['update:modelValue'])
 
+// ── helpers ──
+const ymd = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')
+
+const fmt = (d) => {
+  if (!d) return ''
+  return props.format
+    .replace('YYYY', d.getFullYear())
+    .replace('MM', String(d.getMonth() + 1).padStart(2, '0'))
+    .replace('DD', String(d.getDate()).padStart(2, '0'))
+}
+
+const parse = (s) => {
+  if (!s) return null
+  const n = s.replace(/\//g, '-').replace(/年|月/g, '-').replace(/日/g, '')
+  const d = new Date(n)
+  return isNaN(d.getTime()) ? null : d
+}
+
+const isOff = (d) => {
+  const s = ymd(d)
+  return (props.minDate && s < props.minDate) || (props.maxDate && s > props.maxDate)
+}
+
+// ── state ──
+const open = ref(false)
+const view = ref('day')
+const cursorDate = ref(new Date())
+const selectedDate = ref(null)
+const rootEl = ref(null)
+const panelEl = ref(null)
+const panelStyle = ref({})
+
 const weekdays = ['日', '一', '二', '三', '四', '五', '六']
 
-const rootEl = ref(null)
-const open = ref(false)
-const viewYear = ref(new Date().getFullYear())
-const viewMonth = ref(new Date().getMonth() + 1) // 1-based
-
-// Parse modelValue into { year, month, day } or null
-function parseDate(v) {
-  if (!v || typeof v !== 'string') return null
-  const m = v.match(/^(\d{4})-(\d{2})-(\d{2})$/)
-  if (!m) return null
-  return { year: +m[1], month: +m[2], day: +m[3] }
-}
-
-function formatDate(y, m, d) {
-  const mm = String(m).padStart(2, '0')
-  const dd = String(d).padStart(2, '0')
-  return `${r"${"}y${r"}"}-${r"${"}mm${r"}"}-${r"${"}dd${r"}"}`
-}
-
-// Today
-function today() {
-  const d = new Date()
-  return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() }
-}
-
-const selectedDate = ref(parseDate(props.modelValue))
-
-const displayValue = computed(() => {
-  if (selectedDate.value) {
-    return formatDate(selectedDate.value.year, selectedDate.value.month, selectedDate.value.day)
+// init
+if (props.modelValue) {
+  const d = parse(props.modelValue)
+  if (d) {
+    selectedDate.value = d
+    cursorDate.value = new Date(d.getFullYear(), d.getMonth(), 1)
   }
-  return ''
+}
+cursorDate.value.setDate(1)
+
+// ── sync from external ──
+watch(() => props.modelValue, (v) => {
+  const d = parse(v)
+  const cur = selectedDate.value ? ymd(selectedDate.value) : null
+  const ext = d ? ymd(d) : null
+  if (cur !== ext) {
+    selectedDate.value = d
+    if (d) cursorDate.value = new Date(d.getFullYear(), d.getMonth(), 1)
+  }
 })
 
-const headerLabel = computed(() => `${r"${"}viewYear.value${r"}"}年 ${r"${"}viewMonth.value${r"}"}月`)
+// ── computed ──
+const hasValue = computed(() => !!selectedDate.value)
+const displayText = computed(() => selectedDate.value ? fmt(selectedDate.value) : props.placeholder)
 
-// Days in a month
-function daysInMonth(y, m) {
-  return new Date(y, m, 0).getDate()
-}
+const titleText = computed(() => {
+  const y = cursorDate.value.getFullYear()
+  const m = cursorDate.value.getMonth()
+  if (view.value === 'day') return y + '年 ' + (m + 1) + '月'
+  if (view.value === 'month') return y + '年'
+  const base = Math.floor(y / 12) * 12
+  return base + ' — ' + (base + 11)
+})
 
-// First day of week for a month (0=Sun)
-function firstDayOfWeek(y, m) {
-  return new Date(y, m - 1, 1).getDay()
-}
+const dayCells = computed(() => {
+  const y = cursorDate.value.getFullYear()
+  const m = cursorDate.value.getMonth()
+  const today = ymd(new Date())
+  const sel = selectedDate.value ? ymd(selectedDate.value) : null
 
-const days = computed(() => {
-  const y = viewYear.value
-  const m = viewMonth.value
-  const total = daysInMonth(y, m)
-  const firstDow = firstDayOfWeek(y, m)
-  const lastMonthTotal = daysInMonth(m === 1 ? y - 1 : y, m === 1 ? 12 : m - 1)
+  const sd = new Date(y, m, 1).getDay()
+  const dim = new Date(y, m + 1, 0).getDate()
+  const dip = new Date(y, m, 0).getDate()
+  const total = Math.ceil((sd + dim) / 7) * 7
 
-  const result = []
-
-  // Previous month filler
-  for (let i = firstDow - 1; i >= 0; i--) {
-    result.push({ label: lastMonthTotal - i, type: 'other' })
-  }
-
-  // Current month
-  for (let d = 1; d <= total; d++) {
-    result.push({ label: d, type: 'current', year: y, month: m, day: d })
-  }
-
-  // Next month filler
-  const remaining = 7 - (result.length % 7)
-  if (remaining < 7) {
-    for (let d = 1; d <= remaining; d++) {
-      result.push({ label: d, type: 'other' })
+  const cells = []
+  for (let i = 0; i < total; i++) {
+    let date, isOther = false
+    if (i < sd) {
+      date = new Date(y, m - 1, dip - sd + 1 + i)
+      isOther = true
+    } else if (i >= sd + dim) {
+      date = new Date(y, m + 1, i - sd - dim + 1)
+      isOther = true
+    } else {
+      date = new Date(y, m, i - sd + 1)
     }
+    const dw = date.getDay()
+    const ymdVal = ymd(date)
+    cells.push({
+      ymd: ymdVal,
+      day: date.getDate(),
+      isOther,
+      isWeekend: dw === 0 || dw === 6,
+      isToday: ymdVal === today,
+      isSelected: ymdVal === sel,
+      isDisabled: isOff(date),
+    })
   }
-
-  return result
+  return cells
 })
 
-function dayClass(d) {
-  if (d.type === 'other') return '${namespace}-dp-day--other'
+const yearRange = computed(() => {
+  const base = Math.floor(cursorDate.value.getFullYear() / 12) * 12
+  return Array.from({ length: 12 }, (_, i) => base + i)
+})
 
-  const t = today()
-  const isToday = d.year === t.year && d.month === t.month && d.day === t.day
-  const isSelected = selectedDate.value &&
-    d.year === selectedDate.value.year &&
-    d.month === selectedDate.value.month &&
-    d.day === selectedDate.value.day
+const selectedYear = computed(() => selectedDate.value ? selectedDate.value.getFullYear() : null)
+const currentYear = new Date().getFullYear()
 
-  return {
-    '${namespace}-dp-day--today': isToday,
-    '${namespace}-dp-day--selected': isSelected,
-  }
+function isMonthSelected(m) {
+  if (!selectedDate.value) return false
+  return selectedDate.value.getFullYear() === cursorDate.value.getFullYear() && selectedDate.value.getMonth() === m
 }
 
-function selectDay(d) {
-  if (d.type !== 'current') return
-  const date = { year: d.year, month: d.month, day: d.day }
-  selectedDate.value = date
-  emit('update:modelValue', formatDate(date.year, date.month, date.day))
-  closePanel()
+function isMonthCurrent(m) {
+  const now = new Date()
+  return now.getFullYear() === cursorDate.value.getFullYear() && now.getMonth() === m
 }
 
-function setToday() {
-  const t = today()
-  viewYear.value = t.year
-  viewMonth.value = t.month
-  selectedDate.value = t
-  emit('update:modelValue', formatDate(t.year, t.month, t.day))
-  closePanel()
-}
-
-function clearValue() {
-  selectedDate.value = null
-  emit('update:modelValue', null)
-  closePanel()
-}
-
-function prevMonth() {
-  if (viewMonth.value === 1) {
-    viewYear.value--
-    viewMonth.value = 12
-  } else {
-    viewMonth.value--
-  }
-}
-
-function nextMonth() {
-  if (viewMonth.value === 12) {
-    viewYear.value++
-    viewMonth.value = 1
-  } else {
-    viewMonth.value++
-  }
-}
-
-function togglePanel() {
+// ── actions ──
+function toggle() {
   if (props.disabled) return
-  open.value = !open.value
-  if (open.value) {
-    syncViewToSelected()
-  }
+  open.value ? closePanel() : openPanel()
+}
+
+function openPanel() {
+  // close other datepickers
+  document.querySelectorAll('.${namespace}-dp--open').forEach(el => {
+    if (el !== rootEl.value && el._bnrDpClose) el._bnrDpClose()
+  })
+  open.value = true
+  nextTick(() => positionPanel())
 }
 
 function closePanel() {
   open.value = false
 }
 
-function syncViewToSelected() {
-  const d = selectedDate.value || today()
-  viewYear.value = d.year
-  viewMonth.value = d.month
-}
+function positionPanel() {
+  if (!rootEl.value || !panelEl.value) return
+  const rect = rootEl.value.querySelector('.${namespace}-dp__trigger').getBoundingClientRect()
+  const pw = panelEl.value.offsetWidth || 260
+  const ph = panelEl.value.offsetHeight || 280
+  const spaceRight = window.innerWidth - rect.left
+  const spaceBelow = window.innerHeight - rect.bottom
 
-// Click outside to close
-function onDocClick(e) {
-  if (rootEl.value && !rootEl.value.contains(e.target)) {
-    closePanel()
+  const style = { position: 'fixed', zIndex: '99999' }
+  if (spaceBelow >= ph || spaceBelow >= 120) {
+    style.top = (rect.bottom + 2) + 'px'
+  } else {
+    style.bottom = (window.innerHeight - rect.top + 2) + 'px'
   }
+  if (spaceRight >= pw) {
+    style.left = rect.left + 'px'
+  } else {
+    style.right = (window.innerWidth - rect.right) + 'px'
+  }
+  panelStyle.value = style
 }
 
-// Keep view synced with external modelValue changes
-watch(() => props.modelValue, (v) => {
-  const parsed = parseDate(v)
-  selectedDate.value = parsed
-  if (parsed) {
-    viewYear.value = parsed.year
-    viewMonth.value = parsed.month
+function pickDay(d) {
+  if (d.isDisabled) return
+  const date = new Date(d.ymd)
+  selectedDate.value = date
+  cursorDate.value = new Date(date.getFullYear(), date.getMonth(), 1)
+  emit('update:modelValue', fmt(date))
+  closePanel()
+}
+
+function pickMonth(m) {
+  cursorDate.value = new Date(cursorDate.value.getFullYear(), m, 1)
+  view.value = 'day'
+}
+
+function pickYear(yr) {
+  cursorDate.value = new Date(yr, cursorDate.value.getMonth(), 1)
+  view.value = 'month'
+}
+
+function step(dir, byYear) {
+  const cur = cursorDate.value
+  if (view.value === 'day') {
+    byYear ? cur.setFullYear(cur.getFullYear() + dir) : cur.setMonth(cur.getMonth() + dir)
+  } else if (view.value === 'month') {
+    cur.setFullYear(cur.getFullYear() + dir)
+  } else {
+    cur.setFullYear(cur.getFullYear() + dir * 12)
+  }
+  cursorDate.value = new Date(cur)
+}
+
+function drillUp() {
+  if (view.value === 'day') view.value = 'month'
+  else if (view.value === 'month') view.value = 'year'
+}
+
+function pickToday() {
+  const today = new Date()
+  if (isOff(today)) return
+  selectedDate.value = today
+  cursorDate.value = new Date(today.getFullYear(), today.getMonth(), 1)
+  view.value = 'day'
+  emit('update:modelValue', fmt(today))
+  closePanel()
+}
+
+function clear() {
+  selectedDate.value = null
+  emit('update:modelValue', null)
+  closePanel()
+}
+
+function onKeydown(e) {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle() }
+  else if (e.key === 'Escape') closePanel()
+  else if (e.key === 'Tab') closePanel()
+}
+
+// ── outside click ──
+function onDocClick(e) {
+  if (rootEl.value && !rootEl.value.contains(e.target) && !(panelEl.value && panelEl.value.contains(e.target))) closePanel()
+}
+watch(open, (v) => {
+  if (v) {
+    document.addEventListener('click', onDocClick, true)
+    window.addEventListener('scroll', positionPanel, true)
+    window.addEventListener('resize', positionPanel)
+  } else {
+    document.removeEventListener('click', onDocClick, true)
+    window.removeEventListener('scroll', positionPanel, true)
+    window.removeEventListener('resize', positionPanel)
   }
 })
 
 onMounted(() => {
-  document.addEventListener('click', onDocClick, true)
+  if (rootEl.value) rootEl.value._bnrDpClose = closePanel
 })
 
 onBeforeUnmount(() => {
+  if (rootEl.value) delete rootEl.value._bnrDpClose
   document.removeEventListener('click', onDocClick, true)
+  window.removeEventListener('scroll', positionPanel, true)
+  window.removeEventListener('resize', positionPanel)
 })
-</script>
 
+defineExpose({ openPanel, closePanel, clear })
+</script>
 <style scoped>
+/* BNR Datepicker — ${namespace}-datepicker.css */
+/* Namespace: ${namespace}-dp */
+
 .${namespace}-dp {
   position: relative;
   display: inline-flex;
-  align-items: center;
-  width: 100%;
-  min-width: 0;
+  min-width: 140px;
+  font-family: var(--${namespace}-font, "Microsoft YaHei", sans-serif);
+  font-size: 12px;
+  user-select: none;
+  flex: 1;
 }
 
-/* ── Input ── */
-.${namespace}-dp-input {
+.${namespace}-dp__trigger {
   flex: 1;
   height: 22px;
-  border: 1px solid var(--${namespace}-border);
-  font-size: 12px;
-  font-family: var(--${namespace}-font);
-  padding: 0 22px 0 5px;
-  background: var(--${namespace}-bg);
-  color: var(--${namespace}-text);
-  outline: none;
-  min-width: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 26px 0 5px;
+  border: 1px solid var(--${namespace}-border, #c8c8c8);
+  background: #fff;
+  color: var(--${namespace}-text, #1c2833);
   cursor: pointer;
-  border-radius: var(--${namespace}-radius-sm);
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: border-color .15s;
 }
-.${namespace}-dp-input:focus {
-  border-color: var(--${namespace}-primary);
+.${namespace}-dp__trigger::after {
+  content: '\25A6';
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: var(--${namespace}-text-muted, #5d6d7e);
+  pointer-events: none;
+}
+.${namespace}-dp--open .${namespace}-dp__trigger {
+  border-color: var(--${namespace}-primary, #1a4f8a);
   box-shadow: 0 0 0 2px rgba(26,79,138,.08);
 }
-.${namespace}-dp-input::placeholder {
-  color: var(--${namespace}-text-light);
-}
-.${namespace}-dp-input:disabled {
+.${namespace}-dp--disabled .${namespace}-dp__trigger {
   background: #f5f7fa;
-  color: var(--${namespace}-text-disabled);
+  color: var(--${namespace}-text-muted, #5d6d7e);
   cursor: not-allowed;
 }
+.${namespace}-dp__trigger--placeholder { color: var(--${namespace}-text-light, #909eac); }
 
-/* ── Trigger icon ── */
-.${namespace}-dp-trigger {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--${namespace}-text-muted);
-  font-size: 13px;
-  border: none;
-  background: none;
-  padding: 0;
-  line-height: 1;
-}
-.${namespace}-dp-trigger:hover {
-  color: var(--${namespace}-primary);
-}
-.${namespace}-dp-trigger:disabled,
-.${namespace}-dp--disabled .${namespace}-dp-trigger {
-  cursor: not-allowed;
-  color: var(--${namespace}-text-disabled);
-}
+.${namespace}-dp__clear { display: none !important; }
 
-/* ── Dropdown panel ── */
-.${namespace}-dp-panel {
+
+.${namespace}-dp__panel {
+  display: none;
   position: absolute;
-  top: 100%;
+  top: calc(100% + 2px);
   left: 0;
-  z-index: 1000;
-  margin-top: 2px;
-  background: var(--${namespace}-bg);
-  border: 1px solid var(--${namespace}-border);
-  border-radius: var(--${namespace}-radius-md);
+  background: #fff;
+  border: 1px solid var(--${namespace}-primary-border, #d0d8e8);
   box-shadow: 0 4px 12px rgba(0,0,0,.12);
-  padding: 6px 8px 8px;
-  width: 230px;
-  user-select: none;
+  z-index: 9999;
+  width: 224px;
 }
+.${namespace}-dp--open .${namespace}-dp__panel { display: block; }
+.${namespace}-dp__panel--open { display: block; }
 
-/* ── Header (month/year + nav) ── */
-.${namespace}-dp-header {
+.${namespace}-dp__head {
+  background: var(--${namespace}-primary, #1a4f8a);
+  color: #fff;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding-bottom: 6px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid var(--${namespace}-border-light);
+  height: 28px;
+  padding: 0 4px;
+  gap: 2px;
 }
-
-.${namespace}-dp-header-label {
-  font-size: 13px;
-  font-weight: bold;
-  color: var(--${namespace}-text);
-  cursor: default;
-  min-width: 90px;
-  text-align: center;
-}
-
-.${namespace}-dp-nav {
+.${namespace}-dp__nav {
   width: 22px;
   height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border: none;
-  background: none;
-  border-radius: var(--${namespace}-radius-sm);
-  font-size: 12px;
-  color: var(--${namespace}-text-muted);
-  padding: 0;
-  line-height: 1;
+  border-radius: 2px;
+  font-size: 13px;
+  flex-shrink: 0;
+  color: rgba(255,255,255,.85);
 }
-.${namespace}-dp-nav:hover {
-  background: var(--${namespace}-primary-bg);
-  color: var(--${namespace}-primary);
-}
-
-/* ── Weekday row ── */
-.${namespace}-dp-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+.${namespace}-dp__nav:hover { background: rgba(255,255,255,.2); color: #fff; }
+.${namespace}-dp__title {
+  flex: 1;
   text-align: center;
-  margin-bottom: 2px;
-}
-
-.${namespace}-dp-weekday {
-  font-size: 11px;
-  color: var(--${namespace}-text-light);
-  padding: 3px 0;
+  font-size: 12px;
   font-weight: bold;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 2px;
 }
+.${namespace}-dp__title:hover { background: rgba(255,255,255,.15); }
 
-/* ── Day grid ── */
-.${namespace}-dp-days {
+.${namespace}-dp__weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  background: var(--${namespace}-primary-bg, #e8edf5);
+  border-bottom: 1px solid var(--${namespace}-primary-border, #d0d8e8);
+}
+.${namespace}-dp__wd {
+  text-align: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--${namespace}-primary, #1a4f8a);
+  padding: 3px 0;
+}
+.${namespace}-dp__wd:first-child,
+.${namespace}-dp__wd:last-child { color: var(--${namespace}-danger, #c0392b); }
+
+.${namespace}-dp__days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 3px;
   gap: 1px;
 }
-
-.${namespace}-dp-day {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 26px;
-  font-size: 12px;
+.${namespace}-dp__day {
+  text-align: center;
+  font-size: 11px;
+  padding: 4px 0;
   cursor: pointer;
-  border-radius: var(--${namespace}-radius-sm);
-  color: var(--${namespace}-text);
-  border: none;
-  background: none;
-  font-family: var(--${namespace}-font);
-  padding: 0;
+  border-radius: 2px;
+  color: var(--${namespace}-text, #1c2833);
+  line-height: 1.4;
 }
-.${namespace}-dp-day:hover {
-  background: var(--${namespace}-primary-bg);
-  color: var(--${namespace}-primary);
+.${namespace}-dp__day:hover:not(.${namespace}-dp__day--disabled) {
+  background: var(--${namespace}-primary-bg, #e8edf5);
+  color: var(--${namespace}-primary, #1a4f8a);
 }
-
-/* Other-month filler */
-.${namespace}-dp-day--other {
-  color: var(--${namespace}-text-disabled);
-  cursor: default;
-}
-.${namespace}-dp-day--other:hover {
-  background: none;
-  color: var(--${namespace}-text-disabled);
-}
-
-/* Today */
-.${namespace}-dp-day--today {
+.${namespace}-dp__day--other { color: var(--${namespace}-text-light, #909eac); }
+.${namespace}-dp__day--today {
   font-weight: bold;
-  color: var(--${namespace}-primary);
-  border: 1px solid var(--${namespace}-primary);
+  color: var(--${namespace}-primary, #1a4f8a);
+  border: 1px solid var(--${namespace}-primary-border, #d0d8e8);
 }
-
-/* Selected */
-.${namespace}-dp-day--selected {
-  background: var(--${namespace}-primary) !important;
+.${namespace}-dp__day--selected {
+  background: var(--${namespace}-primary, #1a4f8a) !important;
   color: #fff !important;
   font-weight: bold;
 }
-
-/* ── Footer (today + clear) ── */
-.${namespace}-dp-footer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 6px;
-  padding-top: 6px;
-  border-top: 1px solid var(--${namespace}-border-light);
-  gap: 4px;
+.${namespace}-dp__day--disabled {
+  color: var(--${namespace}-text-disabled, #c8d0d8);
+  cursor: not-allowed;
 }
+.${namespace}-dp__day--weekend { color: var(--${namespace}-danger, #c0392b); }
+.${namespace}-dp__day--weekend.${namespace}-dp__day--selected { color: #fff !important; }
 
-.${namespace}-dp-btn {
-  height: 20px;
-  padding: 0 8px;
+.${namespace}-dp__my-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 6px;
+  gap: 3px;
+}
+.${namespace}-dp__my-item {
+  text-align: center;
   font-size: 11px;
-  font-family: var(--${namespace}-font);
-  border: 1px solid var(--${namespace}-border);
-  border-radius: var(--${namespace}-radius-sm);
+  padding: 5px 2px;
   cursor: pointer;
-  background: var(--${namespace}-bg);
-  color: #333;
-  display: inline-flex;
-  align-items: center;
+  border-radius: 2px;
+  color: var(--${namespace}-text, #1c2833);
 }
-.${namespace}-dp-btn:hover {
-  background: var(--${namespace}-primary-bg);
-  color: var(--${namespace}-primary);
-  border-color: var(--${namespace}-primary-border);
-}
+.${namespace}-dp__my-item:hover { background: var(--${namespace}-primary-bg, #e8edf5); color: var(--${namespace}-primary, #1a4f8a); }
+.${namespace}-dp__my-item--selected { background: var(--${namespace}-primary, #1a4f8a); color: #fff; font-weight: bold; }
+.${namespace}-dp__my-item--current { font-weight: bold; color: var(--${namespace}-primary, #1a4f8a); }
 
+.${namespace}-dp__footer {
+  border-top: 1px solid var(--${namespace}-border-light, #e4e8f0);
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--${namespace}-bg-page, #f0f2f5);
+}
+.${namespace}-dp__today-btn {
+  font-size: 11px;
+  color: var(--${namespace}-primary, #1a4f8a);
+  cursor: pointer;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+.${namespace}-dp__today-btn:hover { background: var(--${namespace}-primary-bg, #e8edf5); }
+.${namespace}-dp__clear-btn {
+  font-size: 11px;
+  color: var(--${namespace}-text-muted, #5d6d7e);
+  cursor: pointer;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+.${namespace}-dp__clear-btn:hover { color: var(--${namespace}-danger, #c0392b); background: var(--${namespace}-danger-bg, #fcecea); }
+
+.${namespace}-dp--sm .${namespace}-dp__trigger { height: 20px; font-size: 11px; }
+.${namespace}-dp--lg .${namespace}-dp__trigger { height: 28px; font-size: 13px; }
+.${namespace}-dp--block { display: flex; width: 100%; }
 </style>

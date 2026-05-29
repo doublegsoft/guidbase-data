@@ -342,6 +342,12 @@ onBeforeUnmount(() => {
   color: var(--${namespace}-primary);
   font-weight: bold;
 }
+.${namespace}-dd-option--selected::after {
+  content: '✓';
+  margin-left: auto;
+  font-size: 11px;
+  flex-shrink: 0;
+}
 .${namespace}-dd-option--disabled {
   color: var(--${namespace}-text-disabled);
   cursor: not-allowed;
