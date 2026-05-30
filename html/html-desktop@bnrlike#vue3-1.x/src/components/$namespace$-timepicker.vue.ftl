@@ -19,7 +19,6 @@
       @click="toggleOpen"
       @keydown="onTriggerKey"
     >
-      <span class="${namespace}-tp__icon">&#x1F554;</span>
       <span class="${namespace}-tp__text" :style="{ color: displayValue ? '' : '#909eac' }">
         {{ displayValue || placeholder }}
       </span>

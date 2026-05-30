@@ -215,7 +215,7 @@ defineExpose({
   flex-wrap: wrap;
   align-items: center;
   gap: 4px;
-  min-height: 26px;
+  min-height: 24px;
   border: 1px solid #c8c8c8;
   border-radius: 2px;
   background: #fff;

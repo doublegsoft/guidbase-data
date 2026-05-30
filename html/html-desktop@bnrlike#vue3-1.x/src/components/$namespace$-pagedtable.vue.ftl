@@ -36,7 +36,7 @@
           </tbody>
         </table>
       </div>
-      <BnrPagination
+      <${namespace}-pagination
         :total="displayData.length"
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
@@ -52,7 +52,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import BnrPagination from './BnrPagination.vue'
+import ${js.nameType(namespace)}Pagination from './${namespace}-pagination.vue'
 
 const props = defineProps({
   data:         { type: Array,    default: () => [] },

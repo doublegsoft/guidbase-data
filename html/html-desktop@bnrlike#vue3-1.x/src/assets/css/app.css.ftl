@@ -106,6 +106,12 @@ html, body {
   /* -- Radius -- */
   --${namespace}-radius-sm: 2px;
   --${namespace}-radius-md: 4px;
+
+  --${namespace}-p: #1a4f8a; --${namespace}-pd: #15407a; --${namespace}-ph: #d0e0f5;
+  --${namespace}-pb: #e8edf5; --${namespace}-pbd: #d0d8e8;
+  --${namespace}-bl: #e4e8f0; --${namespace}-bd: #c8c8c8; --${namespace}-bg: #fff; --${namespace}-bgp: #f0f2f5;
+  --${namespace}-t: #1c2833; --${namespace}-tm: #5d6d7e; --${namespace}-tl: #909eac;
+  --${namespace}-rb: #fcecea; --${namespace}-ob: #fef3e6;
 }
 
 /* ══════════════════════════════════════════════
@@ -575,6 +581,12 @@ html, body {
 .${namespace}-input--error,
 .${namespace}-select--error   { border-color: var(--${namespace}-danger) !important; background: var(--${namespace}-danger-bg); }
 
+.${namespace}-field-unit {
+  font-size: 10px; 
+  color: rgb(144, 158, 172); 
+  margin-left: 4px;
+}
+
 .${namespace}-textarea {
   height: auto;
   padding: 3px 5px;
@@ -620,6 +632,20 @@ html, body {
   color: var(--${namespace}-warning);
 }
 .${namespace}-edit-bar::before { content: "✏"; margin-right: 2px; }
+
+.${namespace}-form-footer { 
+  position: sticky; 
+  bottom: 0; 
+  z-index: 100; 
+  display: flex; 
+  align-items: 
+  center; 
+  gap: 8px; 
+  padding: 10px 14px; 
+  background: #fff; 
+  border-top: 2px solid var(--bnr-primary); 
+  box-shadow: 0 -2px 8px rgba(0,0,0,.08); 
+}
 
 /* ══════════════════════════════════════════════
    11. Buttons
@@ -684,6 +710,10 @@ html, body {
 /* Sizes */
 .${namespace}-btn--sm { height: 20px; padding: 0 6px; font-size: 11px; }
 .${namespace}-btn--lg { height: 28px; padding: 0 14px; font-size: 12px; font-weight: bold; }
+
+.${namespace}-btn-gap {
+  margin-left: 6px;
+}
 
 /* ══════════════════════════════════════════════
    12. Badge / Tag

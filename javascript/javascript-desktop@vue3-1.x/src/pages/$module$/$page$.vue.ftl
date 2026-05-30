@@ -21,6 +21,7 @@ onMounted(async () => {
 <#list page.widgets as widget>
   <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
   <#if (widget.type != "select" && widget.type != "multiselect" && widget.type != "cascade") || (widget.value("data")!"")?starts_with("enum[")><#continue></#if>
+  <#if !widget.ancestor("entry_form")??><#continue></#if>
   <#assign visited_widgets += {widget.id: widget}>
   ${js.nameVariable(widget.id)}Options.value = await sdk.fetch${js.nameType(widget.id)}Options();
 </#list>
