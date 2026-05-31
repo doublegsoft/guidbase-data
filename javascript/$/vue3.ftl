@@ -96,6 +96,7 @@ ${""?left_pad(indent)}  render: v => `<span style="font-family:Consolas,monospac
   </#list>
 ${""?left_pad(indent)}}])
 ${""?left_pad(indent)}const ${js.nameVariable(table.id)}Rows = ref([])
+${""?left_pad(indent)}const ${js.nameVariable(table.id)}Total = ref(0)
 </#macro>
 
 <#macro print_paged_table_methods table indent=0>
@@ -103,10 +104,13 @@ ${""?left_pad(indent)}const ${js.nameVariable(table.id)}Rows = ref([])
 /**
  * 加载数据的界面函数
  */
-const load${js.nameType(table.id)}Rows = async () => {
+const load${js.nameType(table.id)}Rows = async (pageNumber, pageSize) => {
   isLoading.value = true
   try {
-    const data = await fetchUserDataApi()
+    console.log(pageNumber);
+    const res = await sdk.fetch${js.nameType(table.id)}Rows((pageNumber - 1) * pageSize, pageSize)
+    ${js.nameVariable(table.id)}Rows.value = res.data
+    ${js.nameVariable(table.id)}Total.value = res.total
   } catch (error) {
     // TODO: 这里可以添加错误处理逻辑，例如显示错误消息
   } finally {
@@ -115,12 +119,14 @@ const load${js.nameType(table.id)}Rows = async () => {
 }
 </#macro>
 
-<#macro print_layout_paged_table widget indent=0>
+<#macro print_layout_paged_table table indent=0>
 ${""?left_pad(indent)}<${namespace}-pagedtable
-${""?left_pad(indent)}  ref="${js.nameVariable(widget.id)}Ref"
+${""?left_pad(indent)}  ref="${js.nameVariable(table.id)}Ref"
 ${""?left_pad(indent)}  style="flex:1"
-${""?left_pad(indent)}  :data="filteredData"
-${""?left_pad(indent)}  :columns="${js.nameVariable(widget.id)}Cols"
+${""?left_pad(indent)}  :columns="${js.nameVariable(table.id)}Cols"
+${""?left_pad(indent)}  :data="${js.nameVariable(table.id)}Rows"
+${""?left_pad(indent)}  :total="${js.nameVariable(table.id)}Total"
+${""?left_pad(indent)}  :fetchData="load${js.nameType(table.id)}Rows"
 ${""?left_pad(indent)}  id-key="personId"
 ${""?left_pad(indent)}  :row-class-name="getRowClass"
 ${""?left_pad(indent)}  @selection-change="handleSelection" />
@@ -186,7 +192,7 @@ import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsin
 <@print_layout_entry_form widget=widget indent=indent+2 />    
   <#elseif widget.type == "view_form">
   <#elseif widget.type == "paged_table">
-<@print_layout_paged_table widget=widget indent=indent+2 />    
+<@print_layout_paged_table table=widget indent=indent+2 />    
   <#elseif widget.type == "buttons">
 <@print_layout_buttons widget=widget indent=indent+2 />  
   <#elseif widget.type == "select">

@@ -37,11 +37,11 @@
         </table>
       </div>
       <${namespace}-pagination
-        :total="displayData.length"
+        :total="paginationTotal"
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
         :page-sizes="[10, 20, 50, 100]"
-        @change="scrollToTop"
+        @change="onPageChange"
       />
     </div>
     <div class="${namespace}-drawer" :class="{ '${namespace}-drawer-closed': !drawerOpen }" @click="onDrawerClick">
@@ -62,6 +62,10 @@ const props = defineProps({
   idKey:        { type: String,   default: 'id' },
   rowClassName: { type: Function, default: null },
   drawerRender: { type: Function, default: null },
+  // 服务端分页模式：传入 fetchData 后，页码/页大小/排序变化时自动调用，参数 { currentPage, pageSize, sortKey, sortAsc }
+  fetchData:    { type: Function, default: null },
+  // 服务端分页模式：数据总条数（用于分页条显示）
+  total:        { type: Number,   default: 0 },
 })
 
 const emit = defineEmits(['update:currentPage', 'update:pageSize', 'selection-change', 'row-click'])
@@ -76,7 +80,7 @@ const drawerRow = ref(null)
 const scrollContainer = ref(null)
 
 watch(() => props.data, () => {
-  currentPage.value = 1
+  if (!isServerMode.value) currentPage.value = 1
 })
 
 watch(() => props.currentPage, (v) => {
@@ -87,7 +91,10 @@ watch(() => props.pageSize, (v) => {
   pageSize.value = v
 })
 
+const isServerMode = computed(() => typeof props.fetchData === 'function')
+
 const displayData = computed(() => {
+  if (isServerMode.value) return props.data
   const arr = [...props.data]
   if (sortKey.value) {
     arr.sort((a, b) => {
@@ -101,9 +108,12 @@ const displayData = computed(() => {
 })
 
 const pageData = computed(() => {
+  if (isServerMode.value) return props.data
   const start = (currentPage.value - 1) * pageSize.value
   return displayData.value.slice(start, start + pageSize.value)
 })
+
+const paginationTotal = computed(() => isServerMode.value ? props.total : displayData.value.length)
 
 const isAllChecked = computed(() =>
   pageData.value.length > 0 && pageData.value.every(r => selectedIds.value.has(String(r[props.idKey])))
@@ -123,7 +133,20 @@ function toggleSort(key) {
     sortKey.value = key
     sortAsc.value = true
   }
+  if (isServerMode.value) {
+    currentPage.value = 1
+    // props.fetchData({ currentPage: 1, pageSize: pageSize.value, sortKey: sortKey.value, sortAsc: sortAsc.value })
+    props.fetchData(1, pageSize.value)
+  }
   scrollToTop()
+}
+
+function onPageChange({ currentPage: cp, pageSize: ps }) {
+  scrollToTop()
+  if (isServerMode.value) {
+    // props.fetchData({ pageNumber: cp, pageSize: ps, sortKey: sortKey.value, sortAsc: sortAsc.value })
+    props.fetchData(cp, ps)
+  }
 }
 
 function toggleAll(checked) {
@@ -177,7 +200,26 @@ defineExpose({
   },
 })
 </script>
+
+<style>
+:root {
+  --${namespace}-p: #1a4f8a; --${namespace}-pd: #15407a; --${namespace}-ph: #d0e0f5;
+  --${namespace}-pb: #e8edf5; --${namespace}-pbd: #d0d8e8;
+  --${namespace}-bl: #e4e8f0; --${namespace}-bd: #c8c8c8; --${namespace}-bg: #fff; --${namespace}-bgp: #f0f2f5;
+  --${namespace}-t: #1c2833; --${namespace}-tm: #5d6d7e; --${namespace}-tl: #909eac;
+  --${namespace}-rb: #fcecea; --${namespace}-ob: #fef3e6;
+}
+
+.vue-${namespace}-wrapper {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
+</style>
+
 <style scoped>
+/* 核心布局 */
 .${namespace}-page-table {
   flex: 1;
   display: flex;
@@ -188,11 +230,10 @@ defineExpose({
 .${namespace}-list-area {
   flex: 1;
   display: flex;
-  flex-direction: column; /* 垂直排布 */
+  flex-direction: column;
   overflow: hidden;
 }
 
-/* 滚动区域: 占用除了分页外的所有剩余空间 */
 .${namespace}-table-container {
   flex: 1;
   overflow: auto;
@@ -200,30 +241,16 @@ defineExpose({
   background: #fff;
 }
 
-/* 固定在底部的分页栏 */
-.${namespace}-pagination {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 14px;
-  background: #fff;
-  border-top: 1px solid var(--${namespace}-bd);
-  font-size: 12px;
-  color: var(--${namespace}-t);
-  z-index: 20;
-}
-/* 表格样式 */
+/* 表格 */
 .${namespace}-table {
   width: 100%;
   table-layout: fixed;
-  border-collapse: separate; /* 必须用 separate 才能完美兼容 sticky header 的边框 */
+  border-collapse: separate;
   border-spacing: 0;
   font-size: 13px;
   color: var(--${namespace}-t);
 }
 
-/* 表头固定在顶部 */
 .${namespace}-table thead th {
   position: sticky;
   top: 0;
@@ -234,22 +261,20 @@ defineExpose({
   font-weight: bold;
   text-align: left;
   white-space: nowrap;
-
-  /* 解决 border-collapse: separate 带来的边框问题 */
   border-bottom: 1px solid var(--${namespace}-pbd);
   border-right: 1px solid var(--${namespace}-pbd);
 }
-/* 补充左上边框 */
+
 .${namespace}-table thead th:first-child { border-left: 1px solid var(--${namespace}-pbd); }
 .${namespace}-table thead th:last-child { border-right: none; }
 
 .${namespace}-table thead th.${namespace}-sortable { cursor: pointer; user-select: none; }
 .${namespace}-table thead th.${namespace}-sortable:hover { background: var(--${namespace}-ph); }
+
 .${namespace}-sort-icon { font-size: 10px; margin-left: 4px; opacity: 0.4; }
 .${namespace}-table thead th.${namespace}-asc .${namespace}-sort-icon::after { content: '▲'; opacity: 1; }
 .${namespace}-table thead th.${namespace}-desc .${namespace}-sort-icon::after { content: '▼'; opacity: 1; }
 
-/* 表身单元格 */
 .${namespace}-table tbody td {
   padding: 6px 10px;
   border-bottom: 1px solid var(--${namespace}-bl);
@@ -266,21 +291,83 @@ defineExpose({
 .${namespace}-table tbody tr.${namespace}-selected td { background: #e0edff; }
 .${namespace}-table tbody tr.${namespace}-danger td { background: var(--${namespace}-rb); }
 .${namespace}-table tbody tr.${namespace}-warning td { background: var(--${namespace}-ob); }
-.${namespace}-table tbody tr.${namespace}-danger:hover td, .${namespace}-table tbody tr.${namespace}-warning:hover td { background: #eef5ff; }
+.${namespace}-table tbody tr.${namespace}-danger:hover td,
+.${namespace}-table tbody tr.${namespace}-warning:hover td { background: #eef5ff; }
 
-/* 分页子组件样式 */
-.${namespace}-pg-info { display: flex; align-items: center; gap: 5px; color: var(--${namespace}-tm); margin-right: auto; }
-.${namespace}-pg-size { height: 24px; border: 1px solid var(--${namespace}-bd); padding: 0 4px; border-radius: 2px; outline: none; }
-.${namespace}-pg-controls { display: flex; align-items: center; gap: 4px; }
-.${namespace}-pg-btn {
-  height: 24px; min-width: 24px; padding: 0 6px;
-  background: #fff; border: 1px solid var(--${namespace}-bd);
-  color: var(--${namespace}-t); border-radius: 2px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
+.${namespace}-tc { text-align: center; }
+
+/* 分页 — 穿透 BnrPagination 子组件 */
+.${namespace}-list-area :deep(.${namespace}-pagination) {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  background: #fff;
+  border-top: 1px solid var(--${namespace}-bd);
+  font-size: 12px;
+  color: var(--${namespace}-t);
+  z-index: 20;
 }
-.${namespace}-pg-btn:hover:not(:disabled) { border-color: var(--${namespace}-p); color: var(--${namespace}-p); }
-.${namespace}-pg-btn.${namespace}-on { background: var(--${namespace}-p); color: #fff; border-color: var(--${namespace}-p); }
-.${namespace}-pg-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #f5f5f5; }
+
+.${namespace}-list-area :deep(.${namespace}-pg-info) {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--${namespace}-tm);
+  margin-right: auto;
+}
+
+.${namespace}-list-area :deep(.${namespace}-pg-size) {
+  height: 24px;
+  border: 1px solid var(--${namespace}-bd);
+  padding: 0 4px;
+  border-radius: 2px;
+  outline: none;
+}
+
+.${namespace}-list-area :deep(.${namespace}-pg-controls) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.${namespace}-list-area :deep(.${namespace}-pg-btn) {
+  height: 24px;
+  min-width: 24px;
+  padding: 0 6px;
+  background: #fff;
+  border: 1px solid var(--${namespace}-bd);
+  color: var(--${namespace}-t);
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.${namespace}-list-area :deep(.${namespace}-pg-btn:hover:not(:disabled)) {
+  border-color: var(--${namespace}-p);
+  color: var(--${namespace}-p);
+}
+
+.${namespace}-list-area :deep(.${namespace}-pg-btn.${namespace}-on) {
+  background: var(--${namespace}-p);
+  color: #fff;
+  border-color: var(--${namespace}-p);
+}
+
+.${namespace}-list-area :deep(.${namespace}-pg-btn:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f5f5f5;
+}
+
+.${namespace}-list-area :deep(.${namespace}-pg-ellipsis) {
+  font-size: 12px;
+  color: var(--${namespace}-tl);
+  padding: 0 2px;
+}
 
 /* 右侧抽屉 */
 .${namespace}-drawer {
@@ -295,18 +382,72 @@ defineExpose({
   box-shadow: -2px 0 8px rgba(0,0,0,0.05);
   z-index: 30;
 }
+
 .${namespace}-drawer.${namespace}-drawer-closed { width: 0; border-left: none; }
-.${namespace}-dd-head { background: var(--${namespace}-p); color: #fff; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-.${namespace}-dd-title { font-size: 14px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.${namespace}-dd-close { cursor: pointer; font-size: 16px; opacity: 0.8; }
-.${namespace}-dd-close:hover { opacity: 1; }
-.${namespace}-dd-body { flex: 1; overflow-y: auto; padding: 0; }
 
-/* 抽屉内容区常用样式预设 */
-.${namespace}-dd-sec-head { background: var(--${namespace}-bgp); color: var(--${namespace}-p); padding: 6px 12px; font-size: 12px; font-weight: bold; border-bottom: 1px solid var(--${namespace}-pbd); }
-.${namespace}-dd-row { display: flex; border-bottom: 1px solid var(--${namespace}-bl); }
-.${namespace}-dd-label { width: 90px; flex-shrink: 0; background: var(--${namespace}-bgp); color: var(--${namespace}-tm); padding: 8px 12px; border-right: 1px solid var(--${namespace}-pbd); font-size: 12px; }
-.${namespace}-dd-val { flex: 1; padding: 8px 12px; font-size: 12px; color: var(--${namespace}-t); word-break: break-all; line-height: 1.4; }
+/* 抽屉内容（v-html 渲染，需要 :deep() 穿透） */
+.${namespace}-drawer :deep(.${namespace}-dd-head) {
+  background: var(--${namespace}-p);
+  color: #fff;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
 
-.${namespace}-tc { text-align: center; }
+.${namespace}-drawer :deep(.${namespace}-dd-title) {
+  font-size: 14px;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.${namespace}-drawer :deep(.${namespace}-dd-close) {
+  cursor: pointer;
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.${namespace}-drawer :deep(.${namespace}-dd-close:hover) { opacity: 1; }
+
+.${namespace}-drawer :deep(.${namespace}-dd-body) {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.${namespace}-drawer :deep(.${namespace}-dd-sec-head) {
+  background: var(--${namespace}-bgp);
+  color: var(--${namespace}-p);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  border-bottom: 1px solid var(--${namespace}-pbd);
+}
+
+.${namespace}-drawer :deep(.${namespace}-dd-row) {
+  display: flex;
+  border-bottom: 1px solid var(--${namespace}-bl);
+}
+
+.${namespace}-drawer :deep(.${namespace}-dd-label) {
+  width: 90px;
+  flex-shrink: 0;
+  background: var(--${namespace}-bgp);
+  color: var(--${namespace}-tm);
+  padding: 8px 12px;
+  border-right: 1px solid var(--${namespace}-pbd);
+  font-size: 12px;
+}
+
+.${namespace}-drawer :deep(.${namespace}-dd-val) {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--${namespace}-t);
+  word-break: break-all;
+  line-height: 1.4;
+}
 </style>

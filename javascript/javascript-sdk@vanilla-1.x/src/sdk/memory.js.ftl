@@ -86,6 +86,28 @@ sdk.fetch${js.nameType(widget.id)}Options = async () => {
     }]
   }];
 }
+    <#elseif widget.type == "paged_table">
+sdk.fetch${js.nameType(widget.id)}Rows = async (start, limit) => {
+  return {
+    total: 100,
+    data: [{
+<#list 1..20 as i>      
+ <#if i != 1>
+    },{
+ </#if>
+  <#list widget.children as col>
+    <#if col.type == "date">
+  ${js.nameVariable(col.id)}: '${tatabase.date()}',  
+    <#elseif col.type == "number">
+  ${js.nameVariable(col.id)}: '${tatabase.number(1, 100)}',  
+    <#else>
+  ${js.nameVariable(col.id)}: '${tatabase.string(10)}',
+    </#if>
+  </#list>    
+</#list>  
+    }]
+  };
+};
     </#if>
   </#list>
 </#list>
