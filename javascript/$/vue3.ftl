@@ -55,12 +55,12 @@ const save${js.nameType(form.id)}Data = async () => {
 const { loading: isSubmitting, run: handleSubmit } = useAsyncLock(save${js.nameType(form.id)}Data)
 </#macro>
 
-<#macro print_layout_entry_form widget indent=0>
-  <#local cols = widget.value("cols")!"3">
-  <#local groups = widget.groups()>
-${""?left_pad(indent)}<div id="form${js.nameType(widget.id)}">
+<#macro print_layout_entry_form form indent=0>
+  <#local cols = form.value("cols")!"3">
+  <#local groups = form.groups()>
+${""?left_pad(indent)}<div id="entry${js.nameType(form.id)}">
   <#list groups as group>
-    <#local rows = widget.rows(group, cols?number)>
+    <#local rows = form.rows(group, cols?number)>
 ${""?left_pad(indent)}  <div class="${namespace}-panel">
 ${""?left_pad(indent)}    <div class="${namespace}-panel-head">${group}</div>
 ${""?left_pad(indent)}    <div class="${namespace}-form ${namespace}-form--${cols}">
@@ -74,6 +74,36 @@ ${""?left_pad(indent)}      </div>
     </#list>
 ${""?left_pad(indent)}    </div>    
 ${""?left_pad(indent)}  </div>  
+  </#list>
+${""?left_pad(indent)}</div>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                              CRITERIA FORM                              -->
+<!----------------------------------------------------------------------------->
+
+<#macro print_criteria_form_variables form indent=0>
+${""?left_pad(indent)}// ${js.nameVariable(form.id)}表单相关变量
+${""?left_pad(indent)}const ${js.nameVariable(form.id)}Data = reactive({
+  <#list form.inputs as input>
+${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
+  </#list>
+${""?left_pad(indent)}});
+  <#list form.inputs as input>
+    <#if (input.type == "select" || input.type == "multiselect") && !(input.value("data")!"")?starts_with("enum[")>
+${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
+    <#elseif input.type == "select">
+${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
+    <#elseif input.type == "cascade">
+${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
+    </#if>
+  </#list>
+</#macro>
+
+<#macro print_layout_criteria_form form indent=0>
+${""?left_pad(indent)}<div id="criteria${js.nameType(form.id)}" class="${namespace}-toolbar">
+  <#list form.inputs as input>
+<@print_layout_widget widget=input indent=indent+2 />
   </#list>
 ${""?left_pad(indent)}</div>
 </#macro>
@@ -140,6 +170,8 @@ ${""?left_pad(indent)}  @selection-change="handleSelection" />
   <#list page.widgets as widget>
     <#if widget.type == 'entry_form'>
 <@print_entry_form_variables form=widget indent=indent />
+    <#elseif widget.type == 'criteria_form'>
+<@print_criteria_form_variables form=widget indent=indent />
     <#elseif widget.type == 'paged_table'>
 <@print_paged_table_variables table=widget indent=indent />
     </#if>
@@ -189,10 +221,12 @@ import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsin
 
 <#macro print_layout_widget widget indent=0>
   <#if widget.type == "entry_form">
-<@print_layout_entry_form widget=widget indent=indent+2 />    
+<@print_layout_entry_form form=widget indent=indent+2 />    
   <#elseif widget.type == "view_form">
   <#elseif widget.type == "paged_table">
 <@print_layout_paged_table table=widget indent=indent+2 />    
+  <#elseif widget.type == "criteria_form">
+<@print_layout_criteria_form form=widget indent=indent+2 />
   <#elseif widget.type == "buttons">
 <@print_layout_buttons widget=widget indent=indent+2 />  
   <#elseif widget.type == "select">
