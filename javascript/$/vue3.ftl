@@ -90,10 +90,10 @@ ${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitiv
   </#list>
 ${""?left_pad(indent)}});
   <#list form.inputs as input>
-    <#if (input.type == "select" || input.type == "multiselect") && !(input.value("data")!"")?starts_with("enum[")>
+    <#if (input.type == "select" || input.type == "multiselect")>
+      <#if !(input.value("data")!"")?starts_with("enum[")>    
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
-    <#elseif input.type == "select">
-${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
+      </#if>
     <#elseif input.type == "cascade">
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
     </#if>
@@ -139,7 +139,6 @@ ${""?left_pad(indent)}const ${js.nameVariable(table.id)}Total = ref(0)
 const load${js.nameType(table.id)}Rows = async (pageNumber, pageSize) => {
   isLoading.value = true
   try {
-    console.log(pageNumber);
     const res = await sdk.fetch${js.nameType(table.id)}Rows((pageNumber - 1) * pageSize, pageSize)
     ${js.nameVariable(table.id)}Rows.value = res.data
     ${js.nameVariable(table.id)}Total.value = res.total
@@ -162,6 +161,21 @@ ${""?left_pad(indent)}  :fetchData="load${js.nameType(table.id)}Rows"
 ${""?left_pad(indent)}  id-key="personId"
 ${""?left_pad(indent)}  :row-class-name="getRowClass"
 ${""?left_pad(indent)}  @selection-change="handleSelection" />
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                  BUTTON                                 -->
+<!----------------------------------------------------------------------------->
+
+<#macro print_paged_button_methods button indent=0>
+  <#if button.id??>
+const handle${js.nameType(button.id)} = () => {
+  <#elseif button.value("action")??>
+const handle${js.nameType(button.value("action"))} = () => {  
+  <#else>
+const handleTodo = () => {    
+  </#if>
+}
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -233,9 +247,9 @@ import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsin
 <@print_layout_buttons widget=widget indent=indent+2 />  
   <#elseif widget.type == "select">
     <#if (widget.value("data")!"")?starts_with("enum[")>
-${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="sdk.${js.nameVariable(widget.id)}Options" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />    
+${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="sdk.${js.nameVariable(widget.id)}Options" :clearable="true" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />    
     <#else>
-${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
+${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options"  :clearable="true" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
     </#if>
   <#elseif widget.type == "date">
 ${""?left_pad(indent)}<${namespace}-datepicker data-test="${js.nameVariable(widget.id)}" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />    
@@ -248,14 +262,14 @@ ${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(wid
   <#elseif widget.type == "tags">
 ${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(widget.id)}" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
   <#elseif widget.type == "longtext">
-${""?left_pad(indent)}<textarea class="${namespace}-textarea" data-test="${js.nameVariable(widget.id)}" placeholder="请输入${widget.title}"></textarea>  
+${""?left_pad(indent)}<textarea class="${namespace}-textarea" data-test="${js.nameVariable(widget.id)}" placeholder="${widget.value("placeholder")!("请输入" + widget.title)}"></textarea>  
   <#elseif widget.type == "text">
 ${""?left_pad(indent)}<input class="${namespace}-input" data-test="${js.nameVariable(widget.id)}" 
 ${""?left_pad(indent)}       v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" 
     <#if (widget.value("readonly")!"") == "true">
 ${""?left_pad(indent)}       :class="{ '${namespace}-input--readonly': true }" :disabled="true">
     <#else>
-${""?left_pad(indent)}       placeholder="请输入${widget.title}">
+${""?left_pad(indent)}       placeholder="${widget.value("placeholder")!("请输入" + widget.title)}">
     </#if>
   <#elseif widget.type == "number">
 ${""?left_pad(indent)}<input class="${namespace}-input" data-test="${js.nameVariable(widget.id)}" 
@@ -263,7 +277,7 @@ ${""?left_pad(indent)}       v-model="${js.nameVariable(widget.container.id)}Dat
     <#if (widget.value("readonly")!"") == "true">
 ${""?left_pad(indent)}       :class="{ '${namespace}-input--readonly': true }" :disabled="true">
     <#else>
-${""?left_pad(indent)}       placeholder="请输入${widget.title}">
+${""?left_pad(indent)}       placeholder="${widget.value("placeholder")!("请输入" + widget.title)}">
     </#if>
   </#if>
   <#if widget.value("unit")??>

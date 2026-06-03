@@ -20,13 +20,12 @@ onMounted(async () => {
   <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
   <#if (widget.type == "select" || widget.type == "multiselect" || widget.type == "cascade") && 
        !(widget.value("data")!"")?starts_with("enum[")>
-    <#if widget.ancestor("entry_form")??>
+    <#if widget.ancestor("entry_form")?? || widget.ancestor("criteria_form")??>
   ${js.nameVariable(widget.id)}Options.value = await sdk.fetch${js.nameType(widget.id)}Options();  
     </#if>
   <#elseif widget.type == "paged_table">
   load${js.nameType(widget.id)}Rows();
   </#if>
-  
 </#list>
 })
 

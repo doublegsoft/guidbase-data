@@ -603,6 +603,12 @@ html, body {
   resize: vertical;
 }
 
+.${namespace}-input::placeholder,
+.${namespace}-textarea::placeholder {
+  color: var(--${namespace}-text-light);
+  opacity: 1;
+}
+
 /* 含 textarea 的 field 行：顶部对齐，label 加小 margin */
 .${namespace}-field:has(.${namespace}-textarea) {
   align-items: flex-start;

@@ -12,6 +12,12 @@
     >
       {{ selectedOption ? selectedOption.label : placeholder }}
     </button>
+    <span
+      v-if="clearable && selectedOption"
+      class="${namespace}-dd-clear"
+      @click.stop="clearValue"
+      title="清除选择"
+    >×</span>
 
     <!-- Panel (teleported to body) -->
     <teleport to="body">
@@ -66,6 +72,7 @@ const props = defineProps({
   options: { type: Array, default: () => [] },
   placeholder: { type: String, default: '请选择...' },
   searchable: { type: Boolean, default: false },
+  clearable: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   size: { type: String, default: '' },
 })
@@ -99,10 +106,10 @@ const filteredOptions = computed(() => {
 
 function highlightLabel(text, q) {
   if (!q) return text
-  const escaped = q.replace(/[.*+?^${r"${}"}()|[\]\\]/g, '\\$&')
+  const escaped = q.replace(${r"/[.*+?^${}()|[\]\\]/g"}, '\\$&')
   return String(text).replace(
     new RegExp(escaped, 'gi'),
-    m => `<mark class="${namespace}-dd-mark">${r"${"}m${r"}"}</mark>`
+    m => `<mark class="${namespace}-dd-mark">${r"${m}"}</mark>`
   )
 }
 
@@ -129,6 +136,10 @@ function selectOption(opt) {
   if (opt.disabled) return
   emit('update:modelValue', opt.value)
   closePanel()
+}
+
+function clearValue() {
+  emit('update:modelValue', null)
 }
 
 function positionPanel() {
@@ -355,6 +366,31 @@ onBeforeUnmount(() => {
 .${namespace}-dd-option--disabled:hover {
   background: none;
   color: var(--${namespace}-text-disabled);
+}
+
+/* ── Clear button ── */
+.${namespace}-dd-clear {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-55%);
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--${namespace}-text-light);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background .1s, color .1s;
+  line-height: 1;
+  pointer-events: auto;
+}
+.${namespace}-dd-clear:hover {
+  background: var(--${namespace}-danger-bg);
+  color: var(--${namespace}-danger);
 }
 
 /* ── Empty / no-results ── */

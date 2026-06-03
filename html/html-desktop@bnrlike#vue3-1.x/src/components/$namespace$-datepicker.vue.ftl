@@ -378,7 +378,7 @@ defineExpose({ openPanel, closePanel, clear })
   color: var(--${namespace}-text-muted, #5d6d7e);
   cursor: not-allowed;
 }
-.${namespace}-dp__trigger--placeholder { color: var(--${namespace}-text-light, #909eac); }
+.${namespace}-dp__trigger--placeholder, .${namespace}-dp__trigger--ph { color: var(--${namespace}-text-light, #909eac); }
 
 .${namespace}-dp__clear { display: none !important; }
 

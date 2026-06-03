@@ -3,7 +3,7 @@
   <#if widget.type == 'text'>
     <#return "''">
   <#elseif widget.type == 'number'>
-    <#return "0">
+    <#return "null">
   <#elseif widget.type == 'bool'>
     <#return "false">
   <#else>
