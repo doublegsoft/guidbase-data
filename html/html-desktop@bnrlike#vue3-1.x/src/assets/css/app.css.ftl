@@ -151,6 +151,14 @@ html, body {
   order-bottom:1px solid #d9d9d9; 
 }
 
+.pt-toolbar > .pt-dp,
+.pt-toolbar > .pt-dd,
+.pt-toolbar > .pt-input,
+.pt-toolbar > .pt-select {
+  flex: 0 0 140px;
+  min-width: 100px;
+}
+
 .${namespace}-nav-section {
   font-size: 10px;
   font-weight: bold;

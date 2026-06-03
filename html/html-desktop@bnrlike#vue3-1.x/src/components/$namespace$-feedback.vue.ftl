@@ -56,7 +56,7 @@ watch(visible,v=>{if(v)document.addEventListener('keydown',onKey);else document.
 .${namespace}-fd-icon{font-size:28px;flex-shrink:0;line-height:1;margin-top:2px}
 .${namespace}-fd-text{flex:1}
 .${namespace}-fd-title{font-size:15px;font-weight:bold;color:#1c2833;margin-bottom:6px;line-height:1.4}
-.${namespace}-fd-message{font-size:13px;color:#5d6d7e;line-height:1.6}
+.${namespace}-fd-message{font-size:13px;color:#5d6d7e;line-height:1.6;white-space:pre-line}   
 .${namespace}-fd-footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid #f0f0f0;background:#fafbfc}
 .${namespace}-fd-btn{height:30px;padding:0 18px;font-size:13px;font-family:inherit;border:1px solid;border-radius:2px;cursor:pointer;transition:background .15s}
 .${namespace}-fd-btn--cancel{background:#fff;color:#333;border-color:#c8c8c8}

@@ -87,9 +87,7 @@ function onSizeChange(e) {
   border-top: 1px solid #c8c8c8;
   font-size: 12px;
   color: #1c2833;
-  width: calc(100% - 168px);
-  position: fixed;
-  bottom: 0;
+  flex-shrink: 0;
 }
 
 .${namespace}-pg-info {

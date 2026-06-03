@@ -340,7 +340,7 @@ defineExpose({ openPanel, closePanel, clear })
   font-family: var(--${namespace}-font, "Microsoft YaHei", sans-serif);
   font-size: 12px;
   user-select: none;
-  flex: 1;
+  width: 100%;
 }
 
 .${namespace}-dp__trigger {

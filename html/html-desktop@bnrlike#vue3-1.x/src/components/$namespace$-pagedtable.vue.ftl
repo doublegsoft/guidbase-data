@@ -9,7 +9,7 @@
                 <input type="checkbox" :checked="isAllChecked" @change="toggleAll($event.target.checked)" style="width:14px;height:14px;accent-color:var(--p);cursor:pointer">
               </th>
               <th v-for="col in columns" :key="col.key"
-                :style="{ width: col.width || '', textAlign: col.align || 'left' }"
+                :style="{ width: col.width || '', textAlign: 'center' }"
                 :class="{ '${namespace}-sortable': col.sortable, '${namespace}-asc': sortKey === col.key && sortAsc, '${namespace}-desc': sortKey === col.key && !sortAsc }"
                 @click="col.sortable && toggleSort(col.key)">
                 {{ col.title }}
@@ -239,6 +239,8 @@ defineExpose({
   overflow: auto;
   position: relative;
   background: #fff;
+  overscroll-behavior: contain;                               
+  -webkit-overflow-scrolling: auto;
 }
 
 /* 表格 */

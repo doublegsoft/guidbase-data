@@ -2,6 +2,14 @@
 <!--                                ENTRY FORM                               -->
 <!----------------------------------------------------------------------------->
 <#macro print_entry_form_variables form indent=0>
+${""?left_pad(indent)}// ${js.nameVariable(form.id)}表单校验规则
+const ${js.nameVariable(form.id)}Rules = [
+  <#list form.inputs as input>  
+    <#if input.value("readonly") == "true"><#continue></#if>
+  {name: '${js.nameVariable(input.id)}',rules: [<#if input.value("required") == "true">{ type: 'required', message: '${input.title}必须填写！' },</#if><#if input.type == "number">{ type: 'number', message: '请正确输入${input.title}！' }</#if>]},
+  </#list>
+]
+const { errors, validate, clearErrors } = useFieldValidation(${js.nameVariable(form.id)}Rules)
 ${""?left_pad(indent)}// ${js.nameVariable(form.id)}表单相关变量
 ${""?left_pad(indent)}const ${js.nameVariable(form.id)}Data = reactive({
   <#list form.inputs as input>
@@ -17,6 +25,9 @@ ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
     </#if>
   </#list>
+const showConfirm${js.nameType(form.id)}Reset = ref(false)
+const show${js.nameType(form.id)}Error = ref(false)
+const validationErrorMessage = ref('')
 </#macro>
 
 <#macro print_entry_form_methods form indent=0>
@@ -39,12 +50,20 @@ const load${js.nameType(form.id)}Data = async () => {
  * 保存数据的界面函数
  */
 const save${js.nameType(form.id)}Data = async () => {
+  if (!validate(demoEntryData)) {
+    const msgs = Object.entries(errors)
+      .filter(([, msg]) => msg)
+      .map(([, msg]) => `· ${r"${msg}"}`)
+    validationErrorMessage.value = msgs.join('\n')
+    show${js.nameType(form.id)}Error.value = true
+    return
+  }
   isSubmitting.value = true
   try {
-    const result = await saveUserDataApi(${js.nameVariable(form.id)}Data)
-    if (result.success) {
-      alert('用户信息保存成功！')
-    }
+    // const result = await saveUserDataApi(${js.nameVariable(form.id)}Data)
+    // if (result.success) {
+    //   alert('用户信息保存成功！')
+    // }
   } catch (error) {
     // TODO: 这里可以添加错误处理逻辑，例如显示错误消息
   } finally {
@@ -52,7 +71,7 @@ const save${js.nameType(form.id)}Data = async () => {
   }
 }
 
-const { loading: isSubmitting, run: handleSubmit } = useAsyncLock(save${js.nameType(form.id)}Data)
+const { loading: isSubmitting, run: handle${js.nameType(form.id)}Save } = useAsyncLock(save${js.nameType(form.id)}Data)
 </#macro>
 
 <#macro print_layout_entry_form form indent=0>
@@ -67,7 +86,7 @@ ${""?left_pad(indent)}    <div class="${namespace}-form ${namespace}-form--${col
     <#list rows as row>
       <#list row as child>
 ${""?left_pad(indent)}      <div class="${namespace}-field<#if child.value("span")??> ${namespace}-field--span${child.value("span")}</#if>">
-${""?left_pad(indent)}        <label class="${namespace}-field-label">${child.title}</label>
+${""?left_pad(indent)}        <label class="${namespace}-field-label<#if (child.value("required")!"") == "true"> ${namespace}-field-label--required</#if>">${child.title}</label>
 <@print_layout_widget widget=child indent=indent+8 />
 ${""?left_pad(indent)}      </div>
       </#list>
@@ -102,11 +121,9 @@ ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
 
 <#macro print_layout_criteria_form form indent=0>
 ${""?left_pad(indent)}<div id="criteria${js.nameType(form.id)}" class="${namespace}-toolbar">
-  <#list form.inputs as input>
-<@print_layout_widget widget=input indent=indent+2 />
+  <#list form.children as widget>
+<@print_layout_widget widget=widget indent=indent+2 />
   </#list>
-${""?left_pad(indent)}  <button class="${namespace}-btn ${namespace}-btn--primary" @click="doSearch">搜索</button>
-${""?left_pad(indent)}  <button class="${namespace}-btn ${namespace}-btn--danger" @click="resetSearch">重置</button>
 ${""?left_pad(indent)}</div>
 </#macro>
 
@@ -121,10 +138,29 @@ ${""?left_pad(indent)}const ${js.nameVariable(table.id)}Cols = ref([{
     <#if column?index != 0>
 ${""?left_pad(indent)}},{    
     </#if>
+    <#if column.id??>
 ${""?left_pad(indent)}  key:'${js.nameVariable(column.id)}',
+    </#if>
 ${""?left_pad(indent)}  title:'${column.title}',      
-${""?left_pad(indent)}  width:'${column.value("width")!"100"}px', 
+${""?left_pad(indent)}  width:'${column.value("width")!"120"}px', 
+    <#if column.type == "date">
+${""?left_pad(indent)}  align: 'center',
 ${""?left_pad(indent)}  render: v => `<span style="font-family:Consolas,monospace;color:#5d6d7e">${r"${v}"}</span>`,
+    <#elseif column.type == "number">
+${""?left_pad(indent)}  align: 'right',    
+${""?left_pad(indent)}  render: v => `<span style="font-family:Consolas,monospace;color:#5d6d7e">${r"${v}"}</span>`,
+    <#elseif column.type == "buttons">
+${""?left_pad(indent)}  align: 'center',
+${""?left_pad(indent)}  render: (v, row) => {                                       
+${""?left_pad(indent)}    return `
+      <#list column.children as button>
+<@print_layout_widget widget=button indent=indent+6 />      
+      </#list>
+${""?left_pad(indent)}    `   
+${""?left_pad(indent)}  },    
+    <#else>
+${""?left_pad(indent)}  render: v => `<span style="font-family:Consolas,monospace;color:#5d6d7e">${r"${v}"}</span>`,
+    </#if>
   </#list>
 ${""?left_pad(indent)}}])
 ${""?left_pad(indent)}const ${js.nameVariable(table.id)}Rows = ref([])
@@ -167,15 +203,79 @@ ${""?left_pad(indent)}  @selection-change="handleSelection" />
 <!--                                  BUTTON                                 -->
 <!----------------------------------------------------------------------------->
 
-<#macro print_paged_button_methods button indent=0>
-  <#if button.id??>
-const handle${js.nameType(button.id)} = () => {
-  <#elseif button.value("action")??>
-const handle${js.nameType(button.value("action"))} = () => {  
+<#function get_button_role button>
+  <#if (button.value("action")!"") == "save">
+    <#return "primary">
+  <#elseif (button.value("action")!"") == "search">
+    <#return "primary">  
+  <#elseif (button.value("action")!"") == "edit">
+    <#return "primary">    
+  <#elseif (button.value("action")!"") == "clear">
+    <#return "warning">
+  <#elseif (button.value("action")!"") == "reset">
+    <#return "warning">  
+  <#elseif (button.value("action")!"") == "delete">
+    <#return "danger">  
+  <#elseif (button.value("action")!"") == "cancel">
+    <#return "default">
   <#else>
-const handleTodo = () => {    
+    <#return "default">
+  </#if>
+</#function>
+
+<#function get_button_method_name button>
+  <#local methodName = "handle">
+  <#if button.id??>
+    <#local methodName += js.nameType(button.id)>
+  </#if>
+  <#if button.ancestor("entry_form")??>
+    <#local ancestor = button.ancestor("entry_form")>
+  <#elseif button.ancestor("criteria_form")??>
+    <#local ancestor = button.ancestor("criteria_form")>
+  </#if>
+  <#if methodName == "handle">
+    <#if ancestor??>
+      <#local methodName += js.nameType(ancestor.id)>
+    <#else>
+      <#local methodName += js.nameType(button.value("ref"))>
+      <#local ancestor = button.page.byId(button.value("ref"))>
+    </#if>
+    <#local methodName += js.nameType(button.value("action")!"Custom")>
+  </#if>
+  <#return methodName>
+</#function>
+
+<#macro print_paged_button_methods button indent=0>
+  <#if (button.value("action")!"") == "save">
+    <#return>
+  </#if>
+  <#if button.ancestor("entry_form")??>
+    <#local ancestor = button.ancestor("entry_form")>
+  <#elseif button.ancestor("criteria_form")??>
+    <#local ancestor = button.ancestor("criteria_form")>
+  </#if>
+  <#if !ancestor??>
+    <#local ancestor = button.page.byId(button.value("ref"))>
+  </#if>
+const ${get_button_method_name(button)} = () => {    
+  <#if (button.value("action")!"") == "reset">
+    <#list ancestor.inputs as input>
+  ${js.nameVariable(ancestor.id)}Data.${js.nameVariable(input.id)} = '';
+    </#list>
+  <#elseif (button.value("action")!"") == "search">
+  load${js.nameType(button.value("ref"))}Rows(1, 20)
   </#if>
 }
+</#macro>
+
+<#macro print_layout_buttons widget indent=0>
+${""?left_pad(indent)}<div class="${namespace}-form-footer">
+${""?left_pad(indent)}  <div style="margin-left: auto;">
+  <#list widget.children as child>
+<@print_layout_widget widget=child indent=indent+4 />
+  </#list>    
+${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}</div>
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -200,6 +300,8 @@ const handleTodo = () => {
 <@print_entry_form_methods form=widget indent=indent />
     <#elseif widget.type == 'paged_table'>
 <@print_paged_table_methods table=widget indent=indent />
+    <#elseif widget.type == 'button'>
+<@print_paged_button_methods button=widget indent=indent />
     </#if>
   </#list>
 </#macro>
@@ -210,6 +312,8 @@ const handleTodo = () => {
     <#if visited_types[widget.type]??><#continue></#if>
     <#if widget.type == 'entry_form'>
 import { useAsyncLock } from '@/composables/useAsyncLock'
+import { useFieldValidation } from '@/composables/useFieldValidation'
+import ${js.nameType(namespace)}Feedback from '@/components/${namespace}-feedback.vue' 
     <#elseif widget.type == "paged_table">
 import ${js.nameType(namespace)}Pagedtable from '@/components/${namespace}-pagedtable.vue'
     <#elseif widget.type == "select">
@@ -245,6 +349,12 @@ import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsin
 <@print_layout_criteria_form form=widget indent=indent+2 />
   <#elseif widget.type == "buttons">
 <@print_layout_buttons widget=widget indent=indent+2 />  
+  <#elseif widget.type == "button">
+    <#if (widget.value("action")!"") == "reset" && widget.byRef()?? && widget.byRef().type == "entry_form">
+${""?left_pad(indent)}<button class="${namespace}-btn ${namespace}-btn--${get_button_role(widget)} ${namespace}-btn-gap" @click="showConfirm${js.nameVariable(widget.value("ref"))}Reset = true">${widget.title}</button>    
+    <#else>
+${""?left_pad(indent)}<button class="${namespace}-btn ${namespace}-btn--${get_button_role(widget)} ${namespace}-btn-gap" @click="${get_button_method_name(widget)}">${widget.title}</button>
+    </#if>
   <#elseif widget.type == "select">
     <#if (widget.value("data")!"")?starts_with("enum[")>
 ${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="sdk.${js.nameVariable(widget.id)}Options" :clearable="true" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />    
@@ -262,7 +372,8 @@ ${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(wid
   <#elseif widget.type == "tags">
 ${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(widget.id)}" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
   <#elseif widget.type == "longtext">
-${""?left_pad(indent)}<textarea class="${namespace}-textarea" data-test="${js.nameVariable(widget.id)}" placeholder="${widget.value("placeholder")!("请输入" + widget.title)}"></textarea>  
+${""?left_pad(indent)}<textarea class="${namespace}-textarea" data-test="${js.nameVariable(widget.id)}" 
+${""?left_pad(indent)}          v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" placeholder="${widget.value("placeholder")!("请输入" + widget.title)}"></textarea>  
   <#elseif widget.type == "text">
 ${""?left_pad(indent)}<input class="${namespace}-input" data-test="${js.nameVariable(widget.id)}" 
 ${""?left_pad(indent)}       v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" 
@@ -283,22 +394,4 @@ ${""?left_pad(indent)}       placeholder="${widget.value("placeholder")!("请输
   <#if widget.value("unit")??>
 ${""?left_pad(indent)}<span class="${namespace}-field-unit">${widget.value("unit")}</span>
   </#if>
-</#macro>
-
-<#macro print_layout_buttons widget indent=0>
-${""?left_pad(indent)}<div class="${namespace}-form-footer">
-${""?left_pad(indent)}  <div style="margin-left: auto;">
-  <#list widget.children as child>
-    <#if (child.value("action")!"") == "save">
-${""?left_pad(indent)}    <button class="${namespace}-btn ${namespace}-btn--primary ${namespace}-btn-gap" @click="">${child.title}</button>
-    <#elseif (child.value("action")!"") == "clear">
-${""?left_pad(indent)}    <button class="${namespace}-btn ${namespace}-btn--danger ${namespace}-btn-gap" @click="">${child.title}</button>    
-    <#elseif (child.value("action")!"") == "cancel">
-${""?left_pad(indent)}    <button class="${namespace}-btn ${namespace}-btn--default ${namespace}-btn-gap" @click="">${child.title}</button>
-    <#else>
-${""?left_pad(indent)}    <button class="${namespace}-btn ${namespace}-btn--default ${namespace}-btn-gap" @click="">${child.title}</button>
-    </#if>
-  </#list>    
-${""?left_pad(indent)}  </div>
-${""?left_pad(indent)}</div>
 </#macro>
