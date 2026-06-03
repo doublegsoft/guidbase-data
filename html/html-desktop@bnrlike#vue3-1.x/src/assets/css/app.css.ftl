@@ -141,6 +141,16 @@ html, body {
   flex-shrink: 0;
 }
 
+.${namespace}-toolbar { 
+  flex-shrink:0; 
+  display:flex; 
+  align-items:center; 
+  gap:8px; 
+  padding:8px 14px; 
+  background:#fff;
+  order-bottom:1px solid #d9d9d9; 
+}
+
 .${namespace}-nav-section {
   font-size: 10px;
   font-weight: bold;
@@ -570,7 +580,7 @@ html, body {
   background: var(--${namespace}-bg);
   color: var(--${namespace}-text);
   outline: none;
-  min-width: 0;
+  min-width: 80px;
 }
 .${namespace}-input:focus,
 .${namespace}-select:focus,

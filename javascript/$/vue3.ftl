@@ -105,6 +105,8 @@ ${""?left_pad(indent)}<div id="criteria${js.nameType(form.id)}" class="${namespa
   <#list form.inputs as input>
 <@print_layout_widget widget=input indent=indent+2 />
   </#list>
+${""?left_pad(indent)}  <button class="${namespace}-btn ${namespace}-btn--primary" @click="doSearch">搜索</button>
+${""?left_pad(indent)}  <button class="${namespace}-btn ${namespace}-btn--danger" @click="resetSearch">重置</button>
 ${""?left_pad(indent)}</div>
 </#macro>
 
