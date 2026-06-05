@@ -18,7 +18,6 @@
         <span style="color:#ffd700;cursor:pointer;" @click="logout">退出</span>
       </div>
     </div>
-
     <div class="${namespace}-main">
       <!-- Sidebar -->
       <nav class="${namespace}-sidebar">
@@ -42,7 +41,17 @@
           <a>首页</a><span>/</span>
           <a>{{ currentModuleLabel }}</a><span>/</span>
           <span>{{ breadPage }}</span>
-          <div style="margin-left:auto;font-size:11px;color:#909eac">上一条 ◀ &nbsp; ▶ 下一条</div>
+          <div v-if="showPrevNext" class="${namespace}-record-nav">
+            <button class="${namespace}-rn-btn" :disabled="!hasPrev" @click="goPrev" title="上一条">
+              <span class="${namespace}-rn-arrow ${namespace}-rn-arrow--left">◀</span>
+              <span>上一条</span>
+            </button>
+            <span class="${namespace}-rn-idx">{{ 1 }} / {{ 1 }}</span>
+            <button class="${namespace}-rn-btn" :disabled="!hasNext" @click="goNext" title="下一条">
+              <span>下一条</span>
+              <span class="${namespace}-rn-arrow ${namespace}-rn-arrow--right">▶</span>
+            </button>
+          </div>
         </div>
         <div class="${namespace}-page">
           <router-view />
@@ -56,10 +65,12 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
+import { useNavControl } from '@/composables/useNavControl'
 import { MENUS, MODULE_LIST } from './menu.js'
 import router from './router'
 
 const route = useRoute()
+const { showPrevNext, show, hide, toggle } = useNavControl()
 
 // 判断是否为登录页
 const isLoginPage = computed(() => route.path === '/login')
@@ -68,7 +79,7 @@ const modules = MODULE_LIST;
 const activeModule = ref(modules[0].key)
 const activeId     = ref(MENUS[modules[0].key].sections[0].items[0].id)
 const activePath   = ref(MENUS[modules[0].key].sections[0].items[0].path)
-const breadPage    = ref('账户 (Account)')
+const breadPage    = ref(MENUS[modules[0].key].sections[0].items[0].label)
 const clock        = ref('')
 const username     = ref(localStorage.getItem('username') || '张伟')
 

@@ -3,10 +3,6 @@
 <#assign page = pageDef>
 <template>
 <@vue3.print_page_layout page=pageDef />
-<#list page.byType("entry_form") as form>
-  <ef-feedback v-model="showConfirm${js.nameType(form.id)}Reset" type="confirm" title="提示" message="确定要重置吗？所有已填写的数据将被清空。" @confirm="handle${js.nameType(form.id)}Reset" />
-  <ef-feedback v-model="show${js.nameType(form.id)}Error" type="error" title="${form.title}校验未通过" :message="validationErrorMessage" />
-</#list>
 </template>
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'

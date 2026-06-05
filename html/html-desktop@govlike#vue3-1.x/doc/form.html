@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>党政红设计系统 - 水平表单演示</title>
+  <style>
+    /* ==========================================================================
+       1. DESIGN SYSTEM VARIABLES (设计系统变量)
+       ========================================================================== */
+    :root {
+      /* 品牌色彩 */
+      --color-primary: #BE0000;       /* 党政红 - 主色 */
+      --color-primary-dark: #8A0000;  /* 深红 - 悬停及暗部 */
+      --color-primary-light: #FFECEC; /* 浅红 - 背景及轻量高亮 */
+      --color-gold: #F1B807;          /* 辅助金 - 文字与重点强调 */
+      --color-gold-light: #FFF8E7;    /* 浅金 - 提示框背景 */
+      --color-gold-border: #F4D068;   /* 金黄边框 */
+      
+      /* 辅助态色彩 */
+      --color-success: #28A745;       /* 正式党员状态标示 */
+      --color-info: #17A2B8;          /* 预备党员状态标示 */
+      --color-warning: #FF9900;       /* 发展对象状态标示 */
+      --color-danger: #DC3545;        /* 必填项/警示 */
+
+      /* 中性色 */
+      --color-bg-main: #F4F4F1;       /* 暖灰底色 */
+      --color-bg-card: #FFFFFF;       /* 卡片白色背景 */
+      --color-text-title: #222222;    /* 标题字色 */
+      --color-text-body: #444444;     /* 正文字色 */
+      --color-text-muted: #888888;    /* 辅助/失效字色 */
+      --color-border: #DCDCDC;        /* 控件与分割线边框 */
+      --color-border-light: #EBEBEB;  /* 轻量分割线 */
+
+      /* 阴影与圆角 */
+      --border-radius-sm: 2px;
+      --border-radius-md: 4px;
+      --box-shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.04);
+      --box-shadow-focus: 0 0 0 3px rgba(190, 0, 0, 0.15);
+
+      /* 字体规范 */
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft YaHei", sans-serif;
+    }
+
+    /* ==========================================================================
+       2. GLOBAL RESET & BASE (基础样式重置)
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-bg-main);
+      color: var(--color-text-body);
+      line-height: 1.6;
+      font-size: 14px;
+      padding-bottom: 50px;
+    }
+    a {
+      color: var(--color-text-body);
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    /* 模块面板 */
+    .panel {
+      background-color: var(--color-bg-card);
+      border-radius: var(--border-radius-sm);
+      box-shadow: var(--box-shadow-sm);
+      margin-top: 20px;
+      border: 1px solid var(--color-border);
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    .panel-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--color-primary-dark);
+      border-left: 4px solid var(--color-primary);
+      padding-left: 10px;
+      line-height: 1.2;
+    }
+
+    /* ==========================================================================
+       3. HORIZONTAL FORM COMPONENTS (水平对齐表单组件)
+       ========================================================================== */
+    .form-container {
+      padding: 20px;
+    }
+    
+    /* 表单网格：控制多列排版 */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    @media (min-width: 992px) {
+      .form-grid {
+        grid-template-columns: repeat(2, 1fr); /* 宽屏下两列双排 */
+      }
+    }
+
+    /* 表单组：弹性盒模型，实现左右布局 */
+    .form-group {
+      display: flex;
+      flex-direction: row;
+      align-items: center; /* 垂直居中对齐单行控件 */
+      gap: 15px;
+    }
+    
+    /* 跨整行样式 */
+    .form-group.col-span-full {
+      grid-column: 1 / -1;
+    }
+
+    /* 对于多行文本域（textarea），标签应与顶部对齐 */
+    .form-group.align-top {
+      align-items: flex-start;
+    }
+    .form-group.align-top .form-label {
+      padding-top: 8px; /* 顶部微调对齐 */
+    }
+
+    /* 标签样式：固定宽度，文字右对齐 */
+    .form-label {
+      width: 110px; /* 固定宽度以实现对齐线 */
+      text-align: right;
+      font-weight: 600;
+      color: var(--color-text-title);
+      font-size: 13px;
+      flex-shrink: 0; /* 防止标签被压缩 */
+      display: inline-block;
+    }
+    /* 必填项红色星号，置于文字前 */
+    .form-label.required::before {
+      content: "*";
+      color: var(--color-danger);
+      margin-right: 4px;
+    }
+
+    /* 输入控件承载容器 */
+    .form-content {
+      flex-grow: 1;
+      width: 100%;
+    }
+
+    /* 输入框、下拉选择框通用样式 */
+    .form-control {
+      width: 100%;
+      height: 38px;
+      padding: 8px 12px;
+      font-size: 14px;
+      color: var(--color-text-body);
+      background-color: #FFFFFF;
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-sm);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus {
+      border-color: var(--color-primary);
+      box-shadow: var(--box-shadow-focus);
+    }
+    .form-control::placeholder {
+      color: var(--color-text-muted);
+      font-size: 13px;
+    }
+
+    /* 文本域 */
+    textarea.form-control {
+      height: auto;
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    /* 单选框与多选框组 */
+    .option-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      min-height: 38px;
+      align-items: center;
+    }
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .option-label input[type="radio"],
+    .option-label input[type="checkbox"] {
+      accent-color: var(--color-primary);
+      width: 16px;
+      height: 16px;
+    }
+
+    /* 按钮基础样式 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20px;
+      height: 38px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      outline: none;
+    }
+    .btn-primary {
+      background-color: var(--color-primary);
+      color: #FFFFFF;
+    }
+    .btn-primary:hover {
+      background-color: var(--color-primary-dark);
+    }
+    .btn-secondary {
+      background-color: #FFFFFF;
+      border-color: var(--color-border);
+      color: var(--color-text-body);
+    }
+    .btn-secondary:hover {
+      background-color: #F5F5F5;
+      border-color: #C0C0C0;
+    }
+
+    /* 表单底端动作条 */
+    .form-actions {
+      padding: 15px 20px;
+      background-color: #FAF9F6;
+      border-top: 1px solid var(--color-border-light);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* ==========================================================================
+       5. RESPONSIVE MEDIA QUERIES (响应式适配)
+       ========================================================================== */
+    @media (max-width: 767px) {
+      /* 在小屏幕设备下，还原为“上下堆叠”排版，防止输入区域过窄 */
+      .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .form-label {
+        width: auto;
+        text-align: left;
+      }
+      .form-group.align-top .form-label {
+        padding-top: 0;
+      }
+    }
+
+    /* 头部模拟 */
+    .sub-header {
+      background-color: var(--color-primary);
+      color: #FFFFFF;
+      padding: 20px 0;
+      border-bottom: 3px solid var(--color-gold);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 模拟系统子页头部 -->
+  <header class="sub-header">
+    <div class="container">
+      <h2>党员业务综合管理后台</h2>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- 表单演示区域 -->
+    <section class="panel">
+      <div class="panel-header">
+        <h3 class="panel-title">党员基础信息登记表（水平样式）</h3>
+      </div>
+      
+      <!-- 表单主体 -->
+      <form class="form-container">
+        <div class="form-grid">
+          
+          <!-- 姓名 -->
+          <div class="form-group">
+            <label class="form-label required">姓名</label>
+            <div class="form-content">
+              <input type="text" class="form-control" placeholder="请输入真实姓名">
+            </div>
+          </div>
+
+          <!-- 性别 -->
+          <div class="form-group">
+            <label class="form-label required">性别</label>
+            <div class="form-content">
+              <div class="option-group">
+                <label class="option-label">
+                  <input type="radio" name="gender" checked> 男
+                </label>
+                <label class="option-label">
+                  <input type="radio" name="gender"> 女
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 身份证号 -->
+          <div class="form-group">
+            <label class="form-label required">身份证号</label>
+            <div class="form-content">
+              <input type="text" class="form-control" placeholder="请输入18位身份证号">
+            </div>
+          </div>
+
+          <!-- 籍贯 -->
+          <div class="form-group">
+            <label class="form-label">籍贯</label>
+            <div class="form-content">
+              <input type="text" class="form-control" placeholder="如：山东省济南市">
+            </div>
+          </div>
+
+          <!-- 所属党支部 -->
+          <div class="form-group">
+            <label class="form-label required">所属党支部</label>
+            <div class="form-content">
+              <select class="form-control">
+                <option value="">请选择所属支部</option>
+                <option value="1">机关第一党支部</option>
+                <option value="2">机关第二党支部</option>
+                <option value="3">老干部党支部</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 入党时间 -->
+          <div class="form-group">
+            <label class="form-label">入党时间</label>
+            <div class="form-content">
+              <input type="date" class="form-control">
+            </div>
+          </div>
+
+          <!-- 多选组 (跨两列) -->
+          <div class="form-group col-span-full">
+            <label class="form-label">拟参与志愿方向</label>
+            <div class="form-content">
+              <div class="option-group">
+                <label class="option-label">
+                  <input type="checkbox" name="direction" checked> 理论政策宣讲
+                </label>
+                <label class="option-label">
+                  <input type="checkbox" name="direction"> 社区基层治理
+                </label>
+                <label class="option-label">
+                  <input type="checkbox" name="direction"> 困难群众帮扶
+                </label>
+                <label class="option-label">
+                  <input type="checkbox" name="direction"> 绿色生态环保
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 个人简况 (文本域，对齐方式设为 align-top 跨两列) -->
+          <div class="form-group col-span-full align-top">
+            <label class="form-label">个人简况概述</label>
+            <div class="form-content">
+              <textarea class="form-control" placeholder="请输入简要个人介绍、代表性先进事迹或需要说明的有关情况..."></textarea>
+            </div>
+          </div>
+
+        </div>
+      </form>
+
+      <!-- 提交动作区域 -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary">重置</button>
+        <button type="submit" class="btn btn-primary">提交审核</button>
+      </div>
+    </section>
+
+  </main>
+
+</body>
+</html>
