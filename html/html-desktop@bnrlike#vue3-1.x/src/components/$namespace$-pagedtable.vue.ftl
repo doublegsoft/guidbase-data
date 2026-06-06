@@ -52,7 +52,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import ${js.nameType(namespace)}Pagination from './${namespace}-pagination.vue'
+import TefPagination from './${namespace}-pagination.vue'
 
 const props = defineProps({
   data:         { type: Array,    default: () => [] },
@@ -202,13 +202,7 @@ defineExpose({
 </script>
 
 <style>
-:root {
-  --${namespace}-p: #1a4f8a; --${namespace}-pd: #15407a; --${namespace}-ph: #d0e0f5;
-  --${namespace}-pb: #e8edf5; --${namespace}-pbd: #d0d8e8;
-  --${namespace}-bl: #e4e8f0; --${namespace}-bd: #c8c8c8; --${namespace}-bg: #fff; --${namespace}-bgp: #f0f2f5;
-  --${namespace}-t: #1c2833; --${namespace}-tm: #5d6d7e; --${namespace}-tl: #909eac;
-  --${namespace}-rb: #fcecea; --${namespace}-ob: #fef3e6;
-}
+/* 颜色全部引用 design system (app.css / app-blue.css)，不再局部覆盖 */
 
 .vue-${namespace}-wrapper {
   display: flex;
@@ -238,7 +232,7 @@ defineExpose({
   flex: 1;
   overflow: auto;
   position: relative;
-  background: #fff;
+  background: var(--${namespace}-bg);
   overscroll-behavior: contain;                               
   -webkit-overflow-scrolling: auto;
 }
@@ -288,13 +282,13 @@ defineExpose({
 }
 .${namespace}-table tbody td:last-child { border-right: none; }
 
-.${namespace}-table tbody tr:nth-child(even) td { background: #fafbfc; }
-.${namespace}-table tbody tr:hover td { background: #eef5ff; cursor: pointer; }
-.${namespace}-table tbody tr.${namespace}-selected td { background: #e0edff; }
+.${namespace}-table tbody tr:nth-child(even) td { background: var(--${namespace}-bg-page); }
+.${namespace}-table tbody tr:hover td { background: var(--${namespace}-primary-bg); cursor: pointer; }
+.${namespace}-table tbody tr.${namespace}-selected td { background: var(--${namespace}-primary-hover); }
 .${namespace}-table tbody tr.${namespace}-danger td { background: var(--${namespace}-rb); }
 .${namespace}-table tbody tr.${namespace}-warning td { background: var(--${namespace}-ob); }
 .${namespace}-table tbody tr.${namespace}-danger:hover td,
-.${namespace}-table tbody tr.${namespace}-warning:hover td { background: #eef5ff; }
+.${namespace}-table tbody tr.${namespace}-warning:hover td { background: var(--${namespace}-primary-bg); }
 
 .${namespace}-tc { text-align: center; }
 
@@ -305,7 +299,7 @@ defineExpose({
   align-items: center;
   gap: 4px;
   padding: 8px 14px;
-  background: #fff;
+  background: var(--${namespace}-bg);
   border-top: 1px solid var(--${namespace}-bd);
   font-size: 12px;
   color: var(--${namespace}-t);
@@ -338,7 +332,7 @@ defineExpose({
   height: 24px;
   min-width: 24px;
   padding: 0 6px;
-  background: #fff;
+  background: var(--${namespace}-bg);
   border: 1px solid var(--${namespace}-bd);
   color: var(--${namespace}-t);
   border-radius: 2px;
@@ -355,14 +349,14 @@ defineExpose({
 
 .${namespace}-list-area :deep(.${namespace}-pg-btn.${namespace}-on) {
   background: var(--${namespace}-p);
-  color: #fff;
+  color: var(--${namespace}-bg);
   border-color: var(--${namespace}-p);
 }
 
 .${namespace}-list-area :deep(.${namespace}-pg-btn:disabled) {
   opacity: 0.5;
   cursor: not-allowed;
-  background: #f5f5f5;
+  background: var(--${namespace}-bg-page);
 }
 
 .${namespace}-list-area :deep(.${namespace}-pg-ellipsis) {
@@ -374,8 +368,8 @@ defineExpose({
 /* 右侧抽屉 */
 .${namespace}-drawer {
   width: 360px;
-  background: #fff;
-  border-left: 1px solid #ddd;
+  background: var(--${namespace}-bg);
+  border-left: 1px solid var(--${namespace}-border-light);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -390,7 +384,7 @@ defineExpose({
 /* 抽屉内容（v-html 渲染，需要 :deep() 穿透） */
 .${namespace}-drawer :deep(.${namespace}-dd-head) {
   background: var(--${namespace}-p);
-  color: #fff;
+  color: var(--${namespace}-bg);
   padding: 10px 14px;
   display: flex;
   align-items: center;

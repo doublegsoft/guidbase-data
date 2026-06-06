@@ -589,6 +589,19 @@ html, body {
   flex-shrink: 0;
 }
 
+.${namespace}-tabs-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.${namespace}-tabs-content div {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;   
+}
+
 /* ══════════════════════════════════════════════
    9. Panel (左红带经典面板)
    ══════════════════════════════════════════════ */
@@ -853,16 +866,13 @@ html, body {
 }
 
 .${namespace}-form-footer {
-  position: sticky;
-  bottom: 0;
   z-index: 100;
+  padding: 10px 14px; 
+  background: #fff; 
+  border-top: 2px solid var(--${namespace}-primary); 
+  box-shadow: 0 -2px 8px rgba(0,0,0,.08); 
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background: #fff;
-  border-top: 2px solid var(--${namespace}-primary);
-  box-shadow: 0 -3px 10px rgba(138,0,0,0.08);
+  height: 50px;
 }
 
 /* ══════════════════════════════════════════════

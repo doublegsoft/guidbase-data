@@ -350,7 +350,7 @@ defineExpose({ openPanel, closePanel, clear })
   align-items: center;
   padding: 0 26px 0 5px;
   border: 1px solid var(--${namespace}-border, #c8c8c8);
-  background: #fff;
+  background: var(--${namespace}-bg);
   color: var(--${namespace}-text, #1c2833);
   cursor: pointer;
   position: relative;
@@ -371,10 +371,10 @@ defineExpose({ openPanel, closePanel, clear })
 }
 .${namespace}-dp--open .${namespace}-dp__trigger {
   border-color: var(--${namespace}-primary, #1a4f8a);
-  box-shadow: 0 0 0 2px rgba(26,79,138,.08);
+  box-shadow: 0 0 0 2px rgba(190,0,0,.15);
 }
 .${namespace}-dp--disabled .${namespace}-dp__trigger {
-  background: #f5f7fa;
+  background: var(--${namespace}-bg-page);
   color: var(--${namespace}-text-muted, #5d6d7e);
   cursor: not-allowed;
 }
@@ -382,13 +382,12 @@ defineExpose({ openPanel, closePanel, clear })
 
 .${namespace}-dp__clear { display: none !important; }
 
-
 .${namespace}-dp__panel {
   display: none;
   position: absolute;
   top: calc(100% + 2px);
   left: 0;
-  background: #fff;
+  background: var(--${namespace}-bg);
   border: 1px solid var(--${namespace}-primary-border, #d0d8e8);
   box-shadow: 0 4px 12px rgba(0,0,0,.12);
   z-index: 9999;
@@ -399,7 +398,7 @@ defineExpose({ openPanel, closePanel, clear })
 
 .${namespace}-dp__head {
   background: var(--${namespace}-primary, #1a4f8a);
-  color: #fff;
+  color: var(--${namespace}-bg);
   display: flex;
   align-items: center;
   height: 28px;
@@ -418,7 +417,7 @@ defineExpose({ openPanel, closePanel, clear })
   flex-shrink: 0;
   color: rgba(255,255,255,.85);
 }
-.${namespace}-dp__nav:hover { background: rgba(255,255,255,.2); color: #fff; }
+.${namespace}-dp__nav:hover { background: rgba(255,255,255,.2); color: var(--${namespace}-bg); }
 .${namespace}-dp__title {
   flex: 1;
   text-align: center;
@@ -473,7 +472,7 @@ defineExpose({ openPanel, closePanel, clear })
 }
 .${namespace}-dp__day--selected {
   background: var(--${namespace}-primary, #1a4f8a) !important;
-  color: #fff !important;
+  color: var(--${namespace}-bg) !important;
   font-weight: bold;
 }
 .${namespace}-dp__day--disabled {
@@ -481,7 +480,7 @@ defineExpose({ openPanel, closePanel, clear })
   cursor: not-allowed;
 }
 .${namespace}-dp__day--weekend { color: var(--${namespace}-danger, #c0392b); }
-.${namespace}-dp__day--weekend.${namespace}-dp__day--selected { color: #fff !important; }
+.${namespace}-dp__day--weekend.${namespace}-dp__day--selected { color: var(--${namespace}-bg) !important; }
 
 .${namespace}-dp__my-grid {
   display: grid;

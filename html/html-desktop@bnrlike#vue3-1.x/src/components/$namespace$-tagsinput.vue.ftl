@@ -40,9 +40,6 @@
     </div>
 
     <!-- 计数 -->
-    <#--  <span v-if="maxCount > 0 || tags.length > 0" class="${namespace}-tags__counter">
-      {{ maxCount > 0 ? tags.length + '/' + maxCount : tags.length + '个' }}
-    </span>  -->
   </div>
 </template>
 
@@ -216,18 +213,18 @@ defineExpose({
   align-items: center;
   gap: 4px;
   min-height: 24px;
-  border: 1px solid #c8c8c8;
+  border: 1px solid var(--${namespace}-border);
   border-radius: 2px;
-  background: #fff;
+  background: var(--${namespace}-bg);
   cursor: text;
   transition: border-color .15s, box-shadow .15s;
 }
 .${namespace}-tags--focus .${namespace}-tags__wrap {
-  border-color: #1a4f8a;
-  box-shadow: 0 0 0 2px rgba(26,79,138,.08);
+  border-color: var(--${namespace}-primary);
+  box-shadow: 0 0 0 2px rgba(190,0,0,.15);
 }
 .${namespace}-tags--disabled .${namespace}-tags__wrap {
-  background: #f5f7fa;
+  background: var(--${namespace}-bg-page);
   cursor: not-allowed;
 }
 
@@ -241,19 +238,19 @@ defineExpose({
 .${namespace}-tags__tag {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  height: 20px;
-  padding: 0 6px;
-  background: linear-gradient(135deg, #e8edf5, #e0e8f4);
-  border: 1px solid #d0d8e8;
-  border-radius: 10px;
-  font-size: 11px;
-  color: #1a4f8a;
+  gap: 2px;
+  height: 18px;
+  padding: 0 4px;
+  background: var(--${namespace}-primary-bg);
+  border: 1px solid var(--${namespace}-primary-border);
+  border-radius: 2px;
+  font-size: 10px;
+  color: var(--${namespace}-primary);
   white-space: nowrap;
-  transition: background .15s;
+  max-width: 120px;
 }
 .${namespace}-tags__tag:hover {
-  background: linear-gradient(135deg, #d0e0f5, #c8d8f0);
+  background: linear-gradient(135deg, var(--${namespace}-primary-hover), var(--${namespace}-primary-border));
 }
 .${namespace}-tags__tag-text {
   max-width: 100px;
@@ -262,13 +259,13 @@ defineExpose({
 }
 .${namespace}-tags__tag-remove {
   font-size: 13px;
-  color: #5d6d7e;
+  color: var(--${namespace}-text-muted);
   cursor: pointer;
   line-height: 1;
   flex-shrink: 0;
   transition: color .1s;
 }
-.${namespace}-tags__tag-remove:hover { color: #c0392b; }
+.${namespace}-tags__tag-remove:hover { color: var(--${namespace}-danger); }
 
 /* TransitionGroup */
 .tag-enter-active { transition: all .15s ease-out; }
@@ -285,16 +282,16 @@ defineExpose({
   background: transparent;
   font-size: 12px;
   font-family: inherit;
-  color: #1c2833;
+  color: var(--${namespace}-text);
   padding: 0;
   line-height: 20px;
 }
-.${namespace}-tags__input::placeholder { color: #909eac; }
+.${namespace}-tags__input::placeholder { color: var(--${namespace}-text-light); }
 .${namespace}-tags--disabled .${namespace}-tags__input { cursor: not-allowed; }
 
 .${namespace}-tags__counter {
   font-size: 10px;
-  color: #909eac;
+  color: var(--${namespace}-text-light);
   white-space: nowrap;
   flex-shrink: 0;
 }

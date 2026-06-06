@@ -24,7 +24,9 @@ onMounted(async () => {
     <#if widget.ancestor("entry_form")?? || widget.ancestor("criteria_form")??>
   ${js.nameVariable(widget.id)}Options.value = await sdk.fetch${js.nameType(widget.id)}Options();  
     </#if>
-  <#elseif widget.type == "paged_table">
+  <#elseif widget.type == "entry_form" || widget.type == "display_form">  
+  load${js.nameType(widget.id)}Data();
+  <#elseif widget.type == "paged_table" || widget.type == "excel_form">
   load${js.nameType(widget.id)}Rows();
   </#if>
 </#list>

@@ -92,6 +92,7 @@ html, body {
 
   /* -- Accent -- */
   --${namespace}-gold:             #ffd700;
+  --${namespace}-gold-dark:        #DAA520;
 
   /* -- Typography -- */
   --${namespace}-font:   "Microsoft YaHei", "微软雅黑", SimSun, sans-serif;
@@ -106,6 +107,11 @@ html, body {
   /* -- Radius -- */
   --${namespace}-radius-sm: 2px;
   --${namespace}-radius-md: 4px;
+
+  /* -- Shadow -- */
+  --${namespace}-shadow-inset: inset 0 1px 2px rgba(28,40,51,0.06);
+  --${namespace}-shadow-sm: 0 1px 3px rgba(28,40,51,0.05), 0 1px 2px rgba(28,40,51,0.03);
+  --${namespace}-shadow-md: 0 4px 12px rgba(21,64,122,0.06);
 
   --${namespace}-p: #1a4f8a; --${namespace}-pd: #15407a; --${namespace}-ph: #d0e0f5;
   --${namespace}-pb: #e8edf5; --${namespace}-pbd: #d0d8e8;
@@ -497,6 +503,19 @@ html, body {
   flex-shrink: 0;
 }
 
+.${namespace}-tabs-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.${namespace}-tabs-content div {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;   
+}
+
 /* ══════════════════════════════════════════════
    8. Panel
    ══════════════════════════════════════════════ */
@@ -625,6 +644,7 @@ html, body {
   grid-template-columns: repeat(4, 1fr);
   gap: 4px 8px;
   padding: 7px 10px;
+  flex-shrink: 0;
 }
 .${namespace}-form--2 { grid-template-columns: repeat(2, 1fr); }
 .${namespace}-form--3 { grid-template-columns: repeat(3, 1fr); }
@@ -740,17 +760,13 @@ html, body {
 .${namespace}-edit-bar::before { content: "✏"; margin-right: 2px; }
 
 .${namespace}-form-footer { 
-  position: sticky; 
-  bottom: 0; 
-  z-index: 100; 
-  display: flex; 
-  align-items: 
-  center; 
-  gap: 8px; 
-  padding: 10px 14px; 
+  z-index: 100;
+  padding: 8px 14px; 
   background: #fff; 
-  border-top: 2px solid var(--bnr-primary); 
-  box-shadow: 0 -2px 8px rgba(0,0,0,.08); 
+  border-top: 2px solid var(--${namespace}-primary); 
+  display: flex;
+  height: 42px;
+  flex-shrink: 0;
 }
 
 /* ══════════════════════════════════════════════

@@ -47,7 +47,7 @@
 
               <!-- Editing input (text/num) -->
               <input
-                v-else-if="editing(ri, ci) && col.type !== 'drop' && col.type !== 'date'"
+                v-else-if="editing(ri, ci) && col.type !== 'select' && col.type !== 'date'"
                 ref="editInput"
                 class="xls-input"
                 :value="row[col.key] ?? ''"
@@ -88,7 +88,7 @@
 
               <!-- Dropdown: display -->
               <div
-                v-else-if="col.type === 'drop'"
+                v-else-if="col.type === 'select'"
                 class="xls-ci"
                 style="justify-content:space-between;padding-right:3px"
               >
@@ -98,7 +98,7 @@
               </div>
 
               <!-- Number -->
-              <div v-else-if="col.type === 'num'" class="xls-ci xls-ci--r">
+              <div v-else-if="col.type === 'number'" class="xls-ci xls-ci--r">
                 <span v-if="col.render" v-html="col.render(row[col.key], row, col)"></span>
                 <span v-else>{{ fmtNum(row[col.key]) }}</span>
               </div>
@@ -411,7 +411,7 @@ const clickCell = (e, r, c) => {
   finishEdit()
   selR.value = r; selC.value = c; selR2.value = r; selC2.value = c
   const col = props.columns[c]
-  if (col?.type === 'drop') { editR.value = r; editC.value = c; openDrop(r, c) }
+  if (col?.type === 'select') { editR.value = r; editC.value = c; openDrop(r, c) }
   else if (col?.type === 'date') { editR.value = r; editC.value = c; openDate(r, c) }
 }
 
@@ -419,7 +419,7 @@ const startEdit = (r, c) => {
   closeDrop(); closeDate()
   const col = props.columns[c]
   if (col.type === 'check') return
-  if (col.type === 'drop') { editR.value = r; editC.value = c; openDrop(r, c); return }
+  if (col.type === 'select') { editR.value = r; editC.value = c; openDrop(r, c); return }
   if (col.type === 'date') { editR.value = r; editC.value = c; openDate(r, c); return }
   editR.value = r; editC.value = c
   nextTick(() => {
@@ -431,9 +431,9 @@ const startEdit = (r, c) => {
 const finishEdit = () => {
   if (editR.value < 0) return
   const col = props.columns[editC.value]
-  if (col.type === 'drop') { closeDrop(); editR.value = -1; editC.value = -1; return }
+  if (col.type === 'select') { closeDrop(); editR.value = -1; editC.value = -1; return }
   if (col.type === 'date') { closeDate(); editR.value = -1; editC.value = -1; return }
-  if (col.type === 'text' || col.type === 'num') {
+  if (col.type === 'text' || col.type === 'number') {
     const inp = editInput.value?.[0]
     if (inp) commitEdit(editR.value, editC.value, inp.value)
     else { editR.value = -1; editC.value = -1 }
@@ -442,7 +442,7 @@ const finishEdit = () => {
 
 const commitEdit = (r, c, v) => {
   const col = props.columns[c]
-  const val = (col.type === 'num' && v !== '') ? (Number(v) || 0) : v
+  const val = (col.type === 'number' && v !== '') ? (Number(v) || 0) : v
   localData.value[r] = { ...localData.value[r], [col.key]: val }
   editR.value = -1; editC.value = -1
   emit('cell-change', { row: r, col: c, key: col.key, value: val })
@@ -631,7 +631,7 @@ const insRow = at => {
   const row = {}
   props.columns.forEach(c => {
     if (c.type === 'check') row[c.key] = false
-    else if (c.type === 'num') row[c.key] = 0
+    else if (c.type === 'number') row[c.key] = 0
     else row[c.key] = ''
   })
   localData.value.splice(at, 0, row); sync()
@@ -694,55 +694,60 @@ onUnmounted(() => document.removeEventListener('keydown', onKey))
 </script>
 
 <style scoped>
+/* ══════════════════════════════════════════════
+   Excel Grid — 党政红色风 (BNR Design System)
+   ══════════════════════════════════════════════ */
 .xls-wrap { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
 
 /* Sheet */
 .xls-sheet { flex: 1; overflow: auto; }
 .xls-sheet::-webkit-scrollbar { width: 10px; height: 10px; }
-.xls-sheet::-webkit-scrollbar-track { background: #f3f2f1; }
-.xls-sheet::-webkit-scrollbar-thumb { background: #c8c8c8; border-radius: 5px; border: 2px solid #f3f2f1; }
+.xls-sheet::-webkit-scrollbar-track { background: var(--${namespace}-bg-page); }
+.xls-sheet::-webkit-scrollbar-thumb { background: var(--${namespace}-border); border-radius: 5px; border: 2px solid var(--${namespace}-bg-page); }
 
 table { border-collapse: collapse; table-layout: fixed; }
 .xls-corner {
   position: sticky; top: 0; left: 0; z-index: 12;
-  background: #e8e8e8; border: 1px solid #c8c8c8; width: 46px; min-width: 46px;
+  background: var(--${namespace}-primary-bg); border: 1px solid var(--${namespace}-border-light); width: 46px; min-width: 46px;
 }
 
-/* Column headers */
+/* Column headers — 浅红暖调 */
 th.xls-ch {
   position: sticky; top: 0; z-index: 10;
-  background: #e8e8e8; border: 1px solid #c8c8c8;
-  text-align: center; font-weight: 600; color: #6b7280;
+  background: var(--${namespace}-primary-bg); border: 1px solid var(--${namespace}-border-light);
+  text-align: center; font-weight: 600; color: var(--${namespace}-text-muted);
   padding: 4px 6px; cursor: pointer; user-select: none;
   font-size: 12px; white-space: nowrap;
+  transition: background 0.15s ease;
 }
-th.xls-ch:hover { background: #ddd; }
-th.xls-ch.sc { background: #b8d0f0; color: #1a3a5c; }
+th.xls-ch:hover { background: var(--${namespace}-primary-hover); }
+th.xls-ch.sc { background: var(--${namespace}-primary-hover); color: var(--${namespace}-primary-dark); }
 
-/* Row headers */
+/* Row headers — 浅红暖调 */
 th.xls-rh {
   position: sticky; left: 0; z-index: 9;
-  background: #e8e8e8; border: 1px solid #c8c8c8;
-  text-align: center; font-weight: 400; color: #6b7280;
+  background: var(--${namespace}-primary-bg); border: 1px solid var(--${namespace}-border-light);
+  text-align: center; font-weight: 400; color: var(--${namespace}-text-muted);
   padding: 2px 4px; user-select: none; font-size: 11px; cursor: pointer;
   width: 46px; min-width: 46px;
+  transition: background 0.15s ease;
 }
-th.xls-rh:hover { background: #ddd; }
-th.xls-rh.sr { background: #b8d0f0; }
+th.xls-rh:hover { background: var(--${namespace}-primary-hover); }
+th.xls-rh.sr { background: var(--${namespace}-primary-hover); }
 
-/* Data cells */
+/* Data cells — 暖条纹背景 */
 td {
-  border: 1px solid #c8c8c8; padding: 0; height: 24px;
+  border: 1px solid var(--${namespace}-border-light); padding: 0; height: 24px;
   vertical-align: middle; cursor: cell; position: relative; overflow: hidden;
-  font-size: 13px;
+  font-size: 13px; color: var(--${namespace}-text);
 }
-tr:nth-child(even) td { background: #f8f9fa; }
-tr:nth-child(odd) td  { background: #fff; }
+tr:nth-child(even) td { background: var(--${namespace}-bg-page); }
+tr:nth-child(odd) td  { background: var(--${namespace}-bg); }
 td.sel {
-  background: rgba(26,115,232,.12) !important;
-  outline: 2px solid #1a73e8; outline-offset: -1px; z-index: 3; overflow: visible;
+  background: rgba(190,0,0,.10) !important;
+  outline: 2px solid var(--${namespace}-primary); outline-offset: -1px; z-index: 3; overflow: visible;
 }
-td.inr { background: rgba(26,115,232,.07) !important; }
+td.inr { background: rgba(190,0,0,.06) !important; }
 
 /* Cell content */
 .xls-ci {
@@ -751,65 +756,67 @@ td.inr { background: rgba(26,115,232,.07) !important; }
 }
 .xls-ci--r { justify-content: flex-end; }
 .xls-cbc { display: flex; align-items: center; justify-content: center; height: 100%; }
-.xls-cbc input { width: 14px; height: 14px; accent-color: #1a73e8; cursor: pointer; }
-.xls-drop-hint { font-size: 10px; color: #aaa; flex-shrink: 0; padding-left: 2px; }
+.xls-cbc input { width: 14px; height: 14px; accent-color: var(--${namespace}-primary); cursor: pointer; }
+.xls-drop-hint { font-size: 10px; color: var(--${namespace}-text-light); flex-shrink: 0; padding-left: 2px; }
 
-/* Edit input */
+/* Edit input — 党政红聚焦 */
 .xls-input {
   position: absolute; inset: 0; z-index: 20; width: 100%; height: 100%;
-  padding: 1px 6px; border: none; outline: 2px solid #1a73e8;
-  font-size: 13px; font-family: inherit; background: #fff;
-  box-shadow: 0 2px 12px rgba(0,0,0,.2);
+  padding: 1px 6px; border: none; outline: 2px solid var(--${namespace}-primary);
+  font-size: 13px; font-family: inherit; background: var(--${namespace}-bg);
+  box-shadow: 0 0 0 4px rgba(190,0,0,.15), 0 2px 12px rgba(0,0,0,.15);
 }
 
-/* Dropdown trigger */
+/* Dropdown trigger — 党政红聚焦 */
 .xls-drop-trigger {
   position: absolute; inset: 0; display: flex; align-items: center;
   padding: 0 4px 0 6px; font-size: 13px; cursor: pointer;
-  background: #fff; outline: 2px solid #1a73e8; z-index: 20;
-  box-shadow: 0 2px 12px rgba(0,0,0,.2); user-select: none;
+  background: var(--${namespace}-bg); outline: 2px solid var(--${namespace}-primary); z-index: 20;
+  box-shadow: 0 0 0 4px rgba(190,0,0,.15), 0 2px 12px rgba(0,0,0,.15); user-select: none;
 }
-.xls-drop-arrow { margin-left: auto; font-size: 11px; color: #888; }
+.xls-drop-arrow { margin-left: auto; font-size: 11px; color: var(--${namespace}-text-muted); }
 
-/* Date trigger */
+/* Date trigger — 党政红聚焦 */
 .xls-date-trigger {
   position: absolute; inset: 0; display: flex; align-items: center;
   padding: 0 4px 0 6px; font-size: 13px; cursor: pointer;
-  background: #fff; outline: 2px solid #1a73e8; z-index: 20;
-  box-shadow: 0 2px 12px rgba(0,0,0,.2); user-select: none;
+  background: var(--${namespace}-bg); outline: 2px solid var(--${namespace}-primary); z-index: 20;
+  box-shadow: 0 0 0 4px rgba(190,0,0,.15), 0 2px 12px rgba(0,0,0,.15); user-select: none;
 }
 .xls-date-arrow { margin-left: auto; font-size: 11px; flex-shrink: 0; padding-left: 2px; }
 
-/* Resize handle */
+/* Resize handle — 党政红悬停 */
 .xls-resize {
   position: absolute; right: -3px; top: 0; width: 6px; height: 100%;
   cursor: col-resize; z-index: 11;
 }
-.xls-resize:hover { background: rgba(26,115,232,.3); }
+.xls-resize:hover { background: rgba(190,0,0,.25); }
 .xls-sort { font-size: 10px; margin-left: 2px; opacity: .5; }
 
-/* Dropdown panel */
+/* Dropdown panel — 暖灰白底 + 党政红边框 */
 .xls-drop-panel {
   position: fixed; z-index: 9999;
-  background: #fff; border: 1px solid #1a73e8;
-  border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,.2);
+  background: var(--${namespace}-bg); border: 1px solid var(--${namespace}-primary);
+  border-radius: 2px; box-shadow: 0 4px 16px rgba(138,0,0,.10);
   min-width: 90px; overflow: hidden;
 }
 .xls-drop-item {
   padding: 5px 14px; cursor: pointer; font-size: 13px; white-space: nowrap;
+  color: var(--${namespace}-text); transition: background 0.15s ease;
 }
-.xls-drop-item:hover { background: #e8f0fe; }
-.xls-drop-item.active { background: rgba(26,115,232,.12); font-weight: 600; color: #1a73e8; }
+.xls-drop-item:hover { background: var(--${namespace}-primary-bg); }
+.xls-drop-item.active { background: rgba(190,0,0,.08); font-weight: 600; color: var(--${namespace}-primary-dark); }
 
-/* Date picker panel */
+/* Date picker panel — 深红头部，暖调内容 */
 .xls-date-panel {
   position: fixed; z-index: 9999;
-  background: #fff; border: 1px solid #1a73e8;
-  border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,.2);
+  background: var(--${namespace}-bg); border: 1px solid var(--${namespace}-primary);
+  border-radius: 2px; box-shadow: 0 4px 16px rgba(138,0,0,.10);
   width: 232px; overflow: hidden;
 }
 .xls-date-head {
-  background: #1a4f8a; color: #fff;
+  background: linear-gradient(135deg, var(--${namespace}-primary-dark) 0%, var(--${namespace}-primary) 50%, var(--${namespace}-primary-dark) 100%);
+  color: var(--${namespace}-bg);
   display: flex; align-items: center; height: 28px; padding: 0 4px; gap: 2px;
 }
 .xls-date-nav {
@@ -817,7 +824,7 @@ td.inr { background: rgba(26,115,232,.07) !important; }
   cursor: pointer; border-radius: 2px; font-size: 13px; flex-shrink: 0;
   color: rgba(255,255,255,.85);
 }
-.xls-date-nav:hover { background: rgba(255,255,255,.2); color: #fff; }
+.xls-date-nav:hover { background: rgba(255,255,255,.2); color: var(--${namespace}-bg); }
 .xls-date-title {
   flex: 1; text-align: center; font-size: 12px; font-weight: bold;
   cursor: pointer; padding: 2px 4px; border-radius: 2px;
@@ -825,73 +832,76 @@ td.inr { background: rgba(26,115,232,.07) !important; }
 .xls-date-title:hover { background: rgba(255,255,255,.15); }
 .xls-date-weekdays {
   display: grid; grid-template-columns: repeat(7, 1fr);
-  background: #e8edf5; border-bottom: 1px solid #d0d8e8;
+  background: var(--${namespace}-primary-bg); border-bottom: 1px solid var(--${namespace}-primary-border);
 }
 .xls-date-wd {
   text-align: center; font-size: 10px; font-weight: bold;
-  color: #1a4f8a; padding: 3px 0;
+  color: var(--${namespace}-primary-dark); padding: 3px 0;
 }
-.xls-date-wd:first-child, .xls-date-wd:last-child { color: #c0392b; }
+.xls-date-wd:first-child, .xls-date-wd:last-child { color: var(--${namespace}-danger); }
 .xls-date-days {
   display: grid; grid-template-columns: repeat(7, 1fr);
   padding: 3px; gap: 1px;
 }
 .xls-date-day {
   text-align: center; font-size: 11px; padding: 4px 0;
-  cursor: pointer; border-radius: 2px; color: #1c2833; line-height: 1.4;
+  cursor: pointer; border-radius: 2px; color: var(--${namespace}-text); line-height: 1.4;
+  transition: all 0.15s ease;
 }
-.xls-date-day:hover { background: #e8edf5; color: #1a4f8a; }
-.xls-date-day--other { color: #909eac; }
+.xls-date-day:hover { background: var(--${namespace}-primary-bg); color: var(--${namespace}-primary-dark); }
+.xls-date-day--other { color: var(--${namespace}-text-disabled); }
 .xls-date-day--today {
-  font-weight: bold; color: #1a4f8a; border: 1px solid #d0d8e8;
+  font-weight: bold; color: var(--${namespace}-primary); border: 1px solid var(--${namespace}-primary-border);
 }
 .xls-date-day--selected {
-  background: #1a4f8a !important; color: #fff !important; font-weight: bold;
+  background: var(--${namespace}-primary) !important; color: var(--${namespace}-bg) !important; font-weight: bold;
 }
-.xls-date-day--weekend { color: #c0392b; }
-.xls-date-day--weekend.xls-date-day--selected { color: #fff !important; }
+.xls-date-day--weekend { color: var(--${namespace}-danger); }
+.xls-date-day--weekend.xls-date-day--selected { color: var(--${namespace}-bg) !important; }
 .xls-date-my-grid {
   display: grid; grid-template-columns: repeat(4, 1fr);
   padding: 6px; gap: 3px;
 }
 .xls-date-my-item {
   text-align: center; font-size: 11px; padding: 5px 2px;
-  cursor: pointer; border-radius: 2px; color: #1c2833;
+  cursor: pointer; border-radius: 2px; color: var(--${namespace}-text);
+  transition: all 0.15s ease;
 }
-.xls-date-my-item:hover { background: #e8edf5; color: #1a4f8a; }
+.xls-date-my-item:hover { background: var(--${namespace}-primary-bg); color: var(--${namespace}-primary-dark); }
 .xls-date-my-item--selected {
-  background: #1a4f8a; color: #fff; font-weight: bold;
+  background: var(--${namespace}-primary); color: var(--${namespace}-bg); font-weight: bold;
 }
 .xls-date-footer {
-  border-top: 1px solid #e4e8f0; padding: 4px 6px;
+  border-top: 1px solid var(--${namespace}-border-light); padding: 4px 6px;
   display: flex; align-items: center; justify-content: space-between;
-  background: #f0f2f5;
+  background: var(--${namespace}-bg-page);
 }
 .xls-date-today {
-  font-size: 11px; color: #1a4f8a; cursor: pointer;
+  font-size: 11px; color: var(--${namespace}-primary); cursor: pointer;
   padding: 1px 4px; border-radius: 2px;
 }
-.xls-date-today:hover { background: #e8edf5; }
+.xls-date-today:hover { background: var(--${namespace}-primary-bg); }
 .xls-date-clear {
-  font-size: 11px; color: #5d6d7e; cursor: pointer;
+  font-size: 11px; color: var(--${namespace}-text-muted); cursor: pointer;
   padding: 1px 4px; border-radius: 2px;
 }
-.xls-date-clear:hover { color: #c0392b; background: #fcecea; }
+.xls-date-clear:hover { color: var(--${namespace}-danger); background: var(--${namespace}-danger-bg); }
 
-/* Context menu */
+/* Context menu — 暖白灰底 */
 .xls-ctx {
   position: fixed; z-index: 9998;
-  background: #fff; border: 1px solid #ccc;
-  border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,.15);
+  background: var(--${namespace}-bg); border: 1px solid var(--${namespace}-border-light);
+  border-radius: 2px; box-shadow: 0 4px 16px rgba(45,37,34,.10);
   min-width: 170px; padding: 4px 0; font-size: 13px;
 }
 .xls-cxi {
   padding: 5px 16px; cursor: pointer;
   display: flex; align-items: center; gap: 8px; white-space: nowrap;
+  color: var(--${namespace}-text); transition: background 0.15s ease;
 }
-.xls-cxi:hover { background: #f0f0f0; }
-.xls-cxi i { font-size: 14px; color: #6b7280; width: 16px; }
-.xls-cxi--danger, .xls-cxi--danger i { color: #dc2626; }
-.xls-cxs { height: 1px; background: #e8e8e8; margin: 3px 0; }
-.xls-cxsc { margin-left: auto; font-size: 11px; color: #aaa; }
+.xls-cxi:hover { background: var(--${namespace}-primary-bg); }
+.xls-cxi i { font-size: 14px; color: var(--${namespace}-text-muted); width: 16px; }
+.xls-cxi--danger, .xls-cxi--danger i { color: var(--${namespace}-danger); }
+.xls-cxs { height: 1px; background: var(--${namespace}-border-light); margin: 3px 0; }
+.xls-cxsc { margin-left: auto; font-size: 11px; color: var(--${namespace}-text-light); }
 </style>

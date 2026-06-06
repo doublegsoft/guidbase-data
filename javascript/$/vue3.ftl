@@ -31,13 +31,14 @@ const validationErrorMessage = ref('')
 </#macro>
 
 <#macro print_entry_form_methods form indent=0>
+
 /**
  * 加载数据的界面函数
  */
 const load${js.nameType(form.id)}Data = async () => {
   isLoading.value = true
   try {
-    const data = await fetchUserDataApi()
+    const data = await sdk.fetch${js.nameType(form.id)}Data()
     Object.assign(${js.nameVariable(form.id)}Data, data)
   } catch (error) {
     // TODO: 这里可以添加错误处理逻辑，例如显示错误消息
@@ -121,6 +122,21 @@ ${""?left_pad(indent)}const ${js.nameVariable(form.id)}Rows = ref([])
 </#macro>
 
 <#macro print_excel_form_methods form indent=0>
+
+/**
+ * 加载数据的界面函数
+ */
+const load${js.nameType(form.id)}Rows = async () => {
+  isLoading.value = true
+  try {
+    const res = await sdk.fetch${js.nameType(form.id)}Rows(0, -1)
+    ${js.nameVariable(form.id)}Rows.value = res.data
+  } catch (error) {
+    // TODO: 这里可以添加错误处理逻辑，例如显示错误消息
+  } finally {
+    isLoading.value = false
+  }
+}
 </#macro>
 
 <#macro print_layout_excel_form form indent=0>
@@ -172,6 +188,24 @@ ${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitiv
 ${""?left_pad(indent)}});
 </#macro>
 
+<#macro print_display_form_methods form indent=0>
+
+/**
+ * 加载数据的界面函数
+ */
+const load${js.nameType(form.id)}Data = async () => {
+  isLoading.value = true
+  try {
+    const data = await sdk.fetch${js.nameType(form.id)}Data()
+    Object.assign(${js.nameVariable(form.id)}Data, data)
+  } catch (error) {
+    // TODO: 这里可以添加错误处理逻辑，例如显示错误消息
+  } finally {
+    isLoading.value = false
+  }
+}
+</#macro>
+
 <#macro print_layout_display_form form indent=0>
   <#list form.groups() as group>
 ${""?left_pad(indent)}<div class="${namespace}-panel">
@@ -198,7 +232,12 @@ ${""?left_pad(indent)}const tabs${js.nameType(tabs.id)} = [
 ${""?left_pad(indent)}  { key: '${js.nameVariable(tab.id)}',  label: '${tab.title}', badge: '' },
   </#list>
 ${""?left_pad(indent)}]
-const activeTab${js.nameType(tabs.id)} = ref('${js.nameVariable(tabs.children[0].id)}')
+${""?left_pad(indent)}const activeTab${js.nameType(tabs.id)} = ref('${js.nameVariable(tabs.children[0].id)}')
+${""?left_pad(indent)}const ${js.nameVariable(tabs.id)}Ref = ref(null)
+${""?left_pad(indent)}const ${js.nameVariable(tabs.id)}Height = ref('${js.nameVariable(tabs.children[0].id)}')
+</#macro>
+
+<#macro print_tabs_methods tabs indent=0>
 </#macro>
 
 <#macro print_layout_tabs tabs indent=0>
@@ -219,9 +258,9 @@ ${""?left_pad(indent)}  <div class="${namespace}-tabs-right" v-show="activeTab${
 ${""?left_pad(indent)}  </div>
   </#if>
 ${""?left_pad(indent)}</div>
-${""?left_pad(indent)}<div style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
+${""?left_pad(indent)}<div class="${namespace}-tabs-content" ref="${js.nameVariable(tabs.id)}Ref">
   <#list tabs.children as tab>
-${""?left_pad(indent)}  <div v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(tab.id)}'">
+${""?left_pad(indent)}  <div v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(tab.id)}'" :style="{ height: ${js.nameType(tabs.id)}Height + 'px' }">
     <#if tab.children?size == 0>
 ${""?left_pad(indent)}    ${tab.title}
     <#else>
@@ -332,9 +371,6 @@ ${""?left_pad(indent)}  @selection-change="handleSelection" />
 
 <#function get_button_method_name button>
   <#local methodName = "handle">
-  <#if button.id??>
-    <#local methodName += js.nameType(button.id)>
-  </#if>
   <#if button.ancestor("entry_form")??>
     <#local ancestor = button.ancestor("entry_form")>
   <#elseif button.ancestor("criteria_form")??>
@@ -347,7 +383,11 @@ ${""?left_pad(indent)}  @selection-change="handleSelection" />
       <#local methodName += js.nameType(button.value("ref"))>
       <#local ancestor = button.page.byId(button.value("ref"))>
     </#if>
-    <#local methodName += js.nameType(button.value("action")!"Custom")>
+  </#if>
+  <#if button.id??>
+    <#local methodName += js.nameType(button.id)>
+  <#else>
+    <#local methodName += (js.nameType(button.value("action", "custom")))>  
   </#if>
   <#return methodName>
 </#function>
@@ -376,6 +416,7 @@ const ${get_button_method_name(button)} = () => {
 </#macro>
 
 <#macro print_layout_buttons buttons indent=0>
+  <#-- bnrlike 模式下，按钮在tab页的右侧 -->
   <#if buttons.ancestor("tabs")??>
     <#return>
   </#if>
@@ -391,39 +432,6 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                                   PAGE                                  -->
 <!----------------------------------------------------------------------------->
-
-<#macro print_page_variables page indent=0>
-  <#list page.widgets as widget>
-    <#if widget.type == 'entry_form'>
-<@print_entry_form_variables form=widget indent=indent />
-    <#elseif widget.type == 'excel_form'>
-<@print_excel_form_variables form=widget indent=indent />
-    <#elseif widget.type == 'criteria_form'>
-<@print_criteria_form_variables form=widget indent=indent />
-    <#elseif widget.type == 'display_form'>
-<@print_display_form_variables form=widget indent=indent />
-    <#elseif widget.type == 'paged_table'>
-<@print_paged_table_variables table=widget indent=indent />
-    <#elseif widget.type == 'tabs'>
-<@print_tabs_variables tabs=widget indent=indent />
-    </#if>
-  </#list>
-</#macro>
-
-<#macro print_page_methods page indent=0>
-  <#list page.widgets as widget>
-    <#if widget.type == 'entry_form'>
-<@print_entry_form_methods form=widget indent=indent />
-    <#elseif widget.type == 'excel_form'>
-<@print_excel_form_methods form=widget indent=indent />
-    <#elseif widget.type == 'paged_table'>
-<@print_paged_table_methods table=widget indent=indent />
-    <#elseif widget.type == 'button'>
-<@print_paged_button_methods button=widget indent=indent />
-    </#if>
-  </#list>
-</#macro>
-
 <#macro print_page_imports page indent=0>
   <#local visited_types = {}>
   <#list page.widgets as widget>
@@ -450,6 +458,42 @@ import ${js.nameType(namespace)}Multiselect from '@/components/${namespace}-mult
 import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsinput.vue' 
     </#if>
     <#local visited_types += {widget.type: widget} />
+  </#list>
+</#macro>
+
+<#macro print_page_variables page indent=0>
+  <#list page.widgets as widget>
+    <#if widget.type == 'entry_form'>
+<@print_entry_form_variables form=widget indent=indent />
+    <#elseif widget.type == 'excel_form'>
+<@print_excel_form_variables form=widget indent=indent />
+    <#elseif widget.type == 'criteria_form'>
+<@print_criteria_form_variables form=widget indent=indent />
+    <#elseif widget.type == 'display_form'>
+<@print_display_form_variables form=widget indent=indent />
+    <#elseif widget.type == 'paged_table'>
+<@print_paged_table_variables table=widget indent=indent />
+    <#elseif widget.type == 'tabs'>
+<@print_tabs_variables tabs=widget indent=indent />
+    </#if>
+  </#list>
+</#macro>
+
+<#macro print_page_methods page indent=0>
+  <#list page.widgets as widget>
+    <#if widget.type == 'entry_form'>
+<@print_entry_form_methods form=widget indent=indent />
+    <#elseif widget.type == 'display_form'>
+<@print_display_form_methods form=widget indent=indent />
+    <#elseif widget.type == 'excel_form'>
+<@print_excel_form_methods form=widget indent=indent />
+    <#elseif widget.type == 'paged_table'>
+<@print_paged_table_methods table=widget indent=indent />
+    <#elseif widget.type == 'tabs'>
+<@print_tabs_methods tabs=widget indent=indent />
+    <#elseif widget.type == 'button'>
+<@print_paged_button_methods button=widget indent=indent />
+    </#if>
   </#list>
 </#macro>
 

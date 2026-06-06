@@ -83,10 +83,10 @@ function onSizeChange(e) {
   align-items: center;
   justify-content: space-between;
   padding: 8px 14px;
-  background: #fff;
-  border-top: 1px solid #c8c8c8;
+  background: var(--${namespace}-bg);
+  border-top: 1px solid var(--${namespace}-border);
   font-size: 12px;
-  color: #1c2833;
+  color: var(--${namespace}-text);
   flex-shrink: 0;
 }
 
@@ -94,12 +94,12 @@ function onSizeChange(e) {
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #5d6d7e;
+  color: var(--${namespace}-text-muted);
 }
 
 .${namespace}-pg-size {
   height: 24px;
-  border: 1px solid #c8c8c8;
+  border: 1px solid var(--${namespace}-border);
   padding: 0 4px;
   border-radius: 2px;
   outline: none;
@@ -116,9 +116,9 @@ function onSizeChange(e) {
   height: 24px;
   min-width: 24px;
   padding: 0 6px;
-  background: #fff;
-  border: 1px solid #c8c8c8;
-  color: #1c2833;
+  background: var(--${namespace}-bg);
+  border: 1px solid var(--${namespace}-border);
+  color: var(--${namespace}-text);
   border-radius: 2px;
   cursor: pointer;
   display: flex;
@@ -129,26 +129,26 @@ function onSizeChange(e) {
 }
 
 .${namespace}-pg-btn:hover:not(:disabled) {
-  border-color: #1a4f8a;
-  color: #1a4f8a;
+  border-color: var(--${namespace}-primary);
+  color: var(--${namespace}-primary);
 }
 
 .${namespace}-pg-btn.${namespace}-on {
-  background: #1a4f8a;
-  color: #fff;
-  border-color: #1a4f8a;
+  background: var(--${namespace}-primary);
+  color: var(--${namespace}-bg);
+  border-color: var(--${namespace}-primary);
   font-weight: bold;
 }
 
 .${namespace}-pg-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-  background: #f5f5f5;
+  background: var(--${namespace}-bg-page);
 }
 
 .${namespace}-pg-ellipsis {
   font-size: 12px;
-  color: #909eac;
+  color: var(--${namespace}-text-light);
   padding: 0 2px;
 }
 </style>
