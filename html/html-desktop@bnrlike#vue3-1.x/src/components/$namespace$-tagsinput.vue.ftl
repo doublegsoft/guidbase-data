@@ -7,6 +7,7 @@
       '${namespace}-tags--focus': isFocus,
       ['${namespace}-tags--' + size]: size,
       '${namespace}-tags--block': block,
+      '${namespace}-tags--plain': plain,
     }"
   >
     <div class="${namespace}-tags__wrap" @click="focusInput">
@@ -56,6 +57,7 @@ const props = defineProps({
   disabled:        { type: Boolean,  default: false },
   size:            { type: String,   default: '' },
   block:           { type: Boolean,  default: false },
+  plain:           { type: Boolean,  default: false },
   separator:       { type: Array,    default: null },
   onCreate:        { type: Function, default: null },
 })
@@ -288,6 +290,17 @@ defineExpose({
 }
 .${namespace}-tags__input::placeholder { color: var(--${namespace}-text-light); }
 .${namespace}-tags--disabled .${namespace}-tags__input { cursor: not-allowed; }
+
+/* plain - 无边框 */
+.${namespace}-tags--plain .${namespace}-tags__wrap {
+  border-color: transparent;
+  box-shadow: none;
+  background: transparent;
+}
+.${namespace}-tags--plain.${namespace}-tags--focus .${namespace}-tags__wrap {
+  border-color: transparent;
+  box-shadow: none;
+}
 
 .${namespace}-tags__counter {
   font-size: 10px;

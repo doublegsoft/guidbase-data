@@ -1,5 +1,5 @@
 <template>
-  <div class="${namespace}-dp" :class="{[`${namespace}-dp--${r"${size}"}`]: size, '${namespace}-dp--open': open, '${namespace}-dp--disabled': disabled, '${namespace}-dp--has-value': hasValue}" ref="rootEl">
+  <div class="${namespace}-dp" :class="{[`${namespace}-dp--${r"${size}"}`]: size, '${namespace}-dp--plain': plain, '${namespace}-dp--open': open, '${namespace}-dp--disabled': disabled, '${namespace}-dp--has-value': hasValue}" ref="rootEl">
     <div class="${namespace}-dp__trigger" :class="{'${namespace}-dp__trigger--ph': !hasValue}" @click="toggle" @keydown="onKeydown" tabindex="0">
       {{ displayText }}
     </div>
@@ -69,6 +69,7 @@ const props = defineProps({
   modelValue:  { type: String,  default: null },
   placeholder: { type: String,  default: '请选择日期' },
   disabled:    { type: Boolean, default: false },
+  plain:       { type: Boolean, default: false },
   size:        { type: String,  default: '' },
   format:      { type: String,  default: 'YYYY-MM-DD' },
   minDate:     { type: String,  default: null },
@@ -524,6 +525,20 @@ defineExpose({ openPanel, closePanel, clear })
   border-radius: 2px;
 }
 .${namespace}-dp__clear-btn:hover { color: var(--${namespace}-danger, #c0392b); background: var(--${namespace}-danger-bg, #fcecea); }
+
+.${namespace}-dp--plain .${namespace}-dp__trigger {
+  border: none;
+  background: transparent;
+  padding: 0 4px;
+  box-shadow: none;
+}
+.${namespace}-dp--plain .${namespace}-dp__trigger::after {
+  content: none;
+}
+.${namespace}-dp--plain.${namespace}-dp--open .${namespace}-dp__trigger {
+  border: none;
+  box-shadow: none;
+}
 
 .${namespace}-dp--sm .${namespace}-dp__trigger { height: 20px; font-size: 11px; }
 .${namespace}-dp--lg .${namespace}-dp__trigger { height: 28px; font-size: 13px; }

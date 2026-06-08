@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中国电子口岸 · 海关报关单申报系统</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#002b5c;
+  --navy2:#003d80;
+  --navy3:#0052a3;
+  --sky:#0077cc;
+  --sky2:#0099e6;
+  --gold:#c8860a;
+  --gold2:#e6a012;
+  --red:#cc2200;
+  --green:#1a7a3c;
+  --orange:#d46c00;
+  --bg:#edf1f7;
+  --bg2:#f4f6fa;
+  --white:#ffffff;
+  --border:#b8c8dc;
+  --border2:#cdd8e8;
+  --text:#1a2030;
+  --text2:#3a4a60;
+  --text3:#6a7a90;
+  --muted:#8090a8;
+  --row-alt:#f0f4f9;
+  --sel:#d4e8ff;
+  --warn-bg:#fff8e8;
+  --warn-border:#e8c040;
+  --err-bg:#fff0ee;
+  --err-border:#e04030;
+}
+html,body{height:100%;overflow:hidden;font-family:'Noto Sans SC',sans-serif;font-size:12px;background:var(--bg);color:var(--text)}
+#app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* ══ 顶部通栏 ══ */
+#topbar{
+  background:linear-gradient(90deg,var(--navy) 0%,var(--navy2) 60%,var(--navy3) 100%);
+  height:42px;display:flex;align-items:center;padding:0 14px;flex-shrink:0;
+  border-bottom:2px solid var(--gold);
+  position:relative;overflow:hidden;
+}
+#topbar::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,0) 0px,rgba(255,255,255,0) 60px,rgba(255,255,255,.015) 60px,rgba(255,255,255,.015) 61px);
+  pointer-events:none;
+}
+.tb-emblem{
+  width:28px;height:28px;background:rgba(200,134,10,.25);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  border:1px solid rgba(200,134,10,.5);flex-shrink:0;
+}
+.tb-titles{margin-left:10px}
+.tb-title-main{font-size:15px;font-weight:700;color:#ffd060;letter-spacing:2px;line-height:1.2}
+.tb-title-sub{font-size:10px;color:rgba(255,220,120,.6);letter-spacing:1px}
+.tb-divider{width:1px;height:28px;background:rgba(255,255,255,.15);margin:0 16px}
+.tb-sys-name{font-size:13px;color:rgba(255,255,255,.85);font-weight:500;letter-spacing:1px}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.tb-info{font-size:11px;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:5px}
+.tb-info strong{color:rgba(255,200,100,.9)}
+.tb-btn-sm{
+  padding:3px 10px;border-radius:2px;font-size:11px;cursor:pointer;border:none;
+  background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);
+  border:1px solid rgba(255,255,255,.15);
+}
+.tb-btn-sm:hover{background:rgba(255,255,255,.2)}
+.tb-clock{font-size:13px;font-weight:700;color:#ffd060;font-variant-numeric:tabular-nums;letter-spacing:1px}
+
+/* ══ 菜单栏 ══ */
+#menubar{
+  background:#1a3a6a;height:28px;display:flex;align-items:stretch;
+  border-bottom:1px solid #0a2040;flex-shrink:0;
+}
+.mb-item{
+  display:flex;align-items:center;padding:0 12px;font-size:12px;
+  color:rgba(255,255,255,.75);cursor:pointer;position:relative;gap:4px;
+  border-right:1px solid rgba(255,255,255,.06);
+  white-space:nowrap;
+}
+.mb-item:hover{background:#2a4a7a;color:#fff}
+.mb-item.act{background:var(--sky);color:#fff}
+.mb-item.act::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid var(--bg2)}
+.mb-ico{font-size:13px}
+.mb-shortcut{font-size:9px;color:rgba(255,255,255,.4);margin-left:auto;padding-left:8px}
+
+/* ══ 工具栏 ══ */
+#toolbar{
+  background:var(--bg2);height:34px;display:flex;align-items:center;
+  padding:0 8px;border-bottom:1px solid var(--border);flex-shrink:0;gap:3px;
+}
+.tool-group{display:flex;align-items:center;gap:2px;padding:0 4px;border-right:1px solid var(--border2)}
+.tool-group:last-child{border-right:none;margin-left:auto}
+.tbtn{
+  display:flex;align-items:center;gap:3px;padding:3px 8px;border:1px solid transparent;
+  border-radius:2px;cursor:pointer;background:transparent;font-size:11px;color:var(--text2);
+  white-space:nowrap;font-family:inherit;
+}
+.tbtn:hover{background:#e0e8f4;border-color:var(--border)}
+.tbtn:active{background:#d0d8ec}
+.tbtn.primary{background:var(--sky);color:#fff;border-color:var(--sky2)}
+.tbtn.primary:hover{background:var(--sky2)}
+.tbtn.danger{background:var(--red);color:#fff;border-color:#aa1800}
+.tbtn.success{background:var(--green);color:#fff;border-color:#156030}
+.tbtn.warn{background:var(--gold);color:#fff;border-color:var(--gold2)}
+.tbtn.disabled{opacity:.45;cursor:not-allowed}
+.tbtn-ico{font-size:13px}
+.t-sep{width:1px;height:20px;background:var(--border2);margin:0 2px}
+.status-pill{
+  display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:2px;
+  font-size:11px;font-weight:500;border:1px solid;
+}
+.sp-draft{background:#fff8e8;color:#a06010;border-color:#d4a030}
+.sp-submit{background:#e8f4ff;color:#0055aa;border-color:#80b8e8}
+.sp-pass{background:#e8f8ee;color:#1a6a30;border-color:#80c898}
+
+/* ══ 主体布局 ══ */
+#main{display:flex;flex:1;overflow:hidden;gap:0}
+#sidebar{width:200px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+#content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* ══ 侧边栏 ══ */
+.sb-section{flex-shrink:0}
+.sb-header{
+  background:var(--navy);color:rgba(255,255,255,.85);
+  padding:5px 10px;font-size:11px;font-weight:500;letter-spacing:1px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.sb-header-add{color:rgba(255,200,100,.8);cursor:pointer;font-size:14px;font-weight:700}
+.sb-item{
+  display:flex;align-items:center;gap:6px;padding:6px 10px 6px 14px;
+  font-size:12px;color:var(--text2);cursor:pointer;
+  border-bottom:1px solid var(--border2);
+  position:relative;
+}
+.sb-item:hover{background:#e8f0f8}
+.sb-item.act{background:var(--sel);color:var(--sky);font-weight:500;border-left:3px solid var(--sky)}
+.sb-item.act{padding-left:11px}
+.sb-item-ico{font-size:13px;flex-shrink:0;width:16px;text-align:center}
+.sb-item-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-item-badge{
+  padding:1px 5px;border-radius:8px;font-size:10px;font-weight:600;
+  background:#e04030;color:#fff;flex-shrink:0;
+}
+.sb-item-badge.blue{background:var(--sky);color:#fff}
+.sb-item-badge.green{background:var(--green);color:#fff}
+
+.sb-stats{padding:8px 10px;border-bottom:1px solid var(--border2)}
+.sb-stat-row{display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px}
+.sb-stat-label{color:var(--text3)}
+.sb-stat-val{font-weight:600;color:var(--text)}
+.sb-stat-val.red{color:var(--red)}
+.sb-stat-val.green{color:var(--green)}
+
+.sb-scroll{flex:1;overflow-y:auto}
+.sb-scroll::-webkit-scrollbar{width:4px}
+.sb-scroll::-webkit-scrollbar-thumb{background:#c0ccd8;border-radius:2px}
+
+/* ══ 表单区域 ══ */
+#form-tabs{
+  display:flex;background:var(--navy);flex-shrink:0;
+}
+.ftab{
+  padding:6px 16px;font-size:12px;color:rgba(255,255,255,.65);
+  cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;
+}
+.ftab:hover{color:rgba(255,255,255,.9)}
+.ftab.act{color:#fff;border-bottom-color:#ffd060;background:rgba(255,255,255,.08)}
+.ftab-count{
+  margin-left:4px;background:rgba(255,150,50,.8);color:#fff;
+  padding:0 5px;border-radius:8px;font-size:10px;
+}
+
+#form-area{flex:1;overflow-y:auto;padding:10px 12px}
+#form-area::-webkit-scrollbar{width:6px}
+#form-area::-webkit-scrollbar-thumb{background:#c0ccd8;border-radius:3px}
+
+/* ══ 表单卡片 ══ */
+.form-card{
+  background:#fff;border:1px solid var(--border);border-radius:3px;
+  margin-bottom:10px;overflow:hidden;
+}
+.form-card-header{
+  background:linear-gradient(90deg,var(--navy) 0%,#1a4a80 100%);
+  padding:6px 12px;display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;user-select:none;
+}
+.form-card-title{
+  font-size:12px;font-weight:600;color:#fff;letter-spacing:1px;
+  display:flex;align-items:center;gap:6px;
+}
+.form-card-title::before{content:'▶';font-size:9px;color:rgba(255,220,100,.8)}
+.form-card.collapsed .form-card-title::before{content:'▶'}
+.form-card-tools{display:flex;align-items:center;gap:6px}
+.fct-btn{padding:2px 8px;background:rgba(255,255,255,.15);border:none;border-radius:2px;color:rgba(255,255,255,.8);font-size:11px;cursor:pointer}
+.fct-btn:hover{background:rgba(255,255,255,.25)}
+.form-card-body{padding:10px 12px}
+
+/* ══ 字段行 ══ */
+.form-row{display:flex;flex-wrap:wrap;gap:0;margin-bottom:1px}
+.form-field{
+  display:flex;align-items:center;
+  border:1px solid var(--border2);
+  margin:-1px 0 0 -1px;
+  min-height:26px;
+}
+.form-field:hover{z-index:1;border-color:var(--sky)}
+.form-field:focus-within{z-index:2;border-color:var(--sky);box-shadow:0 0 0 2px rgba(0,119,204,.12)}
+.field-label{
+  background:#eaf0f8;padding:3px 8px;
+  font-size:11px;color:var(--text2);white-space:nowrap;
+  border-right:1px solid var(--border2);flex-shrink:0;
+  min-height:26px;display:flex;align-items:center;
+}
+.field-label.req::after{content:'*';color:var(--red);margin-left:2px}
+.field-input{
+  flex:1;min-width:60px;padding:3px 6px;border:none;outline:none;
+  font-size:12px;font-family:inherit;color:var(--text);background:#fff;
+  min-height:26px;
+}
+.field-input:focus{background:#f8fbff}
+.field-select{
+  flex:1;padding:2px 4px;border:none;outline:none;
+  font-size:12px;font-family:inherit;color:var(--text);background:#fff;
+  min-height:26px;cursor:pointer;
+}
+.field-input.code{font-family:monospace;font-size:11px;letter-spacing:.5px}
+.field-input.num{text-align:right}
+.field-input.readonly{background:#f4f6f8;color:var(--text2);cursor:default}
+.field-addon{
+  padding:3px 6px;background:#f4f6f8;border-left:1px solid var(--border2);
+  font-size:11px;color:var(--text3);white-space:nowrap;cursor:pointer;
+  display:flex;align-items:center;
+}
+.field-addon:hover{background:#e4ecf8;color:var(--sky)}
+.field-err .field-input,.field-err .field-select{background:#fff4f4}
+.field-err{border-color:var(--red)!important}
+.field-warn .field-input{background:#fffbf0}
+.field-warn{border-color:#e0a000!important}
+
+/* widths */
+.w1{width:calc(100%/12*1)}.w2{width:calc(100%/12*2)}.w3{width:calc(100%/12*3)}
+.w4{width:calc(100%/12*4)}.w5{width:calc(100%/12*5)}.w6{width:50%}
+.w7{width:calc(100%/12*7)}.w8{width:calc(100%/12*8)}.w9{width:calc(100%/12*9)}
+.w10{width:calc(100%/12*10)}.w12{width:100%}
+
+/* ══ 货物清单表格 ══ */
+.goods-table-wrap{overflow-x:auto;border:1px solid var(--border)}
+.goods-table{width:100%;border-collapse:collapse;font-size:11px;min-width:1200px}
+.goods-table th{
+  background:linear-gradient(180deg,#2a4a7a,#1a3a6a);
+  color:rgba(255,255,255,.9);padding:5px 6px;
+  border:1px solid rgba(255,255,255,.1);font-weight:500;
+  white-space:nowrap;text-align:center;position:sticky;top:0;z-index:5;
+}
+.goods-table th.req::after{content:'*';color:#ffb060;margin-left:2px}
+.goods-table td{
+  padding:3px 5px;border:1px solid var(--border2);color:var(--text);
+  background:#fff;vertical-align:middle;
+}
+.goods-table tr:nth-child(even) td{background:var(--row-alt)}
+.goods-table tr.sel td{background:var(--sel)!important}
+.goods-table tr:hover td{background:#e8f2ff!important}
+.goods-table td input{
+  width:100%;border:none;outline:none;padding:2px 4px;
+  background:transparent;font-size:11px;font-family:inherit;color:var(--text);
+}
+.goods-table td input:focus{background:#fff;outline:1px solid var(--sky)}
+.goods-table td.num input,.goods-table td.num{text-align:right}
+.goods-table td.center{text-align:center}
+.goods-table .td-seq{width:32px;text-align:center;font-size:10px;color:var(--text3);background:#f0f4f8!important;font-weight:600}
+.goods-table .row-ops{width:56px;text-align:center}
+.row-op-btn{padding:1px 5px;border:1px solid;border-radius:2px;font-size:10px;cursor:pointer;background:#fff;margin:0 1px}
+.row-op-btn.add{border-color:#1a7a3c;color:#1a7a3c}
+.row-op-btn.add:hover{background:#1a7a3c;color:#fff}
+.row-op-btn.del{border-color:#cc2200;color:#cc2200}
+.row-op-btn.del:hover{background:#cc2200;color:#fff}
+
+/* ══ 底部状态栏 ══ */
+#statusbar{
+  display:flex;align-items:center;gap:0;
+  background:#1a3a6a;border-top:1px solid #0a2040;flex-shrink:0;height:22px;
+}
+.sb2-item{
+  padding:0 10px;font-size:10px;color:rgba(255,255,255,.6);
+  border-right:1px solid rgba(255,255,255,.08);height:100%;
+  display:flex;align-items:center;gap:4px;
+}
+.sb2-item strong{color:rgba(255,220,100,.9)}
+.sb2-item.green strong{color:#80e8a0}
+.sb2-item.red strong{color:#ff8080}
+.sb2-right{margin-left:auto;display:flex;align-items:stretch}
+.sb2-progress{
+  display:flex;align-items:center;gap:6px;padding:0 12px;
+  font-size:10px;color:rgba(255,255,255,.5);
+}
+.sb2-pbar{width:80px;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
+.sb2-pfill{height:100%;background:var(--gold2);border-radius:3px;width:62%}
+
+/* ══ 验证错误面板 ══ */
+#err-panel{
+  background:var(--err-bg);border-top:2px solid var(--err-border);
+  flex-shrink:0;max-height:80px;overflow-y:auto;
+}
+.err-header{
+  display:flex;align-items:center;gap:6px;padding:3px 10px;
+  background:#ffeeec;border-bottom:1px solid var(--err-border);
+  font-size:11px;font-weight:600;color:#a02010;cursor:pointer;
+}
+.err-list{padding:3px 10px}
+.err-row{
+  display:flex;align-items:center;gap:8px;padding:2px 0;font-size:11px;
+  border-bottom:1px solid #ffd8d4;color:#802010;
+}
+.err-code{color:var(--red);font-weight:600;min-width:80px}
+.err-fix{margin-left:auto;color:var(--sky);cursor:pointer;font-size:10px}
+.err-fix:hover{text-decoration:underline}
+
+/* ══ 右侧辅助面板 ══ */
+#assist{width:220px;border-left:1px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;flex-shrink:0}
+.ast-tab{display:flex;background:#1a3a6a}
+.ast-tabitem{flex:1;padding:5px;text-align:center;font-size:11px;color:rgba(255,255,255,.6);cursor:pointer;border-bottom:2px solid transparent}
+.ast-tabitem.act{color:#fff;border-bottom-color:var(--gold2)}
+.ast-body{flex:1;overflow-y:auto;padding:8px}
+.ast-body::-webkit-scrollbar{width:3px}
+.ast-body::-webkit-scrollbar-thumb{background:#c0ccd8}
+
+.ast-card{background:#fff;border:1px solid var(--border2);border-radius:3px;margin-bottom:8px;overflow:hidden}
+.ast-card-hd{background:#e8eef8;padding:4px 8px;font-size:11px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:4px}
+.ast-card-hd::before{content:'▸';color:var(--sky)}
+.ast-card-bd{padding:6px 8px;font-size:11px;color:var(--text2);line-height:1.8}
+.ast-row{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #f0f4f8;font-size:11px}
+.ast-row:last-child{border-bottom:none}
+.ast-key{color:var(--text3)}
+.ast-val{color:var(--text);font-weight:500;text-align:right;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ast-val.green{color:var(--green)}
+.ast-val.red{color:var(--red)}
+.ast-val.blue{color:var(--sky)}
+.ast-hint{font-size:11px;color:var(--text3);line-height:1.7;padding:4px 0}
+.ast-hint strong{color:var(--red)}
+.ast-hint em{font-style:normal;color:var(--sky)}
+
+/* ══ 通知浮层 ══ */
+.toast{
+  position:fixed;top:60px;right:20px;z-index:9999;
+  background:#fff;border:1px solid var(--border);border-radius:3px;
+  box-shadow:0 4px 16px rgba(0,0,0,.15);padding:10px 14px;
+  display:flex;align-items:flex-start;gap:8px;max-width:320px;
+  animation:slideIn .2s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+.toast-ico{font-size:16px;flex-shrink:0;margin-top:1px}
+.toast-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
+.toast-body{font-size:11px;color:var(--text2);line-height:1.6}
+.toast-close{margin-left:auto;cursor:pointer;color:var(--text3);font-size:14px;flex-shrink:0;line-height:1}
+.toast-close:hover{color:var(--text)}
+
+/* ══ 数字徽章 ══ */
+.badge{display:inline-flex;align-items:center;padding:1px 6px;border-radius:2px;font-size:10px;font-weight:600}
+.badge-draft{background:#fff3cc;color:#a06000;border:1px solid #e0c060}
+.badge-proc{background:#e0eeff;color:#0050aa;border:1px solid #90b8e8}
+.badge-err{background:#ffe8e8;color:#aa1800;border:1px solid #e0a0a0}
+.badge-ok{background:#e0f5e8;color:#1a6a30;border:1px solid #90cc90}
+
+/* ══ 加载动画 ══ */
+.spin{display:inline-block;animation:spin .8s linear infinite;font-size:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 折叠 */
+.form-card.collapsed .form-card-body{display:none}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- 顶部通栏 -->
+<div id="topbar">
+  <div class="tb-emblem">🏛</div>
+  <div class="tb-titles">
+    <div class="tb-title-main">中国电子口岸</div>
+    <div class="tb-title-sub">CHINA E-PORT · CUSTOMS CLEARANCE SYSTEM</div>
+  </div>
+  <div class="tb-divider"></div>
+  <div class="tb-sys-name">H2000 海关报关单申报平台 v6.3.1</div>
+  <div class="tb-right">
+    <div class="tb-info">操作员：<strong>张小明</strong></div>
+    <div class="tb-info">关区：<strong>上海海关 3100</strong></div>
+    <div class="tb-info">企业：<strong>上海XX进出口有限公司</strong></div>
+    <div class="tb-divider"></div>
+    <button class="tb-btn-sm">修改密码</button>
+    <button class="tb-btn-sm">系统帮助</button>
+    <button class="tb-btn-sm">退出</button>
+    <div class="tb-clock" id="theclock">--:--:--</div>
+  </div>
+</div>
+
+<!-- 菜单栏 -->
+<div id="menubar">
+  <div class="mb-item act"><span class="mb-ico">📋</span>报关单管理<span class="mb-shortcut">F2</span></div>
+  <div class="mb-item"><span class="mb-ico">🚢</span>进口申报<span class="mb-shortcut">F3</span></div>
+  <div class="mb-item"><span class="mb-ico">✈</span>出口申报<span class="mb-shortcut">F4</span></div>
+  <div class="mb-item"><span class="mb-ico">📦</span>货物查询<span class="mb-shortcut">F5</span></div>
+  <div class="mb-item"><span class="mb-ico">💳</span>税费管理</div>
+  <div class="mb-item"><span class="mb-ico">📑</span>证书许可</div>
+  <div class="mb-item"><span class="mb-ico">🔍</span>稽查核查</div>
+  <div class="mb-item"><span class="mb-ico">📊</span>统计报表</div>
+  <div class="mb-item"><span class="mb-ico">⚙</span>系统设置</div>
+</div>
+
+<!-- 工具栏 -->
+<div id="toolbar">
+  <div class="tool-group">
+    <button class="tbtn primary" onclick="doSave()"><span class="tbtn-ico">💾</span>暂存 F5</button>
+    <button class="tbtn success" onclick="doSubmit()"><span class="tbtn-ico">📤</span>申报 F6</button>
+    <button class="tbtn warn" onclick="doValidate()"><span class="tbtn-ico">✅</span>校验 F7</button>
+  </div>
+  <div class="tool-group">
+    <button class="tbtn" onclick="doNew()"><span class="tbtn-ico">➕</span>新建</button>
+    <button class="tbtn" onclick="doCopy()"><span class="tbtn-ico">📄</span>复制</button>
+    <button class="tbtn" onclick="doDelete()"><span class="tbtn-ico">🗑</span>删除</button>
+    <button class="tbtn" onclick="doImport()"><span class="tbtn-ico">📥</span>导入</button>
+    <button class="tbtn" onclick="doPrint()"><span class="tbtn-ico">🖨</span>打印</button>
+  </div>
+  <div class="tool-group">
+    <button class="tbtn" onclick="doQuery()"><span class="tbtn-ico">🔍</span>查询进度</button>
+    <button class="tbtn" onclick="doCorrect()"><span class="tbtn-ico">📝</span>申请更改</button>
+    <button class="tbtn danger disabled"><span class="tbtn-ico">🚫</span>申请撤单</button>
+  </div>
+  <div class="tool-group">
+    <div class="status-pill sp-draft">
+      <span>●</span> 草稿
+    </div>
+    <span style="margin-left:8px;font-size:11px;color:var(--text3)">报关单号：</span>
+    <span style="font-size:11px;font-weight:700;color:var(--navy);font-family:monospace;letter-spacing:1px">310120240310001234</span>
+  </div>
+  <div class="tool-group">
+    <span style="font-size:11px;color:var(--text3)">完整度：</span>
+    <div style="width:80px;height:10px;background:#dde4ee;border-radius:2px;overflow:hidden;margin-right:4px">
+      <div style="width:62%;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))"></div>
+    </div>
+    <span style="font-size:11px;color:var(--gold);font-weight:600">62%</span>
+  </div>
+</div>
+
+<!-- 主体区域 -->
+<div id="main">
+
+  <!-- 左侧边栏：报关单列表 -->
+  <div id="sidebar">
+    <div class="sb-section">
+      <div class="sb-header">
+        待申报列表
+        <span class="sb-header-add" title="新建">＋</span>
+      </div>
+      <div class="sb-stats">
+        <div class="sb-stat-row"><span class="sb-stat-label">草稿</span><span class="sb-stat-val red">5</span></div>
+        <div class="sb-stat-row"><span class="sb-stat-label">已申报</span><span class="sb-stat-val blue" style="color:var(--sky)">12</span></div>
+        <div class="sb-stat-row"><span class="sb-stat-label">已放行</span><span class="sb-stat-val green">8</span></div>
+        <div class="sb-stat-row"><span class="sb-stat-label">查验中</span><span class="sb-stat-val red">2</span></div>
+      </div>
+    </div>
+    <div class="sb-scroll">
+      <div class="sb-item act">
+        <span class="sb-item-ico">📋</span>
+        <span class="sb-item-label">2403100001</span>
+        <span class="sb-item-badge">草稿</span>
+      </div>
+      <div class="sb-item">
+        <span class="sb-item-ico">📤</span>
+        <span class="sb-item-label">2403090023</span>
+        <span class="sb-item-badge blue">申报中</span>
+      </div>
+      <div class="sb-item">
+        <span class="sb-item-ico">✅</span>
+        <span class="sb-item-label">2403080056</span>
+        <span class="sb-item-badge green">已放行</span>
+      </div>
+      <div class="sb-item">
+        <span class="sb-item-ico">🔍</span>
+        <span class="sb-item-label">2403070034</span>
+        <span class="sb-item-badge" style="background:#e67c00;color:#fff">查验</span>
+      </div>
+      <div class="sb-item">
+        <span class="sb-item-ico">📋</span>
+        <span class="sb-item-label">2403060012</span>
+        <span class="sb-item-badge">草稿</span>
+      </div>
+      <div class="sb-item">
+        <span class="sb-item-ico">✅</span>
+        <span class="sb-item-label">2403050078</span>
+        <span class="sb-item-badge green">已放行</span>
+      </div>
+      <div class="sb-item">
+        <span class="sb-item-ico">⚠</span>
+        <span class="sb-item-label">2403040091</span>
+        <span class="sb-item-badge" style="background:#aa1800;color:#fff">退单</span>
+      </div>
+      <div class="sb-section" style="margin-top:8px">
+        <div class="sb-header">历史记录（本月）</div>
+      </div>
+      <div class="sb-item"><span class="sb-item-ico">✅</span><span class="sb-item-label">2403030044</span><span class="sb-item-badge green">放行</span></div>
+      <div class="sb-item"><span class="sb-item-ico">✅</span><span class="sb-item-label">2403020019</span><span class="sb-item-badge green">放行</span></div>
+      <div class="sb-item"><span class="sb-item-ico">✅</span><span class="sb-item-label">2403010033</span><span class="sb-item-badge green">放行</span></div>
+    </div>
+  </div>
+
+  <!-- 内容区 -->
+  <div id="content">
+    <div id="form-tabs">
+      <div class="ftab act">🗂 基本信息</div>
+      <div class="ftab">📦 货物清单 <span class="ftab-count">3</span></div>
+      <div class="ftab">📄 随附单证</div>
+      <div class="ftab">💰 税费核算</div>
+      <div class="ftab">📋 申报历史</div>
+    </div>
+
+    <div id="form-area">
+
+      <!-- 卡片1：报关单基本信息 -->
+      <div class="form-card" id="card1">
+        <div class="form-card-header" onclick="toggleCard('card1')">
+          <div class="form-card-title">报关单基本信息（必填）</div>
+          <div class="form-card-tools">
+            <button class="fct-btn" onclick="event.stopPropagation();fillDemo()">填写示例</button>
+            <button class="fct-btn" onclick="event.stopPropagation()">历史导入</button>
+          </div>
+        </div>
+        <div class="form-card-body">
+          <div class="form-row">
+            <div class="form-field w3">
+              <span class="field-label req">预录入编号</span>
+              <input class="field-input code" value="3101202403100012" readonly>
+            </div>
+            <div class="form-field w2 field-err">
+              <span class="field-label req">报关类型</span>
+              <select class="field-select">
+                <option value="">请选择</option>
+                <option selected>进口报关单</option>
+                <option>出口报关单</option>
+                <option>转关申报单</option>
+              </select>
+            </div>
+            <div class="form-field w2">
+              <span class="field-label req">进出口标志</span>
+              <select class="field-select">
+                <option>I-进口</option>
+                <option>E-出口</option>
+              </select>
+            </div>
+            <div class="form-field w2">
+              <span class="field-label req">申报日期</span>
+              <input class="field-input" value="2024-03-10">
+              <span class="field-addon">📅</span>
+            </div>
+            <div class="form-field w3">
+              <span class="field-label req">进口口岸</span>
+              <input class="field-input code" value="3100">
+              <span class="field-addon">🔍查询</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field w4">
+              <span class="field-label req">进出口企业</span>
+              <input class="field-input" value="上海XX进出口贸易有限公司">
+              <span class="field-addon">🔍</span>
+            </div>
+            <div class="form-field w3">
+              <span class="field-label req">企业海关编码</span>
+              <input class="field-input code" value="3101200112345">
+            </div>
+            <div class="form-field w3">
+              <span class="field-label req">报关单位</span>
+              <input class="field-input" value="上海XX报关有限公司">
+              <span class="field-addon">🔍</span>
+            </div>
+            <div class="form-field w2">
+              <span class="field-label req">报关单位编码</span>
+              <input class="field-input code" value="310120001">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field w3">
+              <span class="field-label req">贸易方式</span>
+              <select class="field-select">
+                <option>0110-一般贸易</option>
+                <option>0214-进料加工</option>
+                <option>0615-来料加工</option>
+                <option>1039-保税仓库进出境货物</option>
+              </select>
+            </div>
+            <div class="form-field w3">
+              <span class="field-label req">征免性质</span>
+              <select class="field-select">
+                <option>101-照章征税</option>
+                <option>201-全免</option>
+                <option>301-减半征税</option>
+              </select>
+            </div>
+            <div class="form-field w2">
+              <span class="field-label req">运输方式</span>
+              <select class="field-select">
+                <option>2-水路运输</option>
+                <option>4-空运</option>
+                <option>5-邮运</option>
+                <option>8-公路</option>
+              </select>
+            </div>
+            <div class="form-field w2 field-warn">
+              <span class="field-label req">运输工具名称</span>
+              <input class="field-input" value="COSCO STAR" placeholder="船名/航班号">
+            </div>
+            <div class="form-field w2">
+              <span class="field-label req">航次号</span>
+              <input class="field-input code" value="2403S">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片2：收发货人信息 -->
+      <div class="form-card" id="card2">
+        <div class="form-card-header" onclick="toggleCard('card2')">
+          <div class="form-card-title">收发货人 / 贸易方信息</div>
+          <div class="form-card-tools">
+            <button class="fct-btn" onclick="event.stopPropagation()">常用收货人</button>
+          </div>
+        </div>
+        <div class="form-card-body">
+          <div class="form-row">
+            <div class="form-field w4">
+              <span class="field-label req">收货单位</span>
+              <input class="field-input" value="上海浦东某某实业集团有限公司">
+            </div>
+            <div class="form-field w3">
+              <span class="field-label req">收货单位代码</span>
+              <input class="field-input code" value="310200234567">
+            </div>
+            <div class="form-field w2">
+              <span class="field-label req">贸易国（地区）</span>
+              <input class="field-input code" value="DE-德国">
+              <span class="field-addon">🔍</span>
+            </div>
+            <div class="form-field w3">
+              <span class="field-label req">装货港</span>
+              <input class="field-input code" value="DEHAM-汉堡">
+              <span class="field-addon">🔍</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field w4">
+              <span class="field-label req">境外收发货人</span>
+              <input class="field-input" value="DEUTSCHES UNTERNEHMEN GMBH">
+            </div>
+            <div class="form-field w2">
+              <span class="field-label">境外收发货人代码</span>
+              <input class="field-input code" value="DE1234567890">
+            </div>
+            <div class="form-field w3">
+              <span class="field-label req">卸货港</span>
+              <input class="field-input code" value="CNSHA-上海港">
+              <span class="field-addon">🔍</span>
+            </div>
+            <div class="form-field w3">
+              <span class="field-label req">指运港</span>
+              <input class="field-input code" value="CNSHA-上海港">
+              <span class="field-addon">🔍</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片3：运费/保险/杂费 -->
+      <div class="form-card" id="card3">
+        <div class="form-card-header" onclick="toggleCard('card3')">
+          <div class="form-card-title">运费 / 保险费 / 杂费（完税价格核定）</div>
+        </div>
+        <div class="form-card-body">
+          <div class="form-row">
+            <div class="form-field w2">
+              <span class="field-label req">成交方式</span>
+              <select class="field-select">
+                <option>CIF-到岸价</option>
+                <option>FOB-离岸价</option>
+                <option>CFR-成本加运费</option>
+                <option>EXW-出厂价</option>
+              </select>
+            </div>
+            <div class="form-field w2">
+              <span class="field-label req">成交币制</span>
+              <select class="field-select">
+                <option>USD-美元</option>
+                <option>EUR-欧元</option>
+                <option>CNY-人民币</option>
+                <option>JPY-日元</option>
+              </select>
+            </div>
+            <div class="form-field w2">
+              <span class="field-label req">成交总价</span>
+              <input class="field-input num" value="128,640.00">
+            </div>
+            <div class="form-field w1">
+              <span class="field-label req">运费</span>
+              <input class="field-input num" value="2,400.00">
+            </div>
+            <div class="form-field w1">
+              <span class="field-label">运费标志</span>
+              <select class="field-select">
+                <option>1-计费</option>
+                <option>2-百分比</option>
+                <option>3-未知</option>
+              </select>
+            </div>
+            <div class="form-field w1">
+              <span class="field-label req">保险费</span>
+              <input class="field-input num" value="386.00">
+            </div>
+            <div class="form-field w1">
+              <span class="field-label">杂费</span>
+              <input class="field-input num" value="0.00">
+            </div>
+            <div class="form-field w2">
+              <span class="field-label">折合人民币</span>
+              <input class="field-input num readonly" value="934,586.40" readonly>
+              <span class="field-addon">汇率: 7.24</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field w2">
+              <span class="field-label req">总毛重（KG）</span>
+              <input class="field-input num" value="18,600.000">
+            </div>
+            <div class="form-field w2">
+              <span class="field-label req">总净重（KG）</span>
+              <input class="field-input num" value="17,820.000">
+            </div>
+            <div class="form-field w2">
+              <span class="field-label">件数</span>
+              <input class="field-input num" value="240">
+            </div>
+            <div class="form-field w2">
+              <span class="field-label">包装种类</span>
+              <select class="field-select">
+                <option>CT-纸箱</option>
+                <option>WD-木箱</option>
+                <option>BG-袋</option>
+                <option>BK-散装</option>
+              </select>
+            </div>
+            <div class="form-field w4">
+              <span class="field-label">集装箱号</span>
+              <input class="field-input code" value="CSQU3054383 / TCNU1234567">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片4：货物清单 -->
+      <div class="form-card" id="card4">
+        <div class="form-card-header" onclick="toggleCard('card4')">
+          <div class="form-card-title">货物明细清单（共 3 项）</div>
+          <div class="form-card-tools">
+            <button class="fct-btn" onclick="event.stopPropagation();addGoodsRow()">＋增行</button>
+            <button class="fct-btn" onclick="event.stopPropagation()">📥批量导入</button>
+            <button class="fct-btn" onclick="event.stopPropagation()">🏷归类辅助</button>
+          </div>
+        </div>
+        <div class="form-card-body" style="padding:0">
+          <div class="goods-table-wrap">
+            <table class="goods-table" id="goods-tbl">
+              <thead>
+                <tr>
+                  <th class="td-seq">#</th>
+                  <th class="req" style="min-width:90px">HS 商品编码</th>
+                  <th class="req" style="min-width:180px">商品名称（规格型号）</th>
+                  <th style="min-width:60px">数量</th>
+                  <th class="req" style="min-width:60px">单位</th>
+                  <th style="min-width:60px">第二数量</th>
+                  <th style="min-width:60px">第二单位</th>
+                  <th class="req" style="min-width:70px">申报单价</th>
+                  <th class="req" style="min-width:80px">申报总价</th>
+                  <th class="req" style="min-width:60px">币制</th>
+                  <th style="min-width:70px">毛重(KG)</th>
+                  <th style="min-width:70px">净重(KG)</th>
+                  <th style="min-width:60px">原产国</th>
+                  <th style="min-width:80px">最终目的国</th>
+                  <th style="min-width:80px">成交方式</th>
+                  <th style="min-width:80px">征减免标志</th>
+                  <th class="row-ops">操作</th>
+                </tr>
+              </thead>
+              <tbody id="goods-body">
+                <tr>
+                  <td class="td-seq">1</td>
+                  <td><input value="8482100000" class="code"></td>
+                  <td><input value="深沟球轴承 内径17mm 外径47mm 宽14mm"></td>
+                  <td class="num"><input value="120" class="num"></td>
+                  <td><input value="只"></td>
+                  <td class="num"><input value=""></td>
+                  <td><input value=""></td>
+                  <td class="num"><input value="42.30" class="num"></td>
+                  <td class="num"><input value="5,076.00" class="num"></td>
+                  <td><input value="USD" class="code"></td>
+                  <td class="num"><input value="1,200.00" class="num"></td>
+                  <td class="num"><input value="1,140.00" class="num"></td>
+                  <td><input value="DE" class="code"></td>
+                  <td><input value="CN" class="code"></td>
+                  <td><input value="CIF"></td>
+                  <td><input value="101"></td>
+                  <td class="row-ops">
+                    <button class="row-op-btn add" onclick="addGoodsRow()">＋</button>
+                    <button class="row-op-btn del" onclick="delGoodsRow(this)">－</button>
+                  </td>
+                </tr>
+                <tr class="sel">
+                  <td class="td-seq">2</td>
+                  <td><input value="8483409000" class="code"></td>
+                  <td><input value="变速箱齿轮组件 型号ZF6HP26 铝合金壳体"></td>
+                  <td class="num"><input value="60" class="num"></td>
+                  <td><input value="套"></td>
+                  <td class="num"><input value="60" class="num"></td>
+                  <td><input value="KG"></td>
+                  <td class="num"><input value="860.00" class="num"></td>
+                  <td class="num"><input value="51,600.00" class="num"></td>
+                  <td><input value="EUR" class="code"></td>
+                  <td class="num"><input value="8,400.00" class="num"></td>
+                  <td class="num"><input value="7,980.00" class="num"></td>
+                  <td><input value="DE" class="code"></td>
+                  <td><input value="CN" class="code"></td>
+                  <td><input value="CIF"></td>
+                  <td><input value="101"></td>
+                  <td class="row-ops">
+                    <button class="row-op-btn add" onclick="addGoodsRow()">＋</button>
+                    <button class="row-op-btn del" onclick="delGoodsRow(this)">－</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="td-seq">3</td>
+                  <td><input value="8708999990" class="code"></td>
+                  <td><input value="汽车零部件其他 钢制支架总成 重量≤5KG/件"></td>
+                  <td class="num"><input value="1,200" class="num"></td>
+                  <td><input value="件"></td>
+                  <td class="num"><input value="6,000" class="num"></td>
+                  <td><input value="KG"></td>
+                  <td class="num"><input value="60.00" class="num"></td>
+                  <td class="num"><input value="71,964.00" class="num"></td>
+                  <td><input value="USD" class="code"></td>
+                  <td class="num"><input value="9,000.00" class="num"></td>
+                  <td class="num"><input value="8,700.00" class="num"></td>
+                  <td><input value="DE" class="code"></td>
+                  <td><input value="CN" class="code"></td>
+                  <td><input value="CIF"></td>
+                  <td><input value="101"></td>
+                  <td class="row-ops">
+                    <button class="row-op-btn add" onclick="addGoodsRow()">＋</button>
+                    <button class="row-op-btn del" onclick="delGoodsRow(this)">－</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- 合计行 -->
+          <div style="display:flex;justify-content:flex-end;gap:20px;padding:6px 12px;background:#eaf0f8;border-top:1px solid var(--border);font-size:11px">
+            <span>合计申报总价：<strong style="color:var(--navy);font-size:13px">$ 128,640.00</strong></span>
+            <span>折合人民币：<strong style="color:var(--red);font-size:13px">¥ 934,586.40</strong></span>
+            <span>总毛重：<strong>18,600 KG</strong></span>
+            <span>总净重：<strong>17,820 KG</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片5：随附单证 -->
+      <div class="form-card collapsed" id="card5">
+        <div class="form-card-header" onclick="toggleCard('card5')">
+          <div class="form-card-title">随附单证（已添加 4 项）</div>
+          <div class="form-card-tools">
+            <button class="fct-btn" onclick="event.stopPropagation()">＋添加单证</button>
+          </div>
+        </div>
+        <div class="form-card-body">
+          <div style="font-size:11px;color:var(--text2);line-height:2">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+              <div style="background:#f0f4f8;padding:4px 8px;border:1px solid var(--border2)">📄 合同：SC20240301-001 &nbsp;<span style="color:var(--green)">✓已验</span></div>
+              <div style="background:#f0f4f8;padding:4px 8px;border:1px solid var(--border2)">📄 发票：INV-2024-0301 &nbsp;<span style="color:var(--green)">✓已验</span></div>
+              <div style="background:#f0f4f8;padding:4px 8px;border:1px solid var(--border2)">📄 装箱单：PL-2024-0301 &nbsp;<span style="color:var(--green)">✓已验</span></div>
+              <div style="background:#fff8e8;padding:4px 8px;border:1px solid #e0c060">📄 原产地证书：待上传 &nbsp;<span style="color:var(--gold)">⚠ 待验</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片6：申报要素 -->
+      <div class="form-card collapsed" id="card6">
+        <div class="form-card-header" onclick="toggleCard('card6')">
+          <div class="form-card-title">申报要素 / 监管条件（HS 归类要素）</div>
+        </div>
+        <div class="form-card-body">
+          <div style="font-size:11px;color:var(--orange);background:#fff8ee;border:1px solid #e8c080;padding:6px 10px;border-radius:2px;margin-bottom:8px">
+            ⚠ 商品编码 8483409000 需申报以下要素：用途（汽车变速箱/工程机械/其他）、材质（铸铁/铝合金/钢材）、是否整件产品
+          </div>
+          <div class="form-row">
+            <div class="form-field w3">
+              <span class="field-label req">品牌类型</span>
+              <select class="field-select"><option>1-无品牌</option><option>2-境内自主品牌</option><option>3-境外品牌（贴牌）</option></select>
+            </div>
+            <div class="form-field w3">
+              <span class="field-label req">出口享惠情况</span>
+              <select class="field-select"><option>1-不享受</option><option>2-中国-东盟</option><option>3-中国-韩国</option></select>
+            </div>
+            <div class="form-field w6">
+              <span class="field-label req">申报要素</span>
+              <input class="field-input" placeholder="用途:变速箱用;材质:铝合金;是否整件:是">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /form-area -->
+
+    <!-- 校验错误面板 -->
+    <div id="err-panel" style="display:none">
+      <div class="err-header" onclick="toggleErrPanel()">
+        ⛔ 校验错误 <span id="err-count" style="margin-left:4px;background:#e04030;color:#fff;padding:1px 6px;border-radius:8px;font-size:10px">3</span>
+        <span style="margin-left:auto;font-size:10px">点击收起</span>
+      </div>
+      <div class="err-list" id="err-list"></div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- 右侧辅助面板 -->
+  <div id="assist">
+    <div class="ast-tab">
+      <div class="ast-tabitem act">归类</div>
+      <div class="ast-tabitem">税率</div>
+      <div class="ast-tabitem">规则</div>
+    </div>
+    <div class="ast-body">
+      <div class="ast-card">
+        <div class="ast-card-hd">当前商品（第2行）</div>
+        <div class="ast-card-bd">
+          <div class="ast-row"><span class="ast-key">HS编码</span><span class="ast-val blue">8483409000</span></div>
+          <div class="ast-row"><span class="ast-key">商品名称</span><span class="ast-val">变速箱齿轮组</span></div>
+          <div class="ast-row"><span class="ast-key">申报单价</span><span class="ast-val">EUR 860.00</span></div>
+          <div class="ast-row"><span class="ast-key">原产地</span><span class="ast-val">德国 DE</span></div>
+        </div>
+      </div>
+      <div class="ast-card">
+        <div class="ast-card-hd">适用税率</div>
+        <div class="ast-card-bd">
+          <div class="ast-row"><span class="ast-key">最惠国税率</span><span class="ast-val red">10%</span></div>
+          <div class="ast-row"><span class="ast-key">普通税率</span><span class="ast-val red">25%</span></div>
+          <div class="ast-row"><span class="ast-key">增值税率</span><span class="ast-val">13%</span></div>
+          <div class="ast-row"><span class="ast-key">消费税率</span><span class="ast-val green">0%</span></div>
+          <div class="ast-row"><span class="ast-key">监管证件</span><span class="ast-val">无</span></div>
+        </div>
+      </div>
+      <div class="ast-card">
+        <div class="ast-card-hd">预估税费（本行）</div>
+        <div class="ast-card-bd">
+          <div class="ast-row"><span class="ast-key">完税价格</span><span class="ast-val">¥ 402,984</span></div>
+          <div class="ast-row"><span class="ast-key">关税</span><span class="ast-val red">¥ 40,298</span></div>
+          <div class="ast-row"><span class="ast-key">增值税</span><span class="ast-val red">¥ 57,363</span></div>
+          <div class="ast-row"><span class="ast-key">合计税费</span><span class="ast-val red" style="font-size:13px;font-weight:700">¥ 97,661</span></div>
+        </div>
+      </div>
+      <div class="ast-card">
+        <div class="ast-card-hd">注意事项</div>
+        <div class="ast-card-bd">
+          <div class="ast-hint">
+            <strong>📌 监管条件A</strong>：需提交进口许可证<br>
+            <em>原产地证书</em>可申请适用中欧协定税率，请上传Form A。<br>
+            <strong>⚠ 价格预警</strong>：申报价格低于同类商品均价18%，请核实。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- 状态栏 -->
+<div id="statusbar">
+  <div class="sb2-item">关区：<strong>上海海关 3100</strong></div>
+  <div class="sb2-item">报关单：<strong>310120240310001234</strong></div>
+  <div class="sb2-item green">状态：<strong>草稿</strong></div>
+  <div class="sb2-item">货物行数：<strong>3</strong></div>
+  <div class="sb2-item red">校验错误：<strong id="sb-err">3</strong></div>
+  <div class="sb2-item">操作员：<strong>张小明</strong></div>
+  <div class="sb2-right">
+    <div class="sb2-progress">
+      表单完整度
+      <div class="sb2-pbar"><div class="sb2-pfill"></div></div>
+      62%
+    </div>
+    <div class="sb2-item">服务器：<strong style="color:#80e8a0">正常</strong></div>
+    <div class="sb2-item" id="sb-date">2024-03-10</div>
+  </div>
+</div>
+
+<!-- Toast 容器 -->
+<div id="toast-wrap"></div>
+
+</div><!-- /app -->
+
+<script>
+// ── 时钟 ──────────────────────────────
+function tick(){
+  const now=new Date();
+  const p=n=>String(n).padStart(2,'0');
+  document.getElementById('theclock').textContent=`${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+}
+setInterval(tick,1000);tick();
+
+// ── 折叠卡片 ──────────────────────────
+function toggleCard(id){
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+// ── Toast 通知 ────────────────────────
+function showToast(ico,title,body,duration=3500){
+  const wrap=document.getElementById('toast-wrap');
+  const t=document.createElement('div');
+  t.className='toast';
+  t.innerHTML=`<span class="toast-ico">${ico}</span><div><div class="toast-title">${title}</div><div class="toast-body">${body}</div></div><span class="toast-close" onclick="this.closest('.toast').remove()">✕</span>`;
+  wrap.appendChild(t);
+  setTimeout(()=>t.style.opacity='0',duration-400);
+  setTimeout(()=>t.remove(),duration);
+}
+
+// ── 错误面板 ──────────────────────────
+const ERRORS=[
+  {code:'E0012',field:'进口口岸',msg:'进口口岸代码与申报关区不一致，请核查'},
+  {code:'W0034',field:'运输工具名称',msg:'船名存在模糊匹配，请确认是否为 COSCO STAR V.2403S'},
+  {code:'E0156',field:'HS商品编码(行2)',msg:'8483409000 项下商品需填写申报要素，当前为空'},
+];
+function renderErrors(){
+  const list=document.getElementById('err-list');
+  list.innerHTML=ERRORS.map(e=>`
+    <div class="err-row">
+      <span class="err-code">${e.code}</span>
+      <span style="color:#555;min-width:120px">[${e.field}]</span>
+      <span style="flex:1">${e.msg}</span>
+      <span class="err-fix" onclick="jumpToField('${e.field}')">跳转修复 ›</span>
+    </div>
+  `).join('');
+}
+function toggleErrPanel(){
+  const p=document.getElementById('err-panel');
+  const list=document.getElementById('err-list');
+  list.style.display=list.style.display==='none'?'block':'none';
+}
+function jumpToField(f){
+  showToast('🎯','跳转到字段',`已定位到：${f}`);
+}
+
+// ── 工具栏操作 ────────────────────────
+function doValidate(){
+  renderErrors();
+  document.getElementById('err-panel').style.display='block';
+  document.getElementById('err-list').style.display='block';
+  showToast('⛔','校验完成','发现 3 处错误，2 处警告，请修正后再提交申报');
+}
+function doSave(){
+  showToast('💾','暂存成功','报关单草稿已保存，编号：310120240310001234');
+}
+function doSubmit(){
+  if(document.getElementById('err-panel').style.display!=='none'){
+    showToast('⚠','无法申报','存在校验错误，请先修正所有错误后再提交申报');
+    return;
+  }
+  showToast('📤','正在申报','报关单已提交至海关系统，等待接受回执……');
+  setTimeout(()=>showToast('✅','申报成功','报关单已接受，海关编号：3101202403100012，请等待审结'),2000);
+}
+function doNew(){showToast('➕','新建报关单','已创建新的空白报关单，编号待分配')}
+function doCopy(){showToast('📄','复制成功','已复制当前报关单，请修改必要字段后申报')}
+function doDelete(){showToast('🗑','确认删除','草稿报关单已删除')}
+function doImport(){showToast('📥','数据导入','请选择 Excel/EDI 格式的货物清单文件')}
+function doPrint(){showToast('🖨','准备打印','正在生成报关单PDF格式，请稍候……')}
+function doQuery(){showToast('🔍','进度查询','正在连接海关系统查询申报进度……')}
+function doCorrect(){showToast('📝','申请更改','更改申请功能需要主管审批，正在发起流程……')}
+function fillDemo(){showToast('✏','示例已填充','已填入示例数据，请根据实际情况修改')}
+
+// ── 货物清单行操作 ──────────────────
+let rowCount=3;
+function addGoodsRow(){
+  rowCount++;
+  const tbody=document.getElementById('goods-body');
+  const tr=document.createElement('tr');
+  tr.innerHTML=`
+    <td class="td-seq">${rowCount}</td>
+    <td><input class="code" placeholder="HS编码"></td>
+    <td><input placeholder="商品名称/规格型号"></td>
+    <td class="num"><input class="num" placeholder="0"></td>
+    <td><input placeholder="单位"></td>
+    <td class="num"><input class="num"></td>
+    <td><input></td>
+    <td class="num"><input class="num" placeholder="0.00"></td>
+    <td class="num"><input class="num" placeholder="0.00"></td>
+    <td><input class="code" value="USD"></td>
+    <td class="num"><input class="num" placeholder="0.000"></td>
+    <td class="num"><input class="num" placeholder="0.000"></td>
+    <td><input class="code" placeholder="DE"></td>
+    <td><input class="code" placeholder="CN"></td>
+    <td><input value="CIF"></td>
+    <td><input value="101"></td>
+    <td class="row-ops">
+      <button class="row-op-btn add" onclick="addGoodsRow()">＋</button>
+      <button class="row-op-btn del" onclick="delGoodsRow(this)">－</button>
+    </td>`;
+  tbody.appendChild(tr);
+  tr.querySelector('input').focus();
+  showToast('➕','已增加一行','第 '+rowCount+' 行货物，请填写详细信息');
+}
+function delGoodsRow(btn){
+  const tr=btn.closest('tr');
+  if(document.getElementById('goods-body').rows.length<=1){showToast('⚠','无法删除','至少保留一行货物明细');return;}
+  tr.remove();
+  // renum
+  [...document.getElementById('goods-body').rows].forEach((r,i)=>r.cells[0].textContent=i+1);
+  showToast('🗑','已删除','货物明细行已删除');
+}
+
+// ── 菜单标签切换 ─────────────────────
+document.querySelectorAll('.mb-item').forEach(el=>{
+  el.addEventListener('click',function(){
+    document.querySelectorAll('.mb-item').forEach(e=>e.classList.remove('act'));
+    this.classList.add('act');
+  });
+});
+document.querySelectorAll('.ftab').forEach(el=>{
+  el.addEventListener('click',function(){
+    document.querySelectorAll('.ftab').forEach(e=>e.classList.remove('act'));
+    this.classList.add('act');
+  });
+});
+document.querySelectorAll('.sb-item').forEach(el=>{
+  el.addEventListener('click',function(){
+    document.querySelectorAll('.sb-item').forEach(e=>e.classList.remove('act'));
+    this.classList.add('act');
+  });
+});
+document.querySelectorAll('.ast-tabitem').forEach(el=>{
+  el.addEventListener('click',function(){
+    document.querySelectorAll('.ast-tabitem').forEach(e=>e.classList.remove('act'));
+    this.classList.add('act');
+  });
+});
+
+// 表格行选中
+document.getElementById('goods-body').addEventListener('click',function(e){
+  const tr=e.target.closest('tr');
+  if(!tr)return;
+  document.querySelectorAll('#goods-body tr').forEach(r=>r.classList.remove('sel'));
+  tr.classList.add('sel');
+});
+</script>
+</body>
+</html>

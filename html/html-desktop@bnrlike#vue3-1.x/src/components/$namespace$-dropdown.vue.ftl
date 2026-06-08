@@ -1,5 +1,5 @@
 <template>
-  <div ref="rootEl" class="${namespace}-dd" :class="[sizeClass, { '${namespace}-dd--disabled': disabled }]">
+  <div ref="rootEl" class="${namespace}-dd" :class="[sizeClass, { '${namespace}-dd--plain': plain, '${namespace}-dd--disabled': disabled }]">
     <!-- Trigger -->
     <button
       ref="triggerEl"
@@ -74,6 +74,7 @@ const props = defineProps({
   searchable: { type: Boolean, default: false },
   clearable: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
+  plain: { type: Boolean, default: false },
   size: { type: String, default: '' },
 })
 
@@ -286,6 +287,20 @@ onBeforeUnmount(() => {
 }
 .${namespace}-dd-trigger--placeholder {
   color: var(--${namespace}-text-light);
+}
+
+/* Plain variant — 无边框、无图标 */
+.${namespace}-dd--plain .${namespace}-dd-trigger {
+  border: none;
+  background: transparent;
+  padding: 0 4px;
+  box-shadow: none;
+}
+.${namespace}-dd--plain .${namespace}-dd-trigger::after {
+  content: none;
+}
+.${namespace}-dd--plain .${namespace}-dd-trigger:focus {
+  box-shadow: none;
 }
 
 /* Size variants */

@@ -1,0 +1,1011 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>某三甲医院 HIS · 住院医生工作站</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#006b5e;--teal2:#008a78;--teal3:#00a890;
+  --teal-lt:#e0f5f2;--teal-mid:#b0e4dc;
+  --navy:#0a3050;--navy2:#0e4070;
+  --red:#c8200a;--red-lt:#fff0ee;
+  --amber:#b86000;--amber-lt:#fff8e8;
+  --green:#1a7a3c;--green-lt:#e8f8ee;
+  --blue:#1050a0;--blue-lt:#e8f0ff;
+  --purple:#6030a0;--purple-lt:#f0eaff;
+  --bg:#f0f4f2;--bg2:#f7faf9;
+  --white:#fff;
+  --border:#c0d4cc;--border2:#d8e8e4;
+  --text:#1a2820;--text2:#3a5048;--text3:#6a8078;
+  --row-alt:#f4f9f7;--sel:#d0f0e8;
+  --shadow:0 2px 8px rgba(0,80,60,.08);
+}
+html,body{height:100%;overflow:hidden;font-family:'Noto Sans SC',sans-serif;font-size:12px;background:var(--bg);color:var(--text)}
+#app{display:flex;flex-direction:column;height:100vh}
+
+/* ── TOP BAR ── */
+#top{
+  background:linear-gradient(90deg,var(--navy) 0%,var(--navy2) 50%,#104870 100%);
+  height:44px;display:flex;align-items:center;padding:0 14px;flex-shrink:0;
+  border-bottom:2px solid var(--teal3);gap:12px;
+}
+.top-logo{display:flex;align-items:center;gap:8px}
+.top-logo-cross{
+  width:30px;height:30px;background:rgba(0,168,144,.25);border-radius:6px;
+  border:1px solid rgba(0,200,170,.4);display:flex;align-items:center;justify-content:center;
+  position:relative;flex-shrink:0;
+}
+.top-logo-cross::before,.top-logo-cross::after{content:'';position:absolute;background:#00e8c8;border-radius:1px}
+.top-logo-cross::before{width:4px;height:16px}
+.top-logo-cross::after{width:16px;height:4px}
+.top-sys{font-size:16px;font-weight:700;color:#a0f0e0;letter-spacing:2px}
+.top-sub{font-size:10px;color:rgba(180,230,220,.5);letter-spacing:1px;margin-top:1px}
+.top-div{width:1px;height:26px;background:rgba(255,255,255,.12)}
+.top-dept{font-size:13px;color:rgba(255,255,255,.8);font-weight:500}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.top-user{font-size:11px;color:rgba(200,240,230,.7);display:flex;align-items:center;gap:5px}
+.top-user strong{color:#a0f0e0}
+.top-clock{font-size:14px;font-weight:700;color:#80ffe8;font-variant-numeric:tabular-nums;letter-spacing:1px}
+.top-btn{padding:3px 10px;border-radius:3px;font-size:11px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:rgba(255,255,255,.75);cursor:pointer}
+.top-btn:hover{background:rgba(255,255,255,.16)}
+.top-alert{
+  background:rgba(200,32,10,.3);border:1px solid rgba(200,32,10,.5);
+  border-radius:3px;padding:3px 8px;font-size:11px;color:#ffb0a8;
+  display:flex;align-items:center;gap:4px;cursor:pointer;animation:blink 2s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.7}}
+
+/* ── MENUBAR ── */
+#menu{
+  background:#0d3a28;height:26px;display:flex;align-items:stretch;
+  border-bottom:1px solid #082818;flex-shrink:0;
+}
+.mi{display:flex;align-items:center;padding:0 11px;font-size:12px;color:rgba(255,255,255,.7);cursor:pointer;gap:4px;border-right:1px solid rgba(255,255,255,.05);white-space:nowrap}
+.mi:hover{background:#1a5038;color:#fff}
+.mi.act{background:var(--teal);color:#fff}
+.mi .mico{font-size:12px}
+
+/* ── TOOLBAR ── */
+#tbar{
+  background:var(--bg2);height:32px;display:flex;align-items:center;
+  padding:0 8px;border-bottom:1px solid var(--border);flex-shrink:0;gap:3px;
+}
+.tg{display:flex;align-items:center;gap:2px;padding:0 4px;border-right:1px solid var(--border2)}
+.tg:last-child{border-right:none;margin-left:auto}
+.tb{display:flex;align-items:center;gap:3px;padding:3px 7px;border:1px solid transparent;border-radius:2px;cursor:pointer;font-size:11px;color:var(--text2);background:transparent;font-family:inherit;white-space:nowrap}
+.tb:hover{background:#deeee8;border-color:var(--border)}
+.tb.p{background:var(--teal);color:#fff;border-color:var(--teal2)}.tb.p:hover{background:var(--teal2)}
+.tb.r{background:var(--red);color:#fff;border-color:#a01a06}.tb.r:hover{background:#aa1806}
+.tb.g{background:var(--green);color:#fff;border-color:#156030}
+.tb.a{background:var(--amber);color:#fff;border-color:#a05000}
+.tb.off{opacity:.4;cursor:not-allowed;pointer-events:none}
+
+/* ── MAIN LAYOUT ── */
+#main{display:flex;flex:1;overflow:hidden}
+/* 三栏 */
+#col-l{width:210px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2)}
+#col-m{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+#col-r{width:240px;flex-shrink:0;border-left:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2)}
+
+/* ── 患者列表（左栏） ── */
+.panel-hd{
+  background:var(--teal);color:#fff;padding:5px 10px;font-size:11px;font-weight:500;
+  letter-spacing:1px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+.panel-hd-add{cursor:pointer;font-size:14px;font-weight:700;color:rgba(255,255,255,.8)}
+.search-bar{display:flex;align-items:center;border-bottom:1px solid var(--border2);padding:5px 8px;gap:5px;flex-shrink:0}
+.search-input{flex:1;border:1px solid var(--border);border-radius:2px;padding:3px 6px;font-size:11px;font-family:inherit;outline:none}
+.search-input:focus{border-color:var(--teal)}
+.search-btn{padding:3px 8px;background:var(--teal);color:#fff;border:none;border-radius:2px;font-size:11px;cursor:pointer}
+
+.pt-list{flex:1;overflow-y:auto}
+.pt-list::-webkit-scrollbar{width:4px}
+.pt-list::-webkit-scrollbar-thumb{background:var(--teal-mid);border-radius:2px}
+.pt-item{
+  display:flex;flex-direction:column;padding:7px 10px;
+  border-bottom:1px solid var(--border2);cursor:pointer;position:relative;
+}
+.pt-item:hover{background:#e8f4f0}
+.pt-item.sel{background:var(--sel);border-left:3px solid var(--teal)}
+.pt-item.sel{padding-left:7px}
+.pt-item.crit{border-left:3px solid var(--red);padding-left:7px}
+.pt-item.crit:not(.sel){background:rgba(200,32,10,.04)}
+.pt-row1{display:flex;align-items:center;gap:5px}
+.pt-name{font-size:13px;font-weight:600;color:var(--text)}
+.pt-gender{font-size:10px;padding:0 4px;border-radius:2px;font-weight:600}
+.pt-gender.m{background:#ddeeff;color:#0050a0}
+.pt-gender.f{background:#ffdded;color:#c0205a}
+.pt-age{font-size:11px;color:var(--text3)}
+.pt-badge{margin-left:auto;font-size:9px;padding:1px 5px;border-radius:8px;font-weight:600}
+.pt-badge.crit{background:#ffe8e8;color:var(--red);border:1px solid #f0c0c0}
+.pt-badge.obs{background:#fff8e0;color:var(--amber);border:1px solid #e8d080}
+.pt-badge.ok{background:#e8f8ee;color:var(--green);border:1px solid #a8d8b8}
+.pt-badge.new{background:#e8f0ff;color:var(--blue);border:1px solid #b0c8f0}
+.pt-row2{display:flex;gap:8px;margin-top:3px;font-size:10px;color:var(--text3)}
+.pt-bed{font-weight:600;color:var(--teal)}
+.pt-diag{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── 患者概要（右栏顶部） ── */
+.pt-summary{
+  background:linear-gradient(135deg,var(--teal),var(--teal2));
+  padding:10px 12px;flex-shrink:0;
+}
+.pts-row1{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.pts-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);
+  display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;
+  flex-shrink:0;
+}
+.pts-name{font-size:16px;font-weight:700;color:#fff}
+.pts-info{font-size:11px;color:rgba(255,255,255,.75);margin-top:2px}
+.pts-badges{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.pts-tag{padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;background:rgba(255,255,255,.2);color:#fff}
+.pts-tag.warn{background:rgba(200,32,10,.5)}
+.pts-tag.attn{background:rgba(180,96,0,.5)}
+.pts-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
+.pts-kv{background:rgba(255,255,255,.12);border-radius:3px;padding:4px 6px}
+.pts-k{font-size:9px;color:rgba(255,255,255,.6);letter-spacing:.5px}
+.pts-v{font-size:12px;font-weight:600;color:#fff;margin-top:1px}
+.pts-v.abnorm{color:#ffcc80}
+.pts-v.danger{color:#ff9080}
+
+/* ── 标签页（中栏） ── */
+#tabs{display:flex;background:var(--navy);flex-shrink:0}
+.tab{padding:6px 14px;font-size:12px;color:rgba(255,255,255,.6);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tab:hover{color:#fff}
+.tab.act{color:#fff;border-bottom-color:#80ffe8;background:rgba(255,255,255,.07)}
+.tab-cnt{margin-left:3px;background:rgba(255,120,80,.85);color:#fff;padding:0 4px;border-radius:8px;font-size:9px}
+.tab-cnt.g{background:rgba(80,200,120,.85)}
+
+/* ── 医嘱区 ── */
+#ord-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.ord-toolbar{
+  display:flex;align-items:center;gap:4px;padding:5px 10px;
+  border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;flex-wrap:wrap;
+}
+.ord-filter{display:flex;align-items:center;gap:0;margin-left:auto}
+.ofl{padding:3px 9px;border:1px solid var(--border);font-size:11px;color:var(--text2);cursor:pointer;background:#fff}
+.ofl:first-child{border-radius:2px 0 0 2px}
+.ofl:last-child{border-radius:0 2px 2px 0}
+.ofl.act{background:var(--teal);color:#fff;border-color:var(--teal)}
+
+.ord-split{display:flex;flex:1;overflow:hidden}
+.ord-left{flex:1;overflow-y:auto;border-right:1px solid var(--border);min-width:0}
+.ord-left::-webkit-scrollbar{width:4px}
+.ord-left::-webkit-scrollbar-thumb{background:var(--teal-mid);border-radius:2px}
+.ord-right{width:280px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden}
+
+/* 医嘱表格 */
+.ord-table{width:100%;border-collapse:collapse;font-size:11px}
+.ord-table th{
+  background:linear-gradient(180deg,#1a5038,#0d3a28);
+  color:rgba(255,255,255,.85);padding:5px 7px;
+  border:1px solid rgba(255,255,255,.08);font-weight:500;
+  white-space:nowrap;position:sticky;top:0;z-index:5;
+}
+.ord-table td{padding:4px 7px;border:1px solid var(--border2);color:var(--text);background:#fff;vertical-align:top}
+.ord-table tr:nth-child(even) td{background:var(--row-alt)}
+.ord-table tr.sel td{background:var(--sel)!important}
+.ord-table tr:hover td{background:#e4f4ee!important}
+.ord-table tr.group-hd td{background:#e0f0ea!important;font-weight:600;color:var(--teal);font-size:11px}
+.ord-table tr.new-ord td{background:#fffaee!important;border-left:3px solid var(--amber)!important}
+.ord-table .td-seq{width:28px;text-align:center;font-size:10px;color:var(--text3);background:#f0f6f3!important}
+.ord-status{display:inline-flex;align-items:center;padding:1px 5px;border-radius:2px;font-size:10px;font-weight:600}
+.os-new{background:#fff8e0;color:#a06000;border:1px solid #e0c060}
+.os-exec{background:#e8f8ee;color:var(--green);border:1px solid #a8d8b8}
+.os-stop{background:#f4f4f4;color:#888;border:1px solid #ccc;text-decoration:line-through}
+.os-wait{background:#e8f0ff;color:var(--blue);border:1px solid #b0c8f0}
+.os-crit{background:#ffe8e8;color:var(--red);border:1px solid #f0c0c0}
+.drug-name{font-weight:500;color:var(--navy)}
+.drug-spec{font-size:10px;color:var(--text3)}
+.drug-route{padding:0 4px;background:#f0f6f3;border-radius:2px;font-size:10px;color:var(--teal)}
+
+/* 开医嘱面板 */
+.new-ord-panel{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:8px 10px;flex-shrink:0;
+}
+.nop-title{font-size:11px;font-weight:600;color:var(--teal);margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.nop-title::before{content:'Rx';background:var(--teal);color:#fff;padding:0 5px;border-radius:2px;font-size:10px;font-weight:700}
+.nop-row{display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap}
+.nop-field{display:flex;flex-direction:column;gap:2px}
+.nop-label{font-size:10px;color:var(--text3)}
+.nop-input{border:1px solid var(--border);border-radius:2px;padding:3px 6px;font-size:11px;font-family:inherit;outline:none;background:#fff;color:var(--text)}
+.nop-input:focus{border-color:var(--teal)}
+.nop-input.drug{width:160px}
+.nop-input.dose{width:70px}
+.nop-input.freq{width:80px}
+.nop-input.route{width:80px}
+.nop-input.days{width:50px}
+.nop-select{border:1px solid var(--border);border-radius:2px;padding:3px 4px;font-size:11px;font-family:inherit;outline:none;background:#fff;color:var(--text)}
+.nop-select:focus{border-color:var(--teal)}
+.drug-suggest{
+  position:absolute;z-index:100;background:#fff;border:1px solid var(--border);
+  border-radius:3px;box-shadow:var(--shadow);max-height:140px;overflow-y:auto;min-width:220px;
+}
+.drug-sug-item{padding:5px 10px;cursor:pointer;font-size:11px;border-bottom:1px solid var(--border2)}
+.drug-sug-item:hover{background:var(--teal-lt)}
+.drug-sug-name{font-weight:600;color:var(--navy)}
+.drug-sug-spec{font-size:10px;color:var(--text3);margin-top:1px}
+.drug-sug-stock{float:right;font-size:10px;color:var(--green);font-weight:600}
+.drug-sug-item.oos .drug-sug-stock{color:var(--red)}
+
+/* 检验检查面板 */
+.exam-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px}
+.exam-card{
+  background:#fff;border:1px solid var(--border2);border-radius:4px;overflow:hidden;cursor:pointer;
+}
+.exam-card:hover{box-shadow:var(--shadow)}
+.exam-card-hd{
+  background:var(--teal);color:#fff;padding:4px 8px;font-size:11px;font-weight:500;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.exam-card-cnt{font-size:9px;background:rgba(255,255,255,.25);padding:1px 5px;border-radius:8px}
+.exam-item{display:flex;align-items:center;padding:4px 8px;border-bottom:1px solid var(--border2);font-size:11px;gap:6px}
+.exam-item:last-child{border-bottom:none}
+.exam-name{flex:1;color:var(--text2)}
+.exam-val{font-weight:600;font-size:12px}
+.exam-val.normal{color:var(--green)}
+.exam-val.high{color:var(--red)}
+.exam-val.low{color:var(--blue)}
+.exam-ref{font-size:10px;color:var(--text3)}
+.exam-arrow{font-size:11px}
+.exam-arrow.up{color:var(--red)}
+.exam-arrow.dn{color:var(--blue)}
+
+/* 右栏内容 */
+.r-section{margin-bottom:0;border-bottom:1px solid var(--border2)}
+.r-section-hd{
+  background:#e8f4f0;padding:5px 10px;font-size:11px;font-weight:600;color:var(--teal);
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+}
+.r-section-hd::before{content:'▸';margin-right:4px}
+.r-section-bd{padding:6px 10px;font-size:11px;color:var(--text2);overflow-y:auto}
+
+/* 生命体征迷你卡 */
+.vital-mini{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px}
+.vm-item{background:var(--bg2);border:1px solid var(--border2);border-radius:3px;padding:4px 6px}
+.vm-label{font-size:9px;color:var(--text3);display:flex;align-items:center;justify-content:space-between}
+.vm-val{font-size:14px;font-weight:700;color:var(--text);line-height:1.2}
+.vm-val.warn{color:var(--amber)}
+.vm-val.danger{color:var(--red)}
+.vm-unit{font-size:9px;font-weight:400;color:var(--text3)}
+
+/* 过敏 */
+.allergy-tag{
+  display:inline-block;margin:2px;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;
+  background:#ffe8e8;color:var(--red);border:1px solid #f0b0b0;
+}
+
+/* 护理记录 */
+.nurse-row{padding:3px 0;border-bottom:1px solid var(--border2);display:flex;gap:6px;font-size:11px}
+.nurse-row:last-child{border-bottom:none}
+.nurse-time{color:var(--text3);flex-shrink:0;min-width:40px}
+.nurse-content{color:var(--text2)}
+
+/* 病程时间线 */
+.timeline{padding:6px 10px}
+.tl-item{display:flex;gap:8px;margin-bottom:8px;position:relative}
+.tl-item::before{content:'';position:absolute;left:14px;top:18px;bottom:-8px;width:1px;background:var(--border2)}
+.tl-item:last-child::before{display:none}
+.tl-dot{
+  width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px;
+  background:var(--teal);border:2px solid var(--teal-lt);
+}
+.tl-dot.warn{background:var(--amber)}
+.tl-dot.crit{background:var(--red)}
+.tl-body{flex:1}
+.tl-time{font-size:10px;color:var(--text3)}
+.tl-title{font-size:11px;font-weight:600;color:var(--text);margin-top:1px}
+.tl-desc{font-size:10px;color:var(--text2);line-height:1.6;margin-top:2px}
+.tl-doctor{font-size:10px;color:var(--teal);margin-top:2px}
+
+/* 状态栏 */
+#sbar{
+  background:#0d3a28;height:20px;display:flex;align-items:center;flex-shrink:0;
+  border-top:1px solid #081e14;
+}
+.sb-item{padding:0 10px;font-size:10px;color:rgba(255,255,255,.55);border-right:1px solid rgba(255,255,255,.07);height:100%;display:flex;align-items:center;gap:4px}
+.sb-item strong{color:rgba(180,255,220,.9)}
+.sb-r{margin-left:auto;display:flex;align-items:stretch}
+
+/* 危急值弹窗 */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:4px;box-shadow:0 8px 40px rgba(0,0,0,.3);width:440px;overflow:hidden}
+.modal-hd{background:var(--red);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700}
+.modal-bd{padding:16px}
+.modal-ft{display:flex;justify-content:flex-end;gap:8px;padding:10px 16px;background:#f8f8f8;border-top:1px solid #e8e8e8}
+.modal-btn{padding:6px 18px;border-radius:3px;border:none;font-size:12px;cursor:pointer;font-family:inherit}
+.modal-btn.p{background:var(--red);color:#fff}
+.modal-btn.s{background:#e8e8e8;color:#333}
+.crit-item{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;gap:10px}
+.crit-item:last-child{border-bottom:none}
+.crit-ico{font-size:20px}
+.crit-label{font-size:12px;color:#444;flex:1}
+.crit-val{font-size:16px;font-weight:800;color:var(--red)}
+.crit-ref{font-size:10px;color:#888;margin-top:2px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- TOP -->
+<div id="top">
+  <div class="top-logo">
+    <div class="top-logo-cross"></div>
+    <div>
+      <div class="top-sys">某市第一人民医院 HIS 系统</div>
+      <div class="top-sub">HOSPITAL INFORMATION SYSTEM · 住院医生工作站 v8.2.4</div>
+    </div>
+  </div>
+  <div class="top-div"></div>
+  <div class="top-dept">内科楼 · 心血管内科 · 3病区</div>
+  <div class="top-right">
+    <div class="top-alert" onclick="showCritModal()">⚠ 危急值 2条</div>
+    <div class="top-user">主治医师：<strong>李建国</strong>&nbsp;｜&nbsp;工号：<strong>YS0234</strong></div>
+    <button class="top-btn">交班</button>
+    <button class="top-btn">退出</button>
+    <div class="top-clock" id="theclock">--:--:--</div>
+  </div>
+</div>
+
+<!-- MENU -->
+<div id="menu">
+  <div class="mi act"><span class="mico">🏥</span>医嘱管理</div>
+  <div class="mi"><span class="mico">📋</span>病历书写</div>
+  <div class="mi"><span class="mico">🧪</span>检验检查</div>
+  <div class="mi"><span class="mico">💊</span>药物查询</div>
+  <div class="mi"><span class="mico">📊</span>手术申请</div>
+  <div class="mi"><span class="mico">🔄</span>会诊转科</div>
+  <div class="mi"><span class="mico">📤</span>出院管理</div>
+  <div class="mi"><span class="mico">📈</span>质控统计</div>
+</div>
+
+<!-- TOOLBAR -->
+<div id="tbar">
+  <div class="tg">
+    <button class="tb p" onclick="doNewOrd()">✚ 新开医嘱</button>
+    <button class="tb g" onclick="doConfirmOrd()">✔ 确认医嘱</button>
+    <button class="tb a" onclick="doStopOrd()">⏹ 停止医嘱</button>
+    <button class="tb r" onclick="doDelOrd()">✕ 作废</button>
+  </div>
+  <div class="tg">
+    <button class="tb" onclick="doRefresh()">↻ 刷新</button>
+    <button class="tb" onclick="doPrint()">🖨 打印执行单</button>
+    <button class="tb" onclick="doExport()">📥 导出</button>
+  </div>
+  <div class="tg">
+    <button class="tb" onclick="doTransfer()">🔄 整组复制</button>
+    <button class="tb off">📋 套餐医嘱</button>
+    <button class="tb" onclick="doMedHist()">💊 用药历史</button>
+  </div>
+  <div class="tg">
+    <span style="font-size:11px;color:var(--text3)">当前床位：</span>
+    <span style="font-size:13px;font-weight:700;color:var(--teal);margin:0 6px">3-18床</span>
+    <span style="font-size:11px;color:var(--text3)">住院号：</span>
+    <span style="font-size:12px;font-weight:600;color:var(--navy);font-family:monospace">2024031896</span>
+  </div>
+</div>
+
+<!-- MAIN 3-COL -->
+<div id="main">
+
+  <!-- 左：患者列表 -->
+  <div id="col-l">
+    <div class="panel-hd">
+      3病区患者列表（16人）
+      <span class="panel-hd-add" title="收新患者">+</span>
+    </div>
+    <div class="search-bar">
+      <input class="search-input" placeholder="姓名/床号/住院号...">
+      <button class="search-btn">搜</button>
+    </div>
+    <div class="pt-list">
+      <!-- 危重患者 -->
+      <div style="background:#fff0ee;padding:3px 10px;font-size:10px;color:var(--red);border-bottom:1px solid var(--border2);font-weight:600">▸ 危重患者（2人）</div>
+      <div class="pt-item crit" onclick="selectPatient(this,'王建国','M')">
+        <div class="pt-row1"><span class="pt-name">王建国</span><span class="pt-gender m">男</span><span class="pt-age">68岁</span><span class="pt-badge crit">危重</span></div>
+        <div class="pt-row2"><span class="pt-bed">3-06床</span><span class="pt-diag">急性心肌梗死 Killip III级</span></div>
+      </div>
+      <div class="pt-item crit" onclick="selectPatient(this,'赵秀兰','F')">
+        <div class="pt-row1"><span class="pt-name">赵秀兰</span><span class="pt-gender f">女</span><span class="pt-age">74岁</span><span class="pt-badge crit">危重</span></div>
+        <div class="pt-row2"><span class="pt-bed">3-12床</span><span class="pt-diag">心力衰竭 NYHA IV级</span></div>
+      </div>
+      <!-- 普通患者 -->
+      <div style="background:#f4f8f4;padding:3px 10px;font-size:10px;color:var(--green);border-bottom:1px solid var(--border2);font-weight:600">▸ 普通患者（14人）</div>
+      <div class="pt-item sel" onclick="selectPatient(this,'张明辉','M')">
+        <div class="pt-row1"><span class="pt-name">张明辉</span><span class="pt-gender m">男</span><span class="pt-age">55岁</span><span class="pt-badge obs">观察</span></div>
+        <div class="pt-row2"><span class="pt-bed">3-18床</span><span class="pt-diag">不稳定型心绞痛</span></div>
+      </div>
+      <div class="pt-item" onclick="selectPatient(this,'李凤英','F')">
+        <div class="pt-row1"><span class="pt-name">李凤英</span><span class="pt-gender f">女</span><span class="pt-age">62岁</span><span class="pt-badge ok">好转</span></div>
+        <div class="pt-row2"><span class="pt-bed">3-20床</span><span class="pt-diag">高血压3级 极高危</span></div>
+      </div>
+      <div class="pt-item" onclick="selectPatient(this,'刘志远','M')">
+        <div class="pt-row1"><span class="pt-name">刘志远</span><span class="pt-gender m">男</span><span class="pt-age">48岁</span><span class="pt-badge new">新入</span></div>
+        <div class="pt-row2"><span class="pt-bed">3-22床</span><span class="pt-diag">阵发性房颤</span></div>
+      </div>
+      <div class="pt-item" onclick="selectPatient(this,'陈淑华','F')">
+        <div class="pt-row1"><span class="pt-name">陈淑华</span><span class="pt-gender f">女</span><span class="pt-age">70岁</span><span class="pt-badge ok">好转</span></div>
+        <div class="pt-row2"><span class="pt-bed">3-24床</span><span class="pt-diag">扩张型心肌病</span></div>
+      </div>
+      <div class="pt-item" onclick="selectPatient(this,'孙国强','M')">
+        <div class="pt-row1"><span class="pt-name">孙国强</span><span class="pt-gender m">男</span><span class="pt-age">58岁</span><span class="pt-badge obs">观察</span></div>
+        <div class="pt-row2"><span class="pt-bed">3-26床</span><span class="pt-diag">慢性心力衰竭急性发作</span></div>
+      </div>
+      <div class="pt-item" onclick="selectPatient(this,'周玉梅','F')">
+        <div class="pt-row1"><span class="pt-name">周玉梅</span><span class="pt-gender f">女</span><span class="pt-age">52岁</span><span class="pt-badge ok">好转</span></div>
+        <div class="pt-row2"><span class="pt-bed">3-28床</span><span class="pt-diag">二尖瓣狭窄 中度</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 中：医嘱&检验 -->
+  <div id="col-m">
+    <div id="tabs">
+      <div class="tab act">💊 医嘱管理 <span class="tab-cnt">12</span></div>
+      <div class="tab">🧪 检验报告 <span class="tab-cnt g">3</span></div>
+      <div class="tab">🩻 影像报告</div>
+      <div class="tab">📋 病程记录</div>
+      <div class="tab">📄 入院记录</div>
+    </div>
+
+    <div id="ord-area">
+      <!-- 新开医嘱面板 -->
+      <div class="new-ord-panel" id="new-ord-panel" style="display:none">
+        <div class="nop-title">开立新医嘱</div>
+        <div class="nop-row" style="align-items:flex-end;gap:6px">
+          <div class="nop-field" style="position:relative">
+            <span class="nop-label">药品名称</span>
+            <input class="nop-input drug" id="drug-inp" placeholder="输入药品名/拼音首字母..." oninput="showDrugSug()" autocomplete="off">
+            <div class="drug-suggest" id="drug-sug" style="display:none">
+              <div class="drug-sug-item" onclick="selectDrug('阿司匹林肠溶片','100mg×30片','口服')">
+                <span class="drug-sug-stock">库存: 486</span>
+                <div class="drug-sug-name">阿司匹林肠溶片</div>
+                <div class="drug-sug-spec">规格: 100mg×30片 ｜ 批号: 20230901</div>
+              </div>
+              <div class="drug-sug-item" onclick="selectDrug('阿托伐他汀钙片','20mg×7片','口服')">
+                <span class="drug-sug-stock">库存: 234</span>
+                <div class="drug-sug-name">阿托伐他汀钙片</div>
+                <div class="drug-sug-spec">规格: 20mg×7片 ｜ 批号: 20231201</div>
+              </div>
+              <div class="drug-sug-item oos" onclick="selectDrug('阿莫西林胶囊','500mg×12粒','口服')">
+                <span class="drug-sug-stock oos">缺货</span>
+                <div class="drug-sug-name">阿莫西林胶囊</div>
+                <div class="drug-sug-spec">规格: 500mg×12粒 ｜ 暂缺货，预计3天到</div>
+              </div>
+            </div>
+          </div>
+          <div class="nop-field"><span class="nop-label">剂量</span><input class="nop-input dose" value="100mg"></div>
+          <div class="nop-field">
+            <span class="nop-label">用药途径</span>
+            <select class="nop-select" style="width:80px">
+              <option>口服</option><option>静脉注射</option><option>肌肉注射</option>
+              <option>皮下注射</option><option>舌下含服</option><option>外用</option>
+            </select>
+          </div>
+          <div class="nop-field">
+            <span class="nop-label">频次</span>
+            <select class="nop-select" style="width:80px">
+              <option>QD 每日一次</option><option>BID 每日两次</option>
+              <option>TID 每日三次</option><option>QID 每日四次</option>
+              <option>QN 每晚一次</option><option>ST 立即执行</option>
+              <option>PRN 必要时</option>
+            </select>
+          </div>
+          <div class="nop-field"><span class="nop-label">天数</span><input class="nop-input days" value="7"></div>
+          <div class="nop-field">
+            <span class="nop-label">医嘱类型</span>
+            <select class="nop-select" style="width:80px">
+              <option>长期医嘱</option><option>临时医嘱</option>
+            </select>
+          </div>
+          <button class="tb p" style="margin-bottom:1px" onclick="submitNewOrd()">✔ 确定开立</button>
+          <button class="tb" style="margin-bottom:1px" onclick="cancelNewOrd()">取消</button>
+        </div>
+        <div style="font-size:10px;color:var(--amber);margin-top:3px">
+          ⚠ 注意：患者对<strong>青霉素</strong>过敏，开立抗生素前请确认。肌酐偏高，注意肾毒性药物剂量。
+        </div>
+      </div>
+
+      <!-- 医嘱工具行 -->
+      <div class="ord-toolbar">
+        <div class="ord-filter">
+          <div class="ofl act">全部</div>
+          <div class="ofl">长期</div>
+          <div class="ofl">临时</div>
+          <div class="ofl">今日</div>
+          <div class="ofl">待执行</div>
+        </div>
+      </div>
+
+      <div class="ord-split">
+        <!-- 医嘱表格 -->
+        <div class="ord-left">
+          <table class="ord-table">
+            <thead>
+              <tr>
+                <th>#</th><th>类型</th><th>医嘱内容</th><th>剂量/规格</th><th>用药途径</th><th>频次</th><th>开始时间</th><th>停止时间</th><th>开嘱医师</th><th>状态</th><th>执行护士</th>
+              </tr>
+            </thead>
+            <tbody id="ord-body">
+              <tr class="group-hd"><td colspan="11">── 长期医嘱 ──────────────────────────</td></tr>
+              <tr>
+                <td class="td-seq">1</td>
+                <td><span style="font-size:10px;color:var(--blue)">长期</span></td>
+                <td><div class="drug-name">阿司匹林肠溶片</div><div class="drug-spec">【抗血小板聚集】</div></td>
+                <td>100mg/次</td>
+                <td><span class="drug-route">口服</span></td>
+                <td>QD</td>
+                <td>2024-03-08 08:00</td>
+                <td>—</td>
+                <td>李建国</td>
+                <td><span class="ord-status os-exec">执行中</span></td>
+                <td>王护士</td>
+              </tr>
+              <tr>
+                <td class="td-seq">2</td>
+                <td><span style="font-size:10px;color:var(--blue)">长期</span></td>
+                <td><div class="drug-name">阿托伐他汀钙片</div><div class="drug-spec">【调脂稳斑】</div></td>
+                <td>40mg/次</td>
+                <td><span class="drug-route">口服</span></td>
+                <td>QN</td>
+                <td>2024-03-08 08:00</td>
+                <td>—</td>
+                <td>李建国</td>
+                <td><span class="ord-status os-exec">执行中</span></td>
+                <td>王护士</td>
+              </tr>
+              <tr>
+                <td class="td-seq">3</td>
+                <td><span style="font-size:10px;color:var(--blue)">长期</span></td>
+                <td><div class="drug-name">琥珀酸美托洛尔缓释片</div><div class="drug-spec">【β受体阻滞剂 控心率】</div></td>
+                <td>47.5mg/次</td>
+                <td><span class="drug-route">口服</span></td>
+                <td>QD</td>
+                <td>2024-03-08 08:00</td>
+                <td>—</td>
+                <td>李建国</td>
+                <td><span class="ord-status os-exec">执行中</span></td>
+                <td>王护士</td>
+              </tr>
+              <tr>
+                <td class="td-seq">4</td>
+                <td><span style="font-size:10px;color:var(--blue)">长期</span></td>
+                <td><div class="drug-name">单硝酸异山梨酯缓释片</div><div class="drug-spec">【硝酸酯类 扩血管】</div></td>
+                <td>60mg/次</td>
+                <td><span class="drug-route">口服</span></td>
+                <td>QD</td>
+                <td>2024-03-08 08:00</td>
+                <td>—</td>
+                <td>李建国</td>
+                <td><span class="ord-status os-exec">执行中</span></td>
+                <td>张护士</td>
+              </tr>
+              <tr>
+                <td class="td-seq">5</td>
+                <td><span style="font-size:10px;color:var(--blue)">长期</span></td>
+                <td><div class="drug-name">低分子肝素钠注射液</div><div class="drug-spec">【抗凝治疗】</div></td>
+                <td>4000IU/次</td>
+                <td><span class="drug-route">皮下注射</span></td>
+                <td>Q12H</td>
+                <td>2024-03-09 08:00</td>
+                <td>—</td>
+                <td>李建国</td>
+                <td><span class="ord-status os-exec">执行中</span></td>
+                <td>张护士</td>
+              </tr>
+              <tr>
+                <td class="td-seq">6</td>
+                <td><span style="font-size:10px;color:var(--blue)">长期</span></td>
+                <td><div class="drug-name">0.9%氯化钠注射液 250ml<br>硝酸甘油注射液 10mg</div><div class="drug-spec">【持续泵入 扩冠】</div></td>
+                <td>微量泵 5ml/h</td>
+                <td><span class="drug-route">静脉注射</span></td>
+                <td>持续</td>
+                <td>2024-03-09 14:00</td>
+                <td>—</td>
+                <td>李建国</td>
+                <td><span class="ord-status os-crit">持续泵入</span></td>
+                <td>张护士</td>
+              </tr>
+              <tr>
+                <td class="td-seq">7</td>
+                <td><span style="font-size:10px;color:var(--blue)">长期</span></td>
+                <td><div class="drug-name">【护理】一级护理</div></td>
+                <td>—</td>
+                <td>—</td>
+                <td>持续</td>
+                <td>2024-03-08 08:00</td>
+                <td>—</td>
+                <td>李建国</td>
+                <td><span class="ord-status os-exec">执行中</span></td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td class="td-seq">8</td>
+                <td><span style="font-size:10px;color:var(--blue)">长期</span></td>
+                <td><div class="drug-name">【饮食】低盐低脂流食</div></td>
+                <td>—</td>
+                <td>—</td>
+                <td>持续</td>
+                <td>2024-03-08 08:00</td>
+                <td>—</td>
+                <td>李建国</td>
+                <td><span class="ord-status os-exec">执行中</span></td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td class="td-seq">9</td>
+                <td><span style="font-size:10px;color:var(--text3)">已停</span></td>
+                <td><div class="drug-name" style="text-decoration:line-through;color:#888">依诺肝素钠注射液</div><div class="drug-spec" style="color:#bbb">【已停用】</div></td>
+                <td style="color:#bbb">4000IU</td>
+                <td><span class="drug-route" style="opacity:.5">皮下注射</span></td>
+                <td style="color:#bbb">QD</td>
+                <td>2024-03-08 08:00</td>
+                <td>2024-03-09 08:00</td>
+                <td>李建国</td>
+                <td><span class="ord-status os-stop">已停止</span></td>
+                <td style="color:#bbb">—</td>
+              </tr>
+              <tr class="group-hd"><td colspan="11">── 临时医嘱 ──────────────────────────</td></tr>
+              <tr class="new-ord">
+                <td class="td-seq">10</td>
+                <td><span style="font-size:10px;color:var(--amber)">临时</span></td>
+                <td><div class="drug-name">心肌酶谱＋肌钙蛋白I</div><div class="drug-spec">【急查 Q6H 复查】</div></td>
+                <td>—</td>
+                <td><span class="drug-route">抽血化验</span></td>
+                <td>ST</td>
+                <td>2024-03-10 08:30</td>
+                <td>—</td>
+                <td>李建国</td>
+                <td><span class="ord-status os-wait">待执行</span></td>
+                <td>—</td>
+              </tr>
+              <tr class="new-ord">
+                <td class="td-seq">11</td>
+                <td><span style="font-size:10px;color:var(--amber)">临时</span></td>
+                <td><div class="drug-name">心脏超声（床旁）</div><div class="drug-spec">【评估心功能 射血分数】</div></td>
+                <td>—</td>
+                <td>—</td>
+                <td>ST</td>
+                <td>2024-03-10 08:30</td>
+                <td>—</td>
+                <td>李建国</td>
+                <td><span class="ord-status os-wait">待执行</span></td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td class="td-seq">12</td>
+                <td><span style="font-size:10px;color:var(--amber)">临时</span></td>
+                <td><div class="drug-name">硝酸甘油片 0.5mg</div><div class="drug-spec">【胸痛发作时备用】</div></td>
+                <td>0.5mg/次</td>
+                <td><span class="drug-route">舌下含服</span></td>
+                <td>PRN</td>
+                <td>2024-03-08 08:00</td>
+                <td>—</td>
+                <td>李建国</td>
+                <td><span class="ord-status os-exec">执行中</span></td>
+                <td>张护士</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 检验结果快览 -->
+        <div class="ord-right">
+          <div class="panel-hd" style="font-size:11px">最新检验结果</div>
+          <div style="flex:1;overflow-y:auto;padding:6px">
+            <div class="exam-card" style="margin-bottom:6px">
+              <div class="exam-card-hd">心肌酶谱 <span class="exam-card-cnt">03-10 06:00</span></div>
+              <div class="exam-item"><span class="exam-name">肌钙蛋白I (cTnI)</span><span class="exam-val high">12.8 <span class="exam-arrow up">↑</span></span><span class="exam-ref">≤0.04</span></div>
+              <div class="exam-item"><span class="exam-name">肌酸激酶 (CK)</span><span class="exam-val high">856 <span class="exam-arrow up">↑</span></span><span class="exam-ref">≤200</span></div>
+              <div class="exam-item"><span class="exam-name">CK-MB</span><span class="exam-val high">68 <span class="exam-arrow up">↑</span></span><span class="exam-ref">≤25</span></div>
+              <div class="exam-item"><span class="exam-name">肌红蛋白</span><span class="exam-val high">320 <span class="exam-arrow up">↑</span></span><span class="exam-ref">≤80</span></div>
+            </div>
+            <div class="exam-card" style="margin-bottom:6px">
+              <div class="exam-card-hd">血常规 <span class="exam-card-cnt">03-09 22:00</span></div>
+              <div class="exam-item"><span class="exam-name">白细胞 (WBC)</span><span class="exam-val high">12.3 <span class="exam-arrow up">↑</span></span><span class="exam-ref">4-10</span></div>
+              <div class="exam-item"><span class="exam-name">血红蛋白 (Hb)</span><span class="exam-val low">98 <span class="exam-arrow dn">↓</span></span><span class="exam-ref">120-160</span></div>
+              <div class="exam-item"><span class="exam-name">血小板 (PLT)</span><span class="exam-val normal">186</span><span class="exam-ref">100-300</span></div>
+            </div>
+            <div class="exam-card">
+              <div class="exam-card-hd">生化全套 <span class="exam-card-cnt">03-09 22:00</span></div>
+              <div class="exam-item"><span class="exam-name">肌酐 (Cr)</span><span class="exam-val high">142 <span class="exam-arrow up">↑</span></span><span class="exam-ref">53-115</span></div>
+              <div class="exam-item"><span class="exam-name">尿素氮 (BUN)</span><span class="exam-val high">9.8 <span class="exam-arrow up">↑</span></span><span class="exam-ref">1.7-8.3</span></div>
+              <div class="exam-item"><span class="exam-name">血钾 (K⁺)</span><span class="exam-val low">3.2 <span class="exam-arrow dn">↓</span></span><span class="exam-ref">3.5-5.5</span></div>
+              <div class="exam-item"><span class="exam-name">血糖 (Glu)</span><span class="exam-val high">9.6 <span class="exam-arrow up">↑</span></span><span class="exam-ref">3.9-6.1</span></div>
+              <div class="exam-item"><span class="exam-name">总胆固醇 (TC)</span><span class="exam-val normal">4.2</span><span class="exam-ref">≤5.2</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右：患者详情 -->
+  <div id="col-r">
+    <!-- 患者概要 -->
+    <div class="pt-summary">
+      <div class="pts-row1">
+        <div class="pts-avatar">张</div>
+        <div>
+          <div class="pts-name">张明辉</div>
+          <div class="pts-info">男 · 55岁 · 3-18床 · 住院号 2024031896</div>
+        </div>
+        <div class="pts-badges">
+          <span class="pts-tag warn">⚠ 青霉素过敏</span>
+          <span class="pts-tag attn">肾功不全</span>
+        </div>
+      </div>
+      <div class="pts-grid">
+        <div class="pts-kv"><div class="pts-k">入院诊断</div><div class="pts-v" style="font-size:11px">不稳定型心绞痛</div></div>
+        <div class="pts-kv"><div class="pts-k">住院天数</div><div class="pts-v">3天</div></div>
+        <div class="pts-kv"><div class="pts-k">护理级别</div><div class="pts-v">一级护理</div></div>
+        <div class="pts-kv"><div class="pts-k">主管医师</div><div class="pts-v">李建国</div></div>
+        <div class="pts-kv"><div class="pts-k">责任护士</div><div class="pts-v">王芳</div></div>
+        <div class="pts-kv"><div class="pts-k">入院时间</div><div class="pts-v" style="font-size:10px">03-08 09:30</div></div>
+      </div>
+    </div>
+
+    <div style="flex:1;overflow-y:auto">
+      <!-- 生命体征 -->
+      <div class="r-section">
+        <div class="r-section-hd">📊 生命体征（最近一次 07:00）</div>
+        <div class="r-section-bd">
+          <div class="vital-mini">
+            <div class="vm-item">
+              <div class="vm-label">体温 <span style="font-size:9px;color:var(--green)">正常</span></div>
+              <div class="vm-val">36.8<span class="vm-unit">°C</span></div>
+            </div>
+            <div class="vm-item">
+              <div class="vm-label">脉搏 <span style="font-size:9px;color:var(--green)">正常</span></div>
+              <div class="vm-val">78<span class="vm-unit">次/分</span></div>
+            </div>
+            <div class="vm-item">
+              <div class="vm-label">收缩压 <span style="font-size:9px;color:var(--amber)">偏高</span></div>
+              <div class="vm-val warn">148<span class="vm-unit">mmHg</span></div>
+            </div>
+            <div class="vm-item">
+              <div class="vm-label">舒张压</div>
+              <div class="vm-val warn">96<span class="vm-unit">mmHg</span></div>
+            </div>
+            <div class="vm-item">
+              <div class="vm-label">血氧饱和度 <span style="font-size:9px;color:var(--amber)">注意</span></div>
+              <div class="vm-val warn">94<span class="vm-unit">%</span></div>
+            </div>
+            <div class="vm-item">
+              <div class="vm-label">呼吸频率</div>
+              <div class="vm-val">18<span class="vm-unit">次/分</span></div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--amber);background:var(--amber-lt);padding:3px 6px;border-radius:2px">
+            ⚠ 血压偏高，血氧94%，已吸氧3L/min，关注呼吸状况
+          </div>
+        </div>
+      </div>
+
+      <!-- 过敏信息 -->
+      <div class="r-section">
+        <div class="r-section-hd" style="color:var(--red)">⚠ 过敏 / 禁忌信息</div>
+        <div class="r-section-bd">
+          <span class="allergy-tag">青霉素 — 皮疹荨麻疹</span>
+          <span class="allergy-tag">磺胺类 — 严重过敏史</span>
+          <div style="margin-top:5px;font-size:10px;color:var(--red)">开立以上药物将触发系统警报，需主任签批</div>
+        </div>
+      </div>
+
+      <!-- 护理记录 -->
+      <div class="r-section">
+        <div class="r-section-hd">📝 护理记录（今日）</div>
+        <div class="r-section-bd" style="max-height:120px">
+          <div class="nurse-row"><span class="nurse-time">07:00</span><span class="nurse-content">晨间护理，测量生命体征，BP 148/96，氧饱94%，汇报医生</span></div>
+          <div class="nurse-row"><span class="nurse-time">06:30</span><span class="nurse-content">抽血：心肌酶谱+血常规+生化，标本已送检</span></div>
+          <div class="nurse-row"><span class="nurse-time">22:00</span><span class="nurse-content">夜间巡视，患者诉轻微胸闷，含硝酸甘油0.5mg，5分钟后缓解</span></div>
+          <div class="nurse-row"><span class="nurse-time">18:00</span><span class="nurse-content">执行长期医嘱，静脉泵入硝酸甘油，速率5ml/h</span></div>
+          <div class="nurse-row"><span class="nurse-time">14:00</span><span class="nurse-content">低分子肝素钠4000IU皮下注射，注射部位腹部左侧</span></div>
+        </div>
+      </div>
+
+      <!-- 病程时间线 -->
+      <div class="r-section">
+        <div class="r-section-hd">📅 病程记录</div>
+        <div class="r-section-bd" style="padding:0">
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-dot warn"></div>
+              <div class="tl-body">
+                <div class="tl-time">2024-03-10 08:30</div>
+                <div class="tl-title">病程记录 · 今日查房</div>
+                <div class="tl-desc">患者昨夜胸闷发作一次，含硝酸甘油缓解。今晨BP 148/96，SpO₂ 94%，心率78次/分。心电图较前无明显变化。复查心肌酶、心超评估心功能。加强血压管控，维持现有治疗方案。</div>
+                <div class="tl-doctor">李建国 主治医师</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot crit"></div>
+              <div class="tl-body">
+                <div class="tl-time">2024-03-09 22:15</div>
+                <div class="tl-title">临时处置 · 胸闷发作</div>
+                <div class="tl-desc">护士报告患者胸闷，予硝酸甘油舌下含服，5分钟后症状缓解。心电图检查未见新发缺血改变。继续观察。</div>
+                <div class="tl-doctor">李建国 主治医师</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot"></div>
+              <div class="tl-body">
+                <div class="tl-time">2024-03-08 09:30</div>
+                <div class="tl-title">入院记录</div>
+                <div class="tl-desc">患者因反复胸痛胸闷3天急诊入院。既往高血压病史10年，冠心病史5年。体检：BP 162/98，心率92次/分。诊断：不稳定型心绞痛。予抗血小板、抗凝、扩冠等治疗。</div>
+                <div class="tl-doctor">李建国 主治医师</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- STATUS BAR -->
+<div id="sbar">
+  <div class="sb-item">科室：<strong>心血管内科 3病区</strong></div>
+  <div class="sb-item">当前患者：<strong>张明辉 · 3-18床</strong></div>
+  <div class="sb-item">住院号：<strong>2024031896</strong></div>
+  <div class="sb-item">今日医嘱：<strong>12条</strong></div>
+  <div class="sb-item" style="color:rgba(255,180,80,.8)">待确认医嘱：<strong style="color:#ffcc60">2条</strong></div>
+  <div class="sb-item">危急值：<strong style="color:#ff8080">2条未处理</strong></div>
+  <div class="sb-r">
+    <div class="sb-item">操作员：<strong>李建国 YS0234</strong></div>
+    <div class="sb-item">服务器：<strong>正常</strong></div>
+    <div class="sb-item" id="sb-date">2024-03-10</div>
+  </div>
+</div>
+
+<!-- 危急值弹窗 -->
+<div class="modal-overlay" id="crit-modal" style="display:none" onclick="if(event.target===this)hideCritModal()">
+  <div class="modal">
+    <div class="modal-hd">⚠ 危急值提醒 — 需立即处置</div>
+    <div class="modal-bd">
+      <div style="font-size:12px;color:#555;margin-bottom:10px;background:#fff8e8;padding:6px 10px;border-radius:3px;border-left:3px solid var(--amber)">
+        以下检验结果超出危急值范围，请立即查看并在系统中确认已知晓，否则将自动升级通知上级医师。
+      </div>
+      <div class="crit-item">
+        <div class="crit-ico">🫀</div>
+        <div style="flex:1">
+          <div class="crit-val">cTnI 12.8 ng/mL <span style="font-size:12px">↑↑</span></div>
+          <div class="crit-label">患者：<strong>张明辉</strong> 3-18床 ｜ 肌钙蛋白I 危急值</div>
+          <div class="crit-ref">参考范围：≤0.04 ng/mL ｜ 超出上限 320 倍 ｜ 危急等级：<span style="color:var(--red);font-weight:700">极高</span></div>
+        </div>
+      </div>
+      <div class="crit-item">
+        <div class="crit-ico">🩸</div>
+        <div style="flex:1">
+          <div class="crit-val">K⁺ 3.2 mmol/L <span style="font-size:12px">↓</span></div>
+          <div class="crit-label">患者：<strong>张明辉</strong> 3-18床 ｜ 血清钾低危急值</div>
+          <div class="crit-ref">参考范围：3.5-5.5 mmol/L ｜ 注意心律失常风险 ｜ 危急等级：<span style="color:var(--amber);font-weight:700">中等</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="modal-btn s" onclick="hideCritModal()">稍后处理</button>
+      <button class="modal-btn p" onclick="confirmCrit()">✔ 确认已知晓，立即处置</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 时钟
+function tick(){
+  const now=new Date();
+  const p=n=>String(n).padStart(2,'0');
+  document.getElementById('theclock').textContent=`${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+}
+setInterval(tick,1000);tick();
+
+// 危急值弹窗
+function showCritModal(){document.getElementById('crit-modal').style.display='flex'}
+function hideCritModal(){document.getElementById('crit-modal').style.display='none'}
+function confirmCrit(){
+  hideCritModal();
+  showToast('✅','危急值已确认','已记录处置，系统已通知护士站。请及时补钾并复查血钾。',5000);
+}
+
+// Toast
+function showToast(ico,title,body,duration=3500){
+  const d=document.createElement('div');
+  d.style.cssText='position:fixed;top:60px;right:16px;z-index:9999;background:#fff;border:1px solid #c0d4cc;border-radius:4px;box-shadow:0 4px 20px rgba(0,80,60,.15);padding:10px 14px;display:flex;align-items:flex-start;gap:8px;max-width:340px;font-family:inherit;animation:slideIn .2s';
+  d.innerHTML=`<span style="font-size:16px;flex-shrink:0">${ico}</span><div><div style="font-size:12px;font-weight:600;color:#1a2820;margin-bottom:3px">${title}</div><div style="font-size:11px;color:#3a5048;line-height:1.6">${body}</div></div><span onclick="this.closest('div').remove()" style="margin-left:auto;cursor:pointer;color:#6a8078;font-size:14px;flex-shrink:0;line-height:1">✕</span>`;
+  document.body.appendChild(d);
+  setTimeout(()=>d.style.opacity='0',duration-400);
+  setTimeout(()=>d.remove(),duration);
+}
+
+// 患者切换
+function selectPatient(el,name,gender){
+  document.querySelectorAll('.pt-item').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  const bed=el.querySelector('.pt-bed').textContent;
+  document.querySelector('.pts-name').textContent=name;
+  document.querySelector('.pts-avatar').textContent=name[0];
+  document.querySelector('.pts-info').textContent=`${gender==='M'?'男':'女'} · ${55+Math.floor(Math.random()*20)}岁 · ${bed} · 住院号 20240${Math.floor(Math.random()*99999+10000)}`;
+  showToast('👤','已切换患者',`当前患者：${name}，${bed}`);
+}
+
+// 新开医嘱
+function doNewOrd(){
+  const p=document.getElementById('new-ord-panel');
+  p.style.display=p.style.display==='none'?'block':'none';
+  if(p.style.display==='block')document.getElementById('drug-inp').focus();
+}
+function cancelNewOrd(){document.getElementById('new-ord-panel').style.display='none'}
+
+// 药品联想
+function showDrugSug(){
+  const v=document.getElementById('drug-inp').value;
+  const sug=document.getElementById('drug-sug');
+  sug.style.display=v.length>0?'block':'none';
+}
+function selectDrug(name,spec,route){
+  document.getElementById('drug-inp').value=name;
+  document.getElementById('drug-sug').style.display='none';
+  showToast('💊','药品已选择',`${name} ${spec} ｜ 请确认剂量和频次`);
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#new-ord-panel'))document.getElementById('drug-sug').style.display='none';
+});
+
+function submitNewOrd(){
+  const drug=document.getElementById('drug-inp').value;
+  if(!drug){showToast('⚠','请选择药品','请输入药品名称并从列表中选择');return;}
+  document.getElementById('new-ord-panel').style.display='none';
+  showToast('✅','医嘱已开立',`${drug}医嘱已创建，等待护士执行确认`);
+}
+
+// 工具栏
+function doConfirmOrd(){showToast('✔','医嘱已确认','所选医嘱已确认，已通知护士站执行')}
+function doStopOrd(){showToast('⏹','停止医嘱','所选医嘱已发起停止申请，护士确认后生效')}
+function doDelOrd(){showToast('🗑','已作废','临时医嘱已作废，请在操作日志中查看记录')}
+function doRefresh(){showToast('↻','刷新成功','医嘱及检验数据已更新至最新')}
+function doPrint(){showToast('🖨','准备打印','正在生成执行单PDF，请稍候...')}
+function doExport(){showToast('📥','导出','医嘱数据已导出至本地')}
+function doTransfer(){showToast('🔄','复制成功','整组长期医嘱已复制，可粘贴至其他患者')}
+function doMedHist(){showToast('💊','用药历史','正在调取患者近期用药记录...')}
+
+// 菜单
+document.querySelectorAll('.mi').forEach(el=>{
+  el.addEventListener('click',function(){
+    document.querySelectorAll('.mi').forEach(e=>e.classList.remove('act'));
+    this.classList.add('act');
+  });
+});
+document.querySelectorAll('.tab').forEach(el=>{
+  el.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(e=>e.classList.remove('act'));
+    this.classList.add('act');
+  });
+});
+document.querySelectorAll('.ofl').forEach(el=>{
+  el.addEventListener('click',function(){
+    document.querySelectorAll('.ofl').forEach(e=>e.classList.remove('act'));
+    this.classList.add('act');
+  });
+});
+document.querySelectorAll('#ord-body tr').forEach(el=>{
+  el.addEventListener('click',function(){
+    if(this.classList.contains('group-hd'))return;
+    document.querySelectorAll('#ord-body tr').forEach(e=>e.classList.remove('sel'));
+    this.classList.add('sel');
+  });
+});
+
+// 自动弹出危急值（延迟）
+setTimeout(showCritModal, 1200);
+</script>
+</body>
+</html>
+

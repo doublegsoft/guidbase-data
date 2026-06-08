@@ -101,6 +101,296 @@ ${""?left_pad(indent)}<${namespace}-feedback v-model="show${js.nameType(form.id)
 </#macro>
 
 <!----------------------------------------------------------------------------->
+<!--                              OFFICIAL FORM                              -->
+<!----------------------------------------------------------------------------->
+<#macro print_official_form_variables form indent=0>
+${""?left_pad(indent)}// ${js.nameVariable(form.id)}表单校验规则
+const ${js.nameVariable(form.id)}Rules = [
+  <#list form.inputs as input>  
+    <#if input.value("readonly") == "true"><#continue></#if>
+  {name: '${js.nameVariable(input.id)}',rules: [<#if input.value("required") == "true">{ type: 'required', message: '${input.title}必须填写！' },</#if><#if input.type == "number">{ type: 'number', message: '请正确输入${input.title}！' }</#if>]},
+  </#list>
+]
+const { errors, validate, clearErrors } = useFieldValidation(${js.nameVariable(form.id)}Rules)
+${""?left_pad(indent)}// ${js.nameVariable(form.id)}表单相关变量
+${""?left_pad(indent)}const ${js.nameVariable(form.id)}Data = reactive({
+  <#list form.inputs as input>
+${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
+  </#list>
+${""?left_pad(indent)}});
+  <#list form.inputs as input>
+    <#if (input.type == "select" || input.type == "multiselect") && !(input.value("data")!"")?starts_with("enum[")>
+${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
+    <#elseif input.type == "select">
+${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
+    <#elseif input.type == "cascade">
+${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
+    </#if>
+  </#list>
+const showConfirm${js.nameType(form.id)}Reset = ref(false)
+const show${js.nameType(form.id)}Error = ref(false)
+const validationErrorMessage = ref('')
+</#macro>
+
+<#macro print_layout_official_form form indent>
+  <#local cols = form.value("cols")!"3">
+  <#local groups = form.groups()>
+${""?left_pad(indent)}<div class="${namespace}-of">
+${""?left_pad(indent)}  <div ref="${js.nameVariable(form.id)}Ref" class="${namespace}-of__container">
+${""?left_pad(indent)}    <div class="${namespace}-of__header">
+${""?left_pad(indent)}      <h1>${form.title}</h1>
+${""?left_pad(indent)}      <div class="${namespace}-of__meta">
+${""?left_pad(indent)}        <span>机密程度：{{ confidentialLevel }}</span>
+${""?left_pad(indent)}        <span>流程编号：{{ flowNo }}</span>
+${""?left_pad(indent)}        <span>申请日期：{{ applyDate }}</span>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}
+${""?left_pad(indent)}    <table class="${namespace}-of__table">
+  <#list groups as group>
+    <#local rows = form.rows(group, cols?number)>
+    <#list rows as row>
+${""?left_pad(indent)}      <tr>
+      <#list row as child>
+${""?left_pad(indent)}        <td class="${namespace}-of__label<#if child.value("required","") == "true"> ${namespace}-of__required</#if>">${child.title}</td>
+${""?left_pad(indent)}        <td colspan="${child.value("span","1")?number * 2 - 1}">
+          <#if child.type == "date">
+${""?left_pad(indent)}          <${namespace}-datepicker data-test="${js.nameVariable(child.id)}" v-model="${js.nameVariable(form.id)}Data.${js.nameVariable(child.id)}" plain />
+          <#elseif child.type == "select">
+            <#if (child.value("data")!"")?starts_with("enum[")>
+${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(child.id)}" :options="sdk.${js.nameVariable(child.id)}Options" :clearable="true" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />    
+            <#else>
+${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options"  :clearable="true" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />
+            </#if>
+          <#elseif child.type == "multiselect">
+${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />      
+          <#elseif child.type == "tags">
+${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(child.id)}" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />      
+          <#elseif child.type == "longtext">
+${""?left_pad(indent)}          <textarea
+${""?left_pad(indent)}            class="${namespace}-of__textarea"
+${""?left_pad(indent)}            :class="{ '${namespace}-of__readonly': readonly }"
+${""?left_pad(indent)}            :placeholder="${child.value("placeholder", "请填写" + child.title)}"
+${""?left_pad(indent)}            :value="${js.nameVariable(form.id)}Data.${js.nameVariable(child.id)}"
+${""?left_pad(indent)}            :readonly="readonly || ${child.value("readonly","false")}"
+${""?left_pad(indent)}            @input=""></textarea>      
+          <#else>
+${""?left_pad(indent)}          <input type="text"
+${""?left_pad(indent)}            class="${namespace}-of__input"
+${""?left_pad(indent)}            :class="{ '${namespace}-of__readonly': readonly  || ${child.value("readonly","false")} }"
+${""?left_pad(indent)}            :value="${js.nameVariable(form.id)}Data.${js.nameVariable(child.id)}"
+${""?left_pad(indent)}            :readonly="readonly || ${child.value("readonly","false")}"
+${""?left_pad(indent)}            @input="">              
+          </#if>
+${""?left_pad(indent)}        </td>
+      </#list>
+${""?left_pad(indent)}      </tr>
+    </#list>
+  </#list>
+<#--  ${""?left_pad(indent)}    
+${""?left_pad(indent)}      <tr>
+${""?left_pad(indent)}        <td class="${namespace}-of__label ${namespace}-of__required">项目名称</td>
+${""?left_pad(indent)}        <td colspan="3">
+${""?left_pad(indent)}          <input
+${""?left_pad(indent)}            type="text"
+${""?left_pad(indent)}            class="${namespace}-of__input"
+${""?left_pad(indent)}            :placeholder="readonly ? '' : '请输入项目全称（需与合同保持一致）'"
+${""?left_pad(indent)}            :value="form.projectName"
+${""?left_pad(indent)}            :readonly="readonly"
+${""?left_pad(indent)}            @input="updateField('projectName', $event.target.value)"
+${""?left_pad(indent)}          >
+${""?left_pad(indent)}        </td>
+${""?left_pad(indent)}        <td class="${namespace}-of__label ${namespace}-of__required">预算年度</td>
+${""?left_pad(indent)}        <td>
+${""?left_pad(indent)}          <select
+${""?left_pad(indent)}            class="${namespace}-of__select"
+${""?left_pad(indent)}            :value="form.budgetYear"
+${""?left_pad(indent)}            :disabled="readonly"
+${""?left_pad(indent)}            @change="updateField('budgetYear', $event.target.value)"
+${""?left_pad(indent)}          >
+${""?left_pad(indent)}            <option v-for="y in budgetYearOptions" :key="y" :value="y">{{ y }}年度</option>
+${""?left_pad(indent)}          </select>
+${""?left_pad(indent)}        </td>
+${""?left_pad(indent)}      </tr>
+${""?left_pad(indent)}      <tr>
+${""?left_pad(indent)}        <td class="${namespace}-of__label">项目类别</td>
+${""?left_pad(indent)}        <td>
+${""?left_pad(indent)}          <select
+${""?left_pad(indent)}            class="${namespace}-of__select"
+${""?left_pad(indent)}            :value="form.projectCategory"
+${""?left_pad(indent)}            :disabled="readonly"
+${""?left_pad(indent)}            @change="updateField('projectCategory', $event.target.value)"
+${""?left_pad(indent)}          >
+${""?left_pad(indent)}            <option v-for="opt in categoryOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+${""?left_pad(indent)}          </select>
+${""?left_pad(indent)}        </td>
+${""?left_pad(indent)}        <td class="${namespace}-of__label">资金来源</td>
+${""?left_pad(indent)}        <td>
+${""?left_pad(indent)}          <select
+${""?left_pad(indent)}            class="${namespace}-of__select"
+${""?left_pad(indent)}            :value="form.fundingSource"
+${""?left_pad(indent)}            :disabled="readonly"
+${""?left_pad(indent)}            @change="updateField('fundingSource', $event.target.value)"
+${""?left_pad(indent)}          >
+${""?left_pad(indent)}            <option v-for="opt in fundingOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+${""?left_pad(indent)}          </select>
+${""?left_pad(indent)}        </td>
+${""?left_pad(indent)}        <td class="${namespace}-of__label ${namespace}-of__required">申报金额(元)</td>
+${""?left_pad(indent)}        <td>
+${""?left_pad(indent)}          <input
+${""?left_pad(indent)}            type="number"
+${""?left_pad(indent)}            class="${namespace}-of__input ${namespace}-of__input--amount"
+${""?left_pad(indent)}            :value="form.amount"
+${""?left_pad(indent)}            :readonly="readonly"
+${""?left_pad(indent)}            @input="updateField('amount', Number($event.target.value))"
+${""?left_pad(indent)}          >
+${""?left_pad(indent)}        </td>
+${""?left_pad(indent)}      </tr>
+${""?left_pad(indent)}      <tr>
+${""?left_pad(indent)}        <td class="${namespace}-of__label ${namespace}-of__required">立项申请原因及主要内容简述</td>
+${""?left_pad(indent)}        <td colspan="5" style="padding: 0;">
+${""?left_pad(indent)}          <textarea
+${""?left_pad(indent)}            class="${namespace}-of__textarea"
+${""?left_pad(indent)}            :class="{ '${namespace}-of__readonly': readonly }"
+${""?left_pad(indent)}            :placeholder="readonly ? '' : '请详细填写：1.立项背景；2.要解决的具体业务痛点；3.预期达到的量化指标。'"
+${""?left_pad(indent)}            :value="form.reason"
+${""?left_pad(indent)}            :readonly="readonly"
+${""?left_pad(indent)}            @input="updateField('reason', $event.target.value)"
+${""?left_pad(indent)}          ></textarea>
+${""?left_pad(indent)}        </td>
+${""?left_pad(indent)}      </tr>
+${""?left_pad(indent)}      <tr>
+${""?left_pad(indent)}        <td class="${namespace}-of__label">预算明细清单</td>
+${""?left_pad(indent)}        <td colspan="5" style="padding: 5px;">
+${""?left_pad(indent)}          <table class="${namespace}-of__sub-table">
+${""?left_pad(indent)}            <thead>
+${""?left_pad(indent)}              <tr>
+${""?left_pad(indent)}                <th style="width: 5%;">序号</th>
+${""?left_pad(indent)}                <th style="width: 25%;">费用明细项目</th>
+${""?left_pad(indent)}                <th style="width: 15%;">单价(元)</th>
+${""?left_pad(indent)}                <th style="width: 10%;">数量</th>
+${""?left_pad(indent)}                <th style="width: 15%;">估算金额(元)</th>
+${""?left_pad(indent)}                <th>备注/品牌规格</th>
+${""?left_pad(indent)}                <th v-if="!readonly" style="width: 6%;">操作</th>
+${""?left_pad(indent)}              </tr>
+${""?left_pad(indent)}            </thead>
+${""?left_pad(indent)}            <tbody>
+${""?left_pad(indent)}              <tr v-for="(item, idx) in form.budgetItems" :key="idx">
+${""?left_pad(indent)}                <td style="text-align: center;">{{ idx + 1 }}</td>
+${""?left_pad(indent)}                <td>
+${""?left_pad(indent)}                  <input
+${""?left_pad(indent)}                    type="text"
+${""?left_pad(indent)}                    class="${namespace}-of__input"
+${""?left_pad(indent)}                    :value="item.name"
+${""?left_pad(indent)}                    :readonly="readonly"
+${""?left_pad(indent)}                    @input="updateBudgetItem(idx, 'name', $event.target.value)"
+${""?left_pad(indent)}                  >
+${""?left_pad(indent)}                </td>
+${""?left_pad(indent)}                <td>
+${""?left_pad(indent)}                  <input
+${""?left_pad(indent)}                    type="number"
+${""?left_pad(indent)}                    class="${namespace}-of__input"
+${""?left_pad(indent)}                    style="text-align: right;"
+${""?left_pad(indent)}                    :value="item.unitPrice"
+${""?left_pad(indent)}                    :readonly="readonly"
+${""?left_pad(indent)}                    @input="updateBudgetItem(idx, 'unitPrice', Number($event.target.value))"
+${""?left_pad(indent)}                  >
+${""?left_pad(indent)}                </td>
+${""?left_pad(indent)}                <td>
+${""?left_pad(indent)}                  <input
+${""?left_pad(indent)}                    type="number"
+${""?left_pad(indent)}                    class="${namespace}-of__input"
+${""?left_pad(indent)}                    style="text-align: center;"
+${""?left_pad(indent)}                    :value="item.quantity"
+${""?left_pad(indent)}                    :readonly="readonly"
+${""?left_pad(indent)}                    @input="updateBudgetItem(idx, 'quantity', Number($event.target.value))"
+${""?left_pad(indent)}                  >
+${""?left_pad(indent)}                </td>
+${""?left_pad(indent)}                <td>
+${""?left_pad(indent)}                  <input
+${""?left_pad(indent)}                    type="number"
+${""?left_pad(indent)}                    class="${namespace}-of__input ${namespace}-of__readonly"
+${""?left_pad(indent)}                    style="text-align: right;"
+${""?left_pad(indent)}                    :value="calcItemAmount(item)"
+${""?left_pad(indent)}                    readonly
+${""?left_pad(indent)}                  >
+${""?left_pad(indent)}                </td>
+${""?left_pad(indent)}                <td>
+${""?left_pad(indent)}                  <input
+${""?left_pad(indent)}                    type="text"
+${""?left_pad(indent)}                    class="${namespace}-of__input"
+${""?left_pad(indent)}                    :value="item.remark"
+${""?left_pad(indent)}                    :readonly="readonly"
+${""?left_pad(indent)}                    @input="updateBudgetItem(idx, 'remark', $event.target.value)"
+${""?left_pad(indent)}                  >
+${""?left_pad(indent)}                </td>
+${""?left_pad(indent)}                <td v-if="!readonly" style="text-align: center;">
+${""?left_pad(indent)}                  <button class="${namespace}-of__btn--del" @click="removeBudgetItem(idx)" title="删除行">✕</button>
+${""?left_pad(indent)}                </td>
+${""?left_pad(indent)}              </tr>
+${""?left_pad(indent)}              <tr>
+${""?left_pad(indent)}                <td style="text-align: center;">合计</td>
+${""?left_pad(indent)}                <td :colspan="readonly ? 3 : 4"></td>
+${""?left_pad(indent)}                <td style="text-align: right; font-weight: bold; color: var(--${namespace}-primary);">
+${""?left_pad(indent)}                  {{ formatAmount(budgetTotal) }}
+${""?left_pad(indent)}                </td>
+${""?left_pad(indent)}                <td :colspan="readonly ? 1 : 2">{{ amountChinese }}</td>
+${""?left_pad(indent)}              </tr>
+${""?left_pad(indent)}            </tbody>
+${""?left_pad(indent)}          </table>
+${""?left_pad(indent)}          <div v-if="!readonly" style="margin-top: 4px;">
+${""?left_pad(indent)}            <button class="${namespace}-of__btn--add" @click="addBudgetItem">＋ 添加明细行</button>
+${""?left_pad(indent)}          </div>
+${""?left_pad(indent)}        </td>
+${""?left_pad(indent)}      </tr>
+${""?left_pad(indent)}      <tr>
+${""?left_pad(indent)}        <td class="${namespace}-of__label">附件上传</td>
+${""?left_pad(indent)}        <td colspan="5">
+${""?left_pad(indent)}          <div class="${namespace}-of__attach">
+${""?left_pad(indent)}            <input
+${""?left_pad(indent)}              v-if="!readonly"
+${""?left_pad(indent)}              type="file"
+${""?left_pad(indent)}              style="font-size: 11px;"
+${""?left_pad(indent)}              multiple
+${""?left_pad(indent)}              @change="handleFileChange"
+${""?left_pad(indent)}            >
+${""?left_pad(indent)}            <div v-if="form.attachments.length" class="${namespace}-of__attach-list">
+${""?left_pad(indent)}              已传：
+${""?left_pad(indent)}              <template v-for="(f, i) in form.attachments" :key="i">
+${""?left_pad(indent)}                {{ i > 0 ? '、' : '' }}
+${""?left_pad(indent)}                <a href="#" class="${namespace}-of__link" @click.prevent="$emit('download', f)">{{ i + 1 }}. 《{{ f.name }}》</a>
+${""?left_pad(indent)}                ({{ formatSize(f.size) }})
+${""?left_pad(indent)}              </template>
+${""?left_pad(indent)}            </div>
+${""?left_pad(indent)}            <div v-else style="color: var(--${namespace}-text-light); font-size: 11px; margin-top: 4px;">暂无附件</div>
+${""?left_pad(indent)}          </div>
+${""?left_pad(indent)}        </td>
+${""?left_pad(indent)}      </tr>
+${""?left_pad(indent)}      <tr v-for="(op, idx) in form.opinions" :key="idx">
+${""?left_pad(indent)}        <td class="${namespace}-of__label">{{ op.label }}</td>
+${""?left_pad(indent)}        <td colspan="5" style="padding: 0;">
+${""?left_pad(indent)}          <div class="${namespace}-of__opinion">
+${""?left_pad(indent)}            <textarea
+${""?left_pad(indent)}              class="${namespace}-of__textarea"
+${""?left_pad(indent)}              :class="{ '${namespace}-of__readonly': readonly || op.readonly }"
+${""?left_pad(indent)}              :placeholder="op.placeholder || ''"
+${""?left_pad(indent)}              :value="op.content"
+${""?left_pad(indent)}              :readonly="readonly || op.readonly"
+${""?left_pad(indent)}              @input="updateOpinion(idx, 'content', $event.target.value)"
+${""?left_pad(indent)}            ></textarea>
+${""?left_pad(indent)}            <div class="${namespace}-of__opinion-sign">
+${""?left_pad(indent)}              {{ op.signLabel }}：<span>{{ op.signer || '　' }}</span> &nbsp;
+${""?left_pad(indent)}              日期：<span>{{ op.signDate || '____-__-__' }}</span>
+${""?left_pad(indent)}            </div>
+${""?left_pad(indent)}          </div>
+${""?left_pad(indent)}        </td>
+${""?left_pad(indent)}      </tr>  -->
+${""?left_pad(indent)}    </table>
+${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}</div>
+</#macro>
+
+<!----------------------------------------------------------------------------->
 <!--                                EXCEL FORM                               -->
 <!----------------------------------------------------------------------------->
 <#macro print_excel_form_variables form indent=0>
@@ -435,12 +725,16 @@ ${""?left_pad(indent)}</div>
 <#macro print_page_imports page indent=0>
   <#local visited_types = {}>
   <#list page.widgets as widget>
-    <#if visited_types[widget.type]??><#continue></#if>
-    <#if widget.type == 'entry_form'>
+    <#if widget.type == 'entry_form' || widget.type == 'official_form' || widget.type == "excel_form">
 import { useAsyncLock } from '@/composables/useAsyncLock'
 import { useFieldValidation } from '@/composables/useFieldValidation'
-import ${js.nameType(namespace)}Feedback from '@/components/${namespace}-feedback.vue' 
-    <#elseif widget.type == "excel_form">
+import ${js.nameType(namespace)}Feedback from '@/components/${namespace}-feedback.vue'
+      <#break>
+    </#if>
+  </#list>  
+  <#list page.widgets as widget>
+    <#if visited_types[widget.type]??><#continue></#if>
+    <#if widget.type == "excel_form">
 import ${js.nameType(namespace)}Excelform from '@/components/${namespace}-excelform.vue'
     <#elseif widget.type == "paged_table">
 import ${js.nameType(namespace)}Pagedtable from '@/components/${namespace}-pagedtable.vue'
@@ -465,6 +759,8 @@ import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsin
   <#list page.widgets as widget>
     <#if widget.type == 'entry_form'>
 <@print_entry_form_variables form=widget indent=indent />
+    <#elseif widget.type == 'official_form'>
+<@print_official_form_variables form=widget indent=indent />
     <#elseif widget.type == 'excel_form'>
 <@print_excel_form_variables form=widget indent=indent />
     <#elseif widget.type == 'criteria_form'>
@@ -506,6 +802,8 @@ import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsin
 <#macro print_layout_widget widget indent=0>
   <#if widget.type == "entry_form">
 <@print_layout_entry_form form=widget indent=indent+2 />    
+  <#elseif widget.type == "official_form">
+<@print_layout_official_form form=widget indent=indent+2 />   
   <#elseif widget.type == "excel_form">
 <@print_layout_excel_form form=widget indent=indent+2 />      
   <#elseif widget.type == "paged_table">

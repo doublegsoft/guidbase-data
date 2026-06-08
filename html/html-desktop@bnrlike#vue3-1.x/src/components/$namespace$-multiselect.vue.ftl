@@ -1,18 +1,19 @@
 <template>
   <div
     ref="wrapEl"
-    class="tef-ms"
+    class="${namespace}-ms"
     :class="{
-      'tef-ms--disabled': disabled,
-      'tef-ms--open': isOpen,
-      'tef-ms--searchable': searchable,
-      'tef-ms--block': block,
+      '${namespace}-ms--disabled': disabled,
+      '${namespace}-ms--open': isOpen,
+      '${namespace}-ms--searchable': searchable,
+      '${namespace}-ms--block': block,
+      '${namespace}-ms--plain': plain,
     }"
   >
     <!-- 触发器区域 -->
     <div
       ref="triggerEl"
-      class="tef-ms__trigger"
+      class="${namespace}-ms__trigger"
       tabindex="0"
       role="combobox"
       aria-haspopup="listbox"
@@ -23,21 +24,21 @@
     >
       <!-- 已选标签 -->
       <template v-for="(opt, i) in visibleTags" :key="opt[valueKey]">
-        <span class="tef-ms__tag">
-          <span class="tef-ms__tag-text">{{ opt[labelKey] }}</span>
-          <span class="tef-ms__tag-remove" @click.stop="removeValue(opt[valueKey])">&times;</span>
+        <span class="${namespace}-ms__tag">
+          <span class="${namespace}-ms__tag-text">{{ opt[labelKey] }}</span>
+          <span class="${namespace}-ms__tag-remove" @click.stop="removeValue(opt[valueKey])">&times;</span>
         </span>
       </template>
-      <span v-if="hiddenCount > 0" class="tef-ms__tag-more">+{{ hiddenCount }}</span>
+      <span v-if="hiddenCount > 0" class="${namespace}-ms__tag-more">+{{ hiddenCount }}</span>
 
       <!-- 占位 -->
-      <span v-if="selectedOptions.length === 0" class="tef-ms__placeholder">{{ placeholder }}</span>
+      <span v-if="selectedOptions.length === 0" class="${namespace}-ms__placeholder">{{ placeholder }}</span>
 
       <!-- 计数 -->
-      <span class="tef-ms__count">{{ selectedOptions.length }}/{{ options.length }}</span>
+      <span class="${namespace}-ms__count">{{ selectedOptions.length }}/{{ options.length }}</span>
 
       <!-- 箭头 -->
-      <span class="tef-ms__arrow"></span>
+      <span class="${namespace}-ms__arrow"></span>
     </div>
 
     <!-- 面板（teleport 到 body） -->
@@ -45,22 +46,22 @@
       <div
         v-if="isOpen"
         ref="panelEl"
-        class="tef-ms__panel"
+        class="${namespace}-ms__panel"
         :style="panelStyle"
         @mousedown.prevent
       >
         <!-- 全选/取消按钮 -->
-        <div v-if="showSelectAll" class="tef-ms__actions">
-          <button type="button" class="tef-ms__action-btn" @click="selectAll">全选</button>
-          <button type="button" class="tef-ms__action-btn" @click="deselectAll">取消</button>
+        <div v-if="showSelectAll" class="${namespace}-ms__actions">
+          <button type="button" class="${namespace}-ms__action-btn" @click="selectAll">全选</button>
+          <button type="button" class="${namespace}-ms__action-btn" @click="deselectAll">取消</button>
         </div>
 
         <!-- 搜索 -->
-        <div v-if="searchable" class="tef-ms__search-wrap">
+        <div v-if="searchable" class="${namespace}-ms__search-wrap">
           <input
             ref="searchEl"
             v-model="searchText"
-            class="tef-ms__search"
+            class="${namespace}-ms__search"
             placeholder="搜索..."
             autocomplete="off"
             @keydown.stop="onSearchKey"
@@ -68,26 +69,26 @@
         </div>
 
         <!-- 无结果 -->
-        <div v-if="filteredOptions.length === 0" class="tef-ms__empty">无匹配选项</div>
+        <div v-if="filteredOptions.length === 0" class="${namespace}-ms__empty">无匹配选项</div>
 
         <!-- 选项列表 -->
-        <div v-else class="tef-ms__options">
+        <div v-else class="${namespace}-ms__options">
           <div
             v-for="opt in filteredOptions"
             :key="opt[valueKey]"
-            class="tef-ms__option"
+            class="${namespace}-ms__option"
             :class="{
-              'tef-ms__option--selected': isSelected(opt[valueKey]),
-              'tef-ms__option--disabled': opt.disabled,
+              '${namespace}-ms__option--selected': isSelected(opt[valueKey]),
+              '${namespace}-ms__option--disabled': opt.disabled,
             }"
             @click="toggleValue(opt)"
           >
             <span
-              class="tef-ms__checkbox"
-              :class="{ 'tef-ms__checkbox--checked': isSelected(opt[valueKey]) }"
+              class="${namespace}-ms__checkbox"
+              :class="{ '${namespace}-ms__checkbox--checked': isSelected(opt[valueKey]) }"
             ></span>
-            <span class="tef-ms__opt-label">{{ opt[labelKey] }}</span>
-            <span v-if="opt.desc" class="tef-ms__opt-desc">{{ opt.desc }}</span>
+            <span class="${namespace}-ms__opt-label">{{ opt[labelKey] }}</span>
+            <span v-if="opt.desc" class="${namespace}-ms__opt-desc">{{ opt.desc }}</span>
           </div>
         </div>
       </div>
@@ -107,6 +108,7 @@ const props = defineProps({
   showSelectAll: { type: Boolean,  default: false },
   maxCount:      { type: Number,   default: 0 },              // 0 = 不限制
   maxTagCount:   { type: Number,   default: 5 },              // 最多显示标签数
+  plain:         { type: Boolean,  default: false },
   block:         { type: Boolean,  default: false },
   valueKey:      { type: String,   default: 'value' },
   labelKey:      { type: String,   default: 'label' },
@@ -312,21 +314,23 @@ defineExpose({
 
 <style scoped>
 /* ═══════════════════════════════════════════
-   BNR MultiSelect — tef-ms
+   BNR MultiSelect — ${namespace}-ms
    ═══════════════════════════════════════════ */
 
-.tef-ms {
+.${namespace}-ms {
   position: relative;
+  display: inline-flex;
   min-width: 180px;
-  font-family: var(--tef-font, "Microsoft YaHei", sans-serif);
+  font-family: var(--${namespace}-font, "Microsoft YaHei", sans-serif);
   font-size: 12px;
   user-select: none;
   flex: 1;
+  width: 100%;
 }
-.tef-ms--block { display: flex; width: 100%; }
+.${namespace}-ms--block { display: flex; width: 100%; }
 
 /* Trigger */
-.tef-ms__trigger {
+.${namespace}-ms__trigger {
   flex: 1;
   min-height: 24px;
   display: flex;
@@ -334,24 +338,24 @@ defineExpose({
   flex-wrap: wrap;
   gap: 3px;
   padding: 2px 24px 2px 5px;
-  border: 1px solid var(--tef-border);
-  background: var(--tef-bg);
+  border: 1px solid #c8c8c8;
+  background: #fff;
   cursor: pointer;
   position: relative;
   transition: border-color .15s;
 }
-.tef-ms--open .tef-ms__trigger {
-  border-color: var(--tef-primary);
-  box-shadow: 0 0 0 2px rgba(190,0,0,.15);
+.${namespace}-ms--open .${namespace}-ms__trigger {
+  border-color: #1a4f8a;
+  box-shadow: 0 0 0 2px rgba(26,79,138,.08);
 }
-.tef-ms--disabled .tef-ms__trigger {
-  background: var(--tef-bg-page);
-  color: var(--tef-text-muted);
+.${namespace}-ms--disabled .${namespace}-ms__trigger {
+  background: #f5f7fa;
+  color: #5d6d7e;
   cursor: not-allowed;
 }
 
 /* Arrow */
-.tef-ms__arrow {
+.${namespace}-ms__arrow {
   position: absolute;
   right: 7px;
   top: 50%;
@@ -359,17 +363,17 @@ defineExpose({
   width: 0; height: 0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  border-top: 5px solid var(--tef-text-muted);
+  border-top: 5px solid #5d6d7e;
   transition: transform .15s;
   pointer-events: none;
   flex-shrink: 0;
 }
-.tef-ms--open .tef-ms__arrow {
+.${namespace}-ms--open .${namespace}-ms__arrow {
   transform: translateY(-50%) rotate(180deg);
 }
 
 /* Tags */
-.tef-ms__tags {
+.${namespace}-ms__tags {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -377,49 +381,49 @@ defineExpose({
   flex: 1;
   min-width: 0;
 }
-.tef-ms__tag {
+.${namespace}-ms__tag {
   display: inline-flex;
   align-items: center;
   gap: 2px;
   height: 18px;
   padding: 0 4px;
-  background: var(--tef-primary-bg);
-  border: 1px solid var(--tef-primary-border);
+  background: #e8edf5;
+  border: 1px solid #d0d8e8;
   border-radius: 2px;
   font-size: 10px;
-  color: var(--tef-primary);
+  color: #1a4f8a;
   white-space: nowrap;
   max-width: 120px;
 }
-.tef-ms__tag-text {
+.${namespace}-ms__tag-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.tef-ms__tag-remove {
+.${namespace}-ms__tag-remove {
   font-size: 12px;
   cursor: pointer;
-  color: var(--tef-text-muted);
+  color: #5d6d7e;
   line-height: 1;
   flex-shrink: 0;
 }
-.tef-ms__tag-remove:hover { color: var(--tef-danger); }
+.${namespace}-ms__tag-remove:hover { color: #c0392b; }
 
-.tef-ms__tag-more {
+.${namespace}-ms__tag-more {
   font-size: 10px;
-  color: var(--tef-text-light);
+  color: #909eac;
   white-space: nowrap;
   flex-shrink: 0;
 }
-.tef-ms__count {
+.${namespace}-ms__count {
   font-size: 10px;
-  color: var(--tef-text-light);
+  color: #909eac;
   margin-left: auto;
   flex-shrink: 0;
   padding-left: 4px;
 }
-.tef-ms__placeholder {
-  color: var(--tef-text-light);
+.${namespace}-ms__placeholder {
+  color: #909eac;
   font-size: 12px;
   white-space: nowrap;
   overflow: hidden;
@@ -427,9 +431,9 @@ defineExpose({
 }
 
 /* Panel */
-.tef-ms__panel {
-  background: var(--tef-bg);
-  border: 1px solid var(--tef-primary-border);
+.${namespace}-ms__panel {
+  background: #fff;
+  border: 1px solid #d0d8e8;
   border-radius: 2px;
   box-shadow: 0 4px 16px rgba(0,0,0,.12);
   max-height: 280px;
@@ -438,117 +442,128 @@ defineExpose({
 }
 
 /* Search */
-.tef-ms__search-wrap {
+.${namespace}-ms__search-wrap {
   padding: 4px 6px;
-  border-bottom: 1px solid var(--tef-border-light);
+  border-bottom: 1px solid #e4e8f0;
   position: sticky;
   top: 0;
-  background: var(--tef-bg);
+  background: #fff;
   z-index: 1;
 }
-.tef-ms__search {
+.${namespace}-ms__search {
   width: 100%;
   height: 22px;
-  border: 1px solid var(--tef-border);
+  border: 1px solid #c8c8c8;
   border-radius: 2px;
   font-size: 12px;
   font-family: inherit;
   padding: 0 5px;
   outline: none;
-  color: var(--tef-text);
+  color: #1c2833;
   box-sizing: border-box;
 }
-.tef-ms__search:focus { border-color: var(--tef-primary); }
+.${namespace}-ms__search:focus { border-color: #1a4f8a; }
 
 /* Actions */
-.tef-ms__actions {
+.${namespace}-ms__actions {
   display: flex;
   gap: 4px;
   padding: 4px 6px;
-  border-bottom: 1px solid var(--tef-border-light);
-  background: var(--tef-bg-page);
+  border-bottom: 1px solid #e4e8f0;
+  background: #fafbfc;
   position: sticky;
   top: 0;
   z-index: 1;
 }
-.tef-ms__action-btn {
+.${namespace}-ms__action-btn {
   font-size: 11px;
   padding: 2px 8px;
-  border: 1px solid var(--tef-primary-border);
+  border: 1px solid #d0d8e8;
   border-radius: 2px;
-  background: var(--tef-bg);
-  color: var(--tef-primary);
+  background: #fff;
+  color: #1a4f8a;
   cursor: pointer;
   font-family: inherit;
   transition: background .1s;
 }
-.tef-ms__action-btn:hover { background: var(--tef-primary-bg); }
+.${namespace}-ms__action-btn:hover { background: #e8edf5; }
 
 /* Options */
-.tef-ms__option {
+.${namespace}-ms__option {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
   font-size: 12px;
   cursor: pointer;
-  color: var(--tef-text);
-  border-bottom: 1px solid var(--tef-bg-page);
+  color: #1c2833;
+  border-bottom: 1px solid #f5f7fa;
   transition: background .1s;
   white-space: nowrap;
 }
-.tef-ms__option:last-child { border-bottom: none; }
-.tef-ms__option:hover { background: var(--tef-primary-bg); }
-.tef-ms__option--selected {
-  background: var(--tef-primary-bg);
-  color: var(--tef-primary);
+.${namespace}-ms__option:last-child { border-bottom: none; }
+.${namespace}-ms__option:hover { background: #e8edf5; }
+.${namespace}-ms__option--selected {
+  background: #eef5ff;
+  color: #1a4f8a;
 }
-.tef-ms__option--disabled {
-  color: var(--tef-text-light);
+.${namespace}-ms__option--disabled {
+  color: #909eac;
   cursor: not-allowed;
   background: none !important;
 }
 
 /* Checkbox */
-.tef-ms__checkbox {
+.${namespace}-ms__checkbox {
   width: 14px; height: 14px;
-  border: 1px solid var(--tef-border);
+  border: 1px solid #c8c8c8;
   border-radius: 2px;
-  background: var(--tef-bg);
+  background: #fff;
   flex-shrink: 0;
   position: relative;
   transition: all .15s;
 }
-.tef-ms__checkbox--checked {
-  background: var(--tef-primary);
-  border-color: var(--tef-primary);
+.${namespace}-ms__checkbox--checked {
+  background: #1a4f8a;
+  border-color: #1a4f8a;
 }
-.tef-ms__checkbox--checked::after {
+.${namespace}-ms__checkbox--checked::after {
   content: '';
   position: absolute;
   left: 3px; top: 1px;
   width: 5px; height: 8px;
-  border: solid var(--tef-bg);
+  border: solid #fff;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
 
-.tef-ms__opt-label {
+.${namespace}-ms__opt-label {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.tef-ms__opt-desc {
+.${namespace}-ms__opt-desc {
   font-size: 10px;
-  color: var(--tef-text-light);
+  color: #909eac;
   flex-shrink: 0;
 }
 
+/* Plain — borderless minimal style */
+.${namespace}-ms--plain .${namespace}-ms__trigger {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+.${namespace}-ms--plain.${namespace}-ms--open .${namespace}-ms__trigger {
+  border-color: #1a4f8a;
+  box-shadow: 0 0 0 2px rgba(26,79,138,.08);
+}
+
 /* Empty */
-.tef-ms__empty {
+.${namespace}-ms__empty {
   padding: 14px 12px;
   font-size: 12px;
-  color: var(--tef-text-light);
+  color: #909eac;
   text-align: center;
 }
 </style>

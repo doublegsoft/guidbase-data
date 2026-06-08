@@ -1045,3 +1045,277 @@ html, body {
   margin-left: 3px;
   flex-shrink: 0;
 }
+
+/* OfficialForm                          */
+/* Namespace: ${namespace}-of            */
+/* 国企公文表单：红头立项审批单               */
+/* 所有颜色均通过 BNR Design System 变量引用 */
+
+/* ══════════════════════════════════════════════
+   1. Root
+   ══════════════════════════════════════════════ */
+.${namespace}-of {
+  font-family: "SimSun", "Microsoft YaHei", sans-serif;
+  font-size: 12px;
+  color: var(--${namespace}-text);
+}
+
+/* ══════════════════════════════════════════════
+   2. Toolbar
+   ══════════════════════════════════════════════ */
+.${namespace}-of__toolbar {
+  background-color: var(--${namespace}-bg-page);
+  border: 1px solid var(--${namespace}-text-light);
+  padding: 4px 10px;
+  margin-bottom: 8px;
+  display: flex;
+  gap: 5px;
+  max-width: 930px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ══════════════════════════════════════════════
+   3. Buttons
+   ══════════════════════════════════════════════ */
+.${namespace}-of__btn {
+  font-size: 12px;
+  padding: 2px 8px;
+  background: var(--${namespace}-bg);
+  border: 1px solid var(--${namespace}-text-light);
+  cursor: pointer;
+}
+
+.${namespace}-of__btn:hover {
+  background-color: var(--${namespace}-primary-bg);
+  border-color: var(--${namespace}-primary);
+}
+
+/* -- submit variant -- */
+.${namespace}-of__btn--submit {
+  color: var(--${namespace}-danger);
+  font-weight: bold;
+}
+
+/* -- add row -- */
+.${namespace}-of__btn--add {
+  font-size: 11px;
+  padding: 1px 8px;
+  background: var(--${namespace}-bg);
+  border: 1px dashed var(--${namespace}-primary);
+  color: var(--${namespace}-primary);
+  cursor: pointer;
+}
+
+.${namespace}-of__btn--add:hover {
+  background: var(--${namespace}-primary-bg);
+}
+
+/* -- delete row -- */
+.${namespace}-of__btn--del {
+  font-size: 11px;
+  padding: 0 4px;
+  background: var(--${namespace}-bg);
+  border: 1px solid var(--${namespace}-border);
+  color: var(--${namespace}-danger);
+  cursor: pointer;
+}
+
+.${namespace}-of__btn--del:hover {
+  background: var(--${namespace}-danger-bg);
+  border-color: var(--${namespace}-danger);
+}
+
+/* ══════════════════════════════════════════════
+   4. Container — 表单主容器
+   ══════════════════════════════════════════════ */
+.${namespace}-of__container {
+  width: 850px;
+  margin: 0 auto;
+  background-color: var(--${namespace}-bg);
+  border: 1px solid var(--${namespace}-text-muted);
+  padding: 30px 40px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* ══════════════════════════════════════════════
+   5. Header — 红头标题
+   ══════════════════════════════════════════════ */
+.${namespace}-of__header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.${namespace}-of__header h1 {
+  font-family: "KaiTi", "STKaiti", serif;
+  font-size: 26px;
+  color: var(--${namespace}-danger);
+  font-weight: bold;
+  margin: 0 0 10px 0;
+  letter-spacing: 2px;
+}
+
+.${namespace}-of__meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--${namespace}-text);
+  padding: 0 5px;
+  font-size: 12px;
+}
+
+/* ══════════════════════════════════════════════
+   6. Main Table — 主表格
+   ══════════════════════════════════════════════ */
+.${namespace}-of__table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid var(--${namespace}-text);
+}
+
+.${namespace}-of__table td {
+  border: 1px solid var(--${namespace}-text);
+  height: 28px;
+  padding: 2px 4px;
+  vertical-align: middle;
+}
+
+/* ══════════════════════════════════════════════
+   7. Label — 标签列
+   ══════════════════════════════════════════════ */
+.${namespace}-of__label {
+  background-color: var(--${namespace}-primary-bg);
+  font-weight: bold;
+  text-align: center;
+  width: 13%;
+  color: var(--${namespace}-primary);
+}
+
+/* -- required marker -- */
+.${namespace}-of__required::after {
+  content: " *";
+  color: var(--${namespace}-danger);
+}
+
+/* ══════════════════════════════════════════════
+   8. Input / Select — 输入控件
+   ══════════════════════════════════════════════ */
+.${namespace}-of__input,
+.${namespace}-of__select {
+  width: 100%;
+  height: 24px;
+  border: none;
+  outline: none;
+  padding: 0 4px;
+  font-size: 12px;
+  box-sizing: border-box;
+  background-color: transparent;
+}
+
+.${namespace}-of__input:focus,
+.${namespace}-of__select:focus,
+.${namespace}-of__textarea:focus {
+  background-color: var(--${namespace}-warning-bg);
+}
+
+/* -- amount variant -- */
+.${namespace}-of__input--amount {
+  font-weight: bold;
+  color: var(--${namespace}-danger);
+}
+
+/* ══════════════════════════════════════════════
+   9. Readonly state
+   ══════════════════════════════════════════════ */
+.${namespace}-of__readonly {
+  background-color: var(--${namespace}-bg-page);
+  color: var(--${namespace}-text-muted);
+}
+
+/* ══════════════════════════════════════════════
+   10. Textarea — 文本域
+   ══════════════════════════════════════════════ */
+.${namespace}-of__textarea {
+  width: 100%;
+  height: 70px;
+  border: none;
+  outline: none;
+  resize: none;
+  font-size: 12px;
+  font-family: inherit;
+  padding: 4px;
+  box-sizing: border-box;
+  display: block;
+  background-color: transparent;
+}
+
+/* ══════════════════════════════════════════════
+   11. Sub-table — 预算明细 / 嵌套表格
+   ══════════════════════════════════════════════ */
+.${namespace}-of__sub-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 4px 0;
+}
+
+.${namespace}-of__sub-table th {
+  border: 1px solid var(--${namespace}-text-muted);
+  background-color: var(--${namespace}-border-light);
+  font-weight: normal;
+  font-size: 11px;
+  height: 22px;
+}
+
+.${namespace}-of__sub-table td {
+  border: 1px solid var(--${namespace}-text-muted);
+  height: 22px;
+  background-color: var(--${namespace}-bg);
+}
+
+/* ══════════════════════════════════════════════
+   12. Attachments — 附件
+   ══════════════════════════════════════════════ */
+.${namespace}-of__attach {
+  padding: 2px;
+}
+
+.${namespace}-of__attach-list {
+  margin-top: 4px;
+  color: var(--${namespace}-text-muted);
+  font-size: 11px;
+}
+
+.${namespace}-of__link {
+  color: var(--${namespace}-primary);
+  text-decoration: none;
+}
+
+/* ══════════════════════════════════════════════
+   13. Opinion — 审批意见
+   ══════════════════════════════════════════════ */
+.${namespace}-of__opinion {
+  height: 80px;
+  position: relative;
+}
+
+.${namespace}-of__opinion-sign {
+  position: absolute;
+  right: 15px;
+  bottom: 5px;
+  text-align: right;
+  color: var(--${namespace}-text-muted);
+}
+
+.${namespace}-of__opinion-sign span {
+  display: inline-block;
+  width: 100px;
+  border-bottom: 1px solid var(--${namespace}-text);
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════════
+   14. Print — 打印样式
+   ══════════════════════════════════════════════ */
+@media print {
+  .${namespace}-of__toolbar   { display: none; }
+  .${namespace}-of__container { box-shadow: none; border: none; padding: 0; }
+}
