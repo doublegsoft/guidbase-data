@@ -1,5 +1,10 @@
 <template>
   <div class="${namespace}-ft" :style="{ height: height }">
+    <!-- 加载遮罩 -->
+    <div v-if="loading" class="${namespace}-ft__loading-mask">
+      <span class="${namespace}-ft__loading-text">加载中...</span>
+    </div>
+
     <!-- 左阴影 -->
     <div class="${namespace}-ft__shadow ${namespace}-ft__shadow--left" :class="{ 'is-visible': showLeftShadow }"></div>
     <!-- 右阴影 -->
@@ -24,13 +29,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="data.length === 0">
+          <tr v-if="displayData.length === 0">
             <td :colspan="columns.length" class="${namespace}-ft__empty">
-              暂无数据
+              {{ loading ? '加载中...' : '暂无数据' }}
             </td>
           </tr>
           <tr
-            v-for="row in data"
+            v-for="row in displayData"
             :key="String(row[idKey])"
             :class="rowClasses(row)"
           >
@@ -47,11 +52,22 @@
         </tbody>
       </table>
     </div>
+
+    <!-- 分页 -->
+    <${namespace}-pagination
+      v-if="showPagination"
+      :total="internalTotal"
+      v-model:current-page="currentPageModel"
+      v-model:page-size="pageSizeModel"
+      :page-sizes="pageSizes"
+      @change="onPageChange"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import PtPagination from './${namespace}-pagination.vue'
 
 const props = defineProps({
   columns:      { type: Array,    required: true },
@@ -59,13 +75,111 @@ const props = defineProps({
   height:       { type: String,   default: '400px' },
   idKey:        { type: String,   default: 'id' },
   rowClassName: { type: Function, default: null },
+  total:        { type: Number,   default: 0 },
+  // ── 远端数据获取 ──
+  // fetchData: async (params, pageNumber, pageSize) => { data: [...], total: N }
+  fetchData:    { type: Function, default: null },
+  // fetchParams: 传入 fetchData 的搜索条件参数
+  fetchParams:  { type: Object,   default: () => ({}) },
+  // ── 分页 ──
+  // pagination: true | false | undefined（undefined 时若有 fetchData 则自动开启）
+  pagination:   { type: [Boolean, Object], default: undefined },
+  currentPage:  { type: Number,   default: 1 },
+  pageSize:     { type: Number,   default: 20 },
+  pageSizes:    { type: Array,    default: () => [20, 50, 100] },
 })
 
-const emit = defineEmits(['row-click'])
+const emit = defineEmits(['row-click', 'update:currentPage', 'update:pageSize'])
 
 const wrapRef = ref(null)
 const showLeftShadow  = ref(false)
 const showRightShadow = ref(false)
+
+// ── 远端数据模式 ──
+const hasFetcher = computed(() => typeof props.fetchData === 'function')
+
+// 是否显示分页：显式传了 pagination 以它为准，否则有 fetchData 时自动开启
+const showPagination = computed(() => {
+  if (props.pagination !== undefined) return !!props.pagination
+  return hasFetcher.value
+})
+
+const internalData = ref([])
+const internalTotal = ref(0)
+const loading = ref(false)
+let reqId = 0
+
+// 分页内部状态，与 props 双向同步
+const currentPageModel = ref(props.currentPage)
+const pageSizeModel    = ref(props.pageSize)
+
+watch(() => props.currentPage, (v) => { currentPageModel.value = v })
+watch(() => props.pageSize,    (v) => { pageSizeModel.value = v })
+
+// 实际渲染的数据：有 fetchData 时使用内部数据，否则使用 props.data
+const displayData = computed(() =>
+  hasFetcher.value ? internalData.value : props.data
+)
+
+/**
+ * 加载远端数据
+ * 调用 props.fetchData(fetchParams, pageNumber, pageSize)
+ */
+async function loadData() {
+  if (!hasFetcher.value) return
+  const id = ++reqId
+  loading.value = true
+  try {
+    const params = { ...props.fetchParams }
+    const res = await props.fetchData(params, currentPageModel.value, pageSizeModel.value)
+    if (id !== reqId) return
+    if (res) {
+      internalData.value = res.data ?? []
+      internalTotal.value = res.total ?? (Array.isArray(res.data) ? res.data.length : 0)
+    } else {
+      internalData.value = []
+      internalTotal.value = 0
+    }
+  } catch (e) {
+    if (id !== reqId) return
+    console.error('FixedTable fetchData error:', e)
+    internalData.value = []
+    internalTotal.value = 0
+  } finally {
+    if (id === reqId) {
+      loading.value = false
+      nextTick(() => onScroll())
+    }
+  }
+}
+
+// fetchParams 引用变化时自动重新加载（回到第 1 页）
+watch(() => props.fetchParams, () => {
+  if (hasFetcher.value) {
+    currentPageModel.value = 1
+    emit('update:currentPage', 1)
+    loadData()
+  }
+})
+
+// fetchData 函数变化时重新加载
+watch(() => props.fetchData, () => {
+  if (hasFetcher.value) loadData()
+})
+
+// ── 分页事件 ──
+function onPageChange({ currentPage: cp, pageSize: ps }) {
+  emit('update:currentPage', cp)
+  emit('update:pageSize', ps)
+  if (hasFetcher.value) {
+    loadData()
+  }
+}
+
+onMounted(() => {
+  nextTick(() => onScroll())
+  if (hasFetcher.value) loadData()
+})
 
 // ── 计算固定列的 sticky 偏移 ──
 const leftOffsets  = computed(() => calcOffsets('left'))
@@ -81,7 +195,6 @@ function calcOffsets(side) {
       offset += parseWidth(col.width)
     }
   } else {
-    // right side: offsets are from right edge, so the rightmost column gets 0
     let offset = 0
     const reversed = [...fixedCols].reverse()
     for (const col of reversed) {
@@ -169,15 +282,22 @@ function onScroll() {
   showRightShadow.value = el.scrollLeft + el.clientWidth < el.scrollWidth - 1
 }
 
-onMounted(() => {
-  nextTick(() => onScroll())
-})
-
+// 外部 data 变化时刷新滚动阴影
 watch(() => props.data, () => {
   nextTick(() => onScroll())
 })
 
+/** 手动刷新数据，回到第 1 页 */
+function refresh() {
+  currentPageModel.value = 1
+  emit('update:currentPage', 1)
+  loadData()
+}
+
 defineExpose({
+  refresh,
+  /** 内部加载状态 */
+  loading,
   scrollToLeft: () => { if (wrapRef.value) wrapRef.value.scrollLeft = 0 },
   scrollToRight: () => {
     if (wrapRef.value) wrapRef.value.scrollLeft = wrapRef.value.scrollWidth
@@ -189,10 +309,13 @@ defineExpose({
 /* ═══════════════════════════════════════════
    BNR FixedTable — ${namespace}-ft
    固定列表格：左侧/右侧列固定，中间滚动
+   支持远端数据获取 + 分页
    ═══════════════════════════════════════════ */
 
 .${namespace}-ft {
   position: relative;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--${namespace}-border);
   background: var(--${namespace}-bg);
@@ -201,10 +324,28 @@ defineExpose({
   color: var(--${namespace}-text);
 }
 
+/* ── 加载遮罩 ── */
+.${namespace}-ft__loading-mask {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+}
+.${namespace}-ft__loading-text {
+  padding: 8px 20px;
+  background: var(--${namespace}-primary-bg);
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--${namespace}-primary);
+}
+
 /* ── scroll wrap ── */
 .${namespace}-ft__wrap {
+  flex: 1;
   width: 100%;
-  height: 100%;
   overflow: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: auto;
@@ -278,7 +419,6 @@ defineExpose({
   position: sticky;
   z-index: 4;
 }
-/* 左固定最后一列：加右边框阴影 */
 .${namespace}-ft__th--fixed-left-last {
   border-right: 1px solid var(--${namespace}-primary-border);
 }
@@ -296,7 +436,6 @@ defineExpose({
   position: sticky;
   z-index: 4;
 }
-/* 右固定第一列：加左边框阴影 */
 .${namespace}-ft__th--fixed-right-first {
   border-left: 1px solid var(--${namespace}-primary-border);
 }

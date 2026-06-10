@@ -6,28 +6,23 @@ if (typeof sdk === 'undefined') {
 <#list app.pages as page>
   <#list page.widgets as widget>
     <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
+    <#assign objname = widget.value("object",widget.id)>
     <#assign visited_widgets += {widget.id: widget}>
     <#if (widget.type == "select" || widget.type == "multiselect")>
-      <#if (widget.value("data")!"")?starts_with("enum[")>
-        <#assign enumOpts = typebase.enumtype(widget.value("data"))>
+      <#if !widget.value("data","")?starts_with("enum[")>   
 
-sdk.fetch${js.nameType(widget.id)}Options = async () => {
-  return sdk.${js.nameVariable(widget.id)}Options
-};        
-      <#else>
-
-sdk.fetch${js.nameType(widget.id)}Options = async () => {
+sdk.fetch${js.nameType(inflector.pluralize(objname))} = async () => {
   return [];
 };
       </#if>
     <#elseif widget.type == "cascade">
 
-sdk.fetch${js.nameType(widget.id)}Options = async () => {    
+sdk.fetch${js.nameType(inflector.pluralize(objname))} = async () => {    
   return [];
-}
+};
     <#elseif widget.type == "paged_table">
 
-sdk.fetch${js.nameType(widget.id)}Rows = async (params, start, limit) => {
+sdk.fetch${js.nameType(inflector.pluralize(objname))} = async (params, start, limit) => {
   return {
     total: 0,
     data: []

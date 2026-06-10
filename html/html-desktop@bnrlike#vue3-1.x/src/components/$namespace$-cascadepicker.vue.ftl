@@ -15,14 +15,17 @@
     </template>
     <Teleport to="body">
       <div v-if="activeLevel >= 0" class="${namespace}-cscd__panel" :style="panelStyle" ref="panelEl" @click.stop>
-        <div v-for="opt in activeOptions" :key="opt.value"
-          class="${namespace}-cscd__option"
-          :class="{ '${namespace}-cscd__option--selected': isSelected(activeLevel, opt.value), '${namespace}-cscd__option--disabled': opt.disabled }"
-          @click="selectMulti(activeLevel, opt)">
-          <span>{{ opt.label }}</span>
-          <span v-if="opt.children && opt.children.length" class="${namespace}-cscd__has-next">&rsaquo;</span>
-        </div>
-        <div v-if="!activeOptions.length" class="${namespace}-cscd__empty">无匹配选项</div>
+        <div v-if="isLoadingLevel(activeLevel)" class="${namespace}-cscd__loading">加载中...</div>
+        <template v-else>
+          <div v-for="opt in activeOptions" :key="opt.value"
+            class="${namespace}-cscd__option"
+            :class="{ '${namespace}-cscd__option--selected': isSelected(activeLevel, opt.value), '${namespace}-cscd__option--disabled': opt.disabled }"
+            @click="selectMulti(activeLevel, opt)">
+            <span>{{ opt.label }}</span>
+            <span v-if="hasChildren(opt)" class="${namespace}-cscd__has-next">&rsaquo;</span>
+          </div>
+          <div v-if="!activeOptions.length" class="${namespace}-cscd__empty">无匹配选项</div>
+        </template>
       </div>
     </Teleport>
   </div>
@@ -40,17 +43,20 @@
       <div v-if="open" class="${namespace}-cscd__panel ${namespace}-cscd__panel--cascade" :style="panelStyle" ref="panelEl" @click.stop>
         <div class="${namespace}-cscd__cols">
           <div v-for="(col, colIdx) in columns" :key="colIdx" class="${namespace}-cscd__col">
-            <div v-for="opt in col" :key="opt.value"
-              class="${namespace}-cscd__option"
-              :class="{
-                '${namespace}-cscd__option--selected': isPathSelected(colIdx, opt.value),
-                '${namespace}-cscd__option--disabled': opt.disabled,
-              }"
-              @click="onColClick(colIdx, opt)">
-              <span>{{ opt.label }}</span>
-              <span v-if="opt.children && opt.children.length" class="${namespace}-cscd__has-next">&rsaquo;</span>
-            </div>
-            <div v-if="!col.length" class="${namespace}-cscd__empty">—</div>
+            <div v-if="isLoadingCol(colIdx)" class="${namespace}-cscd__loading">加载中...</div>
+            <template v-else>
+              <div v-for="opt in col" :key="opt.value"
+                class="${namespace}-cscd__option"
+                :class="{
+                  '${namespace}-cscd__option--selected': isPathSelected(colIdx, opt.value),
+                  '${namespace}-cscd__option--disabled': opt.disabled,
+                }"
+                @click="onColClick(colIdx, opt)">
+                <span>{{ opt.label }}</span>
+                <span v-if="hasChildren(opt)" class="${namespace}-cscd__has-next">&rsaquo;</span>
+              </div>
+              <div v-if="!col.length" class="${namespace}-cscd__empty">—</div>
+            </template>
           </div>
         </div>
       </div>
@@ -59,11 +65,12 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, watch, onBeforeUnmount, nextTick, reactive } from 'vue'
 
 const props = defineProps({
   modelValue:   { type: Array,    default: () => [] },
   options:      { type: Array,    default: () => [] },
+  fetchOptions: { type: Function, default: null },   // async (parentValue) => Option[]
   placeholder:  { type: String,   default: '请选择' },
   placeholders: { type: Array,    default: () => [] },
   disabled:     { type: Boolean,  default: false },
@@ -74,26 +81,119 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'change'])
 
 // ═══════════════════════════════════════════
-// 通用 helpers
+// 统一数据缓存
 // ═══════════════════════════════════════════
-function findOpt(nodes, value) {
+const ROOT_KEY = '__root__'
+const optionCache = reactive({})        // { [parentKey]: Option[] }
+const loadingKeys = reactive(new Set()) // 正在加载的 parentKey
+
+function cacheKey(parentValue) {
+  return parentValue === null || parentValue === undefined ? ROOT_KEY : String(parentValue)
+}
+
+function hasChildren(opt) {
+  if (opt.hasChildren !== undefined) return opt.hasChildren
+  if (opt.children && opt.children.length) return true
+  if (optionCache[cacheKey(opt.value)] && optionCache[cacheKey(opt.value)].length) return true
+  return false
+}
+
+function findOptInNodes(nodes, value) {
   if (!nodes) return null
   for (const n of nodes) {
     if (String(n.value) === String(value)) return n
-    if (n.children) { const f = findOpt(n.children, value); if (f) return f }
   }
   return null
 }
 
+// ── 静态模式：从 props.options 全量填充缓存 ──
+function populateStaticCache() {
+  for (const k of Object.keys(optionCache)) { delete optionCache[k] }
+  if (!props.options || !props.options.length) return
+  function walk(nodes, parentKey) {
+    optionCache[parentKey] = nodes.map(n => ({
+      value: n.value, label: n.label, disabled: n.disabled,
+      hasChildren: !!(n.children && n.children.length),
+    }))
+    for (const n of nodes) {
+      if (n.children && n.children.length) walk(n.children, cacheKey(n.value))
+    }
+  }
+  walk(props.options, ROOT_KEY)
+}
+
+// ── 懒加载模式：按需通过 fetchOptions 加载 ──
+async function loadLazyOptions(parentValue) {
+  const key = cacheKey(parentValue)
+  if (optionCache[key]) return optionCache[key]
+  if (loadingKeys.has(key)) return []
+  if (!props.fetchOptions) return []
+
+  loadingKeys.add(key)
+  try {
+    const opts = await props.fetchOptions(parentValue)
+    optionCache[key] = (opts || []).map(o => ({
+      value: o.value, label: o.label, disabled: o.disabled,
+      hasChildren: o.hasChildren !== undefined ? o.hasChildren : !!(o.children && o.children.length),
+    }))
+    return optionCache[key]
+  } catch (e) {
+    optionCache[key] = []
+    return []
+  } finally {
+    loadingKeys.delete(key)
+  }
+}
+
+function isLoadingLevel(levelIdx) {
+  if (levelIdx < 0 || levelIdx >= levelStates.value.length) return false
+  return loadingKeys.has(cacheKey(levelStates.value[levelIdx]._parentValue))
+}
+
+function isLoadingCol(colIdx) {
+  return columns.value[colIdx] && columns.value[colIdx]._loading === true
+}
+
+// ── 初始化缓存 ──
+function initCache() {
+  if (props.fetchOptions) {
+    for (const k of Object.keys(optionCache)) { delete optionCache[k] }
+    loadLazyOptions(null) // 预加载根级
+  } else {
+    populateStaticCache()
+  }
+}
+initCache()
+
+watch(() => props.fetchOptions, () => initCache())
+watch(() => props.options, () => { if (!props.fetchOptions) populateStaticCache() }, { deep: true })
+
+// ═══════════════════════════════════════════
+// 标签解析（从缓存中查找）
+// ═══════════════════════════════════════════
 function resolveLabels(path) {
-  let nodes = props.options
+  let parentKey = ROOT_KEY
   const labels = []
   for (const v of path) {
-    const opt = findOpt(nodes, v)
-    if (opt) { labels.push(opt.label); nodes = opt.children || [] }
-    else { labels.push(String(v)); nodes = [] }
+    const nodes = optionCache[parentKey] || []
+    const opt = findOptInNodes(nodes, v)
+    if (opt) { labels.push(opt.label); parentKey = cacheKey(opt.value) }
+    else { labels.push(String(v)); parentKey = '__missing__' }
   }
   return labels
+}
+
+async function ensurePathLoaded(path) {
+  let parentValue = null
+  for (const v of path) {
+    if (!optionCache[cacheKey(parentValue)] && props.fetchOptions) {
+      await loadLazyOptions(parentValue)
+    }
+    const nodes = optionCache[cacheKey(parentValue)] || []
+    const opt = findOptInNodes(nodes, v)
+    if (opt) parentValue = opt.value
+    else break
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -109,39 +209,58 @@ const panelStyle = ref({})
 const activeLevel = ref(-1)
 const levelStates = ref([])
 
-function initLevels() {
-  const labels = resolveLabels(props.modelValue || [])
+async function initLevels() {
+  const path = (props.modelValue || []).filter(Boolean)
+  if (!path.length) {
+    if (!optionCache[ROOT_KEY] && props.fetchOptions) await loadLazyOptions(null)
+    levelStates.value = [{ value: null, label: null, options: optionCache[ROOT_KEY] || [], _parentValue: null }]
+    return
+  }
+  if (props.fetchOptions) await ensurePathLoaded(path)
+  const labels = resolveLabels(path)
   const states = []
-  let nodes = props.options
-  for (let i = 0; i <= (props.modelValue || []).length; i++) {
-    if (i === 0) {
-      states.push({ value: null, label: labels[0] || null, options: nodes })
-    } else {
-      const val = (props.modelValue || [])[i - 1]
-      const opt = findOpt(states[i - 1].options, val)
-      nodes = (opt && opt.children) ? opt.children : []
-      if (nodes.length || i <= (props.modelValue || []).length) {
-        states.push({ value: (props.modelValue || [])[i] || null, label: labels[i] || null, options: nodes })
-      }
+  let parentValue = null
+  for (let i = 0; i <= path.length; i++) {
+    const nodes = optionCache[cacheKey(parentValue)] || []
+    states.push({
+      value: i < path.length ? path[i] : null,
+      label: i < path.length ? (labels[i] || null) : null,
+      options: nodes,
+      _parentValue: parentValue,
+    })
+    if (i < path.length) {
+      const opt = findOptInNodes(nodes, path[i])
+      parentValue = opt ? opt.value : null
     }
   }
   levelStates.value = states
 }
 initLevels()
 
-watch(() => props.modelValue, (v) => {
-  const extLabels = resolveLabels(v || [])
+watch(() => props.modelValue, async (v) => {
+  const path = (v || []).filter(Boolean)
+  const extLabels = resolveLabels(path)
   const curLabels = levelStates.value.map(s => s.label).filter(Boolean)
   if (extLabels.length === curLabels.length && extLabels.every((l, i) => l === curLabels[i])) {
-    for (let i = 0; i < (v || []).length; i++) {
-      if (levelStates.value[i]) levelStates.value[i].value = (v || [])[i]
+    for (let i = 0; i < path.length; i++) {
+      if (levelStates.value[i]) levelStates.value[i].value = path[i]
     }
     return
   }
-  initLevels()
+  await initLevels()
 }, { deep: true })
 
-watch(() => props.options, () => initLevels(), { deep: true })
+watch(() => props.options, async () => {
+  if (!props.fetchOptions) { populateStaticCache(); await initLevels() }
+}, { deep: true })
+
+// 缓存变化 → 同步更新 levelStates 中的 options
+watch(() => optionCache, () => {
+  for (const ls of levelStates.value) {
+    const key = cacheKey(ls._parentValue)
+    if (optionCache[key] && optionCache[key] !== ls.options) ls.options = optionCache[key]
+  }
+}, { deep: true })
 
 const activeOptions = computed(() => {
   if (activeLevel.value < 0 || activeLevel.value >= levelStates.value.length) return []
@@ -164,15 +283,27 @@ function openPanel(idx) {
   nextTick(() => positionPanelMulti(idx))
 }
 
-function selectMulti(levelIdx, opt) {
+async function selectMulti(levelIdx, opt) {
   if (opt.disabled) return
   levelStates.value.splice(levelIdx + 1)
   levelStates.value[levelIdx].value = opt.value
   levelStates.value[levelIdx].label = opt.label
-  if (opt.children && opt.children.length) {
-    levelStates.value.push({ value: null, label: null, options: opt.children })
-    activeLevel.value = levelIdx + 1
-    nextTick(() => positionPanelMulti(levelIdx + 1))
+
+  if (hasChildren(opt)) {
+    const childKey = cacheKey(opt.value)
+    const childOpts = optionCache[childKey]
+    levelStates.value.push({ value: null, label: null, options: childOpts || [], _parentValue: opt.value })
+
+    if (!childOpts && props.fetchOptions) {
+      const newIdx = levelStates.value.length - 1
+      activeLevel.value = newIdx
+      nextTick(() => positionPanelMulti(newIdx))
+      await loadLazyOptions(opt.value)
+      if (levelStates.value[newIdx]) levelStates.value[newIdx].options = optionCache[childKey] || []
+    } else {
+      activeLevel.value = levelIdx + 1
+      nextTick(() => positionPanelMulti(levelIdx + 1))
+    }
   } else {
     closePanel()
   }
@@ -198,26 +329,31 @@ const displayText = computed(() => {
   return labels.join(' ' + props.separator + ' ')
 })
 
-// Build columns for the cascading panel
 const columns = computed(() => {
   const cols = []
-  let nodes = props.options
+  let parentValue = null
   const path = props.modelValue || []
 
-  // Always include the first column (root options)
-  cols.push(nodes)
+  cols.push(optionCache[ROOT_KEY] || [])
 
-  // For each selected value in the path, add its children as the next column
-  for (let i = 0; i < path.length; i++) {
-    const opt = findOpt(nodes, path[i])
-    if (opt && opt.children && opt.children.length) {
-      cols.push(opt.children)
-      nodes = opt.children
+  for (const v of path) {
+    const nodes = optionCache[cacheKey(parentValue)] || []
+    const opt = findOptInNodes(nodes, v)
+    if (opt) {
+      parentValue = opt.value
+      const childKey = cacheKey(parentValue)
+      if (optionCache[childKey]) {
+        cols.push(optionCache[childKey])
+      } else if (loadingKeys.has(childKey)) {
+        cols.push(Object.defineProperty([], '_loading', { value: true, enumerable: false }))
+        break
+      } else {
+        break
+      }
     } else {
       break
     }
   }
-
   return cols
 })
 
@@ -227,19 +363,19 @@ function isPathSelected(colIdx, val) {
   return String(path[colIdx]) === String(val)
 }
 
-function onColClick(colIdx, opt) {
+async function onColClick(colIdx, opt) {
   if (opt.disabled) return
-
   const path = [...(props.modelValue || [])]
-  // Trim path to this column level
   path.splice(colIdx)
   path[colIdx] = opt.value
 
-  if (opt.children && opt.children.length) {
-    // Has children: update path (shows next column), keep panel open
+  if (hasChildren(opt)) {
     emitPath(path)
+    const childKey = cacheKey(opt.value)
+    if (!optionCache[childKey] && props.fetchOptions) {
+      await loadLazyOptions(opt.value)
+    }
   } else {
-    // Leaf node: update path and close panel
     emitPath(path)
     closePanel()
   }
@@ -271,11 +407,9 @@ function closePanel() {
 }
 
 function closeSiblings() {
-  // close other cascade panels
   document.querySelectorAll('.${namespace}-cscd__panel').forEach(el => {
     if (el !== panelEl.value && el._bnrCscdClose) el._bnrCscdClose()
   })
-  // close dropdown panels
   document.querySelectorAll('.${namespace}-dd--open').forEach(el => {
     if (el._bnrDd) el._bnrDd.close()
   })
@@ -359,7 +493,6 @@ defineExpose({ closePanel })
 <style scoped>
 /* ═══ 通用 ═══ */
 .${namespace}-cscd {
-  /* display: inline-flex; */
   align-items: center;
   gap: 2px;
   font-size: 12px;
@@ -483,6 +616,12 @@ defineExpose({ closePanel })
   padding: 12px;
   text-align: center;
   color: var(--${namespace}-text-light, #909eac);
+  font-size: 12px;
+}
+.${namespace}-cscd__loading {
+  padding: 12px;
+  text-align: center;
+  color: var(--${namespace}-primary, #1a4f8a);
   font-size: 12px;
 }
 </style>

@@ -1319,3 +1319,182 @@ html, body {
   .${namespace}-of__toolbar   { display: none; }
   .${namespace}-of__container { box-shadow: none; border: none; padding: 0; }
 }
+
+
+/* ── Row ── */
+.${namespace}-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* ── 基础列 (1-24) ── */
+.${namespace}-col-1  { flex: 0 0 4.16666667%; max-width: 4.16666667%; }
+.${namespace}-col-2  { flex: 0 0 8.33333333%; max-width: 8.33333333%; }
+.${namespace}-col-3  { flex: 0 0 12.5%;       max-width: 12.5%;       }
+.${namespace}-col-4  { flex: 0 0 16.66666667%; max-width: 16.66666667%; }
+.${namespace}-col-5  { flex: 0 0 20.83333333%; max-width: 20.83333333%; }
+.${namespace}-col-6  { flex: 0 0 25%;          max-width: 25%;          }
+.${namespace}-col-7  { flex: 0 0 29.16666667%; max-width: 29.16666667%; }
+.${namespace}-col-8  { flex: 0 0 33.33333333%; max-width: 33.33333333%; }
+.${namespace}-col-9  { flex: 0 0 37.5%;        max-width: 37.5%;        }
+.${namespace}-col-10 { flex: 0 0 41.66666667%; max-width: 41.66666667%; }
+.${namespace}-col-11 { flex: 0 0 45.83333333%; max-width: 45.83333333%; }
+.${namespace}-col-12 { flex: 0 0 50%;          max-width: 50%;          }
+.${namespace}-col-13 { flex: 0 0 54.16666667%; max-width: 54.16666667%; }
+.${namespace}-col-14 { flex: 0 0 58.33333333%; max-width: 58.33333333%; }
+.${namespace}-col-15 { flex: 0 0 62.5%;        max-width: 62.5%;        }
+.${namespace}-col-16 { flex: 0 0 66.66666667%; max-width: 66.66666667%; }
+.${namespace}-col-17 { flex: 0 0 70.83333333%; max-width: 70.83333333%; }
+.${namespace}-col-18 { flex: 0 0 75%;          max-width: 75%;          }
+.${namespace}-col-19 { flex: 0 0 79.16666667%; max-width: 79.16666667%; }
+.${namespace}-col-20 { flex: 0 0 83.33333333%; max-width: 83.33333333%; }
+.${namespace}-col-21 { flex: 0 0 87.5%;        max-width: 87.5%;        }
+.${namespace}-col-22 { flex: 0 0 91.66666667%; max-width: 91.66666667%; }
+.${namespace}-col-23 { flex: 0 0 95.83333333%; max-width: 95.83333333%; }
+.${namespace}-col-24 { flex: 0 0 100%;         max-width: 100%;         }
+
+/* ── 偏移 (1-24) ── */
+.${namespace}-col-offset-1  { margin-left: 4.16666667%; }
+.${namespace}-col-offset-2  { margin-left: 8.33333333%; }
+.${namespace}-col-offset-3  { margin-left: 12.5%;       }
+.${namespace}-col-offset-4  { margin-left: 16.66666667%; }
+.${namespace}-col-offset-5  { margin-left: 20.83333333%; }
+.${namespace}-col-offset-6  { margin-left: 25%;          }
+.${namespace}-col-offset-7  { margin-left: 29.16666667%; }
+.${namespace}-col-offset-8  { margin-left: 33.33333333%; }
+.${namespace}-col-offset-9  { margin-left: 37.5%;        }
+.${namespace}-col-offset-10 { margin-left: 41.66666667%; }
+.${namespace}-col-offset-11 { margin-left: 45.83333333%; }
+.${namespace}-col-offset-12 { margin-left: 50%;          }
+.${namespace}-col-offset-13 { margin-left: 54.16666667%; }
+.${namespace}-col-offset-14 { margin-left: 58.33333333%; }
+.${namespace}-col-offset-15 { margin-left: 62.5%;        }
+.${namespace}-col-offset-16 { margin-left: 66.66666667%; }
+.${namespace}-col-offset-17 { margin-left: 70.83333333%; }
+.${namespace}-col-offset-18 { margin-left: 75%;          }
+.${namespace}-col-offset-19 { margin-left: 79.16666667%; }
+.${namespace}-col-offset-20 { margin-left: 83.33333333%; }
+.${namespace}-col-offset-21 { margin-left: 87.5%;        }
+.${namespace}-col-offset-22 { margin-left: 91.66666667%; }
+.${namespace}-col-offset-23 { margin-left: 95.83333333%; }
+.${namespace}-col-offset-24 { margin-left: 100%;         }
+
+/* ── Gutter ── */
+.${namespace}-row--gap    { margin-left: -6px;  margin-right: -6px;  }
+.${namespace}-row--gap    > [class*="${namespace}-col-"] { padding-left: 6px;  padding-right: 6px;  }
+.${namespace}-row--gap-sm { margin-left: -4px;  margin-right: -4px;  }
+.${namespace}-row--gap-sm > [class*="${namespace}-col-"] { padding-left: 4px;  padding-right: 4px;  }
+.${namespace}-row--gap-lg { margin-left: -12px; margin-right: -12px; }
+.${namespace}-row--gap-lg > [class*="${namespace}-col-"] { padding-left: 12px; padding-right: 12px; }
+
+/* ── 响应式栅格: sm (< 576px) ── */
+@media (max-width: 576px) {
+  .${namespace}-col-sm-1  { flex: 0 0 4.16666667%; max-width: 4.16666667%; }
+  .${namespace}-col-sm-2  { flex: 0 0 8.33333333%; max-width: 8.33333333%; }
+  .${namespace}-col-sm-3  { flex: 0 0 12.5%;       max-width: 12.5%;       }
+  .${namespace}-col-sm-4  { flex: 0 0 16.66666667%; max-width: 16.66666667%; }
+  .${namespace}-col-sm-5  { flex: 0 0 20.83333333%; max-width: 20.83333333%; }
+  .${namespace}-col-sm-6  { flex: 0 0 25%;          max-width: 25%;          }
+  .${namespace}-col-sm-7  { flex: 0 0 29.16666667%; max-width: 29.16666667%; }
+  .${namespace}-col-sm-8  { flex: 0 0 33.33333333%; max-width: 33.33333333%; }
+  .${namespace}-col-sm-9  { flex: 0 0 37.5%;        max-width: 37.5%;        }
+  .${namespace}-col-sm-10 { flex: 0 0 41.66666667%; max-width: 41.66666667%; }
+  .${namespace}-col-sm-11 { flex: 0 0 45.83333333%; max-width: 45.83333333%; }
+  .${namespace}-col-sm-12 { flex: 0 0 50%;          max-width: 50%;          }
+  .${namespace}-col-sm-13 { flex: 0 0 54.16666667%; max-width: 54.16666667%; }
+  .${namespace}-col-sm-14 { flex: 0 0 58.33333333%; max-width: 58.33333333%; }
+  .${namespace}-col-sm-15 { flex: 0 0 62.5%;        max-width: 62.5%;        }
+  .${namespace}-col-sm-16 { flex: 0 0 66.66666667%; max-width: 66.66666667%; }
+  .${namespace}-col-sm-17 { flex: 0 0 70.83333333%; max-width: 70.83333333%; }
+  .${namespace}-col-sm-18 { flex: 0 0 75%;          max-width: 75%;          }
+  .${namespace}-col-sm-19 { flex: 0 0 79.16666667%; max-width: 79.16666667%; }
+  .${namespace}-col-sm-20 { flex: 0 0 83.33333333%; max-width: 83.33333333%; }
+  .${namespace}-col-sm-21 { flex: 0 0 87.5%;        max-width: 87.5%;        }
+  .${namespace}-col-sm-22 { flex: 0 0 91.66666667%; max-width: 91.66666667%; }
+  .${namespace}-col-sm-23 { flex: 0 0 95.83333333%; max-width: 95.83333333%; }
+  .${namespace}-col-sm-24 { flex: 0 0 100%;         max-width: 100%;         }
+}
+
+/* ── 响应式栅格: md (≥ 768px) ── */
+@media (min-width: 768px) {
+  .${namespace}-col-md-1  { flex: 0 0 4.16666667%; max-width: 4.16666667%; }
+  .${namespace}-col-md-2  { flex: 0 0 8.33333333%; max-width: 8.33333333%; }
+  .${namespace}-col-md-3  { flex: 0 0 12.5%;       max-width: 12.5%;       }
+  .${namespace}-col-md-4  { flex: 0 0 16.66666667%; max-width: 16.66666667%; }
+  .${namespace}-col-md-5  { flex: 0 0 20.83333333%; max-width: 20.83333333%; }
+  .${namespace}-col-md-6  { flex: 0 0 25%;          max-width: 25%;          }
+  .${namespace}-col-md-7  { flex: 0 0 29.16666667%; max-width: 29.16666667%; }
+  .${namespace}-col-md-8  { flex: 0 0 33.33333333%; max-width: 33.33333333%; }
+  .${namespace}-col-md-9  { flex: 0 0 37.5%;        max-width: 37.5%;        }
+  .${namespace}-col-md-10 { flex: 0 0 41.66666667%; max-width: 41.66666667%; }
+  .${namespace}-col-md-11 { flex: 0 0 45.83333333%; max-width: 45.83333333%; }
+  .${namespace}-col-md-12 { flex: 0 0 50%;          max-width: 50%;          }
+  .${namespace}-col-md-13 { flex: 0 0 54.16666667%; max-width: 54.16666667%; }
+  .${namespace}-col-md-14 { flex: 0 0 58.33333333%; max-width: 58.33333333%; }
+  .${namespace}-col-md-15 { flex: 0 0 62.5%;        max-width: 62.5%;        }
+  .${namespace}-col-md-16 { flex: 0 0 66.66666667%; max-width: 66.66666667%; }
+  .${namespace}-col-md-17 { flex: 0 0 70.83333333%; max-width: 70.83333333%; }
+  .${namespace}-col-md-18 { flex: 0 0 75%;          max-width: 75%;          }
+  .${namespace}-col-md-19 { flex: 0 0 79.16666667%; max-width: 79.16666667%; }
+  .${namespace}-col-md-20 { flex: 0 0 83.33333333%; max-width: 83.33333333%; }
+  .${namespace}-col-md-21 { flex: 0 0 87.5%;        max-width: 87.5%;        }
+  .${namespace}-col-md-22 { flex: 0 0 91.66666667%; max-width: 91.66666667%; }
+  .${namespace}-col-md-23 { flex: 0 0 95.83333333%; max-width: 95.83333333%; }
+  .${namespace}-col-md-24 { flex: 0 0 100%;         max-width: 100%;         }
+}
+
+/* ── 响应式栅格: lg (≥ 992px) ── */
+@media (min-width: 992px) {
+  .${namespace}-col-lg-1  { flex: 0 0 4.16666667%; max-width: 4.16666667%; }
+  .${namespace}-col-lg-2  { flex: 0 0 8.33333333%; max-width: 8.33333333%; }
+  .${namespace}-col-lg-3  { flex: 0 0 12.5%;       max-width: 12.5%;       }
+  .${namespace}-col-lg-4  { flex: 0 0 16.66666667%; max-width: 16.66666667%; }
+  .${namespace}-col-lg-5  { flex: 0 0 20.83333333%; max-width: 20.83333333%; }
+  .${namespace}-col-lg-6  { flex: 0 0 25%;          max-width: 25%;          }
+  .${namespace}-col-lg-7  { flex: 0 0 29.16666667%; max-width: 29.16666667%; }
+  .${namespace}-col-lg-8  { flex: 0 0 33.33333333%; max-width: 33.33333333%; }
+  .${namespace}-col-lg-9  { flex: 0 0 37.5%;        max-width: 37.5%;        }
+  .${namespace}-col-lg-10 { flex: 0 0 41.66666667%; max-width: 41.66666667%; }
+  .${namespace}-col-lg-11 { flex: 0 0 45.83333333%; max-width: 45.83333333%; }
+  .${namespace}-col-lg-12 { flex: 0 0 50%;          max-width: 50%;          }
+  .${namespace}-col-lg-13 { flex: 0 0 54.16666667%; max-width: 54.16666667%; }
+  .${namespace}-col-lg-14 { flex: 0 0 58.33333333%; max-width: 58.33333333%; }
+  .${namespace}-col-lg-15 { flex: 0 0 62.5%;        max-width: 62.5%;        }
+  .${namespace}-col-lg-16 { flex: 0 0 66.66666667%; max-width: 66.66666667%; }
+  .${namespace}-col-lg-17 { flex: 0 0 70.83333333%; max-width: 70.83333333%; }
+  .${namespace}-col-lg-18 { flex: 0 0 75%;          max-width: 75%;          }
+  .${namespace}-col-lg-19 { flex: 0 0 79.16666667%; max-width: 79.16666667%; }
+  .${namespace}-col-lg-20 { flex: 0 0 83.33333333%; max-width: 83.33333333%; }
+  .${namespace}-col-lg-21 { flex: 0 0 87.5%;        max-width: 87.5%;        }
+  .${namespace}-col-lg-22 { flex: 0 0 91.66666667%; max-width: 91.66666667%; }
+  .${namespace}-col-lg-23 { flex: 0 0 95.83333333%; max-width: 95.83333333%; }
+  .${namespace}-col-lg-24 { flex: 0 0 100%;         max-width: 100%;         }
+}
+
+/* ── 响应式栅格: xl (≥ 1200px) ── */
+@media (min-width: 1200px) {
+  .${namespace}-col-xl-1  { flex: 0 0 4.16666667%; max-width: 4.16666667%; }
+  .${namespace}-col-xl-2  { flex: 0 0 8.33333333%; max-width: 8.33333333%; }
+  .${namespace}-col-xl-3  { flex: 0 0 12.5%;       max-width: 12.5%;       }
+  .${namespace}-col-xl-4  { flex: 0 0 16.66666667%; max-width: 16.66666667%; }
+  .${namespace}-col-xl-5  { flex: 0 0 20.83333333%; max-width: 20.83333333%; }
+  .${namespace}-col-xl-6  { flex: 0 0 25%;          max-width: 25%;          }
+  .${namespace}-col-xl-7  { flex: 0 0 29.16666667%; max-width: 29.16666667%; }
+  .${namespace}-col-xl-8  { flex: 0 0 33.33333333%; max-width: 33.33333333%; }
+  .${namespace}-col-xl-9  { flex: 0 0 37.5%;        max-width: 37.5%;        }
+  .${namespace}-col-xl-10 { flex: 0 0 41.66666667%; max-width: 41.66666667%; }
+  .${namespace}-col-xl-11 { flex: 0 0 45.83333333%; max-width: 45.83333333%; }
+  .${namespace}-col-xl-12 { flex: 0 0 50%;          max-width: 50%;          }
+  .${namespace}-col-xl-13 { flex: 0 0 54.16666667%; max-width: 54.16666667%; }
+  .${namespace}-col-xl-14 { flex: 0 0 58.33333333%; max-width: 58.33333333%; }
+  .${namespace}-col-xl-15 { flex: 0 0 62.5%;        max-width: 62.5%;        }
+  .${namespace}-col-xl-16 { flex: 0 0 66.66666667%; max-width: 66.66666667%; }
+  .${namespace}-col-xl-17 { flex: 0 0 70.83333333%; max-width: 70.83333333%; }
+  .${namespace}-col-xl-18 { flex: 0 0 75%;          max-width: 75%;          }
+  .${namespace}-col-xl-19 { flex: 0 0 79.16666667%; max-width: 79.16666667%; }
+  .${namespace}-col-xl-20 { flex: 0 0 83.33333333%; max-width: 83.33333333%; }
+  .${namespace}-col-xl-21 { flex: 0 0 87.5%;        max-width: 87.5%;        }
+  .${namespace}-col-xl-22 { flex: 0 0 91.66666667%; max-width: 91.66666667%; }
+  .${namespace}-col-xl-23 { flex: 0 0 95.83333333%; max-width: 95.83333333%; }
+  .${namespace}-col-xl-24 { flex: 0 0 100%;         max-width: 100%;         }
+}

@@ -1,6 +1,11 @@
 <template>
   <div class="${namespace}-page-table">
     <div class="${namespace}-list-area">
+      <!-- 加载遮罩 -->
+      <div v-if="loading" class="${namespace}-page-table__loading-mask">
+        <span class="${namespace}-page-table__loading-text">加载中...</span>
+      </div>
+
       <div class="${namespace}-table-container" ref="scrollContainer">
         <table class="${namespace}-table">
           <thead>
@@ -19,7 +24,9 @@
           </thead>
           <tbody>
             <tr v-if="pageData.length === 0">
-              <td :colspan="columns.length + 1" class="${namespace}-tc" style="padding:40px;color:var(--tl)">暂无数据</td>
+              <td :colspan="columns.length + 1" class="${namespace}-tc" style="padding:40px;color:var(--tl)">
+                {{ loading ? '加载中...' : '暂无数据' }}
+              </td>
             </tr>
             <tr v-for="row in pageData" :key="String(row[idKey])"
               :data-id="String(row[idKey])"
@@ -51,8 +58,8 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import TefPagination from './${namespace}-pagination.vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import PtPagination from './${namespace}-pagination.vue'
 
 const props = defineProps({
   data:         { type: Array,    default: () => [] },
@@ -62,10 +69,12 @@ const props = defineProps({
   idKey:        { type: String,   default: 'id' },
   rowClassName: { type: Function, default: null },
   drawerRender: { type: Function, default: null },
-  // 服务端分页模式：传入 fetchData 后，页码/页大小/排序变化时自动调用，参数 { currentPage, pageSize, sortKey, sortAsc }
-  fetchData:    { type: Function, default: null },
-  // 服务端分页模式：数据总条数（用于分页条显示）
   total:        { type: Number,   default: 0 },
+  // ── 远端数据获取 ──
+  // fetchData: async (params, pageNumber, pageSize) => { data: [...], total: N }
+  fetchData:    { type: Function, default: null },
+  // fetchParams: 传入 fetchData 的搜索条件参数
+  fetchParams:  { type: Object,   default: () => ({}) },
 })
 
 const emit = defineEmits(['update:currentPage', 'update:pageSize', 'selection-change', 'row-click'])
@@ -79,22 +88,22 @@ const drawerOpen = ref(false)
 const drawerRow = ref(null)
 const scrollContainer = ref(null)
 
-watch(() => props.data, () => {
-  if (!isServerMode.value) currentPage.value = 1
-})
+watch(() => props.currentPage, (v) => { currentPage.value = v })
+watch(() => props.pageSize,    (v) => { pageSize.value = v })
 
-watch(() => props.currentPage, (v) => {
-  currentPage.value = v
-})
-
-watch(() => props.pageSize, (v) => {
-  pageSize.value = v
-})
-
+// ── 远端数据模式 ──
 const isServerMode = computed(() => typeof props.fetchData === 'function')
 
+const internalData = ref([])
+const internalTotal = ref(0)
+const loading = ref(false)
+let reqId = 0
+
+// 服务端模式：使用内部数据；客户端模式：使用 props.data
+const serverData = computed(() => isServerMode.value ? internalData.value : props.data)
+
 const displayData = computed(() => {
-  if (isServerMode.value) return props.data
+  if (isServerMode.value) return serverData.value
   const arr = [...props.data]
   if (sortKey.value) {
     arr.sort((a, b) => {
@@ -108,17 +117,64 @@ const displayData = computed(() => {
 })
 
 const pageData = computed(() => {
-  if (isServerMode.value) return props.data
+  if (isServerMode.value) return serverData.value
   const start = (currentPage.value - 1) * pageSize.value
   return displayData.value.slice(start, start + pageSize.value)
 })
 
-const paginationTotal = computed(() => isServerMode.value ? props.total : displayData.value.length)
+const paginationTotal = computed(() => isServerMode.value ? internalTotal.value : displayData.value.length)
 
 const isAllChecked = computed(() =>
   pageData.value.length > 0 && pageData.value.every(r => selectedIds.value.has(String(r[props.idKey])))
 )
 
+// ── 远端数据加载 ──
+async function loadData() {
+  if (!isServerMode.value) return
+  const id = ++reqId
+  loading.value = true
+  try {
+    const params = { ...props.fetchParams }
+    const res = await props.fetchData(params, currentPage.value, pageSize.value)
+    if (id !== reqId) return
+    if (res) {
+      internalData.value = res.data ?? []
+      internalTotal.value = res.total ?? (Array.isArray(res.data) ? res.data.length : 0)
+    } else {
+      internalData.value = []
+      internalTotal.value = 0
+    }
+  } catch (e) {
+    if (id !== reqId) return
+    console.error('PagedTable fetchData error:', e)
+    internalData.value = []
+    internalTotal.value = 0
+  } finally {
+    if (id === reqId) {
+      loading.value = false
+    }
+  }
+}
+
+// fetchParams 引用变化 → 回到第 1 页重新加载
+watch(() => props.fetchParams, () => {
+  if (isServerMode.value) {
+    currentPage.value = 1
+    emit('update:currentPage', 1)
+    loadData()
+  }
+})
+
+// fetchData 函数变化 → 重新加载
+watch(() => props.fetchData, () => {
+  if (isServerMode.value) loadData()
+})
+
+onMounted(() => {
+  if (isServerMode.value) loadData()
+})
+
+// ── 事件处理 ──
 function rowClasses(row) {
   const parts = []
   if (selectedIds.value.has(String(row[props.idKey]))) parts.push('${namespace}-selected')
@@ -135,17 +191,17 @@ function toggleSort(key) {
   }
   if (isServerMode.value) {
     currentPage.value = 1
-    // props.fetchData({ currentPage: 1, pageSize: pageSize.value, sortKey: sortKey.value, sortAsc: sortAsc.value })
-    props.fetchData(1, pageSize.value)
+    loadData()
   }
   scrollToTop()
 }
 
 function onPageChange({ currentPage: cp, pageSize: ps }) {
+  emit('update:currentPage', cp)
+  emit('update:pageSize', ps)
   scrollToTop()
   if (isServerMode.value) {
-    // props.fetchData({ pageNumber: cp, pageSize: ps, sortKey: sortKey.value, sortAsc: sortAsc.value })
-    props.fetchData(cp, ps)
+    loadData()
   }
 }
 
@@ -161,7 +217,6 @@ function toggleAll(checked) {
 function toggleRow(id, checked) {
   if (checked) selectedIds.value.add(id)
   else selectedIds.value.delete(id)
-  // trigger reactivity for Set
   selectedIds.value = new Set(selectedIds.value)
   notifySelection()
 }
@@ -193,7 +248,17 @@ function scrollToTop() {
   if (scrollContainer.value) scrollContainer.value.scrollTop = 0
 }
 
+/** 手动刷新数据，回到第 1 页 */
+function refresh() {
+  currentPage.value = 1
+  emit('update:currentPage', 1)
+  loadData()
+}
+
 defineExpose({
+  refresh,
+  /** 内部加载状态 */
+  loading,
   clearSelection: () => {
     selectedIds.value = new Set()
     notifySelection()
@@ -202,8 +267,6 @@ defineExpose({
 </script>
 
 <style>
-/* 颜色全部引用 design system (app.css / app-blue.css)，不再局部覆盖 */
-
 .vue-${namespace}-wrapper {
   display: flex;
   flex: 1;
@@ -226,6 +289,25 @@ defineExpose({
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  position: relative;
+}
+
+/* ── 加载遮罩 ── */
+.${namespace}-page-table__loading-mask {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+}
+.${namespace}-page-table__loading-text {
+  padding: 8px 20px;
+  background: var(--${namespace}-primary-bg);
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--${namespace}-primary);
 }
 
 .${namespace}-table-container {
@@ -233,7 +315,7 @@ defineExpose({
   overflow: auto;
   position: relative;
   background: var(--${namespace}-bg);
-  overscroll-behavior: contain;                               
+  overscroll-behavior: contain;
   -webkit-overflow-scrolling: auto;
 }
 
@@ -292,7 +374,7 @@ defineExpose({
 
 .${namespace}-tc { text-align: center; }
 
-/* 分页 — 穿透 BnrPagination 子组件 */
+/* 分页 — 穿透 PtPagination 子组件 */
 .${namespace}-list-area :deep(.${namespace}-pagination) {
   flex-shrink: 0;
   display: flex;

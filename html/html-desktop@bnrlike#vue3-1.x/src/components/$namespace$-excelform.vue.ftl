@@ -224,8 +224,16 @@
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
-  columns: { type: Array, required: true },
-  data:    { type: Array, required: true },
+  columns:     { type: Array, required: true },
+  data:        { type: Array, default: () => [] },
+  // ── 远端数据获取 ──
+  // fetchData: async (params, pageNumber, pageSize) => { data: [...], total: N }
+  fetchData:   { type: Function, default: null },
+  // fetchParams: 传入 fetchData 的搜索条件参数
+  fetchParams: { type: Object, default: () => ({}) },
+  // pageSize 总是 -1 表示不分页，pageNumber 总是 1
+  pageSize:    { type: Number, default: -1 },
+  pageNumber:  { type: Number, default: 1 },
 })
 
 const emit = defineEmits(['update:data', 'cell-change'])
@@ -267,8 +275,57 @@ watch(() => props.data, v => {
   localData.value = v.map(r => ({ ...r }))
 }, { immediate: true, deep: true })
 
+// ═══════════════════ Remote data mode ═══════════════════
+const isServerMode = computed(() => typeof props.fetchData === 'function')
+const loading = ref(false)
+let reqId = 0
+
+async function loadData() {
+  if (!isServerMode.value) return
+  const id = ++reqId
+  loading.value = true
+  try {
+    const params = { ...props.fetchParams }
+    const res = await props.fetchData(params, props.pageNumber, props.pageSize)
+    if (id !== reqId) return
+    if (res) {
+      localData.value = (res.data ?? []).map(r => ({ ...r }))
+    } else {
+      localData.value = []
+    }
+    sync()
+  } catch (e) {
+    if (id !== reqId) return
+    console.error('ExcelForm fetchData error:', e)
+    localData.value = []
+    sync()
+  } finally {
+    if (id === reqId) {
+      loading.value = false
+    }
+  }
+}
+
+// fetchParams 引用变化 → 重新加载
+watch(() => props.fetchParams, () => {
+  if (isServerMode.value) loadData()
+})
+
+// fetchData 函数变化 → 重新加载
+watch(() => props.fetchData, () => {
+  if (isServerMode.value) loadData()
+})
+
+onMounted(() => {
+  if (isServerMode.value) loadData()
+})
+
+// Expose refresh
+function refresh() { loadData() }
+defineExpose({ refresh, loading })
+
 // ═══════════════════ Helpers ═══════════════════
-const ck = (r, c) => ${r"`${r},${c}`"}
+const ck = (r, c) => `${r"${r},${c}"}`
 const gs = (r, c) => styles.value[ck(r, c)] || {}
 const w  = ci => colW.value[ci] || props.columns[ci]?.width || 90
 const editing = (ri, ci) => editR.value === ri && editC.value === ci

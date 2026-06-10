@@ -5,7 +5,7 @@
 <@vue3.print_page_layout page=pageDef />
 </template>
 <script setup>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 <@vue3.print_page_imports page=pageDef />
 import sdk from '@/sdk/sdk.js'
 
@@ -19,14 +19,16 @@ onMounted(async () => {
 <#assign visited_widgets = {}>  
 <#list page.widgets as widget>
   <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
-  <#if (widget.type == "select" || widget.type == "multiselect" || widget.type == "cascade") && 
+  <#if (widget.type == "select" || widget.type == "multiselect") && 
        !(widget.value("data")!"")?starts_with("enum[")>
     <#if widget.ancestor("entry_form")?? || widget.ancestor("criteria_form")??>
-  ${js.nameVariable(widget.id)}Options.value = await sdk.fetch${js.nameType(widget.id)}Options();  
+  ${js.nameVariable(widget.id)}Options.value = await sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}AsOptions();
     </#if>
   <#elseif widget.type == "entry_form" || widget.type == "display_form">  
   load${js.nameType(widget.id)}Data();
-  <#elseif widget.type == "paged_table" || widget.type == "excel_form">
+  <#elseif widget.type == "excel_form">
+  load${js.nameType(widget.id)}Rows();
+  <#elseif widget.type == "chart">
   load${js.nameType(widget.id)}Rows();
   </#if>
 </#list>
@@ -36,6 +38,3 @@ onUnmounted(() => {
   
 })
 </script>
-
-<style scoped>
-</style>
