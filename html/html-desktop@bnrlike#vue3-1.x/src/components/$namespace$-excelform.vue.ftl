@@ -215,6 +215,8 @@
         <div class="xls-cxi" @click="ctxAct('paste')"><i class="ti ti-clipboard"></i>粘贴 <span class="xls-cxsc">Ctrl+V</span></div>
         <div class="xls-cxs"></div>
         <div class="xls-cxi" @click="ctxAct('clear')"><i class="ti ti-eraser"></i>清除内容</div>
+        <div class="xls-cxs"></div>
+        <div class="xls-cxi" @click="ctxOn = false"><i class="ti ti-x"></i>关闭</div>
       </div>
     </teleport>
   </div>
@@ -325,7 +327,7 @@ function refresh() { loadData() }
 defineExpose({ refresh, loading })
 
 // ═══════════════════ Helpers ═══════════════════
-const ck = (r, c) => `${r"${r},${c}"}`
+const ck = (r, c) => ${r"`${r},${c}`"}
 const gs = (r, c) => styles.value[ck(r, c)] || {}
 const w  = ci => colW.value[ci] || props.columns[ci]?.width || 90
 const editing = (ri, ci) => editR.value === ri && editC.value === ci

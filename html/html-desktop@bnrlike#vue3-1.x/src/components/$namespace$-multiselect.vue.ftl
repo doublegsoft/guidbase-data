@@ -315,13 +315,14 @@ defineExpose({
 <style scoped>
 /* ═══════════════════════════════════════════
    BNR MultiSelect — ${namespace}-ms
+   所有颜色均通过 BNR Design System 变量引用
    ═══════════════════════════════════════════ */
 
 .${namespace}-ms {
   position: relative;
   display: inline-flex;
   min-width: 180px;
-  font-family: var(--${namespace}-font, "Microsoft YaHei", sans-serif);
+  font-family: var(--${namespace}-font);
   font-size: 12px;
   user-select: none;
   flex: 1;
@@ -338,19 +339,19 @@ defineExpose({
   flex-wrap: wrap;
   gap: 3px;
   padding: 2px 24px 2px 5px;
-  border: 1px solid #c8c8c8;
-  background: #fff;
+  border: 1px solid var(--${namespace}-border);
+  background: var(--${namespace}-bg);
   cursor: pointer;
   position: relative;
   transition: border-color .15s;
 }
 .${namespace}-ms--open .${namespace}-ms__trigger {
-  border-color: #1a4f8a;
-  box-shadow: 0 0 0 2px rgba(26,79,138,.08);
+  border-color: var(--${namespace}-primary);
+  box-shadow: 0 0 0 2px rgba(190,0,0,.08);
 }
 .${namespace}-ms--disabled .${namespace}-ms__trigger {
-  background: #f5f7fa;
-  color: #5d6d7e;
+  background: var(--${namespace}-bg-page);
+  color: var(--${namespace}-text-muted);
   cursor: not-allowed;
 }
 
@@ -363,7 +364,7 @@ defineExpose({
   width: 0; height: 0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  border-top: 5px solid #5d6d7e;
+  border-top: 5px solid var(--${namespace}-text-muted);
   transition: transform .15s;
   pointer-events: none;
   flex-shrink: 0;
@@ -387,11 +388,11 @@ defineExpose({
   gap: 2px;
   height: 18px;
   padding: 0 4px;
-  background: #e8edf5;
-  border: 1px solid #d0d8e8;
+  background: var(--${namespace}-primary-bg);
+  border: 1px solid var(--${namespace}-primary-border);
   border-radius: 2px;
   font-size: 10px;
-  color: #1a4f8a;
+  color: var(--${namespace}-primary-dark);
   white-space: nowrap;
   max-width: 120px;
 }
@@ -403,27 +404,27 @@ defineExpose({
 .${namespace}-ms__tag-remove {
   font-size: 12px;
   cursor: pointer;
-  color: #5d6d7e;
+  color: var(--${namespace}-text-muted);
   line-height: 1;
   flex-shrink: 0;
 }
-.${namespace}-ms__tag-remove:hover { color: #c0392b; }
+.${namespace}-ms__tag-remove:hover { color: var(--${namespace}-danger); }
 
 .${namespace}-ms__tag-more {
   font-size: 10px;
-  color: #909eac;
+  color: var(--${namespace}-text-light);
   white-space: nowrap;
   flex-shrink: 0;
 }
 .${namespace}-ms__count {
   font-size: 10px;
-  color: #909eac;
+  color: var(--${namespace}-text-light);
   margin-left: auto;
   flex-shrink: 0;
   padding-left: 4px;
 }
 .${namespace}-ms__placeholder {
-  color: #909eac;
+  color: var(--${namespace}-text-light);
   font-size: 12px;
   white-space: nowrap;
   overflow: hidden;
@@ -432,10 +433,10 @@ defineExpose({
 
 /* Panel */
 .${namespace}-ms__panel {
-  background: #fff;
-  border: 1px solid #d0d8e8;
+  background: var(--${namespace}-bg);
+  border: 1px solid var(--${namespace}-border);
   border-radius: 2px;
-  box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  box-shadow: var(--${namespace}-shadow-md);
   max-height: 280px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -444,33 +445,33 @@ defineExpose({
 /* Search */
 .${namespace}-ms__search-wrap {
   padding: 4px 6px;
-  border-bottom: 1px solid #e4e8f0;
+  border-bottom: 1px solid var(--${namespace}-border-light);
   position: sticky;
   top: 0;
-  background: #fff;
+  background: var(--${namespace}-bg);
   z-index: 1;
 }
 .${namespace}-ms__search {
   width: 100%;
   height: 22px;
-  border: 1px solid #c8c8c8;
+  border: 1px solid var(--${namespace}-border);
   border-radius: 2px;
   font-size: 12px;
   font-family: inherit;
   padding: 0 5px;
   outline: none;
-  color: #1c2833;
+  color: var(--${namespace}-text);
   box-sizing: border-box;
 }
-.${namespace}-ms__search:focus { border-color: #1a4f8a; }
+.${namespace}-ms__search:focus { border-color: var(--${namespace}-primary); }
 
 /* Actions */
 .${namespace}-ms__actions {
   display: flex;
   gap: 4px;
   padding: 4px 6px;
-  border-bottom: 1px solid #e4e8f0;
-  background: #fafbfc;
+  border-bottom: 1px solid var(--${namespace}-border-light);
+  background: var(--${namespace}-bg);
   position: sticky;
   top: 0;
   z-index: 1;
@@ -478,15 +479,15 @@ defineExpose({
 .${namespace}-ms__action-btn {
   font-size: 11px;
   padding: 2px 8px;
-  border: 1px solid #d0d8e8;
+  border: 1px solid var(--${namespace}-primary-border);
   border-radius: 2px;
-  background: #fff;
-  color: #1a4f8a;
+  background: var(--${namespace}-bg);
+  color: var(--${namespace}-primary-dark);
   cursor: pointer;
   font-family: inherit;
   transition: background .1s;
 }
-.${namespace}-ms__action-btn:hover { background: #e8edf5; }
+.${namespace}-ms__action-btn:hover { background: var(--${namespace}-primary-bg); }
 
 /* Options */
 .${namespace}-ms__option {
@@ -496,19 +497,19 @@ defineExpose({
   padding: 6px 10px;
   font-size: 12px;
   cursor: pointer;
-  color: #1c2833;
-  border-bottom: 1px solid #f5f7fa;
+  color: var(--${namespace}-text);
+  border-bottom: 1px solid var(--${namespace}-bg-page);
   transition: background .1s;
   white-space: nowrap;
 }
 .${namespace}-ms__option:last-child { border-bottom: none; }
-.${namespace}-ms__option:hover { background: #e8edf5; }
+.${namespace}-ms__option:hover { background: var(--${namespace}-primary-bg); }
 .${namespace}-ms__option--selected {
-  background: #eef5ff;
-  color: #1a4f8a;
+  background: var(--${namespace}-primary-bg);
+  color: var(--${namespace}-primary-dark);
 }
 .${namespace}-ms__option--disabled {
-  color: #909eac;
+  color: var(--${namespace}-text-light);
   cursor: not-allowed;
   background: none !important;
 }
@@ -516,23 +517,23 @@ defineExpose({
 /* Checkbox */
 .${namespace}-ms__checkbox {
   width: 14px; height: 14px;
-  border: 1px solid #c8c8c8;
+  border: 1px solid var(--${namespace}-border);
   border-radius: 2px;
-  background: #fff;
+  background: var(--${namespace}-bg);
   flex-shrink: 0;
   position: relative;
   transition: all .15s;
 }
 .${namespace}-ms__checkbox--checked {
-  background: #1a4f8a;
-  border-color: #1a4f8a;
+  background: var(--${namespace}-primary);
+  border-color: var(--${namespace}-primary);
 }
 .${namespace}-ms__checkbox--checked::after {
   content: '';
   position: absolute;
   left: 3px; top: 1px;
   width: 5px; height: 8px;
-  border: solid #fff;
+  border: solid var(--${namespace}-bg);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
@@ -544,7 +545,7 @@ defineExpose({
 }
 .${namespace}-ms__opt-desc {
   font-size: 10px;
-  color: #909eac;
+  color: var(--${namespace}-text-light);
   flex-shrink: 0;
 }
 
@@ -555,15 +556,15 @@ defineExpose({
   box-shadow: none;
 }
 .${namespace}-ms--plain.${namespace}-ms--open .${namespace}-ms__trigger {
-  border-color: #1a4f8a;
-  box-shadow: 0 0 0 2px rgba(26,79,138,.08);
+  border-color: var(--${namespace}-primary);
+  box-shadow: 0 0 0 2px rgba(190,0,0,.08);
 }
 
 /* Empty */
 .${namespace}-ms__empty {
   padding: 14px 12px;
   font-size: 12px;
-  color: #909eac;
+  color: var(--${namespace}-text-light);
   text-align: center;
 }
 </style>

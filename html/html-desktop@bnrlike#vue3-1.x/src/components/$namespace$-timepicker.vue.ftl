@@ -19,7 +19,7 @@
       @click="toggleOpen"
       @keydown="onTriggerKey"
     >
-      <span class="${namespace}-tp__text" :style="{ color: displayValue ? '' : '#909eac' }">
+      <span class="${namespace}-tp__text" :class="{ '${namespace}-tp__text--placeholder': !displayValue }">
         {{ displayValue || placeholder }}
       </span>
       <span
@@ -383,12 +383,13 @@ defineExpose({
 <style scoped>
 /* ═══════════════════════════════════════════
    BNR TimePicker — ${namespace}-tp
+   所有颜色均通过 BNR Design System 变量引用
    ═══════════════════════════════════════════ */
 
 .${namespace}-tp {
   position: relative;
   min-width: 120px;
-  font-family: var(--${namespace}-font, "Microsoft YaHei", sans-serif);
+  font-family: var(--${namespace}-font);
   font-size: 12px;
   user-select: none;
   flex: 1;
@@ -402,40 +403,41 @@ defineExpose({
   align-items: center;
   gap: 4px;
   padding: 0 6px;
-  border: 1px solid #c8c8c8;
+  border: 1px solid var(--${namespace}-border);
   border-radius: 2px;
-  background: #fff;
+  background: var(--${namespace}-bg);
   cursor: pointer;
   transition: border-color .15s;
 }
 .${namespace}-tp--open .${namespace}-tp__trigger {
-  border-color: #1a4f8a;
-  box-shadow: 0 0 0 2px rgba(26,79,138,.08);
+  border-color: var(--${namespace}-primary);
+  box-shadow: 0 0 0 2px rgba(190,0,0,.08);
 }
 .${namespace}-tp__icon { font-size: 13px; flex-shrink: 0; }
-.${namespace}-tp__text { flex: 1; font-size: 12px; color: #1c2833; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.${namespace}-tp__clear { font-size: 14px; color: #909eac; cursor: pointer; line-height: 1; flex-shrink: 0; }
-.${namespace}-tp__clear:hover { color: #c0392b; }
+.${namespace}-tp__text { flex: 1; font-size: 12px; color: var(--${namespace}-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.${namespace}-tp__text--placeholder { color: var(--${namespace}-text-light); }
+.${namespace}-tp__clear { font-size: 14px; color: var(--${namespace}-text-light); cursor: pointer; line-height: 1; flex-shrink: 0; }
+.${namespace}-tp__clear:hover { color: var(--${namespace}-danger); }
 
 .${namespace}-tp__panel {
   width: 260px;
-  background: #fff;
-  border: 1px solid #d0d8e8;
+  background: var(--${namespace}-bg);
+  border: 1px solid var(--${namespace}-border);
   border-radius: 2px;
-  box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  box-shadow: var(--${namespace}-shadow-md);
   outline: none;
 }
 
 .${namespace}-tp__head {
   padding: 10px 12px 8px;
-  border-bottom: 1px solid #e4e8f0;
+  border-bottom: 1px solid var(--${namespace}-border-light);
   text-align: center;
-  background: #fafbfc;
+  background: var(--${namespace}-bg);
 }
 .${namespace}-tp__head-time {
   font-size: 26px;
   font-weight: 300;
-  color: #1a4f8a;
+  color: var(--${namespace}-primary);
   letter-spacing: 2px;
   font-variant-numeric: tabular-nums;
 }
@@ -443,23 +445,23 @@ defineExpose({
 .${namespace}-tp__cols {
   display: flex;
   height: 200px;
-  border-bottom: 1px solid #e4e8f0;
+  border-bottom: 1px solid var(--${namespace}-border-light);
   overflow: hidden;
 }
 .${namespace}-tp__col {
   flex: 1;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #f0f2f5;
+  border-right: 1px solid var(--${namespace}-border-light);
 }
 .${namespace}-tp__col:last-child { border-right: none; }
 .${namespace}-tp__col-label {
   text-align: center;
   font-size: 10px;
-  color: #909eac;
+  color: var(--${namespace}-text-light);
   padding: 4px 0;
-  background: #f8f9fa;
-  border-bottom: 1px solid #f0f2f5;
+  background: var(--${namespace}-bg-page);
+  border-bottom: 1px solid var(--${namespace}-border-light);
   flex-shrink: 0;
 }
 .${namespace}-tp__col-list {
@@ -474,35 +476,35 @@ defineExpose({
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  color: #1c2833;
+  color: var(--${namespace}-text);
   cursor: pointer;
   transition: background .1s;
   scroll-snap-align: center;
 }
-.${namespace}-tp__item:hover { background: #eef5ff; }
-.${namespace}-tp__item--active { background: #e8edf5; color: #1a4f8a; font-weight: bold; font-size: 16px; }
-.${namespace}-tp__item--disabled { color: #d0d0d0; cursor: not-allowed; pointer-events: none; }
+.${namespace}-tp__item:hover { background: var(--${namespace}-primary-bg); }
+.${namespace}-tp__item--active { background: var(--${namespace}-primary-bg); color: var(--${namespace}-primary-dark); font-weight: bold; font-size: 16px; }
+.${namespace}-tp__item--disabled { color: var(--${namespace}-text-disabled); cursor: not-allowed; pointer-events: none; }
 
 .${namespace}-tp__footer {
   display: flex;
   align-items: center;
   gap: 4px;
   padding: 6px 8px;
-  background: #fafbfc;
+  background: var(--${namespace}-bg);
 }
 .${namespace}-tp__presets { display: flex; gap: 3px; flex-wrap: wrap; flex: 1; }
 .${namespace}-tp__preset-btn {
   font-size: 10px;
   padding: 2px 6px;
-  border: 1px solid #d0d8e8;
+  border: 1px solid var(--${namespace}-primary-border);
   border-radius: 2px;
-  background: #fff;
-  color: #1a4f8a;
+  background: var(--${namespace}-bg);
+  color: var(--${namespace}-primary-dark);
   cursor: pointer;
   font-family: inherit;
   transition: background .1s;
 }
-.${namespace}-tp__preset-btn:hover { background: #e8edf5; }
+.${namespace}-tp__preset-btn:hover { background: var(--${namespace}-primary-bg); }
 
 .${namespace}-tp__btn {
   font-size: 11px;
@@ -514,10 +516,10 @@ defineExpose({
   transition: background .1s;
   flex-shrink: 0;
 }
-.${namespace}-tp__btn--now { background: #f0f2f5; color: #5d6d7e; }
-.${namespace}-tp__btn--now:hover { background: #e4e8f0; }
-.${namespace}-tp__btn--ok { background: #1a4f8a; color: #fff; }
-.${namespace}-tp__btn--ok:hover { background: #163d6e; }
+.${namespace}-tp__btn--now { background: var(--${namespace}-bg-page); color: var(--${namespace}-text-muted); }
+.${namespace}-tp__btn--now:hover { background: var(--${namespace}-border-light); }
+.${namespace}-tp__btn--ok { background: var(--${namespace}-primary); color: var(--${namespace}-bg); }
+.${namespace}-tp__btn--ok:hover { background: var(--${namespace}-primary-dark); }
 
 .${namespace}-tp--sm .${namespace}-tp__trigger { height: 20px; font-size: 11px; }
 .${namespace}-tp--sm .${namespace}-tp__icon   { font-size: 11px; }
