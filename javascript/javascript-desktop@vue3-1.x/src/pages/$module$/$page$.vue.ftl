@@ -1,4 +1,10 @@
-<#import "/$/vue3.ftl" as vue3>
+<#if (designSystem!"") == "bnrlike">
+<#import "/$/vue3-bnrlike.ftl" as vue3>
+<#elseif (designSystem!"") == "navypitch">
+<#import "/$/vue3-navypitch.ftl" as vue3>
+<#else>
+<#import "/$/vue3-bnrlike.ftl" as vue3>
+</#if>
 <#import "/$/guidbase4js.ftl" as guidbase4js>
 <#assign page = pageDef>
 <template>
