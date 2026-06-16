@@ -14,8 +14,10 @@
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 <@vue3.print_page_imports page=pageDef />
 import sdk from '@/sdk/sdk.js'
+import { useFeedback } from '@/composables/useFeedback.js'
 
 // 数据加载状态，每页都必须有
+const fb = useFeedback()
 const isLoading = ref(true)
 
 <@vue3.print_page_variables page=pageDef />

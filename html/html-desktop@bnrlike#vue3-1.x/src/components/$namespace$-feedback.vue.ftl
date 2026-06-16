@@ -4,17 +4,17 @@
       <div v-if="visible" class="${namespace}-fd-mask" @click.self="onMaskClick">
         <transition name="${namespace}-fd-box" appear>
           <div v-if="visible" class="${namespace}-fd-box">
-            <div class="${namespace}-fd-stripe" :class="'${namespace}-fd-stripe--'+type"></div>
+            <div class="${namespace}-fd-stripe" :class="'${namespace}-fd-stripe--'+typeVal"></div>
             <div class="${namespace}-fd-body">
-              <div class="${namespace}-fd-icon">{{ icons[type] }}</div>
+              <div class="${namespace}-fd-icon">{{ icons[typeVal] }}</div>
               <div class="${namespace}-fd-text">
-                <div class="${namespace}-fd-title">{{ title }}</div>
-                <div v-if="message" class="${namespace}-fd-message">{{ message }}</div>
+                <div class="${namespace}-fd-title">{{ titleVal }}</div>
+                <div v-if="messageVal" class="${namespace}-fd-message">{{ messageVal }}</div>
               </div>
             </div>
             <div class="${namespace}-fd-footer">
-              <button v-if="type==='confirm'" class="${namespace}-fd-btn ${namespace}-fd-btn--cancel" @click="onCancel">{{ cancelText||'取消' }}</button>
-              <button class="${namespace}-fd-btn" :class="'${namespace}-fd-btn--'+type" @click="onConfirm" ref="okBtn">{{ confirmText||'确定' }}</button>
+              <button v-if="typeVal==='confirm'" class="${namespace}-fd-btn ${namespace}-fd-btn--cancel" @click="onCancel">{{ cancelText||'取消' }}</button>
+              <button class="${namespace}-fd-btn" :class="'${namespace}-fd-btn--'+typeVal" @click="onConfirm" ref="okBtn">{{ confirmText||'确定' }}</button>
             </div>
           </div>
         </transition>
@@ -23,24 +23,54 @@
   </teleport>
 </template>
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, computed } from 'vue'
 const props=defineProps({
-  modelValue: {type:Boolean,default:false},
-  type:       {type:String, default:'info'},
-  title:      {type:String, default:'提示'},
-  message:    {type:String, default:''},
-  confirmText:{type:String, default:''},
-  cancelText: {type:String, default:''},
+  // composable 模式：dialog 对象 { show, type, title, message, resolve }
+  dialog:     { type: Object, default: null },
+  // composable 模式：关闭回调，由 useFeedback 的 close() 提供
+  onClose:    { type: Function, default: null },
+  // 独立 v-model 模式（兼容旧用法）
+  modelValue: { type: Boolean, default: false },
+  type:       { type: String, default: 'info' },
+  title:      { type: String, default: '提示' },
+  message:    { type: String, default: '' },
+  confirmText:{ type: String, default: '' },
+  cancelText: { type: String, default: '' },
 })
 const emit=defineEmits(['update:modelValue','confirm','cancel'])
-const visible=ref(props.modelValue)
+
+// 如果传了 dialog prop，使用 composable 模式；否则使用独立 v-model 模式
+const hasDialog = computed(() => props.dialog !== null)
+
+const visible = computed(() => hasDialog.value ? !!props.dialog?.show : props.modelValue)
+const typeVal = computed(() => hasDialog.value ? (props.dialog?.type || 'info') : props.type)
+const titleVal = computed(() => hasDialog.value ? (props.dialog?.title || '提示') : props.title)
+const messageVal = computed(() => hasDialog.value ? (props.dialog?.message || '') : props.message)
+
 const okBtn=ref(null)
 const icons={confirm:'❓',success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'}
-watch(()=>props.modelValue,v=>{visible.value=v;if(v)nextTick(()=>okBtn.value?.focus())})
-function close(r){visible.value=false;emit('update:modelValue',false);emit(r?'confirm':'cancel')}
+
+// visible 变化时聚焦 OK 按钮
+watch(visible, v => { if(v) nextTick(()=>okBtn.value?.focus()) })
+
+function close(r){
+  if (hasDialog.value) {
+    // composable 模式：调用 onClose 回调，由 useFeedback.close() 清理 dialog 并 resolve
+    if (props.onClose) {
+      props.onClose(r)
+    } else if (props.dialog?.resolve) {
+      // 兜底：直接 resolve，但 dialog 不会自动清理
+      props.dialog.resolve(r)
+    }
+  } else {
+    // 独立 v-model 模式
+    emit('update:modelValue', false);
+    emit(r ? 'confirm' : 'cancel');
+  }
+}
 function onConfirm(){close(true)}
 function onCancel(){close(false)}
-function onMaskClick(){if(props.type!=='confirm')close(false)}
+function onMaskClick(){if(typeVal.value!=='confirm')close(false)}
 function onKey(e){if(e.key==='Escape')close(false)}
 watch(visible,v=>{if(v)document.addEventListener('keydown',onKey);else document.removeEventListener('keydown',onKey)})
 </script>

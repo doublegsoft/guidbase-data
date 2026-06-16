@@ -20,43 +20,50 @@
       <span class="ms-arrow" :class="{ 'ms-arrow--up': open }">▾</span>
     </div>
 
-    <Transition name="ms-drop">
-      <div class="ms-drop" v-if="open">
-        <div class="ms-search" v-if="searchable">
-          <span class="ms-search__icon">🔍</span>
-          <input
-            ref="searchRef"
-            class="ms-search__input"
-            v-model="query"
-            placeholder="搜索…"
-            @keydown.escape="close"
-          />
-        </div>
+    <Teleport to="body">
+      <Transition name="ms-drop">
+        <div
+          class="ms-drop"
+          v-if="open"
+          :style="dropStyle"
+          ref="dropRef"
+        >
+          <div class="ms-search" v-if="searchable">
+            <span class="ms-search__icon">🔍</span>
+            <input
+              ref="searchRef"
+              class="ms-search__input"
+              v-model="query"
+              placeholder="搜索…"
+              @keydown.escape="close"
+            />
+          </div>
 
-        <ul class="ms-list">
-          <li
-            v-for="opt in filteredOptions"
-            :key="opt.value"
-            class="ms-option"
-            :class="{ 'ms-option--checked': isSelected(opt.value) }"
-            @click="toggleOption(opt)"
-          >
-            <span class="ms-checkbox" :class="{ 'ms-checkbox--on': isSelected(opt.value) }">
-              <span v-if="isSelected(opt.value)">✓</span>
-            </span>
-            <span class="ms-option__label">{{ opt.label }}</span>
-          </li>
-          <li class="ms-empty" v-if="filteredOptions.length === 0">
-            <span>无匹配选项</span>
-          </li>
-        </ul>
+          <ul class="ms-list">
+            <li
+              v-for="opt in filteredOptions"
+              :key="opt.value"
+              class="ms-option"
+              :class="{ 'ms-option--checked': isSelected(opt.value) }"
+              @click="toggleOption(opt)"
+            >
+              <span class="ms-checkbox" :class="{ 'ms-checkbox--on': isSelected(opt.value) }">
+                <span v-if="isSelected(opt.value)">✓</span>
+              </span>
+              <span class="ms-option__label">{{ opt.label }}</span>
+            </li>
+            <li class="ms-empty" v-if="filteredOptions.length === 0">
+              <span>无匹配选项</span>
+            </li>
+          </ul>
 
-        <div class="ms-actions" v-if="selected.length > 0">
-          <span class="ms-hint">{{ selected.length }} 项已选</span>
-          <button class="ms-clear" @click="clear">清除全部</button>
+          <div class="ms-actions" v-if="selected.length > 0">
+            <span class="ms-hint">{{ selected.length }} 项已选</span>
+            <button class="ms-clear" @click="clear">清除全部</button>
+          </div>
         </div>
-      </div>
-    </Transition>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -77,6 +84,8 @@ const open = ref(false)
 const query = ref('')
 const rootRef = ref(null)
 const searchRef = ref(null)
+const dropRef = ref(null)
+const dropStyle = ref({})
 
 // allow controlling visible tag count
 const MAX_TAGS = 3
@@ -119,12 +128,29 @@ function clear() {
   emit('update:modelValue', [])
 }
 
+function calcDropPosition() {
+  if (!rootRef.value) return
+  const rect = rootRef.value.getBoundingClientRect()
+  const gap = 4
+  dropStyle.value = {
+    position: 'fixed',
+    top: rect.bottom + gap + 'px',
+    left: rect.left + 'px',
+    width: rect.width + 'px',
+    minWidth: rect.width + 'px',
+    maxWidth: rect.width + 'px',
+  }
+}
+
 function toggle() {
   if (props.disabled) return
   open.value = !open.value
   if (open.value) {
     query.value = ''
-    nextTick(() => searchRef.value?.focus())
+    nextTick(() => {
+      calcDropPosition()
+      searchRef.value?.focus()
+    })
   }
 }
 
@@ -135,19 +161,36 @@ function close() {
 
 function onDocumentClick(e) {
   if (rootRef.value && !rootRef.value.contains(e.target)) {
+    // also check the teleported dropdown
+    if (dropRef.value && dropRef.value.contains(e.target)) return
     close()
   }
 }
 
-onMounted(() => document.addEventListener('click', onDocumentClick, true))
-onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick, true))
+function onResizeOrScroll() {
+  if (open.value) {
+    calcDropPosition()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', onDocumentClick, true)
+  window.addEventListener('resize', onResizeOrScroll, true)
+  window.addEventListener('scroll', onResizeOrScroll, true)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onDocumentClick, true)
+  window.removeEventListener('resize', onResizeOrScroll, true)
+  window.removeEventListener('scroll', onResizeOrScroll, true)
+})
 </script>
 
 <style scoped>
 .ms {
   position: relative;
   width: 100%;
-  font-size: var(--text-sm);
+  font-size: var(--text-body);
   user-select: none;
 }
 .ms--disabled {
@@ -160,8 +203,9 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick, tru
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-height: 38px;
-  padding: var(--space-5) var(--space-8) var(--space-5) var(--space-6);
+  /* min-height: 38px; */
+  height: 38px;
+  padding: var(--space-4) var(--space-8) var(--space-4) var(--space-6);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-card);
@@ -190,7 +234,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick, tru
   top: 50%;
   transform: translateY(-50%);
   color: var(--color-text-muted);
-  font-size: var(--text-xs);
+  font-size: var(--text-base);
   transition: transform var(--transition-fast);
 }
 .ms-arrow--up {
@@ -214,7 +258,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick, tru
   background: color-mix(in srgb, var(--color-teal) 12%, transparent);
   color: var(--color-teal-hover, #00a88c);
   border-radius: var(--radius-pill);
-  font-size: var(--text-xs);
+  font-size: var(--text-base);
   font-weight: var(--weight-semibold);
   white-space: nowrap;
 }
@@ -242,22 +286,19 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick, tru
   padding: 1px 8px;
   background: var(--color-border);
   border-radius: var(--radius-pill);
-  font-size: var(--text-xs);
+  font-size: var(--text-base);
   font-weight: var(--weight-semibold);
   color: var(--color-text-sub);
 }
 
-/* dropdown */
+/* dropdown — teleported to body, positioned with fixed */
 .ms-drop {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
+  position: fixed;
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
-  z-index: 50;
+  z-index: 9999;
   overflow: hidden;
 }
 
@@ -354,7 +395,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocumentClick, tru
   border-top: 1px solid var(--color-border);
 }
 .ms-hint {
-  font-size: var(--text-xs);
+  font-size: var(--text-base);
   color: var(--color-text-muted);
 }
 .ms-clear {

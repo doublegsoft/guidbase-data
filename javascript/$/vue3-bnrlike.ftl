@@ -59,8 +59,6 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>  
   </#list>
 ${""?left_pad(indent)}</div>
-${""?left_pad(indent)}<${namespace}-feedback v-model="showConfirm${js.nameType(form.id)}Reset" type="confirm" title="提示" message="确定要重置吗？所有已填写的数据将被清空。" @confirm="handle${js.nameType(form.id)}Reset" />
-${""?left_pad(indent)}<${namespace}-feedback v-model="show${js.nameType(form.id)}Error" type="error" title="${form.title}校验未通过" :message="validationErrorMessage" />
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -206,11 +204,7 @@ ${""?left_pad(indent)}</div>
   <#elseif widget.type == "buttons">
 <@print_layout_buttons buttons=widget indent=indent+2 />
   <#elseif widget.type == "button">
-    <#if (widget.value("action")!"") == "reset" && widget.byRef()?? && widget.byRef().type == "entry_form">
-${""?left_pad(indent)}<button class="${namespace}-btn ${namespace}-btn--${get_button_role(widget)} ${namespace}-btn-gap" @click="showConfirm${js.nameType(widget.value("ref"))}Reset = true">${widget.title}</button>    
-    <#else>
 ${""?left_pad(indent)}<button class="${namespace}-btn ${namespace}-btn--${get_button_role(widget)} ${namespace}-btn-gap" @click="${get_button_method_name(widget)}">${widget.title}</button>
-    </#if>
   <#elseif widget.type == "select">
     <#if (widget.value("data")!"")?starts_with("enum[")>
 ${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="sdk.${js.nameVariable(widget.id)}Options" :clearable="true" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />    

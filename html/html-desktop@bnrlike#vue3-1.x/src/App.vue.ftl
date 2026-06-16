@@ -57,9 +57,9 @@
           <router-view />
         </div>
       </div>
-
     </div>
   </div>
+  <ef-feedback :dialog="dialog" :on-close="close" />
 </template>
 
 <script setup>
@@ -68,6 +68,10 @@ import { useRoute } from 'vue-router'
 import { useNavControl } from '@/composables/useNavControl'
 import { MENUS, MODULE_LIST } from './menu.js'
 import router from './router'
+import { provideFeedback } from '@/composables/useFeedback.js'
+import ${js.nameType(namespace)}Feedback from '@/components/${namespace}-feedback.vue'
+
+const { dialog, success, warning, error, info, confirm, close } = provideFeedback()
 
 const route = useRoute()
 const { showPrevNext, show, hide, toggle } = useNavControl()

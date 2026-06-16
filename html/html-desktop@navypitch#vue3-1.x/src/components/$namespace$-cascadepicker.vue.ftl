@@ -34,20 +34,15 @@
     <!-- ── Dropdown Panel ───────────────────────── -->
     <Transition name="cp-panel">
       <div v-if="open" class="cp-panel" @click.stop>
-        <!-- Breadcrumb -->
-        <div class="cp-breadcrumb">
-          <span
-            class="cp-breadcrumb__item"
-            :class="{ 'cp-breadcrumb__item--active': selectedPath.length === 0 }"
-            @click="navigateTo(-1)"
-          >请选择</span>
+        <!-- Breadcrumb — only shown when path is deeper than level 1 -->
+        <div class="cp-breadcrumb" v-if="selectedPath.length > 0">
           <template v-for="(p, i) in selectedPath" :key="p.value">
-            <span class="cp-breadcrumb__sep">›</span>
             <span
               class="cp-breadcrumb__item"
               :class="{ 'cp-breadcrumb__item--active': i === selectedPath.length - 1 && i === activeColumn }"
               @click="navigateTo(i)"
             >{{ p.label }}</span>
+            <span v-if="i < selectedPath.length - 1" class="cp-breadcrumb__sep">›</span>
           </template>
         </div>
 
@@ -164,7 +159,15 @@ async function toggleOpen() {
   if (props.disabled) return
   open.value = !open.value
   if (open.value) {
-    await initColumns()
+    // If root data is already loaded (pre-fetched on mount), just reset UI state
+    if (columns.value.length > 0 && !columns.value[0].loading && columns.value[0].options.length > 0) {
+      columns.value = columns.value.slice(0, 1)
+      selectedPath.value = []
+      activeColumn.value = 0
+      columns.value.forEach(c => { c.selectedValue = null })
+    } else {
+      await initColumns()
+    }
   }
 }
 
@@ -270,8 +273,14 @@ async function navigateTo(colIndex) {
 function clearValue() {
   emit('update:modelValue', '')
   selectedPath.value = []
-  columns.value = []
-  activeColumn.value = -1
+  // Keep root column data so it doesn't need to reload next time
+  if (columns.value.length > 0) {
+    columns.value = columns.value.slice(0, 1)
+    columns.value[0].selectedValue = null
+    activeColumn.value = 0
+  } else {
+    activeColumn.value = -1
+  }
   close()
 }
 
@@ -296,7 +305,13 @@ function onClickOutside(e) {
   }
 }
 
-onMounted(() => document.addEventListener('pointerdown', onClickOutside, true))
+onMounted(async () => {
+  document.addEventListener('pointerdown', onClickOutside, true)
+  // Pre-load first-level data so dropdown opens instantly without loading flash
+  await addColumn(null)
+  activeColumn.value = 0
+})
+
 onBeforeUnmount(() => document.removeEventListener('pointerdown', onClickOutside, true))
 </script>
 

@@ -132,7 +132,7 @@ function focusInput() {
   background: color-mix(in srgb, var(--color-teal) 12%, transparent);
   color: var(--color-teal-hover, #00a88c);
   border-radius: var(--radius-pill);
-  font-size: var(--text-xs);
+  font-size: var(--text-base);
   font-weight: var(--weight-semibold);
   white-space: nowrap;
   animation: ti-pop-in var(--transition-smooth) ease;
@@ -164,7 +164,7 @@ function focusInput() {
   border: none;
   outline: none;
   background: transparent;
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   color: var(--color-text-main);
   padding: 0;
   font-family: inherit;

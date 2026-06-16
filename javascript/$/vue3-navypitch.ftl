@@ -3,37 +3,41 @@
 <!--                                   TABS                                  -->
 <!----------------------------------------------------------------------------->
 <#macro print_layout_tabs tabs indent=0>
-${""?left_pad(indent)}<div class="tabs">
-${""?left_pad(indent)}. <div class="tabs-nav">
-${""?left_pad(indent)}    <div v-for="tab in tabs${js.nameType(tabs.id)}" :key="tab.key"
-${""?left_pad(indent)}         class="tab"
-${""?left_pad(indent)}         :class="{ 'active': activeTab${js.nameType(tabs.id)} === tab.key }"
-${""?left_pad(indent)}         @click="activeTab${js.nameType(tabs.id)} = tab.key">
-${""?left_pad(indent)}      <span>{{ tab.label }}</span>
-${""?left_pad(indent)}      <span v-if="tab.badge" class="${namespace}-tab-badge">{{ tab.badge }}</span>
-${""?left_pad(indent)}    </div>
-${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}<div class="card">
+${""?left_pad(indent)}  <div class="card-body">
+${""?left_pad(indent)}    <div class="tabs">
+${""?left_pad(indent)}      <div class="tabs-nav">
+${""?left_pad(indent)}        <div v-for="tab in tabs${js.nameType(tabs.id)}" :key="tab.key"
+${""?left_pad(indent)}             class="tab"
+${""?left_pad(indent)}             :class="{ 'active': activeTab${js.nameType(tabs.id)} === tab.key }"
+${""?left_pad(indent)}             @click="activeTab${js.nameType(tabs.id)} = tab.key">
+${""?left_pad(indent)}          <span>{{ tab.label }}</span>
+${""?left_pad(indent)}          <span v-if="tab.badge" class="${namespace}-tab-badge">{{ tab.badge }}</span>
+${""?left_pad(indent)}        </div>
+${""?left_pad(indent)}      </div>
   <#if tabs.contains("buttons")>
     <#local buttons = tabs.byType("buttons")[0]>
-${""?left_pad(indent)}  <div class="tab-actions" v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(buttons.container.id)}'">
+${""?left_pad(indent)}      <div class="tabs-actions" v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(buttons.container.id)}'">
     <#list buttons.children as button>
-<@print_layout_widget widget=button indent=indent+4 />
+<@print_layout_widget widget=button indent=indent+8 />
     </#list>
-${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}      </div>
   </#if>
-${""?left_pad(indent)}</div>
-${""?left_pad(indent)}<div class="tab-panel" ref="${js.nameVariable(tabs.id)}Ref">
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}    <div class="tab-panel" ref="${js.nameVariable(tabs.id)}Ref">
   <#list tabs.children as tab>
-${""?left_pad(indent)}  <div v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(tab.id)}'" :style="{ height: ${js.nameType(tabs.id)}Height + 'px' }">
+${""?left_pad(indent)}      <div v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(tab.id)}'" :style="{ height: ${js.nameType(tabs.id)}Height + 'px' }">
     <#if tab.children?size == 0>
 ${""?left_pad(indent)}    ${tab.title}
     <#else>
       <#list tab.children as child>
-<@print_layout_widget widget=child indent=indent+4 />
+<@print_layout_widget widget=child indent=indent+8 />
       </#list>
     </#if>
-${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}      </div>
   </#list>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
 </#macro>
 
@@ -63,8 +67,6 @@ ${""?left_pad(indent)}    </div>
   </#list>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
-${""?left_pad(indent)}<${namespace}-feedback v-model="showConfirm${js.nameType(form.id)}Reset" type="confirm" title="提示" message="确定要重置吗？所有已填写的数据将被清空。" @confirm="handle${js.nameType(form.id)}Reset" />
-${""?left_pad(indent)}<${namespace}-feedback v-model="show${js.nameType(form.id)}Error" type="error" title="${form.title}校验未通过" :message="validationErrorMessage" />
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -196,7 +198,6 @@ ${""?left_pad(indent)}</div>
 <!--                                   PAGE                                  -->
 <!----------------------------------------------------------------------------->
 <#macro print_page_imports page indent=0>
-import ${js.nameType(namespace)}Feedback from '@/components/${namespace}-feedback.vue'
   <#local visited_types = {}>
   <#list page.widgets as widget>
     <#if widget.type == 'entry_form' || widget.type == 'official_form' || widget.type == "excel_form">
@@ -280,8 +281,8 @@ ${""?left_pad(indent)}</div>
   <#elseif widget.type == "buttons">
 <@print_layout_buttons buttons=widget indent=indent+2 />
   <#elseif widget.type == "button">
-    <#if (widget.value("action")!"") == "reset" && widget.byRef()?? && widget.byRef().type == "entry_form">
-${""?left_pad(indent)}<button class="btn btn-${get_button_role(widget)}" @click="showConfirm${js.nameType(widget.value("ref"))}Reset = true">${widget.title}</button>    
+    <#if widget.ancestor("tabs")??>
+${""?left_pad(indent)}<button class="btn-tab btn-tab-${get_button_role(widget)}">${widget.title}</button>    
     <#else>
 ${""?left_pad(indent)}<button class="btn btn-${get_button_role(widget)}" @click="${get_button_method_name(widget)}">${widget.title}</button>
     </#if>

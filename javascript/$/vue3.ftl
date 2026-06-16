@@ -73,7 +73,6 @@ ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
     </#if>
   </#list>
-const showConfirm${js.nameType(form.id)}Reset = ref(false)
 const show${js.nameType(form.id)}Error = ref(false)
 const validationErrorMessage = ref('')
 </#macro>
@@ -144,8 +143,8 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>  
   </#list>
 ${""?left_pad(indent)}</div>
-${""?left_pad(indent)}<${namespace}-feedback v-model="showConfirm${js.nameType(form.id)}Reset" type="confirm" title="提示" message="确定要重置吗？所有已填写的数据将被清空。" @confirm="handle${js.nameType(form.id)}Reset" />
-${""?left_pad(indent)}<${namespace}-feedback v-model="show${js.nameType(form.id)}Error" type="error" title="${form.title}校验未通过" :message="validationErrorMessage" />
+<#--  ${""?left_pad(indent)}<${namespace}-feedback v-model="showConfirm${js.nameType(form.id)}Reset" type="confirm" title="提示" message="确定要重置吗？所有已填写的数据将被清空。" @confirm="handle${js.nameType(form.id)}Reset" />
+${""?left_pad(indent)}<${namespace}-feedback v-model="show${js.nameType(form.id)}Error" type="error" title="${form.title}校验未通过" :message="validationErrorMessage" />  -->
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -173,7 +172,7 @@ ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
     </#if>
   </#list>
-const showConfirm${js.nameType(form.id)}Reset = ref(false)
+<#--  const showConfirm${js.nameType(form.id)}Reset = ref(false)  -->
 const show${js.nameType(form.id)}Error = ref(false)
 const validationErrorMessage = ref('')
 </#macro>
@@ -603,8 +602,10 @@ ${""?left_pad(indent)}<${namespace}-chart :option="${js.nameVariable(chart.id)}C
     <#local ancestor = button.page.byId(button.value("ref"))>
   </#if>
 
-const ${get_button_method_name(button)} = () => {    
+const ${get_button_method_name(button)} = async () => {    
   <#if (button.value("action","")) == "reset">
+  const ok = await fb.confirm('确定要清空表单数据？')
+  if (!ok) return;
     <#list ancestor.inputs as input>
   ${js.nameVariable(ancestor.id)}Data.${js.nameVariable(input.id)} = '';
     </#list>
@@ -632,7 +633,6 @@ ${""?left_pad(indent)}</div>
 <!--                                   PAGE                                  -->
 <!----------------------------------------------------------------------------->
 <#macro print_page_imports page indent=0>
-import ${js.nameType(namespace)}Feedback from '@/components/${namespace}-feedback.vue'
   <#local visited_types = {}>
   <#list page.widgets as widget>
     <#if widget.type == 'entry_form' || widget.type == 'official_form' || widget.type == "excel_form">
@@ -718,7 +718,7 @@ import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsin
 ${""?left_pad(indent)}const open${js.nameType(widget.id)}InDrawer = () => {
 ${""?left_pad(indent)}
 ${""?left_pad(indent)}}    
-    <#elseif (widget.value("viewport","") == "dialog")
+    <#elseif (widget.value("viewport","") == "dialog")>
 ${""?left_pad(indent)}const open${js.nameType(widget.id)}InDialog = () => {
 ${""?left_pad(indent)}
 ${""?left_pad(indent)}}        
@@ -768,11 +768,8 @@ ${""?left_pad(indent)}</div>
   <#elseif widget.type == "buttons">
 <@print_layout_buttons buttons=widget indent=indent+2 />
   <#elseif widget.type == "button">
-    <#if (widget.value("action")!"") == "reset" && widget.byRef()?? && widget.byRef().type == "entry_form">
-${""?left_pad(indent)}<button class="${namespace}-btn ${namespace}-btn--${get_button_role(widget)} ${namespace}-btn-gap" @click="showConfirm${js.nameType(widget.value("ref"))}Reset = true">${widget.title}</button>    
-    <#else>
 ${""?left_pad(indent)}<button class="${namespace}-btn ${namespace}-btn--${get_button_role(widget)} ${namespace}-btn-gap" @click="${get_button_method_name(widget)}">${widget.title}</button>
-    </#if>
+    <#--  </#if>  -->
   <#elseif widget.type == "select">
     <#if (widget.value("data")!"")?starts_with("enum[")>
 ${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="sdk.${js.nameVariable(widget.id)}Options" :clearable="true" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />    
