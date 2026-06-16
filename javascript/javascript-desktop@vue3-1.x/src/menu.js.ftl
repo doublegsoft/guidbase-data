@@ -14,7 +14,7 @@ export const MENUS = {
       items: [
   <#list app.pages as page>
     <#if page.module != module><#continue></#if>      
-        { id: '${js.nameFile(page.name)}', label: '${page.title!"页面"}', path: '/${js.nameFile(page.id)}', },
+        { id: '${js.nameFile(page.name)}', label: '${page.title!"页面"}', path: '/${js.nameFile(page.module)}/${js.nameFile(page.name)}', },
   </#list> 
       ],
     }],

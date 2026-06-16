@@ -107,7 +107,7 @@ const props = defineProps({
   /** 是否禁用 */
   disabled:      { type: Boolean, default: false },
   /** 是否可搜索 */
-  searchable:    { type: Boolean, default: true },
+  searchable:    { type: Boolean, default: false },
   /** 是否校验错误 */
   error:         { type: Boolean, default: false },
   /** 朴素模式 — 无边框无背景，用于表格行内 */

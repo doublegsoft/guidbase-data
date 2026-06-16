@@ -364,6 +364,7 @@ body {
 
 .main {
   margin-left: var(--sidebar-w);
+  padding-top: var(--header-h);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -381,9 +382,11 @@ body {
   align-items: center;
   padding: 0 var(--space-14);
   gap: var(--space-9);
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: var(--z-sticky);
+  left: var(--sidebar-w);
+  right: 0;
+  z-index: 50;
 }
 
 .topbar-title {
@@ -466,6 +469,14 @@ body {
 }
 
 /* Button variants */
+
+.btn-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
 .btn-primary {
   background: var(--color-teal);
   color: #fff;
@@ -1336,14 +1347,29 @@ tbody tr:hover td {
 
 /* ── 5n.  Tabs ─────────────────────────────── */
 
+/* ═══════════════════════════════════════════════════════════════════════
+   1.  DEFAULT UNDERLINE STYLE
+   .tabs + .tab  — 设计系统默认组件
+   ═══════════════════════════════════════════════════════════════════════ */
+
 .tabs {
   display: flex;
+  align-items: center;
   gap: 0;
   border-bottom: 1px solid var(--color-border);
   margin-bottom: var(--space-11);
 }
 
+.tabs-nav {
+  display: flex;
+  gap: 0;
+  flex: 1;
+}
+
 .tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
   padding: var(--space-6) var(--space-10);
   font-size: var(--text-md);
   font-weight: var(--weight-medium);
@@ -1353,6 +1379,7 @@ tbody tr:hover td {
   margin-bottom: -1px;
   transition: all var(--transition-base);
   white-space: nowrap;
+  user-select: none;
 }
 
 .tab:hover {
@@ -1364,6 +1391,350 @@ tbody tr:hover td {
   border-bottom-color: var(--color-teal);
   font-weight: var(--weight-bold);
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   1b.  TABS RIGHT ACTIONS
+   .tabs-actions  — tabs 右侧按钮区域
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.tabs-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding-bottom: 2px;
+  flex-shrink: 0;
+}
+
+/* Button base inside tabs bar — compact, matches tab height */
+.tabs-actions .btn-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+/* Primary action */
+.tabs-actions .btn-tab-primary {
+  background: var(--color-teal);
+  color: #fff;
+}
+.tabs-actions .btn-tab-primary:hover {
+  background: var(--color-teal-hover);
+}
+
+/* Secondary action */
+.tabs-actions .btn-tab-secondary {
+  background: var(--color-surface);
+  color: var(--color-text-main);
+  border: 1px solid var(--color-border);
+}
+.tabs-actions .btn-tab-secondary:hover {
+  background: #e5ecf2;
+}
+
+/* Text-only action (link-like) */
+.tabs-actions .btn-tab-text {
+  background: transparent;
+  color: var(--color-text-sub);
+  padding: 6px 8px;
+}
+.tabs-actions .btn-tab-text:hover {
+  color: var(--color-teal);
+}
+
+/* Icon-only button */
+.tabs-actions .btn-tab-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-sub);
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.tabs-actions .btn-tab-icon:hover {
+  background: var(--color-card);
+  border-color: var(--color-teal);
+  color: var(--color-teal);
+}
+
+/* Danger action */
+.tabs-actions .btn-tab-danger {
+  background: transparent;
+  color: var(--color-red);
+  padding: 6px 10px;
+}
+.tabs-actions .btn-tab-danger:hover {
+  background: rgba(231,76,111,0.08);
+}
+
+/* Divider between actions */
+.tabs-actions .tabs-actions-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--color-border);
+  margin: 0 2px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   2.  TAB ICON + BADGE
+   在 .tab 内部嵌入图标和计数 Badge
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.tab-icon-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tab-icon-emoji {
+  font-size: 15px;
+}
+
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 10px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  margin-left: 4px;
+  line-height: 1;
+}
+
+.tab-badge.gray  { background: var(--color-border);  color: var(--color-text-sub); }
+.tab-badge.amber { background: var(--color-amber);   color: #fff; }
+.tab-badge.blue  { background: var(--color-blue);    color: #fff; }
+.tab-badge.teal  { background: var(--color-teal);    color: #fff; }
+.tab-badge.red   { background: var(--color-red);     color: #fff; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   3.  PILL STYLE
+   .tabs-pill + .tab-pill  — 胶囊 / Chrome-style
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.tabs-pill {
+  display: inline-flex;
+  gap: 6px;
+  background: #E8EDF2;
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  margin-bottom: var(--space-11);
+}
+
+.tab-pill {
+  padding: var(--space-5) var(--space-9);
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-sub);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-smooth);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.tab-pill:hover {
+  color: var(--color-text-main);
+}
+
+.tab-pill.active {
+  background: var(--color-card);
+  color: var(--color-teal);
+  font-weight: var(--weight-bold);
+  box-shadow: var(--shadow-sm);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   4.  CARD / SEGMENTED STYLE
+   .tabs-card + .tab-card  — 分段按钮组
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.tabs-card {
+  display: inline-flex;
+  gap: 0;
+  margin-bottom: var(--space-11);
+}
+
+.tab-card {
+  padding: var(--space-5) var(--space-9);
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-sub);
+  cursor: pointer;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-right: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.tab-card:first-child {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.tab-card:last-child {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  border-right: 1px solid var(--color-border);
+}
+
+.tab-card:hover {
+  background: #f7fafc;
+  color: var(--color-text-main);
+}
+
+.tab-card.active {
+  background: var(--color-teal);
+  color: #fff;
+  border-color: var(--color-teal);
+  font-weight: var(--weight-bold);
+}
+
+.tab-card.active + .tab-card {
+  border-left: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   5.  VERTICAL LINE STYLE
+   .nav-item.active  — 侧边栏竖线导航
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.tabs-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #0D1B2A;
+  border-radius: var(--radius-xl);
+  padding: var(--space-5) 0;
+  overflow: hidden;
+}
+
+.tabs-vertical-label {
+  padding: var(--space-8) var(--space-11) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  user-select: none;
+}
+
+.tab-vertical {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: 9px var(--space-11);
+  cursor: pointer;
+  color: rgba(255,255,255,0.5);
+  transition: all var(--transition-smooth);
+  position: relative;
+  font-size: 13.5px;
+  font-weight: var(--weight-medium);
+  user-select: none;
+}
+
+.tab-vertical:hover {
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.05);
+}
+
+.tab-vertical.active {
+  color: #fff;
+  background: rgba(0,201,167,0.12);
+}
+
+.tab-vertical.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  background: var(--color-teal);
+  border-radius: 0 3px 3px 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   6.  TAB PANEL (content area)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.tab-panel {
+  display: none;
+  padding: var(--space-11);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  font-size: 13.5px;
+  color: var(--color-text-main);
+  line-height: 1.6;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* Standalone panel (for pill/card variants without border-top dependency) */
+.tab-panel-standalone {
+  padding: var(--space-11);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  font-size: 13.5px;
+  color: var(--color-text-main);
+  line-height: 1.6;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   7.  SIZE UTILITIES
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Smaller tabs for tight spaces */
+.tabs-sm .tab,
+.tab-sm {
+  padding: 6px 14px;
+  font-size: var(--text-base);
+}
+
+.tabs-sm .tab-pill,
+.tab-pill-sm {
+  padding: 5px 14px;
+  font-size: var(--text-base);
+}
+
+/* Larger tabs for hero / landing sections */
+.tabs-lg .tab,
+.tab-lg {
+  padding: 12px 24px;
+  font-size: 15px;
+}
+
 
 /* ── 5o.  Field Canvas (Football Pitch) ────── */
 
@@ -1527,6 +1898,15 @@ tbody tr:hover td {
   margin-bottom: var(--space-8);
 }
 
+.form-row-2 { grid-template-columns: 1fr 1fr; }
+.form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.form-row-1-2 { grid-template-columns: 1fr 2fr; }
+
+.form-col-span-2 { grid-column: span 2; }
+.form-col-span-3 { grid-column: span 3; }
+.form-col-span-4 { grid-column: span 4; }
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -1578,6 +1958,15 @@ textarea.form-input {
   min-height: 100px;
 }
 
+.form-input:disabled,
+.form-input[readonly] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--color-surface);
+  color: var(--color-text-sub);
+  border-color: var(--color-border);
+}
+
 /* ── Input with unit label ────────────────── */
 
 .input-with-unit {
@@ -1604,6 +1993,125 @@ textarea.form-input {
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   white-space: nowrap;
   user-select:
+}
+
+/* ── 8b.  Display Field Grid ───────────────────
+   <dl class="df-grid df-grid--3">
+     <div class="df-field">
+       <dt class="df-label">Label</dt>
+       <dd class="df-value">Value</dd>
+     </div>
+   </dl>
+   ─────────────────────────────────────────────── */
+
+.df-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-10) var(--space-13);
+}
+
+.df-grid--3 { grid-template-columns: 1fr 1fr 1fr; }
+.df-grid--4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.df-grid--1-2 { grid-template-columns: 1fr 2fr; }
+
+/* ── 8c.  Display Field ──────────────────────── */
+
+.df-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.df-field--span-2 { grid-column: span 2; }
+.df-field--span-3 { grid-column: span 3; }
+.df-field--span-4 { grid-column: span 4; }
+
+/* ── 8d.  Display Label ──────────────────────── */
+
+.df-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+/* ── 8e.  Display Value ──────────────────────── */
+
+.df-value {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-main);
+  margin: 0;
+  min-height: 22px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.df-value--empty {
+  color: var(--color-text-muted);
+  font-weight: var(--weight-normal);
+}
+
+.df-value--highlight {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-teal);
+}
+
+.df-value--mono {
+  font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 8f.  Display Bar (progress row) ─────────── */
+
+.df-bar-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.df-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-7);
+}
+
+.df-bar__label {
+  width: 48px;
+  font-size: var(--text-sm);
+  color: var(--color-text-sub);
+  flex-shrink: 0;
+}
+
+.df-bar__num {
+  width: 34px;
+  text-align: right;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  flex-shrink: 0;
+}
+
+.df-bar__num.t  { color: var(--color-teal); }   /* teal */
+.df-bar__num.a  { color: var(--color-amber); }  /* amber */
+.df-bar__num.b  { color: var(--color-blue); }   /* blue */
+.df-bar__num.r  { color: var(--color-red); }    /* red */
+
+/* ── 8g.  Display Section (within a card body) ── */
+
+.df-section + .df-section {
+  margin-top: var(--space-12);
+  padding-top: var(--space-10);
+  border-top: 1px solid var(--color-border);
+}
+
+.df-section__title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-main);
+  margin-bottom: var(--space-8);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════

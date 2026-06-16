@@ -426,7 +426,7 @@ ${""?left_pad(indent)}  style="flex:1"
 ${""?left_pad(indent)}  :columns="${js.nameVariable(table.id)}Cols"
 ${""?left_pad(indent)}  :fetch-data="load${js.nameType(table.id)}Rows"
 ${""?left_pad(indent)}  :fetch-params="${js.nameVariable(table.value("object", table.id))}CriteriaData"
-${""?left_pad(indent)}  id-key="personId"
+${""?left_pad(indent)}  id-key="${js.nameVariable(table.value("object","object"))}Id"
 ${""?left_pad(indent)}  :row-class-name="getRowClass"
 ${""?left_pad(indent)}  @selection-change="handleSelection" />
 </#macro>
@@ -632,12 +632,12 @@ ${""?left_pad(indent)}</div>
 <!--                                   PAGE                                  -->
 <!----------------------------------------------------------------------------->
 <#macro print_page_imports page indent=0>
+import ${js.nameType(namespace)}Feedback from '@/components/${namespace}-feedback.vue'
   <#local visited_types = {}>
   <#list page.widgets as widget>
     <#if widget.type == 'entry_form' || widget.type == 'official_form' || widget.type == "excel_form">
 import { useAsyncLock } from '@/composables/useAsyncLock'
 import { useFieldValidation } from '@/composables/useFieldValidation'
-import ${js.nameType(namespace)}Feedback from '@/components/${namespace}-feedback.vue'
       <#break>
     </#if>
   </#list>  
@@ -713,6 +713,17 @@ import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsin
 <@print_paged_button_methods button=widget indent=indent />
     </#if>
   </#list>
+  <#list page.widgets as widget>
+    <#if widget.value("viewport","") == "drawer">
+${""?left_pad(indent)}const open${js.nameType(widget.id)}InDrawer = () => {
+${""?left_pad(indent)}
+${""?left_pad(indent)}}    
+    <#elseif (widget.value("viewport","") == "dialog")
+${""?left_pad(indent)}const open${js.nameType(widget.id)}InDialog = () => {
+${""?left_pad(indent)}
+${""?left_pad(indent)}}        
+    </#if>
+  </#list>
 </#macro>
 
 <#macro print_page_layout page indent=0>
@@ -722,6 +733,13 @@ import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsin
 </#macro>
 
 <#macro print_layout_widget widget indent=0>
+  <#if widget.value("viewport","") == "dialog">
+${""?left_pad(indent)}<${namespace}-dialog v-model="open${js.nameType(widget.id)}InDialog" title="${widget.title}" size="lg">
+    <#local indent += 2>
+  <#elseif widget.value("viewport","") == "drawer">
+${""?left_pad(indent)}<${namespace}-drawer v-model="open${js.nameType(widget.id)}InDrawer" title="${widget.title}">
+    <#local indent += 2>
+  </#if>
   <#if widget.type == "tabs">
 <@print_layout_tabs tabs=widget indent=indent+2 />
   <#elseif widget.type == "card">
