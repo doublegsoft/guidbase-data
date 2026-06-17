@@ -28,10 +28,10 @@
                 {{ loading ? '加载中...' : '暂无数据' }}
               </td>
             </tr>
-            <tr v-for="row in pageData" :key="String(row[idKey])"
+            <tr v-for="(row, rowIndex) in pageData" :key="String(row[idKey])"
               :data-id="String(row[idKey])"
               :class="rowClasses(row)"
-              @click="onRowClick($event, row)">
+              @click="onRowClick($event, row, rowIndex)">
               <td class="${namespace}-tc" @click.stop>
                 <input type="checkbox" :checked="selectedIds.has(String(row[idKey]))" @change="toggleRow(String(row[idKey]), $event.target.checked)" style="width:14px;height:14px;accent-color:var(--p);cursor:pointer">
               </td>
@@ -75,9 +75,11 @@ const props = defineProps({
   fetchData:    { type: Function, default: null },
   // fetchParams: 传入 fetchData 的搜索条件参数
   fetchParams:  { type: Object,   default: () => ({}) },
+  // rowAction: 操作按钮回调映射 { handlerName: (row, index) => void }
+  rowAction:    { type: Object,   default: null },
 })
 
-const emit = defineEmits(['update:currentPage', 'update:pageSize', 'selection-change', 'row-click'])
+const emit = defineEmits(['update:currentPage', 'update:pageSize', 'selection-change', 'row-click', 'row-action'])
 
 const currentPage = ref(props.currentPage)
 const pageSize = ref(props.pageSize)
@@ -221,7 +223,22 @@ function toggleRow(id, checked) {
   notifySelection()
 }
 
-function onRowClick(e, row) {
+function onRowClick(e, row, rowIndex) {
+  // 操作按钮点击 → 事件委托：v-html 中的 @click="handlerName" 不会被 Vue 编译，
+  // 但作为 DOM 属性存在，通过 getAttribute('@click') 提取 handler 名
+  const btn = e.target.closest('button, a')
+  if (btn) {
+    const actionName = btn.getAttribute('@click')
+    if (actionName) {
+      // 优先走 rowAction prop（直接调用，无需页面监听事件）
+      if (props.rowAction && typeof props.rowAction[actionName] === 'function') {
+        props.rowAction[actionName](row, rowIndex)
+      }
+      // 同时 emit row-action 事件，兼容 @row-action 监听方式
+      emit('row-action', { handler: actionName, row, index: rowIndex })
+      return
+    }
+  }
   if (e.target.tagName.toLowerCase() === 'a' && e.target.dataset.action) return
   if (props.drawerRender) openDrawer(row)
   emit('row-click', row)

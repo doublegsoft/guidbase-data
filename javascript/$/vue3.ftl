@@ -1,3 +1,70 @@
+<#function get_button_role button>
+  <#if (button.value("action")!"") == "save">
+    <#return "primary">
+  <#elseif (button.value("action")!"") == "search">
+    <#return "primary">  
+  <#elseif (button.value("action")!"") == "edit">
+    <#return "primary">    
+  <#elseif (button.value("action")!"") == "clear">
+    <#return "warning">
+  <#elseif (button.value("action")!"") == "reset">
+    <#return "warning">  
+  <#elseif (button.value("action")!"") == "delete">
+    <#return "danger">  
+  <#elseif (button.value("action")!"") == "cancel">
+    <#return "default">
+  <#else>
+    <#return "default">
+  </#if>
+</#function>
+
+<#function get_button_method_name button>
+  <#local methodName = "handle">
+  <#if button.ancestor("entry_form")??>
+    <#local ancestor = button.ancestor("entry_form")>
+  <#elseif button.ancestor("criteria_form")??>
+    <#local ancestor = button.ancestor("criteria_form")>
+  <#elseif button.ancestor("paged_table")??>
+    <#local ancestor = button.ancestor("paged_table")>  
+  <#elseif button.ancestor("paged_grid")??>
+    <#local ancestor = button.ancestor("paged_grid")>    
+  </#if>
+  <#if methodName == "handle">
+    <#if ancestor??>
+      <#local methodName += js.nameType(ancestor.id)>
+    <#else>
+      <#local methodName += js.nameType(button.value("ref"))>
+      <#local ancestor = button.page.byId(button.value("ref"))>
+    </#if>
+  </#if>
+  <#if button.id??>
+    <#local methodName += js.nameType(button.id)>
+  <#else>
+    <#local methodName += (js.nameType(button.value("action", "custom")))>  
+  </#if>
+  <#return methodName>
+</#function>
+
+<#function get_input_model_name input>
+  <#if input.container.type == "criteria_form">
+    <#return js.nameVariable(input.container.id) + "Crit." + js.nameVariable(input.id)>
+  <#else>
+    <#return js.nameVariable(input.container.id) + "Data." + js.nameVariable(input.id)>
+  </#if>
+</#function>
+
+<#function is_ref_or_ancestor widget typename>
+  <#if widget.ancestor(typename)??>
+    <#return true>
+  </#if>
+  <#if widget.page.byId(widget.value("ref"))??>
+    <#local ref = widget.page.byId(widget.value("ref"))>
+    <#if ref.type == typename>
+      <#return true>
+    </#if>
+  </#if>
+  <#return false>
+</#function>
 <!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
 <!----------------------------------------------------------------------------->
@@ -73,7 +140,7 @@ ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
     </#if>
   </#list>
-const show${js.nameType(form.id)}Error = ref(false)
+const ${js.nameVariable(form.id)}Error = ref(false)
 const validationErrorMessage = ref('')
 </#macro>
 
@@ -88,7 +155,7 @@ const load${js.nameType(form.id)}Data = async () => {
     const data = await sdk.fetch${js.nameType(objname)}()
     Object.assign(${js.nameVariable(form.id)}Data, data)
   } catch (error) {
-    // TODO: 这里可以添加错误处理逻辑，例如显示错误消息
+    fb.error('发生错误', error)
   } finally {
     isLoading.value = false
   }
@@ -103,17 +170,17 @@ const save${js.nameType(form.id)}Data = async () => {
       .filter(([, msg]) => msg)
       .map(([, msg]) => `· ${r"${msg}"}`)
     validationErrorMessage.value = msgs.join('\n')
-    show${js.nameType(form.id)}Error.value = true
+    ${js.nameVariable(form.id)}ErrorShow.value = true
     return
   }
   isSubmitting.value = true
   try {
-    // const result = await saveUserDataApi(${js.nameVariable(form.id)}Data)
-    // if (result.success) {
-    //   alert('用户信息保存成功！')
-    // }
+    const result = await sdk.save${js.nameType(form.value("object",form.id))}(${js.nameVariable(form.id)}Data)
+    if (result.success) {
+      fb.success('成功', '保存成功');
+    }
   } catch (error) {
-    // TODO: 这里可以添加错误处理逻辑，例如显示错误消息
+    fb.error('发生错误', error)
   } finally {
     isSubmitting.value = false
   }
@@ -143,8 +210,6 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>  
   </#list>
 ${""?left_pad(indent)}</div>
-<#--  ${""?left_pad(indent)}<${namespace}-feedback v-model="showConfirm${js.nameType(form.id)}Reset" type="confirm" title="提示" message="确定要重置吗？所有已填写的数据将被清空。" @confirm="handle${js.nameType(form.id)}Reset" />
-${""?left_pad(indent)}<${namespace}-feedback v-model="show${js.nameType(form.id)}Error" type="error" title="${form.title}校验未通过" :message="validationErrorMessage" />  -->
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -172,8 +237,7 @@ ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
     </#if>
   </#list>
-<#--  const showConfirm${js.nameType(form.id)}Reset = ref(false)  -->
-const show${js.nameType(form.id)}Error = ref(false)
+const ${js.nameVariable(form.id)}ErrorShow = ref(false)
 const validationErrorMessage = ref('')
 </#macro>
 
@@ -243,7 +307,7 @@ ${""?left_pad(indent)}</div>
 <#macro print_criteria_form_variables form indent=0>
 
 ${""?left_pad(indent)}// 【${form.title!form.id}】查询表单相关变量
-${""?left_pad(indent)}const ${js.nameVariable(form.id)}Data = reactive({
+${""?left_pad(indent)}const ${js.nameVariable(form.id)}Crit = reactive({
   <#list form.inputs as input>
 ${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
   </#list>
@@ -289,7 +353,7 @@ const load${js.nameType(form.id)}Data = async () => {
     const data = await sdk.fetch${js.nameType(form.id)}Data()
     Object.assign(${js.nameVariable(form.id)}Data, data)
   } catch (error) {
-    // TODO: 这里可以添加错误处理逻辑，例如显示错误消息
+    fb.error('发生错误', error)
   } finally {
     isLoading.value = false
   }
@@ -346,7 +410,7 @@ const load${js.nameType(form.id)}Rows = async () => {
     const res = await sdk.fetch${js.nameType(inflector.pluralize(form.value("object", form.id)))}({}, 0, -1)
     return res
   } catch (error) {
-    // TODO: 这里可以添加错误处理逻辑，例如显示错误消息
+    fb.error('发生错误', error)
   } finally {
     isLoading.value = false
   }
@@ -411,7 +475,7 @@ const load${js.nameType(table.id)}Rows = async (params, pageNumber, pageSize) =>
     const res = await sdk.fetch${js.nameType(inflector.pluralize(objname))}(params, (pageNumber - 1) * pageSize, pageSize)
     return res;
   } catch (error) {
-    // TODO: 这里可以添加错误处理逻辑，例如显示错误消息
+    fb.error('发生错误', error)
   } finally {
     isLoading.value = false
   }
@@ -422,12 +486,13 @@ const load${js.nameType(table.id)}Rows = async (params, pageNumber, pageSize) =>
 ${""?left_pad(indent)}<${namespace}-pagedtable
 ${""?left_pad(indent)}  ref="${js.nameVariable(table.id)}Ref"
 ${""?left_pad(indent)}  style="flex:1"
+${""?left_pad(indent)}  id-key="${js.nameVariable(table.value("object","object"))}Id"
 ${""?left_pad(indent)}  :columns="${js.nameVariable(table.id)}Cols"
 ${""?left_pad(indent)}  :fetch-data="load${js.nameType(table.id)}Rows"
-${""?left_pad(indent)}  :fetch-params="${js.nameVariable(table.value("object", table.id))}CriteriaData"
-${""?left_pad(indent)}  id-key="${js.nameVariable(table.value("object","object"))}Id"
+${""?left_pad(indent)}  :fetch-params="${js.nameVariable(table.value("object", table.id))}Crit"
 ${""?left_pad(indent)}  :row-class-name="getRowClass"
-${""?left_pad(indent)}  @selection-change="handleSelection" />
+${""?left_pad(indent)}  @selection-change="handle${js.nameType(table.id)}RowSelection" 
+${""?left_pad(indent)}  @row-action="handle${js.nameType(table.id)}RowAction" />
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -484,7 +549,7 @@ const load${js.nameType(table.id)}Rows = async (params, pageNumber, pageSize) =>
     const res = await sdk.fetch${js.nameType(inflector.pluralize(objname))}(params, (pageNumber - 1) * pageSize, pageSize)
     return res
   } catch (error) {
-    // TODO: 这里可以添加错误处理逻辑，例如显示错误消息
+    fb.error('发生错误', error)
   } finally {
     isLoading.value = false
   }
@@ -497,10 +562,50 @@ ${""?left_pad(indent)}  ref="${js.nameVariable(table.id)}Ref"
 ${""?left_pad(indent)}  style="flex:1"
 ${""?left_pad(indent)}  :columns="${js.nameVariable(table.id)}Cols"
 ${""?left_pad(indent)}  :fetch-data="load${js.nameType(table.id)}Rows"
-${""?left_pad(indent)}  :fetch-params="${js.nameVariable(table.value("object", table.id))}CriteriaData"
+${""?left_pad(indent)}  :fetch-params="${js.nameVariable(table.value("object", table.id))}Crit"
 ${""?left_pad(indent)}  id-key="personId"
 ${""?left_pad(indent)}  :row-class-name="getRowClass"
 ${""?left_pad(indent)}  @selection-change="handleSelection" />
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                               PAGED GRID                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_paged_grid_variables grid indent=0>
+
+${""?left_pad(indent)}// ${js.nameVariable(grid.id)}分页表格相关变量
+${""?left_pad(indent)}const ${js.nameVariable(grid.id)}Ref = ref(null)
+</#macro>
+
+<#macro print_paged_grid_methods grid indent=0>
+  <#local objname = grid.value("object",grid.id)>
+
+/**
+ * 加载数据的界面函数
+ */
+const load${js.nameType(grid.id)}Rows = async (params, pageNumber, pageSize) => {
+  isLoading.value = true
+  try {
+    const res = await sdk.fetch${js.nameType(inflector.pluralize(objname))}(params, (pageNumber - 1) * pageSize, pageSize)
+    return res;
+  } catch (error) {
+    fb.error('发生错误', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+</#macro>
+
+<#macro print_layout_paged_grid grid indent=0>
+${""?left_pad(indent)}<${namespace}-pagedgrid
+${""?left_pad(indent)}  ref="${js.nameVariable(grid.id)}Ref"
+${""?left_pad(indent)}  style="flex:1"
+${""?left_pad(indent)}  id-key="${js.nameVariable(grid.value("object","object"))}Id"
+${""?left_pad(indent)}  :fetch-data="load${js.nameType(grid.id)}Rows"
+${""?left_pad(indent)}  :fetch-params="${js.nameVariable(grid.value("object", grid.id))}Crit">
+${""?left_pad(indent)}  <template #default="{ row, index }">
+${""?left_pad(indent)}  </template>
+${""?left_pad(indent)}</${namespace}-pagedgrid>
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -532,8 +637,8 @@ const load${js.nameType(chart.id)}Rows = async (params, pageNumber, pageSize) =>
   try {
     const res = await sdk.fetch${js.nameType(inflector.pluralize(chart.value("object",chart.id)))}(params, (pageNumber - 1) * pageSize, pageSize)
     ${js.nameVariable(chart.id)}Data.value = res.data
-  } catch (ignored) {
-    
+  } catch (error) {
+    fb.error('发生错误', error)
   } 
 }
 </#macro>
@@ -545,72 +650,43 @@ ${""?left_pad(indent)}<${namespace}-chart :option="${js.nameVariable(chart.id)}C
 <!----------------------------------------------------------------------------->
 <!--                                  BUTTON                                 -->
 <!----------------------------------------------------------------------------->
-
-<#function get_button_role button>
-  <#if (button.value("action")!"") == "save">
-    <#return "primary">
-  <#elseif (button.value("action")!"") == "search">
-    <#return "primary">  
-  <#elseif (button.value("action")!"") == "edit">
-    <#return "primary">    
-  <#elseif (button.value("action")!"") == "clear">
-    <#return "warning">
-  <#elseif (button.value("action")!"") == "reset">
-    <#return "warning">  
-  <#elseif (button.value("action")!"") == "delete">
-    <#return "danger">  
-  <#elseif (button.value("action")!"") == "cancel">
-    <#return "default">
-  <#else>
-    <#return "default">
-  </#if>
-</#function>
-
-<#function get_button_method_name button>
-  <#local methodName = "handle">
-  <#if button.ancestor("entry_form")??>
-    <#local ancestor = button.ancestor("entry_form")>
-  <#elseif button.ancestor("criteria_form")??>
-    <#local ancestor = button.ancestor("criteria_form")>
-  </#if>
-  <#if methodName == "handle">
-    <#if ancestor??>
-      <#local methodName += js.nameType(ancestor.id)>
-    <#else>
-      <#local methodName += js.nameType(button.value("ref"))>
-      <#local ancestor = button.page.byId(button.value("ref"))>
-    </#if>
-  </#if>
-  <#if button.id??>
-    <#local methodName += js.nameType(button.id)>
-  <#else>
-    <#local methodName += (js.nameType(button.value("action", "custom")))>  
-  </#if>
-  <#return methodName>
-</#function>
-
 <#macro print_paged_button_methods button indent=0>
   <#if (button.value("action")!"") == "save">
     <#return>
   </#if>
-  <#if button.ancestor("entry_form")??>
+  <#-- ref优先 -->
+  <#if button.page.byId(button.value("ref"))??>
+    <#local ancestor = button.page.byId(button.value("ref"))>
+  <#elseif button.ancestor("entry_form")??>
     <#local ancestor = button.ancestor("entry_form")>
   <#elseif button.ancestor("criteria_form")??>
     <#local ancestor = button.ancestor("criteria_form")>
-  </#if>
-  <#if !ancestor??>
-    <#local ancestor = button.page.byId(button.value("ref"))>
+  <#elseif button.ancestor("paged_table")??>
+    <#local ancestor = button.ancestor("paged_table")>  
   </#if>
 
+  <#if button.ancestor("paged_table")??>
+const ${get_button_method_name(button)} = async (row) => {    
+    <#if (button.value("action","")) == "edit"><#-- 编辑 -->
+  ${js.nameVariable(button.value("ref"))}DialogOpen.value = true  
+    <#elseif (button.value("action","")) == "view"><#-- 查看 -->
+  ${js.nameVariable(button.value("ref"))}DrawerOpen.value = true
+    <#elseif (button.value("action","")) == "delete"><#-- 删除 -->
+  const ok = await fb.confirm('询问', '确定要删除该条数据？')
+  if (!ok) return;  
+    </#if>
+  <#else>
 const ${get_button_method_name(button)} = async () => {    
-  <#if (button.value("action","")) == "reset">
-  const ok = await fb.confirm('确定要清空表单数据？')
+    <#if (button.value("action","")) == "reset" && is_ref_or_ancestor(button, "entry_form")><#-- 重置 -->
+  const ok = await fb.confirm('询问', '确定要清空表单数据？')
   if (!ok) return;
-    <#list ancestor.inputs as input>
-  ${js.nameVariable(ancestor.id)}Data.${js.nameVariable(input.id)} = '';
-    </#list>
-  <#elseif (button.value("action","")) == "search">
+      <#list ancestor.inputs as input>
+  ${get_input_model_name(input)} = '';
+      </#list>
+    <#elseif (button.value("action","")) == "search"><#-- 重置 -->
   ${js.nameVariable(button.value("ref"))}Ref.value?.refresh()
+    <#elseif (button.value("action","")) == "save"><#-- 保存 -->
+    </#if>
   </#if>
 }
 </#macro>
@@ -642,6 +718,18 @@ import { useFieldValidation } from '@/composables/useFieldValidation'
     </#if>
   </#list>  
   <#list page.widgets as widget>
+    <#if widget.value("viewport","") == "drawer">
+import ${js.nameType(namespace)}Drawer from '@/components/${namespace}-drawer.vue'
+      <#break>
+    </#if>
+  </#list>  
+  <#list page.widgets as widget>
+    <#if widget.value("viewport","") == "dialog">
+import ${js.nameType(namespace)}Dialog from '@/components/${namespace}-dialog.vue'
+      <#break>
+    </#if>
+  </#list>
+  <#list page.widgets as widget>
     <#if visited_types[widget.type]??><#continue></#if>
     <#if widget.type == "excel_form">
 import ${js.nameType(namespace)}Excelform from '@/components/${namespace}-excelform.vue'
@@ -649,8 +737,12 @@ import ${js.nameType(namespace)}Excelform from '@/components/${namespace}-excelf
 import ${js.nameType(namespace)}Pagedtable from '@/components/${namespace}-pagedtable.vue'
     <#elseif widget.type == "fixed_table">
 import ${js.nameType(namespace)}Fixedtable from '@/components/${namespace}-fixedtable.vue'
+    <#elseif widget.type == "paged_grid">
+import ${js.nameType(namespace)}Pagedgrid from '@/components/${namespace}-pagedgrid.vue'      
+    <#elseif widget.type == "week_grid">
+import ${js.nameType(namespace)}Weekgrid from '@/components/${namespace}-weekgrid.vue'
     <#elseif widget.type == "chart">
-import ${js.nameType(namespace)}Chart from '@/components/${namespace}-chart.vue'      
+import ${js.nameType(namespace)}Chart from '@/components/${namespace}-chart.vue'    
 import { createChart } from '@/sdk/charts'    
     <#elseif widget.type == "select">
 import ${js.nameType(namespace)}Dropdown from '@/components/${namespace}-dropdown.vue'  
@@ -687,6 +779,8 @@ import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsin
 <@print_paged_table_variables table=widget indent=indent />
     <#elseif widget.type == 'fixed_table'>
 <@print_fixed_table_variables table=widget indent=indent />
+    <#elseif widget.type == 'paged_grid'>
+<@print_paged_grid_variables grid=widget indent=indent />
     <#elseif widget.type == "chart">
 <@print_chart_variables chart=widget indent=indent />
     </#if>
@@ -707,48 +801,57 @@ import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsin
 <@print_paged_table_methods table=widget indent=indent />
     <#elseif widget.type == 'fixed_table'>
 <@print_fixed_table_methods table=widget indent=indent />
+    <#elseif widget.type == 'paged_grid'>
+<@print_paged_grid_methods grid=widget indent=indent />
     <#elseif widget.type == "chart">
-<@print_chart_methods chart=widget indent=indent+2 />
+<@print_chart_methods chart=widget indent=indent />
     <#elseif widget.type == 'button'>
 <@print_paged_button_methods button=widget indent=indent />
     </#if>
   </#list>
   <#list page.widgets as widget>
     <#if widget.value("viewport","") == "drawer">
-${""?left_pad(indent)}const open${js.nameType(widget.id)}InDrawer = () => {
-${""?left_pad(indent)}
-${""?left_pad(indent)}}    
+${""?left_pad(indent)}const ${js.nameVariable(widget.id)}DrawerOpen = ref(false)      
     <#elseif (widget.value("viewport","") == "dialog")>
-${""?left_pad(indent)}const open${js.nameType(widget.id)}InDialog = () => {
-${""?left_pad(indent)}
-${""?left_pad(indent)}}        
+${""?left_pad(indent)}const ${js.nameVariable(widget.id)}DialogOpen = ref(false)             
     </#if>
   </#list>
+  <#list page.widgets as widget>
+    <#if widget.type != "paged_table"><#continue></#if>
+const ${js.nameVariable(widget.id)}RowActionHandlers = { 
+    <#list widget.widgets as button>     
+      <#if button.type != "button"><#continue></#if>
+  ${get_button_method_name(button)}, 
+    </#list>
+}
+const handle${js.nameType(widget.id)}RowAction = ({ handler, row, index }) => {
+  ${js.nameVariable(widget.id)}RowActionHandlers[handler]?.(row, index)
+}    
+  </#list>
+
 </#macro>
 
 <#macro print_page_layout page indent=0>
   <#list page.children as child>
-<@print_layout_widget widget=child indent=indent />
+    <#if (child.type == "paged_table" || child.type == "entry_form" || child.type == "criteria_form") &&
+         child.value("viewport","") == "">
+<@print_layout_container widget=child indent=indent />       
+    <#else>
+<@print_layout_widget widget=child indent=indent />        
+    </#if>
   </#list>
 </#macro>
 
 <#macro print_layout_widget widget indent=0>
   <#if widget.value("viewport","") == "dialog">
-${""?left_pad(indent)}<${namespace}-dialog v-model="open${js.nameType(widget.id)}InDialog" title="${widget.title}" size="lg">
     <#local indent += 2>
+${""?left_pad(indent)}<${namespace}-dialog v-model="${js.nameVariable(widget.id)}DialogOpen" title="${widget.title}" size="lg">
   <#elseif widget.value("viewport","") == "drawer">
-${""?left_pad(indent)}<${namespace}-drawer v-model="open${js.nameType(widget.id)}InDrawer" title="${widget.title}">
     <#local indent += 2>
+${""?left_pad(indent)}<${namespace}-drawer v-model="${js.nameVariable(widget.id)}DrawerOpen" title="${widget.title}">
   </#if>
   <#if widget.type == "tabs">
 <@print_layout_tabs tabs=widget indent=indent+2 />
-  <#elseif widget.type == "card">
-${""?left_pad(indent)}<div class="${namespace}-panel">
-${""?left_pad(indent)}  <div class="${namespace}-panel-head">${widget.title!"这里是标题"}</div>
-  <#list widget.children as child>
-<@print_layout_widget widget=child indent=indent+2 />
-  </#list>
-${""?left_pad(indent)}</div>  
   <#elseif widget.type == "entry_form">
 <@print_layout_entry_form form=widget indent=indent+2 />    
   <#elseif widget.type == "official_form">
@@ -763,53 +866,34 @@ ${""?left_pad(indent)}</div>
 <@print_layout_criteria_form form=widget indent=indent+2 />
   <#elseif widget.type == "display_form">
 <@print_layout_display_form form=widget indent=indent+2 />
+  <#elseif widget.type == "paged_grid">
+<@print_layout_paged_grid grid=widget indent=indent+2 />
   <#elseif widget.type == "chart">
 <@print_layout_chart chart=widget indent=indent+2 />
   <#elseif widget.type == "buttons">
 <@print_layout_buttons buttons=widget indent=indent+2 />
-  <#elseif widget.type == "button">
-${""?left_pad(indent)}<button class="${namespace}-btn ${namespace}-btn--${get_button_role(widget)} ${namespace}-btn-gap" @click="${get_button_method_name(widget)}">${widget.title}</button>
-    <#--  </#if>  -->
   <#elseif widget.type == "select">
     <#if (widget.value("data")!"")?starts_with("enum[")>
-${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="sdk.${js.nameVariable(widget.id)}Options" :clearable="true" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />    
+${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="sdk.${js.nameVariable(widget.id)}Options" :clearable="true" v-model="${get_input_model_name(widget)}" />    
     <#else>
-${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options"  :clearable="true" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
+${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options"  :clearable="true" v-model="${get_input_model_name(widget)}" />
     </#if>
   <#elseif widget.type == "date">
-${""?left_pad(indent)}<${namespace}-datepicker data-test="${js.nameVariable(widget.id)}" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />    
+${""?left_pad(indent)}<${namespace}-datepicker data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />    
   <#elseif widget.type == "time">
-${""?left_pad(indent)}<${namespace}-timepicker data-test="${js.nameVariable(widget.id)}" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
+${""?left_pad(indent)}<${namespace}-timepicker data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
   <#elseif widget.type == "cascade">
-${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(widget.id)}" :fetch-options="sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
+${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(widget.id)}" :fetch-options="sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions" v-model="${get_input_model_name(widget)}" />
   <#elseif widget.type == "multiselect">
-${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
+${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options" v-model="${get_input_model_name(widget)}" />
   <#elseif widget.type == "tags">
-${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(widget.id)}" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
-  <#elseif widget.type == "longtext">
-${""?left_pad(indent)}<textarea class="${namespace}-textarea" data-test="${js.nameVariable(widget.id)}" 
-${""?left_pad(indent)}          v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" placeholder="${widget.value("placeholder",("请输入" + widget.title))}"></textarea>  
-  <#elseif widget.type == "text">
-${""?left_pad(indent)}<input class="${namespace}-input" data-test="${js.nameVariable(widget.id)}" 
-${""?left_pad(indent)}       v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" 
-    <#if (widget.value("readonly")!"") == "true">
-${""?left_pad(indent)}       :class="{ '${namespace}-input--readonly': true }" :disabled="true">
-    <#else>
-${""?left_pad(indent)}       placeholder="${widget.value("placeholder",("请输入" + widget.title))}">
-    </#if>
-    <#if widget.value("unit") != "">
-${""?left_pad(indent)}<span class="${namespace}-field-unit">${widget.value("unit")}</span>
-    </#if>
-  <#elseif widget.type == "number">
-${""?left_pad(indent)}<input class="${namespace}-input" data-test="${js.nameVariable(widget.id)}" 
-${""?left_pad(indent)}       v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" 
-    <#if (widget.value("readonly")!"") == "true">
-${""?left_pad(indent)}       :class="{ '${namespace}-input--readonly': true }" :disabled="true">
-    <#else>
-${""?left_pad(indent)}       placeholder="${widget.value("placeholder",("请输入" + widget.title))}">
-    </#if>
-    <#if widget.value("unit") != "">
-${""?left_pad(indent)}<span class="${namespace}-field-unit">${widget.value("unit")}</span>
-    </#if>
+${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
+  <#else><#-- 各个Design System的个性化风格 -->
+<@print_layout_custom widget=widget indent=indent+2 />  
+  </#if>
+  <#if widget.value("viewport","") == "dialog">
+${""?left_pad(indent)}</${namespace}-dialog>
+  <#elseif widget.value("viewport","") == "drawer">
+${""?left_pad(indent)}</${namespace}-drawer>  
   </#if>
 </#macro>

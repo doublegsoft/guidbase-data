@@ -70,7 +70,7 @@
       </div>
     </div>
   </div>
-  <ef-feedback :dialog="dialog" :on-close="close" />
+  <${namespace}-feedback :dialog="dialog" :on-close="close" />
 </template>
 
 <script setup>

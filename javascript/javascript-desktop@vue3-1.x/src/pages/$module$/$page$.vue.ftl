@@ -32,7 +32,7 @@ onMounted(async () => {
     <#if widget.ancestor("entry_form")?? || widget.ancestor("criteria_form")??>
   ${js.nameVariable(widget.id)}Options.value = await sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}AsOptions();
     </#if>
-  <#elseif widget.type == "entry_form" || widget.type == "display_form">  
+  <#elseif widget.type == "entry_form" || widget.type == "display_form">
   load${js.nameType(widget.id)}Data();
   <#elseif widget.type == "excel_form">
   load${js.nameType(widget.id)}Rows();

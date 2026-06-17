@@ -39,7 +39,7 @@ ${""?left_pad(indent)}</div>
 <!--                                ENTRY FORM                               -->
 <!----------------------------------------------------------------------------->
 <#macro print_layout_entry_form form indent=0>
-  <#local cols = form.value("cols")!"3">
+  <#local cols = form.value("cols","3")>
   <#local groups = form.groups()>
 ${""?left_pad(indent)}<div id="entry${js.nameType(form.id)}">
   <#list groups as group>
@@ -65,7 +65,7 @@ ${""?left_pad(indent)}</div>
 <!--                              OFFICIAL FORM                              -->
 <!----------------------------------------------------------------------------->
 <#macro print_layout_official_form form indent>
-  <#local cols = form.value("cols")!"3">
+  <#local cols = form.value("cols","3")>
   <#local groups = form.groups()>
 ${""?left_pad(indent)}<div class="${namespace}-of">
 ${""?left_pad(indent)}  <div ref="${js.nameVariable(form.id)}Ref" class="${namespace}-of__container">
@@ -139,18 +139,22 @@ ${""?left_pad(indent)}</div>
 <!--                               DISPLAY FORM                              -->
 <!----------------------------------------------------------------------------->
 <#macro print_layout_display_form form indent=0>
+  <#local cols = form.value("cols", "3")>
   <#list form.groups() as group>
 ${""?left_pad(indent)}<div class="${namespace}-panel">
 ${""?left_pad(indent)}  <div class="${namespace}-panel-head">${group}</div>
-${""?left_pad(indent)}  <div class="${namespace}-fview ${namespace}-fview--${form.value("cols","3")}">
-  <#list form.group(group) as input>
-    <#local span = input.value("span","")>
+    <#local rows = form.rows(group, cols?number)>
+    <#list rows as row>
+${""?left_pad(indent)}  <div class="${namespace}-fview ${namespace}-fview--${cols}">    
+      <#list row as input>
+        <#local span = input.value("span","")>
 ${""?left_pad(indent)}    <div class="${namespace}-fv<#if span != ""> ${namespace}-fv--span${span}</#if>">
 ${""?left_pad(indent)}      <div class="${namespace}-fv-label">${input.title}</div>
 ${""?left_pad(indent)}      <div class="${namespace}-fv-val ${namespace}-fv-val--mono">{{ ${js.nameVariable(form.id)}Data.${js.nameVariable(input.id)} }}</div>
 ${""?left_pad(indent)}    </div>
-  </#list>
-${""?left_pad(indent)}  </div>
+      </#list>
+${""?left_pad(indent)}  </div>      
+    </#list>
 ${""?left_pad(indent)}</div>
   </#list>
 </#macro>
@@ -175,58 +179,30 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                                   PAGE                                  -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_widget widget indent=0>
-  <#if widget.type == "tabs">
-<@print_layout_tabs tabs=widget indent=indent+2 />
-  <#elseif widget.type == "card">
+<#macro print_layout_container widget indent>
+<@print_layout_widget widget=widget indent=indent />
+</#macro>
+
+<#macro print_layout_custom widget indent>
+  <#if widget.type == "card">
 ${""?left_pad(indent)}<div class="${namespace}-panel">
 ${""?left_pad(indent)}  <div class="${namespace}-panel-head">${widget.title!"这里是标题"}</div>
-  <#list widget.children as child>
+    <#list widget.children as child>
 <@print_layout_widget widget=child indent=indent+2 />
-  </#list>
+    </#list>
 ${""?left_pad(indent)}</div>  
-  <#elseif widget.type == "entry_form">
-<@print_layout_entry_form form=widget indent=indent+2 />    
-  <#elseif widget.type == "official_form">
-<@print_layout_official_form form=widget indent=indent+2 />   
-  <#elseif widget.type == "excel_form">
-<@print_layout_excel_form form=widget indent=indent+2 />      
-  <#elseif widget.type == "paged_table">
-<@print_layout_paged_table table=widget indent=indent+2 />
-  <#elseif widget.type == "fixed_table">
-<@print_layout_fixed_table table=widget indent=indent+2 />
-  <#elseif widget.type == "criteria_form">
-<@print_layout_criteria_form form=widget indent=indent+2 />
-  <#elseif widget.type == "display_form">
-<@print_layout_display_form form=widget indent=indent+2 />
-  <#elseif widget.type == "chart">
-<@print_layout_chart chart=widget indent=indent+2 />
-  <#elseif widget.type == "buttons">
-<@print_layout_buttons buttons=widget indent=indent+2 />
   <#elseif widget.type == "button">
-${""?left_pad(indent)}<button class="${namespace}-btn ${namespace}-btn--${get_button_role(widget)} ${namespace}-btn-gap" @click="${get_button_method_name(widget)}">${widget.title}</button>
-  <#elseif widget.type == "select">
-    <#if (widget.value("data")!"")?starts_with("enum[")>
-${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="sdk.${js.nameVariable(widget.id)}Options" :clearable="true" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />    
+    <#if widget.ancestor("paged_table")??>
+${""?left_pad(indent)}<button class="${namespace}-btn btn-sm ${namespace}-btn--${get_button_role(widget)} ${namespace}-btn-gap" @click="${get_button_method_name(widget)}">${widget.title}</button>    
     <#else>
-${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options"  :clearable="true" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
+${""?left_pad(indent)}<button class="${namespace}-btn ${namespace}-btn--${get_button_role(widget)} ${namespace}-btn-gap" @click="${get_button_method_name(widget)}">${widget.title}</button>
     </#if>
-  <#elseif widget.type == "date">
-${""?left_pad(indent)}<${namespace}-datepicker data-test="${js.nameVariable(widget.id)}" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />    
-  <#elseif widget.type == "time">
-${""?left_pad(indent)}<${namespace}-timepicker data-test="${js.nameVariable(widget.id)}" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
-  <#elseif widget.type == "cascade">
-${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(widget.id)}" :fetch-options="sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
-  <#elseif widget.type == "multiselect">
-${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
-  <#elseif widget.type == "tags">
-${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(widget.id)}" v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" />
   <#elseif widget.type == "longtext">
 ${""?left_pad(indent)}<textarea class="${namespace}-textarea" data-test="${js.nameVariable(widget.id)}" 
-${""?left_pad(indent)}          v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" placeholder="${widget.value("placeholder",("请输入" + widget.title))}"></textarea>  
+${""?left_pad(indent)}          v-model="${get_input_model_name(widget)}" placeholder="${widget.value("placeholder",("请输入" + widget.title))}"></textarea>  
   <#elseif widget.type == "text">
 ${""?left_pad(indent)}<input class="${namespace}-input" data-test="${js.nameVariable(widget.id)}" 
-${""?left_pad(indent)}       v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" 
+${""?left_pad(indent)}       v-model="${get_input_model_name(widget)}" 
     <#if (widget.value("readonly")!"") == "true">
 ${""?left_pad(indent)}       :class="{ '${namespace}-input--readonly': true }" :disabled="true">
     <#else>
@@ -237,7 +213,7 @@ ${""?left_pad(indent)}<span class="${namespace}-field-unit">${widget.value("unit
     </#if>
   <#elseif widget.type == "number">
 ${""?left_pad(indent)}<input class="${namespace}-input" data-test="${js.nameVariable(widget.id)}" 
-${""?left_pad(indent)}       v-model="${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}" 
+${""?left_pad(indent)}       v-model="${get_input_model_name(widget)}" 
     <#if (widget.value("readonly")!"") == "true">
 ${""?left_pad(indent)}       :class="{ '${namespace}-input--readonly': true }" :disabled="true">
     <#else>

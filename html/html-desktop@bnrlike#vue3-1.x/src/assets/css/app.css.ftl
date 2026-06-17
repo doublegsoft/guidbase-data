@@ -586,6 +586,7 @@ html, body {
   gap: 0;
   border-top: 1px solid var(--${namespace}-border-light);
 }
+.${namespace}-fview--1 { grid-template-columns: repeat(1, 1fr); }
 .${namespace}-fview--2 { grid-template-columns: repeat(2, 1fr); }
 .${namespace}-fview--3 { grid-template-columns: repeat(3, 1fr); }
 .${namespace}-fview--6 { grid-template-columns: repeat(6, 1fr); }
@@ -598,6 +599,7 @@ html, body {
 }
 /* Remove right border on last column of each row */
 .${namespace}-fview    > .${namespace}-fv:nth-child(4n) { border-right: none; }
+.${namespace}-fview--1 > .${namespace}-fv:nth-child(1n) { border-right: none; }
 .${namespace}-fview--2 > .${namespace}-fv:nth-child(2n) { border-right: none; }
 .${namespace}-fview--3 > .${namespace}-fv:nth-child(3n) { border-right: none; }
 .${namespace}-fview--6 > .${namespace}-fv:nth-child(6n) { border-right: none; }

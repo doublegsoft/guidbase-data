@@ -87,7 +87,14 @@
                   :value="row[col.key]"
                   :index="idx"
                 />
-                <!-- Formatter function -->
+                <!-- Render function (returns HTML string, matches generated code) -->
+                <template v-else-if="col.render">
+                  <span
+                    v-html="col.render(row[col.key], row)"
+                    @click="handleActionClick($event, row, idx)"
+                  ></span>
+                </template>
+                <!-- Formatter function (returns plain text) -->
                 <template v-else-if="col.formatter">
                   {{ col.formatter(row, col, row[col.key], idx) }}
                 </template>
@@ -163,7 +170,7 @@
  * - 支持列插槽: ${r"`cell-${key}`"} 命名插槽自定义单元格
  */
 import { ref, computed, watch, onMounted, toRefs } from 'vue'
-import AcPagination from './${namespace}-pagination.vue'
+import AcPagination from './pt-pagination.vue'
 
 const props = defineProps({
   /** 列定义 [{ key, title, width?, align?, sortable?, formatter?, className? }] */
@@ -218,6 +225,7 @@ const emit = defineEmits([
   'pageChange',
   'rowClick',
   'sortChange',
+  'rowAction',
 ])
 
 const tableWrapRef = ref(null)
@@ -340,6 +348,29 @@ function toggleSort(col) {
 
 function onRowClick(row, idx) {
   emit('rowClick', row, idx)
+}
+
+// ── Action button click (event delegation) ─────
+// Reads @click attribute from the rendered HTML button, parses the handler
+// expression, and emits rowAction so the parent can dispatch.
+
+function handleActionClick(event, row, idx) {
+  const btn = event.target.closest('button')
+  if (!btn) return
+  const expr = btn.getAttribute('@click')
+  if (!expr) return
+  // Parse handler name and arguments: "handleEdit(row)" or "handleEdit"
+  const match = expr.match(/^(\w+)\s*\(?\s*(.*?)\s*\)?$/);
+  if (!match) return;
+  const handler = match[1]
+  // Resolve "row" → actual row object, otherwise pass string as-is
+  const args = match[2]
+    ? match[2].split(',').map(s => {
+        const trimmed = s.trim()
+        return trimmed === 'row' ? row : trimmed.replace(/^['"]|['"]$/g, '')
+      })
+    : []
+  emit('rowAction', { handler, args, row, index: idx })
 }
 </script>
 

@@ -487,22 +487,22 @@ body {
   box-shadow: var(--shadow-glow-teal);
 }
 
-.btn-secondary {
+.btn-default {
   background: var(--color-surface);
   color: var(--color-text-main);
   border: 1px solid var(--color-border);
 }
 
-.btn-secondary:hover {
+.btn-default:hover {
   background: #e5ecf2;
 }
 
-.btn-amber {
+.btn-warning {
   background: var(--color-amber);
   color: var(--color-navy);
 }
 
-.btn-amber:hover {
+.btn-warning:hover {
   background: var(--color-amber-hover);
 }
 
@@ -1890,6 +1890,19 @@ tbody tr:hover td {
 /* ═══════════════════════════════════════════════════════════════════════
    7.  FORMS
    ═══════════════════════════════════════════════════════════════════════ */
+
+.form-footer {
+  display: flex;
+  align-items: center;
+  margin-top: var(--space-12);
+  padding-top: var(--space-9);
+  border-top: 1px solid var(--color-border);
+  gap: var(--space-6);
+}
+
+.form-footer--right {
+  justify-content: flex-end;
+}
 
 .form-row {
   display: grid;
