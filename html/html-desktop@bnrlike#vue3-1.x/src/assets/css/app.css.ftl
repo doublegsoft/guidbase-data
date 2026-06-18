@@ -1500,3 +1500,275 @@ html, body {
   .${namespace}-col-xl-23 { flex: 0 0 95.83333333%; max-width: 95.83333333%; }
   .${namespace}-col-xl-24 { flex: 0 0 100%;         max-width: 100%;         }
 }
+
+/* ==========================================================================
+   1. Base Tile Block (基础瓷砖容器)
+   ========================================================================== */
+.tile {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ==========================================================================
+   2. Layout Modifiers (布局修饰符)
+   ========================================================================== */
+
+/* 2.1 水平/列表排版 */
+.tile--horizontal {
+  flex-direction: row;
+  align-items: center;
+}
+
+/* 2.2 背景图覆层排版 */
+.tile--overlay {
+  position: relative;
+}
+
+/* 2.3 紧凑型排版 */
+.tile--compact {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  gap: 12px;
+  border-radius: 6px;
+}
+.tile--compact .tile__body {
+  padding: 0;
+}
+
+/* 2.4 日程表布局 */
+.tile--schedule {
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 16px;
+  gap: 16px;
+}
+
+/* 2.5 任务看板布局 */
+.tile--task {
+  padding: 16px;
+  gap: 12px;
+}
+
+/* ==========================================================================
+   3. Media & Avatars (媒体区、头像及多头像堆叠)
+   ========================================================================== */
+.tile__media {
+  position: relative;
+  overflow: hidden;
+}
+
+.tile__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* 单头像 */
+.tile__avatar {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* 多头像堆叠组 */
+.tile__avatars {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.tile__avatar--stacked {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: -6px; /* 产生重叠 */
+  border: 2px solid #ffffff; /* 隔离白边 */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.tile__avatars .tile__avatar--stacked:first-child {
+  margin-left: 0;
+}
+
+/* ==========================================================================
+   4. Structured Areas (内部结构块)
+   ========================================================================== */
+.tile__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.tile__body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+/* 方案一、二等没有 padding 内部结构块时使用 */
+.tile--schedule .tile__body,
+.tile--task .tile__body {
+  padding: 0;
+}
+
+.tile__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-top: 1px solid #f3f4f6;
+  background-color: #f9fafb;
+}
+
+/* 日程/任务布局的底部无需额外 padding 和背景 */
+.tile--task .tile__footer,
+.tile--schedule .tile__footer {
+  padding: 12px 0 0 0;
+  background-color: transparent;
+}
+
+/* ==========================================================================
+   5. Typography & Elements (文字排版与标签元素)
+   ========================================================================== */
+
+/* 主标题 */
+.tile__primary {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.4;
+}
+
+/* 副标题/描述 */
+.tile__secondary {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+/* 标签组 */
+.tile__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* 单个标签 */
+.tile__tag {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.tile__tag--highlight {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+/* 状态标签（胶囊型） */
+.tile__status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+/* 状态胶囊颜色变体 */
+.tile__status--active {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.tile__status--pending {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.tile__status--completed {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+/* 状态指示灯（小圆点） */
+.tile__status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.tile__status-dot--active { background-color: #10b981; }
+.tile__status-dot--pending { background-color: #f59e0b; }
+.tile__status-dot--completed { background-color: #9ca3af; }
+
+/* ==========================================================================
+   6. Meta & Time (辅助信息与时间)
+   ========================================================================== */
+.tile__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.tile__name {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.tile__time {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* 日程布局左侧大字号时间 */
+.tile__time--highlight {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2563eb;
+  width: 90px;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+/* 行内串联信息（用于紧凑布局） */
+.tile__meta-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.tile__divider {
+  color: #d1d5db;
+}

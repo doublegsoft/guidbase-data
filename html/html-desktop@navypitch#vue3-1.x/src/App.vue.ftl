@@ -98,7 +98,7 @@ const breadPage    = ref(MENUS[modules[0].key].sections[0].items[0].label)
 const clock        = ref('')
 const username     = ref(localStorage.getItem('username') || '张伟')
 
-const currentSections    = computed(() => MENUS[activeModule.value].sections)
+const currentSections    = computed(() => MODULE_LIST.flatMap(m => MENUS[m.key].sections))
 const currentModuleLabel = computed(() => MENUS[activeModule.value].label)
 
 function switchModule(key) {

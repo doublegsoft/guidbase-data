@@ -163,7 +163,6 @@ ${""?left_pad(indent)}</div>
 <!--                                  BUTTON                                 -->
 <!----------------------------------------------------------------------------->
 <#macro print_layout_buttons buttons indent=0>
-  <#-- bnrlike 模式下，按钮在tab页的右侧 -->
   <#if buttons.ancestor("tabs")??>
     <#return>
   </#if>

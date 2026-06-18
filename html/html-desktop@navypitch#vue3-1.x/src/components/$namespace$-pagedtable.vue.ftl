@@ -135,7 +135,7 @@
 
     <!-- ── Pagination ─────────────────────────────── -->
     <div v-if="showPagination" class="ac-pt__pagination">
-      <AcPagination
+      <${namespace}-pagination
         :current-page="displayCurrentPage"
         :page-size="displayPageSize"
         :total="displayTotal"
@@ -170,7 +170,7 @@
  * - 支持列插槽: ${r"`cell-${key}`"} 命名插槽自定义单元格
  */
 import { ref, computed, watch, onMounted, toRefs } from 'vue'
-import AcPagination from './pt-pagination.vue'
+import ${js.nameType(namespace)}Pagination from './${namespace}-pagination.vue'
 
 const props = defineProps({
   /** 列定义 [{ key, title, width?, align?, sortable?, formatter?, className? }] */
@@ -382,7 +382,7 @@ function handleActionClick(event, row, idx) {
 
 .ac-pt {
   background: var(--color-card);
-  border-radius: var(--radius-xl);
+  /* border-radius: var(--radius-xl); */
   overflow: hidden;
   position: relative;
 }
@@ -440,11 +440,11 @@ function handleActionClick(event, row, idx) {
 }
 
 .ac-pt__table th:first-child {
-  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  /* border-radius: var(--radius-md) 0 0 var(--radius-md); */
 }
 
 .ac-pt__table th:last-child {
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  /* border-radius: 0 var(--radius-md) var(--radius-md) 0; */
 }
 
 /* Column alignment */

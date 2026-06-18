@@ -848,6 +848,15 @@ body {
   padding: var(--space-9) var(--space-11);
 }
 
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-6);
+  margin-top: var(--space-9);
+  padding-top: var(--space-9);
+  border-top: 1px solid var(--color-border);
+}
+
 /* ── 5d.  Table ────────────────────────────── */
 
 .table-wrap {
@@ -876,11 +885,11 @@ th {
 }
 
 th:first-child {
-  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  /* border-radius: var(--radius-md) 0 0 var(--radius-md); */
 }
 
 th:last-child {
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  /* border-radius: 0 var(--radius-md) var(--radius-md) 0; */
 }
 
 td {
@@ -1357,7 +1366,6 @@ tbody tr:hover td {
   align-items: center;
   gap: 0;
   border-bottom: 1px solid var(--color-border);
-  margin-bottom: var(--space-11);
 }
 
 .tabs-nav {
@@ -1696,7 +1704,10 @@ tbody tr:hover td {
 }
 
 .tab-panel.active {
-  display: block;
+  display: flex; 
+  flex-direction: column; 
+  min-height: 500px; 
+  overflow: auto;
 }
 
 /* Standalone panel (for pill/card variants without border-top dependency) */
@@ -1710,6 +1721,13 @@ tbody tr:hover td {
   line-height: 1.6;
 }
 
+.tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-9);
+  min-height: 450px;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════
    7.  SIZE UTILITIES
@@ -1894,8 +1912,13 @@ tbody tr:hover td {
 .form-footer {
   display: flex;
   align-items: center;
-  margin-top: var(--space-12);
-  padding-top: var(--space-9);
+  position: fixed;
+  bottom: 0;
+  left: var(--sidebar-w);
+  right: 0;
+  z-index: 50;
+  background: var(--color-card);
+  padding: var(--space-9) var(--space-14);
   border-top: 1px solid var(--color-border);
   gap: var(--space-6);
 }

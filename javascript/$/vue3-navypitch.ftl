@@ -15,22 +15,23 @@ ${""?left_pad(indent)}          <span>{{ tab.label }}</span>
 ${""?left_pad(indent)}          <span v-if="tab.badge" class="${namespace}-tab-badge">{{ tab.badge }}</span>
 ${""?left_pad(indent)}        </div>
 ${""?left_pad(indent)}      </div>
-  <#if tabs.contains("buttons")>
-    <#local buttons = tabs.byType("buttons")[0]>
-${""?left_pad(indent)}      <div class="tabs-actions" v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(buttons.container.id)}'">
-    <#list buttons.children as button>
+  <#list tabs.children as tab>
+${""?left_pad(indent)}      <div class="tabs-actions" v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(tab.id)}'">
+    <#list tab.children as button>
+      <#if button.type != "button"><#continue></#if>
 <@print_layout_widget widget=button indent=indent+8 />
     </#list>
 ${""?left_pad(indent)}      </div>
-  </#if>
+  </#list>
 ${""?left_pad(indent)}    </div>
-${""?left_pad(indent)}    <div class="tab-panel" ref="${js.nameVariable(tabs.id)}Ref">
+${""?left_pad(indent)}    <div class="tab-panel active" ref="${js.nameVariable(tabs.id)}Ref">
   <#list tabs.children as tab>
-${""?left_pad(indent)}      <div v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(tab.id)}'" :style="{ height: ${js.nameType(tabs.id)}Height + 'px' }">
+${""?left_pad(indent)}      <div v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(tab.id)}'" class="tab-content">
     <#if tab.children?size == 0>
 ${""?left_pad(indent)}    ${tab.title}
     <#else>
       <#list tab.children as child>
+        <#if child.type == "button"><#continue></#if>
 <@print_layout_widget widget=child indent=indent+8 />
       </#list>
     </#if>
@@ -65,6 +66,12 @@ ${""?left_pad(indent)}      </div>
     </#list>
 ${""?left_pad(indent)}    </div>  
   </#list>
+${""?left_pad(indent)}    <div class="card-actions">
+  <#list form.children as child>
+    <#if child.type != "button"><#continue></#if>
+${""?left_pad(indent)}    ${""?left_pad(indent)}<button class="btn btn-${get_button_role(child)}" @click="${get_button_method_name(child)}">${child.title}</button> 
+  </#list>
+${""?left_pad(indent)}    </div>   
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
 </#macro>
@@ -162,7 +169,7 @@ ${""?left_pad(indent)}</div>
   <#local cols = form.value("cols", "3")>
   <#list form.groups() as group>
 ${""?left_pad(indent)}<div class="card">
-${""?left_pad(indent)}  <div class="card-header">${group}</div>
+${""?left_pad(indent)}  <div class="card-header"><#if group == "">${form.title}<#else>${group}</#if></div>
 ${""?left_pad(indent)}  <div class="card-body">
     <#local rows = form.rows(group, cols?number)>
     <#list rows as row>
@@ -236,11 +243,11 @@ ${""?left_pad(indent)}  <div class="card-body">
   </#list>
 ${""?left_pad(indent)}  </div>  
 ${""?left_pad(indent)}</div>  
-  <#elseif widget.type == "button">
-    <#if widget.ancestor("tabs")??>
-${""?left_pad(indent)}<button class="btn-tab btn-tab-${get_button_role(widget)}">${widget.title}</button>    
-    <#elseif widget.ancestor("paged_table")??>
-${""?left_pad(indent)}<button class="btn btn-sm btn-${get_button_role(widget)}" @click="${get_button_method_name(widget)}(row)">${widget.title}</button>    
+  <#elseif widget.type == "button">    
+    <#if widget.ancestor("paged_table")??>
+${""?left_pad(indent)}<button class="btn btn-sm btn-${get_button_role(widget)}" @click="${get_button_method_name(widget)}(row)">${widget.title}</button> 
+    <#elseif widget.container.type == "tab">
+${""?left_pad(indent)}<button class="btn-tab btn-${get_button_role(widget)}" @click="${get_button_method_name(widget)}">${widget.title}</button>   
     <#else>
 ${""?left_pad(indent)}<button class="btn btn-${get_button_role(widget)}" @click="${get_button_method_name(widget)}">${widget.title}</button>
     </#if>
@@ -274,4 +281,8 @@ ${""?left_pad(indent)}  <span class="input-unit-label">${widget.value("unit")}</
     </#if>
 ${""?left_pad(indent)}</div>
   </#if>
+</#macro>
+
+<#macro print_layout_divider indent=0>
+${""?left_pad(indent)}<div style="height:16px;"></div>
 </#macro>

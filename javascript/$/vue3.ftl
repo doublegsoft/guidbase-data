@@ -126,7 +126,7 @@ const ${js.nameVariable(form.id)}Rules = [
   {name: '${js.nameVariable(input.id)}',rules: [<#if input.value("required") == "true">{ type: 'required', message: '${input.title}必须填写！' },</#if><#if input.type == "number">{ type: 'number', message: '请正确输入${input.title}！' }</#if>]},
   </#list>
 ]
-const { errors, validate, clearErrors } = useFieldValidation(${js.nameVariable(form.id)}Rules)
+const { ${js.nameVariable(form.id)}Errors, validate${js.nameType(form.id)}, clear${js.nameType(form.id)}Errors } = useFieldValidation(${js.nameVariable(form.id)}Rules)
 ${""?left_pad(indent)}// ${js.nameVariable(form.id)}表单相关变量
 ${""?left_pad(indent)}const ${js.nameVariable(form.id)}Data = reactive({
   <#list form.inputs as input>
@@ -141,7 +141,7 @@ ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
     </#if>
   </#list>
 const ${js.nameVariable(form.id)}Error = ref(false)
-const validationErrorMessage = ref('')
+const ${js.nameVariable(form.id)}ErrorMessage = ref('')
 </#macro>
 
 <#macro print_entry_form_methods form indent=0>
@@ -165,15 +165,15 @@ const load${js.nameType(form.id)}Data = async () => {
  * 保存数据的界面函数
  */
 const save${js.nameType(form.id)}Data = async () => {
-  if (!validate(demoEntryData)) {
-    const msgs = Object.entries(errors)
+  if (!validate${js.nameType(form.id)}(${js.nameType(form.id)}Data)) {
+    const msgs = Object.entries(${js.nameVariable(form.id)}Errors)
       .filter(([, msg]) => msg)
       .map(([, msg]) => `· ${r"${msg}"}`)
-    validationErrorMessage.value = msgs.join('\n')
+    ${js.nameVariable(form.id)}ErrorMessage.value = msgs.join('\n')
     ${js.nameVariable(form.id)}ErrorShow.value = true
     return
   }
-  isSubmitting.value = true
+  is${js.nameType(form.id)}Submitting.value = true
   try {
     const result = await sdk.save${js.nameType(form.value("object",form.id))}(${js.nameVariable(form.id)}Data)
     if (result.success) {
@@ -182,11 +182,11 @@ const save${js.nameType(form.id)}Data = async () => {
   } catch (error) {
     fb.error('发生错误', error)
   } finally {
-    isSubmitting.value = false
+    is${js.nameType(form.id)}Submitting.value = false
   }
 }
 
-const { loading: isSubmitting, run: handle${js.nameType(form.id)}Save } = useAsyncLock(save${js.nameType(form.id)}Data)
+const { loading: is${js.nameType(form.id)}Submitting, run: handle${js.nameType(form.id)}Save } = useAsyncLock(save${js.nameType(form.id)}Data)
 </#macro>
 
 <#macro print_layout_entry_form form indent=0>
@@ -223,7 +223,7 @@ const ${js.nameVariable(form.id)}Rules = [
   {name: '${js.nameVariable(input.id)}',rules: [<#if input.value("required") == "true">{ type: 'required', message: '${input.title}必须填写！' },</#if><#if input.type == "number">{ type: 'number', message: '请正确输入${input.title}！' }</#if>]},
   </#list>
 ]
-const { errors, validate, clearErrors } = useFieldValidation(${js.nameVariable(form.id)}Rules)
+const { ${js.nameVariable(form.id)}Errors, validate${js.nameType(form.id)}, clear${js.nameType(form.id)}Errors } = useFieldValidation(${js.nameVariable(form.id)}Rules)
 ${""?left_pad(indent)}// ${js.nameVariable(form.id)}表单相关变量
 ${""?left_pad(indent)}const ${js.nameVariable(form.id)}Data = reactive({
   <#list form.inputs as input>
@@ -238,7 +238,7 @@ ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
     </#if>
   </#list>
 const ${js.nameVariable(form.id)}ErrorShow = ref(false)
-const validationErrorMessage = ref('')
+const ${js.nameVariable(form.id)}ErrorMessage = ref('')
 </#macro>
 
 <#macro print_layout_official_form form indent>
@@ -686,11 +686,23 @@ const ${get_button_method_name(button)} = async () => {
     <#elseif (button.value("action","")) == "search"><#-- 重置 -->
   ${js.nameVariable(button.value("ref"))}Ref.value?.refresh()
     <#elseif (button.value("action","")) == "save"><#-- 保存 -->
+  // TODO: save${js.nameType(button.value("ref"))}Data();
+    <#elseif (button.value("action","")) == "add"><#-- 新增 -->
+  ${js.nameVariable(button.value("ref"))}DialogOpen.value = true  
+    <#elseif (button.value("action","")) == "close"><#-- 关闭 -->
+      <#if button.container.type == "entry_form">
+  ${js.nameVariable(button.container.id)}DialogOpen.value = false
+      <#elseif button.container.type == "display_form">
+  ${js.nameVariable(button.container.id)}DrawerOpen.value = false    
+      </#if>
     </#if>
   </#if>
 }
 </#macro>
 
+<#--
+ ### 页面中固定在底部，tabs出现在右侧
+ -->
 <#macro print_layout_buttons buttons indent=0>
   <#-- bnrlike 模式下，按钮在tab页的右侧 -->
   <#if buttons.ancestor("tabs")??>
@@ -828,19 +840,34 @@ const handle${js.nameType(widget.id)}RowAction = ({ handler, row, index }) => {
   ${js.nameVariable(widget.id)}RowActionHandlers[handler]?.(row, index)
 }    
   </#list>
-
 </#macro>
 
 <#macro print_page_layout page indent=0>
+  <#local children = []>
   <#list page.children as child>
+    <#if child.value("viewport","") == "">
+      <#local children += [child]>
+    </#if>
+  </#list>
+  <#list children as child>
     <#if (child.type == "paged_table" || child.type == "entry_form" || child.type == "criteria_form") &&
          child.value("viewport","") == "">
 <@print_layout_container widget=child indent=indent />       
     <#else>
 <@print_layout_widget widget=child indent=indent />        
     </#if>
+    <#if child?index != children?size - 1>
+<@print_layout_divider indent = indent />    
+    </#if>
+  </#list>
+  <#list page.children as child>
+    <#if child.value("viewport","") != "">
+<@print_layout_widget widget=child indent=indent />          
+    </#if>
   </#list>
 </#macro>
+
+<#macro print_layout_divider indent=0></#macro>
 
 <#macro print_layout_widget widget indent=0>
   <#if widget.value("viewport","") == "dialog">

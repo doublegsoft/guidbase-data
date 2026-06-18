@@ -41,45 +41,47 @@
       <span class="ac-dd__trigger-arrow" :class="{ 'ac-dd__trigger-arrow--flip': open }">▾</span>
     </div>
 
-    <!-- ── Dropdown Panel ───────────────────────── -->
-    <Transition name="ac-dd-drop">
-      <div v-if="open" class="ac-dd__panel" @click.stop>
-        <!-- Search -->
-        <div class="ac-dd__search" v-if="searchable">
-          <svg class="ac-dd__search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input
-            ref="searchRef"
-            class="ac-dd__search-input"
-            v-model="query"
-            placeholder="输入关键词筛选…"
-            @keydown.escape="close"
-            @keydown.up.prevent="highlightPrev"
-            @keydown.down.prevent="highlightNext"
-            @keydown.enter.prevent="selectHighlighted"
-          />
-        </div>
+    <!-- ── Dropdown Panel (teleported to body to avoid clipping) ─ -->
+    <Teleport to="body">
+      <Transition name="ac-dd-drop">
+        <div v-if="open" class="ac-dd__panel" :style="panelStyle" ref="panelRef" @click.stop>
+          <!-- Search -->
+          <div class="ac-dd__search" v-if="searchable">
+            <svg class="ac-dd__search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input
+              ref="searchRef"
+              class="ac-dd__search-input"
+              v-model="query"
+              placeholder="输入关键词筛选…"
+              @keydown.escape="close"
+              @keydown.up.prevent="highlightPrev"
+              @keydown.down.prevent="highlightNext"
+              @keydown.enter.prevent="selectHighlighted"
+            />
+          </div>
 
-        <!-- Options list -->
-        <ul class="ac-dd__list" ref="listRef">
-          <li
-            v-for="(opt, idx) in filteredOptions"
-            :key="opt.value"
-            class="ac-dd__option"
-            :class="{
-              'ac-dd__option--selected': isSelected(opt),
-              'ac-dd__option--highlighted': highlightedIndex === idx,
-            }"
-            @click="select(opt)"
-          >
-            <span class="ac-dd__option-label">{{ opt.label }}</span>
-            <span v-if="isSelected(opt)" class="ac-dd__option-check">✓</span>
-          </li>
-          <li class="ac-dd__empty" v-if="filteredOptions.length === 0">
-            <span>无匹配选项</span>
-          </li>
-        </ul>
-      </div>
-    </Transition>
+          <!-- Options list -->
+          <ul class="ac-dd__list" ref="listRef">
+            <li
+              v-for="(opt, idx) in filteredOptions"
+              :key="opt.value"
+              class="ac-dd__option"
+              :class="{
+                'ac-dd__option--selected': isSelected(opt),
+                'ac-dd__option--highlighted': highlightedIndex === idx,
+              }"
+              @click="select(opt)"
+            >
+              <span class="ac-dd__option-label">{{ opt.label }}</span>
+              <span v-if="isSelected(opt)" class="ac-dd__option-check">✓</span>
+            </li>
+            <li class="ac-dd__empty" v-if="filteredOptions.length === 0">
+              <span>无匹配选项</span>
+            </li>
+          </ul>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -125,6 +127,8 @@ const highlightedIndex = ref(-1)
 const rootRef = ref(null)
 const searchRef = ref(null)
 const listRef = ref(null)
+const panelRef = ref(null)
+const panelStyle = ref({})
 
 // ── Computed ─────────────────────────────────────
 const hasValue = computed(() => props.modelValue !== '' && props.modelValue != null)
@@ -145,13 +149,30 @@ function isSelected(opt) {
   return opt.value === props.modelValue
 }
 
+function calcPanelPosition() {
+  if (!rootRef.value) return
+  const gap = 4
+  const triggerEl = rootRef.value.querySelector('.ac-dd__trigger') || rootRef.value
+  const triggerRect = triggerEl.getBoundingClientRect()
+  panelStyle.value = {
+    position: 'fixed',
+    top: triggerRect.bottom + gap + 'px',
+    left: triggerRect.left + 'px',
+    width: triggerRect.width + 'px',
+    minWidth: triggerRect.width + 'px',
+  }
+}
+
 function toggleOpen() {
   if (props.disabled) return
   open.value = !open.value
   if (open.value) {
     query.value = ''
     highlightedIndex.value = -1
-    nextTick(() => searchRef.value?.focus())
+    nextTick(() => {
+      calcPanelPosition()
+      searchRef.value?.focus()
+    })
   }
 }
 
@@ -202,12 +223,26 @@ function scrollToHighlighted() {
 // ── Click-outside ────────────────────────────────
 function onPointerDown(e) {
   if (rootRef.value && !rootRef.value.contains(e.target)) {
+    // also check the teleported panel
+    if (panelRef.value && panelRef.value.contains(e.target)) return
     close()
   }
 }
 
-onMounted(() => document.addEventListener('pointerdown', onPointerDown, true))
-onBeforeUnmount(() => document.removeEventListener('pointerdown', onPointerDown, true))
+function onResizeOrScroll() {
+  if (open.value) calcPanelPosition()
+}
+
+onMounted(() => {
+  document.addEventListener('pointerdown', onPointerDown, true)
+  window.addEventListener('resize', onResizeOrScroll, true)
+  window.addEventListener('scroll', onResizeOrScroll, true)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('pointerdown', onPointerDown, true)
+  window.removeEventListener('resize', onResizeOrScroll, true)
+  window.removeEventListener('scroll', onResizeOrScroll, true)
+})
 
 // ── Reset query when panel closes ────────────────
 watch(open, (v) => {
@@ -351,17 +386,14 @@ watch(open, (v) => {
 /* ── Dropdown Panel ───────────────────────────── */
 
 .ac-dd__panel {
-  position: absolute;
-  top: calc(100% + var(--space-3));
-  left: 0;
-  right: 0;
-  z-index: 500;
+  /* position / top / left / width set dynamically via :style to avoid clipping by
+     parent containers with overflow:hidden (dialogs, drawers, cards, table wraps) */
+  z-index: 9999;
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
   overflow: hidden;
-  min-width: 160px;
 }
 
 /* ── Search ───────────────────────────────────── */
