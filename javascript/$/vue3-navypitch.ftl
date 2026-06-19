@@ -169,7 +169,9 @@ ${""?left_pad(indent)}</div>
   <#local cols = form.value("cols", "3")>
   <#list form.groups() as group>
 ${""?left_pad(indent)}<div class="card">
-${""?left_pad(indent)}  <div class="card-header"><#if group == "">${form.title}<#else>${group}</#if></div>
+${""?left_pad(indent)}  <div class="card-header">
+${""?left_pad(indent)}    <div class="card-title"><#if group == "">${form.title}<#else>${group}</#if></div>
+${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}  <div class="card-body">
     <#local rows = form.rows(group, cols?number)>
     <#list rows as row>
@@ -201,6 +203,19 @@ ${""?left_pad(indent)}  :first-day-of-week="1"
 ${""?left_pad(indent)}  @event-click="handle${js.nameType(grid.id)}EventClick"
 ${""?left_pad(indent)}  @slot-click="handle${js.nameType(grid.id)}SlotClick"
 ${""?left_pad(indent)}/>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                LIST VIEW                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_layout_list_view list indent=0>
+${""?left_pad(indent)}<div class="card">
+${""?left_pad(indent)}  <div class="card-header">
+${""?left_pad(indent)}    <div class="card-title">${list.title}</div>
+${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}  <div class="card-body">
+${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}</div>
 </#macro>
 
 <!----------------------------------------------------------------------------->

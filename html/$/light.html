@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tile Design Reference · Light · 57 Layouts</title>
+<style>
+:root {
+  --bg: #f0f2f7;
+  --surface: #ffffff;
+  --surface2: #f7f8fc;
+  --border: #e4e8f0;
+  --border2: #c8d0e4;
+  --text1: #1a1f36;
+  --text2: #5a657a;
+  --text3: #98a4b8;
+  --blue: #3b7ef8;
+  --teal: #0bb8a0;
+  --green: #22c55e;
+  --yellow: #e8a500;
+  --orange: #f05a1a;
+  --red: #e8274b;
+  --purple: #7c3aed;
+  --pink: #db2777;
+  --cyan: #0891b2;
+  --indigo: #4f46e5;
+  --r: 10px;
+  --r2: 6px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, 'PingFang SC', 'HarmonyOS Sans', BlinkMacSystemFont, sans-serif; background:var(--bg); color:var(--text1); padding:32px 24px; }
+
+/* PAGE HEADER */
+.page-header { text-align:center; margin-bottom:48px; }
+.page-header h1 { font-size:28px; font-weight:700; letter-spacing:-.5px; background:linear-gradient(135deg,#3b7ef8,#0bb8a0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.page-header p { color:var(--text2); font-size:14px; margin-top:8px; }
+.page-meta { display:flex; justify-content:center; gap:16px; margin-top:16px; flex-wrap:wrap; }
+.page-meta span { font-size:11px; padding:4px 10px; border-radius:20px; border:1px solid var(--border2); color:var(--text2); background:#fff; }
+
+/* SECTION HEADERS */
+.section-title { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:2px; color:var(--text3); margin:40px 0 16px; padding-left:12px; border-left:3px solid var(--indigo); }
+
+/* GRID */
+.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:20px; max-width:1440px; margin:0 auto; }
+.grid-wide { grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); }
+.grid-narrow { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+
+/* DEMO WRAPPER */
+.demo { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:16px; transition:border-color .2s, box-shadow .2s; box-shadow:0 1px 4px rgba(0,0,0,.04); }
+.demo:hover { border-color:var(--border2); box-shadow:0 4px 16px rgba(0,0,0,.08); }
+.demo-label { font-size:11px; color:var(--text3); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+.demo-label b { color:var(--text2); font-weight:500; }
+.demo-num { font-size:10px; font-weight:700; color:var(--text3); font-variant-numeric:tabular-nums; background:var(--surface2); border-radius:4px; padding:1px 5px; border:1px solid var(--border); }
+
+/* ===== TILE BASE ===== */
+.tile { border:1px solid var(--border); border-radius:var(--r); padding:14px; background:#fff; font-size:13px; }
+.t-row { display:flex; align-items:center; gap:8px; }
+.t-between { justify-content:space-between; }
+.t-wrap { flex-wrap:wrap; }
+.t-col { flex:1; min-width:0; }
+.t-body { flex:1; min-width:0; }
+.t-sep { width:1px; align-self:stretch; background:var(--border); margin:0 4px; }
+.t-right { text-align:right; justify-content:flex-end; }
+.t-center { text-align:center; justify-content:center; }
+
+/* TYPOGRAPHY */
+.t-h1 { font-size:16px; font-weight:700; color:var(--text1); line-height:1.35; }
+.t-h2 { font-size:14px; font-weight:600; color:var(--text1); line-height:1.4; }
+.t-h3 { font-size:13px; font-weight:600; color:var(--text1); }
+.t-sub { font-size:12px; color:var(--text2); line-height:1.5; }
+.t-cap { font-size:11px; color:var(--text3); line-height:1.5; }
+.t-num { font-size:26px; font-weight:800; color:var(--text1); line-height:1; font-variant-numeric:tabular-nums; letter-spacing:-1px; }
+.t-num-sm { font-size:18px; font-weight:700; color:var(--text1); font-variant-numeric:tabular-nums; }
+.t-mono { font-family:'SF Mono','Fira Code',monospace; font-size:11px; }
+
+/* TAGS & BADGES */
+.tag { display:inline-flex; align-items:center; gap:3px; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:500; white-space:nowrap; }
+.tag-blue { background:rgba(59,126,248,.1); color:#2563eb; border:1px solid rgba(59,126,248,.2); }
+.tag-green { background:rgba(34,197,94,.1); color:#16a34a; border:1px solid rgba(34,197,94,.2); }
+.tag-yellow { background:rgba(232,165,0,.1); color:#b45309; border:1px solid rgba(232,165,0,.2); }
+.tag-red { background:rgba(232,39,75,.1); color:#dc2626; border:1px solid rgba(232,39,75,.2); }
+.tag-purple { background:rgba(124,58,237,.1); color:#7c3aed; border:1px solid rgba(124,58,237,.2); }
+.tag-teal { background:rgba(11,184,160,.1); color:#0d9488; border:1px solid rgba(11,184,160,.2); }
+.tag-orange { background:rgba(240,90,26,.1); color:#ea580c; border:1px solid rgba(240,90,26,.2); }
+.tag-cyan { background:rgba(8,145,178,.1); color:#0891b2; border:1px solid rgba(8,145,178,.2); }
+.tags { display:flex; gap:4px; flex-wrap:wrap; }
+
+/* STATUS DOTS */
+.dot { display:inline-block; width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.dot-green { background:#22c55e; }
+.dot-red { background:#e8274b; }
+.dot-yellow { background:#e8a500; }
+.dot-blue { background:#3b7ef8; }
+.status { display:flex; align-items:center; gap:4px; font-size:11px; }
+.status-on { color:#16a34a; }
+.status-off { color:#dc2626; }
+.status-warn { color:#b45309; }
+.status-info { color:#2563eb; }
+
+/* AVATARS */
+.av { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; color:#fff; }
+.av-sm { width:28px; height:28px; font-size:11px; }
+.av-lg { width:48px; height:48px; font-size:18px; }
+.av-xl { width:64px; height:64px; font-size:24px; }
+.av-stack { display:flex; }
+.av-stack .av { margin-right:-8px; border:2px solid #fff; }
+.av-a { background:linear-gradient(135deg,#3b7ef8,#4f46e5); }
+.av-b { background:linear-gradient(135deg,#22c55e,#0bb8a0); }
+.av-c { background:linear-gradient(135deg,#f59e0b,#f05a1a); }
+.av-d { background:linear-gradient(135deg,#e8274b,#7c3aed); }
+.av-e { background:linear-gradient(135deg,#0891b2,#3b7ef8); }
+.av-online { position:relative; }
+.av-online::after { content:''; position:absolute; bottom:1px; right:1px; width:9px; height:9px; border-radius:50%; background:#22c55e; border:2px solid #fff; }
+
+/* IMAGES / MEDIA */
+.media { border-radius:var(--r2); overflow:hidden; background:var(--surface2); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.media-sq56 { width:56px; height:56px; }
+.media-sq48 { width:48px; height:48px; }
+.media-sq80 { width:80px; height:80px; }
+.media-sq120 { width:120px; min-height:100px; }
+.media-banner { width:100%; min-height:120px; }
+.media-tall { width:100%; min-height:140px; }
+.media-med { width:100%; min-height:100px; }
+.media-sm { width:100%; min-height:80px; }
+/* Gradient placeholders — slightly lighter for light theme */
+.img-music { background:linear-gradient(135deg,#1e2a4a 0%,#243b6e 50%,#1a4080 100%); }
+.img-food { background:linear-gradient(135deg,#ff8c5a,#ffd4a8); }
+.img-travel { background:linear-gradient(135deg,#1a7fe6,#3353c9); }
+.img-product { background:linear-gradient(135deg,#f1f5f9,#e2e8f0); }
+.img-nature { background:linear-gradient(135deg,#166534,#4ade80); }
+.img-space { background:linear-gradient(135deg,#1e1b4b,#312e81,#1e3a5f); }
+.img-sport { background:linear-gradient(135deg,#1d4ed8,#0284c7); }
+.img-art { background:linear-gradient(135deg,#6b21a8,#c026d3); }
+.img-cinema { background:linear-gradient(135deg,#1c1917,#450a0a); }
+.img-tech { background:linear-gradient(135deg,#1e1b4b,#1e3a5f); }
+
+/* DIVIDERS */
+.t-line { border:none; border-top:1px solid var(--border); margin:10px 0; }
+.t-dashed { border-top-style:dashed; }
+
+/* PROGRESS BAR */
+.pbar { height:4px; border-radius:2px; background:var(--border); overflow:hidden; }
+.pbar-fill { height:100%; border-radius:2px; }
+.pbar-blue { background:linear-gradient(90deg,#3b7ef8,#0891b2); }
+.pbar-green { background:linear-gradient(90deg,#0bb8a0,#22c55e); }
+.pbar-yellow { background:linear-gradient(90deg,#e8a500,#f05a1a); }
+.pbar-red { background:linear-gradient(90deg,#e8274b,#db2777); }
+
+/* SPARKLINE */
+.sparkline { display:flex; align-items:flex-end; gap:2px; height:30px; }
+.spark-bar { width:6px; border-radius:2px 2px 0 0; }
+
+/* GRADIENT BACKGROUNDS — for tiles that have bg-* classes */
+.bg-blue { background:linear-gradient(135deg,rgba(59,126,248,.07) 0%,rgba(79,70,229,.1) 100%); border-color:rgba(59,126,248,.2); }
+.bg-teal { background:linear-gradient(135deg,rgba(11,184,160,.07) 0%,rgba(8,145,178,.1) 100%); border-color:rgba(11,184,160,.2); }
+.bg-purple { background:linear-gradient(135deg,rgba(124,58,237,.07) 0%,rgba(219,39,119,.07) 100%); border-color:rgba(124,58,237,.2); }
+.bg-red { background:linear-gradient(135deg,rgba(232,39,75,.07) 0%,rgba(240,90,26,.05) 100%); border-color:rgba(232,39,75,.2); }
+.bg-green { background:linear-gradient(135deg,rgba(34,197,94,.07) 0%,rgba(11,184,160,.08) 100%); border-color:rgba(34,197,94,.2); }
+.bg-yellow { background:linear-gradient(135deg,rgba(232,165,0,.07) 0%,rgba(240,90,26,.05) 100%); border-color:rgba(232,165,0,.2); }
+.bg-vivid { background:linear-gradient(135deg,#312e81,#1e1b4b,#1e3a5f); }
+.bg-cinema { background:linear-gradient(135deg,#1c1917,#450a0a); }
+.bg-space { background:linear-gradient(160deg,#0f0e17,#1e1b4b,#1e1b4b); }
+
+/* PILL PROGRESS */
+.pill-track { display:flex; gap:4px; }
+.pill-seg { height:4px; flex:1; border-radius:2px; }
+
+/* ICON */
+.icon { font-size:16px; line-height:1; flex-shrink:0; }
+.icon-lg { font-size:24px; }
+.icon-xl { font-size:32px; }
+
+/* TIMELINE */
+.tl-dot { width:8px; height:8px; border-radius:50%; background:var(--blue); flex-shrink:0; }
+.tl-line { width:1px; background:var(--border); height:20px; margin:3px auto; }
+.tl-col { display:flex; flex-direction:column; align-items:center; }
+
+/* ACCENT LINE */
+.accent-line { height:3px; border-radius:2px; margin-bottom:12px; }
+.al-blue { background:linear-gradient(90deg,#3b7ef8,#0891b2); }
+.al-teal { background:linear-gradient(90deg,#0bb8a0,#22c55e); }
+.al-purple { background:linear-gradient(90deg,#7c3aed,#db2777); }
+.al-orange { background:linear-gradient(90deg,#f05a1a,#e8a500); }
+
+.tile { transition:border-color .15s, box-shadow .15s; }
+.tile:hover { border-color:var(--border2); box-shadow:0 2px 8px rgba(0,0,0,.06); }
+
+/* OVERLAY TILES */
+.tile-overlay { position:relative; overflow:hidden; }
+.tile-overlay .ov-bg { position:absolute; inset:0; }
+.tile-overlay .ov-content { position:relative; z-index:1; }
+
+/* WAVEFORM */
+.waveform { display:flex; align-items:center; gap:1.5px; height:24px; }
+.wave-bar { width:3px; border-radius:2px; background:#0bb8a0; opacity:.7; }
+
+/* STARS */
+.stars { color:#e8a500; font-size:11px; letter-spacing:1px; }
+
+/* METRIC CHANGE */
+.up { color:#16a34a; font-size:11px; }
+.down { color:#dc2626; font-size:11px; }
+
+/* STEPS */
+.steps { display:flex; align-items:center; gap:4px; font-size:11px; }
+.step-active { color:var(--text1); font-weight:600; }
+.step-done { color:#0d9488; }
+.step-next { color:var(--text3); }
+.step-arrow { color:var(--text3); }
+
+/* KBD */
+.kbd { display:inline-flex; align-items:center; justify-content:center; padding:1px 5px; border-radius:4px; background:var(--surface2); border:1px solid var(--border2); font-size:10px; color:var(--text2); font-family:monospace; }
+
+/* PRICING */
+.price { font-size:20px; font-weight:800; color:var(--text1); }
+.price-old { font-size:12px; color:var(--text3); text-decoration:line-through; }
+.price-cur { font-size:22px; font-weight:800; color:var(--red); }
+
+/* CHAT BUBBLE */
+.bubble { padding:8px 12px; border-radius:12px; max-width:90%; font-size:12px; line-height:1.5; }
+.bubble-left { background:#f1f5f9; border:1px solid var(--border); align-self:flex-start; border-bottom-left-radius:4px; color:var(--text1); }
+.bubble-right { background:linear-gradient(135deg,#3b7ef8,#4f46e5); color:#fff; align-self:flex-end; border-bottom-right-radius:4px; }
+
+/* NOTIFICATION DOT */
+.notif-badge { position:absolute; top:-4px; right:-4px; width:16px; height:16px; border-radius:50%; background:var(--red); border:2px solid #fff; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:#fff; }
+.notif-wrap { position:relative; display:inline-flex; }
+
+/* SCROLL */
+.scroll-x { overflow-x:auto; }
+.scroll-x::-webkit-scrollbar { height:3px; }
+.scroll-x::-webkit-scrollbar-track { background:var(--surface2); }
+.scroll-x::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@media(max-width:400px) { .grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Tile Design Reference</h1>
+  <p>57种卡片布局 · 多主题真实内容 · 浅色系统</p>
+  <div class="page-meta">
+    <span>🎵 音乐播放</span>
+    <span>✈️ 机票航班</span>
+    <span>🍜 外卖餐饮</span>
+    <span>📦 物流快递</span>
+    <span>📈 金融行情</span>
+    <span>🏥 医疗预约</span>
+    <span>🛍️ 电商商品</span>
+    <span>🎮 游戏社交</span>
+    <span>🌤️ 天气日历</span>
+    <span>⚽ 赛事体育</span>
+  </div>
+</div>
+
+<!-- ======================== SECTION 1 ======================== -->
+<p class="section-title">基础信息类 · Basic Info</p>
+<div class="grid">
+
+<!-- 01. 会议与日程 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">01</span><b>会议日程</b> · Meeting Event</div>
+  <div class="tile">
+    <div class="t-row t-between" style="margin-bottom:10px">
+      <div class="t-row" style="gap:6px">
+        <span class="icon">📅</span>
+        <span class="t-cap">周三  10:00 — 11:30</span>
+      </div>
+      <span class="status status-on"><span class="dot dot-green"></span> 进行中</span>
+    </div>
+    <div class="t-h2" style="margin-bottom:4px">Q4产品战略评审会议</div>
+    <div class="t-sub" style="margin-bottom:10px">主持：陈磊 · 会议室 B204 · 腾讯会议同步直播</div>
+    <hr class="t-line">
+    <div class="t-row t-between">
+      <div class="av-stack">
+        <div class="av av-sm av-a">陈</div><div class="av av-sm av-b">刘</div><div class="av av-sm av-c">王</div>
+        <div class="av av-sm" style="background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:10px">+5</div>
+      </div>
+      <div class="tags"><span class="tag tag-blue">高优</span><span class="tag tag-yellow">策略</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 02. 媒体资讯 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">02</span><b>媒体资讯</b> · Media Article</div>
+  <div class="tile" style="padding:0;overflow:hidden">
+    <div class="media media-med img-space" style="position:relative">
+      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8) 0%,transparent 60%)"></div>
+      <div style="position:absolute;bottom:10px;left:12px;right:12px">
+        <div class="tags" style="margin-bottom:6px"><span class="tag tag-cyan">科技</span><span class="tag tag-purple">NASA</span></div>
+        <div class="t-h2">James Webb 拍到迄今最远星系，距地球 134 亿光年</div>
+      </div>
+    </div>
+    <div style="padding:12px">
+      <div class="t-sub" style="margin-bottom:8px">韦伯望远镜最新观测数据揭示了宇宙早期形态，将改写现有宇宙学理论框架……</div>
+      <div class="t-row t-between">
+        <div class="t-row" style="gap:6px"><div class="av av-sm av-a">科</div><span class="t-cap">科技前沿 · 2小时前</span></div>
+        <span class="t-cap">☆ 2.4k</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 03. 用户资料 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">03</span><b>用户资料</b> · User Profile</div>
+  <div class="tile">
+    <div class="t-row" style="gap:12px">
+      <div class="av av-lg av-d av-online" style="flex-shrink:0">李</div>
+      <div class="t-body">
+        <div class="t-h2" style="margin-bottom:2px">李晓雯</div>
+        <div class="t-sub" style="margin-bottom:6px">高级产品经理 · 互联网事业部</div>
+        <div class="tags"><span class="tag tag-purple">Pro</span><span class="tag tag-blue">认证</span></div>
+      </div>
+      <div class="t-right">
+        <div class="t-sub" style="color:var(--text3);font-size:10px;margin-bottom:4px">粉丝</div>
+        <div class="t-num-sm">12.8k</div>
+      </div>
+    </div>
+    <hr class="t-line">
+    <div class="t-row t-between">
+      <div style="text-align:center">
+        <div class="t-num-sm" style="font-size:16px">247</div>
+        <div class="t-cap">动态</div>
+      </div>
+      <div style="text-align:center">
+        <div class="t-num-sm" style="font-size:16px">1.2k</div>
+        <div class="t-cap">关注</div>
+      </div>
+      <div style="text-align:center">
+        <div class="t-num-sm" style="font-size:16px">48</div>
+        <div class="t-cap">收藏</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 04. 任务看板 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">04</span><b>任务看板</b> · Task Board</div>
+  <div class="tile">
+    <div class="t-row t-between" style="margin-bottom:10px">
+      <div class="tags"><span class="tag tag-red">紧急</span><span class="tag tag-blue">前端</span></div>
+      <span class="t-cap">截止 06-22</span>
+    </div>
+    <div class="t-h2" style="margin-bottom:4px">修复移动端首页白屏问题</div>
+    <div class="t-sub" style="margin-bottom:10px">iOS 17.4 Safari 下 LCP 超过 6s，影响转化率约 12%</div>
+    <div class="t-row t-between" style="margin-bottom:8px">
+      <span class="t-cap">进度</span>
+      <span class="t-cap" style="color:var(--blue)">65%</span>
+    </div>
+    <div class="pbar" style="margin-bottom:10px"><div class="pbar-fill pbar-blue" style="width:65%"></div></div>
+    <div class="t-row t-between">
+      <div class="av-stack"><div class="av av-sm av-a">张</div><div class="av av-sm av-b">韩</div></div>
+      <span class="status status-warn"><span class="dot dot-yellow"></span> 进行中</span>
+    </div>
+  </div>
+</div>
+
+<!-- 05. 推广横幅 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">05</span><b>推广横幅</b> · Promo Banner</div>
+  <div class="tile tile-overlay bg-vivid" style="min-height:160px">
+    <div class="ov-content">
+      <div class="tags" style="margin-bottom:10px"><span class="tag tag-yellow">限时</span><span class="tag" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)">会员专享</span></div>
+      <div style="font-size:24px;font-weight:800;line-height:1.2;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px">年度会员<br>3 折起</div>
+      <div class="t-sub" style="margin-bottom:14px">仅剩 <span style="color:var(--yellow);font-weight:600">47:23</span> · 3000+ 课程随心学</div>
+      <button style="background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">立即抢购 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- 06. 紧凑列表 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">06</span><b>紧凑列表</b> · Compact List</div>
+  <div class="tile" style="padding:0;overflow:hidden">
+    <div style="padding:10px 14px;border-bottom:1px solid var(--border)" class="t-row t-between">
+      <div class="t-row" style="gap:8px">
+        <span class="icon">📦</span>
+        <div>
+          <div class="t-h3" style="font-size:13px">顺丰快递 SF1082937</div>
+          <div class="t-cap">上海转运中心 → 北京朝阳</div>
+        </div>
+      </div>
+      <span class="status status-on"><span class="dot dot-green"></span>派送</span>
+    </div>
+    <div style="padding:10px 14px;border-bottom:1px solid var(--border)" class="t-row t-between">
+      <div class="t-row" style="gap:8px">
+        <span class="icon">📦</span>
+        <div>
+          <div class="t-h3" style="font-size:13px">京东快递 JD2094811</div>
+          <div class="t-cap">广州发货中 · 预计明天到</div>
+        </div>
+      </div>
+      <span class="status status-info"><span class="dot dot-blue"></span>运输</span>
+    </div>
+    <div style="padding:10px 14px" class="t-row t-between">
+      <div class="t-row" style="gap:8px">
+        <span class="icon">📦</span>
+        <div>
+          <div class="t-h3" style="font-size:13px">菜鸟驿站 TK4920183</div>
+          <div class="t-cap">已存入驿站 · A区8号柜</div>
+        </div>
+      </div>
+      <span class="tag tag-yellow">待取</span>
+    </div>
+  </div>
+</div>
+
+<!-- 07. 图文卡片 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">07</span><b>图文卡片</b> · Split Content</div>
+  <div class="tile">
+    <div class="t-row" style="gap:12px">
+      <div class="media media-sq80 img-food" style="border-radius:8px;flex-shrink:0;position:relative">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px">🍜</div>
+        <span class="tag tag-red" style="position:absolute;top:6px;left:6px;font-size:10px">热销</span>
+      </div>
+      <div class="t-body">
+        <div class="t-h2" style="margin-bottom:3px">重庆小面·招牌麻辣</div>
+        <div class="t-sub" style="margin-bottom:6px">川渝老字号 · 30年秘制配方</div>
+        <div class="stars">★★★★★</div>
+        <div class="t-row t-between" style="margin-top:6px">
+          <span style="color:var(--red);font-weight:700;font-size:15px">¥18</span>
+          <span class="t-cap">月售 4.2k</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 08. 通知消息 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">08</span><b>通知消息</b> · Notification</div>
+  <div class="tile">
+    <div class="t-row" style="gap:10px;margin-bottom:10px">
+      <div class="notif-wrap">
+        <div class="av av-b" style="background:linear-gradient(135deg,#4cdb8c,#20e3b2)">支</div>
+        <span class="notif-badge">1</span>
+      </div>
+      <div class="t-body">
+        <div class="t-row t-between">
+          <span class="t-h3">支付宝到账通知</span>
+          <span class="t-cap">刚刚</span>
+        </div>
+        <div class="t-sub">收到转账 <span style="color:var(--green);font-weight:600">¥328.00</span></div>
+      </div>
+    </div>
+    <div class="bubble bubble-left">来自：王芳 · 备注"报销餐费"</div>
+  </div>
+</div>
+
+<!-- 09. 背景封面 Hero -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">09</span><b>背景封面</b> · Hero Profile</div>
+  <div class="tile tile-overlay bg-space" style="min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px">
+    <div class="av av-xl" style="background:linear-gradient(135deg,#7b2d8b,#e040fb);margin-bottom:12px;font-size:28px">🎭</div>
+    <div class="t-h1" style="text-align:center;margin-bottom:4px">独立游戏工作室</div>
+    <div class="t-sub" style="text-align:center;margin-bottom:12px">Starfall Interactive</div>
+    <div class="tags" style="justify-content:center"><span class="tag tag-purple">Indie</span><span class="tag tag-cyan">Steam</span><span class="tag tag-blue">4款游戏</span></div>
+  </div>
+</div>
+
+<!-- 10. 时间轴 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">10</span><b>时间轴节点</b> · Timeline Node</div>
+  <div class="tile">
+    <div class="t-h3" style="margin-bottom:12px">✈️ 上海 → 东京 · 行程追踪</div>
+    <div class="t-row" style="gap:0">
+      <div class="tl-col" style="width:60px;flex-shrink:0">
+        <span class="t-cap">08:30</span>
+        <div class="tl-dot" style="background:var(--green)"></div>
+        <div class="tl-line"></div>
+        <div class="tl-dot" style="background:var(--blue)"></div>
+        <div class="tl-line"></div>
+        <div class="tl-dot" style="background:var(--text3)"></div>
+        <span class="t-cap">15:45</span>
+      </div>
+      <div class="t-body" style="padding-left:8px">
+        <div style="margin-bottom:16px">
+          <div class="t-h3" style="color:var(--green);font-size:12px">已出发 · 浦东国际机场 T2</div>
+          <div class="t-cap">CA841 · 经济舱 · 座位 23A</div>
+        </div>
+        <div style="margin-bottom:16px">
+          <div class="t-h3" style="font-size:12px">飞行中 · 预计飞行 3h 20min</div>
+          <div class="t-cap">当前高度 10,700m · 时速 878km/h</div>
+        </div>
+        <div>
+          <div class="t-h3" style="color:var(--text3);font-size:12px">待抵达 · 成田国际机场 T2</div>
+          <div class="t-cap">+30min 延误预警</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 11. 消息留言 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">11</span><b>消息留言</b> · Message Thread</div>
+  <div class="tile">
+    <div class="t-row" style="gap:10px">
+      <div class="av av-c av-online" style="flex-shrink:0">M</div>
+      <div class="t-body">
+        <div class="t-row t-between">
+          <span class="t-h3">Mia Chen</span>
+          <span class="t-cap">19:42</span>
+        </div>
+        <div class="t-sub" style="margin-bottom:4px">设计稿已经更新到 Figma 了，你帮我看看第三屏的配色有没有问题</div>
+        <div class="t-row" style="gap:6px">
+          <span class="tag tag-teal">设计</span>
+          <span class="t-cap">附件: ui_v3.fig</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 12. 电子票务 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">12</span><b>电子票务</b> · E-Ticket</div>
+  <div class="tile" style="padding:0;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#1565C0,#0d47a1);padding:16px">
+      <div class="t-row t-between" style="margin-bottom:12px">
+        <span class="t-cap" style="color:rgba(255,255,255,.6)">中国国际航空 CA841</span>
+        <span class="tag" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3)">经济舱</span>
+      </div>
+      <div class="t-row" style="gap:0;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:32px;font-weight:800;color:#fff;letter-spacing:-1px">PVG</div>
+          <div style="color:rgba(255,255,255,.7);font-size:11px">上海浦东</div>
+        </div>
+        <div style="text-align:center">
+          <div style="color:rgba(255,255,255,.5);font-size:12px">3h 20m</div>
+          <div style="color:rgba(255,255,255,.4);font-size:18px">━━ ✈ ━━</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:32px;font-weight:800;color:#fff;letter-spacing:-1px">NRT</div>
+          <div style="color:rgba(255,255,255,.7);font-size:11px">东京成田</div>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px dashed var(--border);padding:12px;background:var(--surface2)">
+      <div class="t-row t-between">
+        <div><div class="t-cap">出发</div><div class="t-h3">06:30</div></div>
+        <div><div class="t-cap">座位</div><div class="t-h3">23A</div></div>
+        <div><div class="t-cap">登机口</div><div class="t-h3">B12</div></div>
+        <div><div class="t-cap">日期</div><div class="t-h3">06-25</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /grid -->
+
+<!-- ======================== SECTION 2 ======================== -->
+<p class="section-title">数据与指标类 · Data & Metrics</p>
+<div class="grid">
+
+<!-- 13. 密集信息列表 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">13</span><b>密集信息</b> · Dense Detail</div>
+  <div class="tile">
+    <div class="t-row" style="gap:10px">
+      <div class="media media-sq48 img-sport" style="border-radius:8px;flex-shrink:0">
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px">⚽</div>
+      </div>
+      <div class="t-body">
+        <div class="t-row t-between" style="margin-bottom:2px">
+          <span class="t-h3">曼城 vs 皇马</span>
+          <span class="status status-on"><span class="dot dot-green"></span>直播</span>
+        </div>
+        <div class="t-row" style="gap:4px;margin-bottom:4px">
+          <span class="tag tag-blue">欧冠</span><span class="tag tag-yellow">半决赛</span>
+        </div>
+        <div class="t-sub">埃蒂哈德体育场 · 第 67 分钟</div>
+      </div>
+    </div>
+    <hr class="t-line">
+    <div class="t-row" style="justify-content:space-around">
+      <div style="text-align:center"><div style="font-size:28px;font-weight:800;color:var(--cyan)">3</div><div class="t-cap">曼城</div></div>
+      <div style="text-align:center"><div class="t-cap" style="font-size:16px;margin-bottom:4px">—</div></div>
+      <div style="text-align:center"><div style="font-size:28px;font-weight:800;color:var(--yellow)">2</div><div class="t-cap">皇马</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 14. 竖向海报 -->
+<div class="demo" style="max-width:240px">
+  <div class="demo-label"><span class="demo-num">14</span><b>竖向海报</b> · Vertical Poster</div>
+  <div class="tile" style="padding:0;overflow:hidden">
+    <div class="media media-tall img-cinema" style="position:relative">
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-size:48px;margin-bottom:8px">🎬</div>
+        <div style="font-size:22px;font-weight:800;color:#fff;text-align:center;padding:0 16px">奥本海默</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.6)">Oppenheimer</div>
+      </div>
+    </div>
+    <div style="padding:12px">
+      <div class="t-row t-between" style="margin-bottom:6px">
+        <div class="stars">★★★★★</div>
+        <span class="t-cap">9.0分</span>
+      </div>
+      <div class="t-sub" style="margin-bottom:8px">克里斯托弗·诺兰 · 2023 · 传记</div>
+      <div class="tags"><span class="tag tag-purple">传记</span><span class="tag tag-blue">历史</span><span class="tag tag-red">剧情</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 15. 工单详情 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">15</span><b>工单详情</b> · Issue Detail</div>
+  <div class="tile">
+    <div class="accent-line al-orange"></div>
+    <div class="t-row t-between" style="margin-bottom:8px">
+      <div class="tags"><span class="tag tag-red">P0 紧急</span><span class="tag tag-orange">线上故障</span></div>
+      <span class="t-mono" style="color:var(--text3)">#INC-20847</span>
+    </div>
+    <div class="t-h2" style="margin-bottom:4px">支付服务响应超时，影响约 1800 笔/分钟</div>
+    <div class="t-sub" style="margin-bottom:10px">起始时间 14:32 · 已持续 <span style="color:var(--red);font-weight:600">23分钟</span> · 预计 15 分钟内恢复</div>
+    <div class="steps">
+      <span class="step-done">✓ 告警</span><span class="step-arrow">›</span>
+      <span class="step-done">✓ 定位</span><span class="step-arrow">›</span>
+      <span class="step-active">⚙ 修复</span><span class="step-arrow">›</span>
+      <span class="step-next">验证</span><span class="step-arrow">›</span>
+      <span class="step-next">关闭</span>
+    </div>
+    <hr class="t-line">
+    <div class="t-row t-between">
+      <div class="t-row" style="gap:6px"><div class="av av-sm av-a">苟</div><span class="t-cap">负责人：苟杰</span></div>
+      <span class="t-cap">SLA 剩余 37min</span>
+    </div>
+  </div>
+</div>
+
+<!-- 16. 团队目录 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">16</span><b>团队目录</b> · Team Directory</div>
+  <div class="tile">
+    <div class="t-h2" style="margin-bottom:10px">🏢 增长与数据团队</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="t-row t-between">
+        <div class="t-row" style="gap:8px"><div class="av av-sm av-a av-online">赵</div><div><div class="t-h3" style="font-size:12px">赵晓燕</div><div class="t-cap">产品 Lead</div></div></div>
+        <span class="status status-on"><span class="dot dot-green"></span>在线</span>
+      </div>
+      <div class="t-row t-between">
+        <div class="t-row" style="gap:8px"><div class="av av-sm av-b">钱</div><div><div class="t-h3" style="font-size:12px">钱志强</div><div class="t-cap">数据分析师</div></div></div>
+        <span class="status status-warn"><span class="dot dot-yellow"></span>开会中</span>
+      </div>
+      <div class="t-row t-between">
+        <div class="t-row" style="gap:8px"><div class="av av-sm av-c">孙</div><div><div class="t-h3" style="font-size:12px">孙美琪</div><div class="t-cap">增长运营</div></div></div>
+        <span class="status status-off"><span class="dot dot-red"></span>离线</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 17. 沉浸高光 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">17</span><b>沉浸高光</b> · Immersive</div>
+  <div class="tile tile-overlay" style="min-height:160px;background:linear-gradient(160deg,#0a0a2e,#1a0d4f,#0d2040)">
+    <div style="position:absolute;top:-20px;right:-20px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(79,142,247,.3),transparent 70%);pointer-events:none"></div>
+    <div class="t-row t-between" style="margin-bottom:14px">
+      <span class="tag tag-cyan">🎵 正在播放</span>
+      <span class="t-cap" style="color:rgba(255,255,255,.4)">无损音质</span>
+    </div>
+    <div class="t-h1" style="font-size:20px;margin-bottom:4px">晴天</div>
+    <div class="t-sub" style="margin-bottom:16px;color:rgba(255,255,255,.6)">周杰伦 · 叶惠美</div>
+    <div class="waveform" style="margin-bottom:10px">
+      <div class="wave-bar" style="height:8px"></div><div class="wave-bar" style="height:14px"></div><div class="wave-bar" style="height:18px"></div><div class="wave-bar" style="height:22px"></div><div class="wave-bar" style="height:16px"></div><div class="wave-bar" style="height:10px"></div><div class="wave-bar" style="height:20px"></div><div class="wave-bar" style="height:24px"></div><div class="wave-bar" style="height:18px"></div><div class="wave-bar" style="height:12px"></div><div class="wave-bar" style="height:16px"></div><div class="wave-bar" style="height:8px"></div>
+      <div class="wave-bar" style="height:14px;opacity:.3"></div><div class="wave-bar" style="height:18px;opacity:.3"></div><div class="wave-bar" style="height:22px;opacity:.3"></div><div class="wave-bar" style="height:10px;opacity:.3"></div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" style="width:42%;background:linear-gradient(90deg,var(--cyan),var(--blue))"></div></div>
+    <div class="t-row t-between" style="margin-top:6px">
+      <span class="t-cap" style="color:rgba(255,255,255,.4)">1:47</span>
+      <span class="t-cap" style="color:rgba(255,255,255,.4)">4:17</span>
+    </div>
+  </div>
+</div>
+
+<!-- 18. 迷你状态 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">18</span><b>迷你状态</b> · Mini Status</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <div class="tile bg-green">
+      <div class="t-cap" style="color:var(--teal);margin-bottom:4px">CPU</div>
+      <div class="t-num-sm">34%</div>
+      <div class="pbar" style="margin-top:6px"><div class="pbar-fill pbar-green" style="width:34%"></div></div>
+    </div>
+    <div class="tile bg-blue">
+      <div class="t-cap" style="color:var(--blue);margin-bottom:4px">内存</div>
+      <div class="t-num-sm">67%</div>
+      <div class="pbar" style="margin-top:6px"><div class="pbar-fill pbar-blue" style="width:67%"></div></div>
+    </div>
+    <div class="tile bg-yellow">
+      <div class="t-cap" style="color:var(--yellow);margin-bottom:4px">磁盘</div>
+      <div class="t-num-sm">82%</div>
+      <div class="pbar" style="margin-top:6px"><div class="pbar-fill pbar-yellow" style="width:82%"></div></div>
+    </div>
+    <div class="tile bg-red">
+      <div class="t-cap" style="color:var(--red);margin-bottom:4px">带宽</div>
+      <div class="t-num-sm">91%</div>
+      <div class="pbar" style="margin-top:6px"><div class="pbar-fill pbar-red" style="width:91%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 19. 双栏内容 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">19</span><b>双栏内容</b> · Dual Column</div>
+  <div class="tile">
+    <div class="t-h3" style="margin-bottom:10px">🌤️ 天气预报 · 北京</div>
+    <div class="t-row" style="gap:8px;align-items:stretch">
+      <div class="t-col" style="text-align:center;background:var(--bg);border-radius:8px;padding:12px">
+        <div style="font-size:36px;margin-bottom:4px">☀️</div>
+        <div style="font-size:28px;font-weight:800;color:var(--yellow)">32°</div>
+        <div class="t-cap" style="margin-top:4px">今天 · 晴</div>
+        <div class="t-cap">体感 35°</div>
+      </div>
+      <div class="t-col" style="background:var(--bg);border-radius:8px;padding:10px">
+        <div class="t-row t-between" style="margin-bottom:8px"><span class="t-cap">湿度</span><span class="t-sub" style="font-size:12px">42%</span></div>
+        <div class="t-row t-between" style="margin-bottom:8px"><span class="t-cap">风速</span><span class="t-sub" style="font-size:12px">3.2 m/s</span></div>
+        <div class="t-row t-between" style="margin-bottom:8px"><span class="t-cap">紫外线</span><span class="tag tag-red" style="font-size:10px">强</span></div>
+        <div class="t-row t-between"><span class="t-cap">空气</span><span class="tag tag-green" style="font-size:10px">优</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 20. 画廊 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">20</span><b>画廊展示</b> · Gallery</div>
+  <div class="tile" style="padding:0;overflow:hidden">
+    <div style="display:grid;grid-template-columns:2fr 1fr;grid-template-rows:80px 80px;gap:2px">
+      <div class="img-art" style="grid-row:1/3;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative">
+        🎨
+        <span class="tag tag-yellow" style="position:absolute;top:8px;left:8px;font-size:10px">精选</span>
+      </div>
+      <div class="img-nature" style="display:flex;align-items:center;justify-content:center;font-size:24px">🌿</div>
+      <div class="img-space" style="display:flex;align-items:center;justify-content:center;font-size:24px">🌌</div>
+    </div>
+    <div style="padding:12px">
+      <div class="t-h3" style="margin-bottom:4px">「像素与星光」数字艺术展</div>
+      <div class="t-row t-between">
+        <div class="t-row" style="gap:4px"><div class="av av-sm av-d">顾</div><span class="t-cap">顾晨艺术工作室</span></div>
+        <span class="t-cap">32幅</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 21. 核心指标 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">21</span><b>核心指标</b> · Key Metric</div>
+  <div class="tile bg-teal">
+    <div class="accent-line al-teal"></div>
+    <div class="t-row t-between" style="margin-bottom:10px">
+      <span class="t-cap">今日 GMV</span>
+      <span class="up">↑ 23.4%</span>
+    </div>
+    <div class="t-num" style="color:var(--teal);margin-bottom:4px">¥4,287,391</div>
+    <div class="t-cap" style="margin-bottom:16px">较昨日 +¥810,247</div>
+    <div class="sparkline">
+      <div class="spark-bar" style="height:40%;background:var(--teal);opacity:.4"></div>
+      <div class="spark-bar" style="height:55%;background:var(--teal);opacity:.5"></div>
+      <div class="spark-bar" style="height:45%;background:var(--teal);opacity:.5"></div>
+      <div class="spark-bar" style="height:70%;background:var(--teal);opacity:.6"></div>
+      <div class="spark-bar" style="height:60%;background:var(--teal);opacity:.6"></div>
+      <div class="spark-bar" style="height:80%;background:var(--teal);opacity:.7"></div>
+      <div class="spark-bar" style="height:75%;background:var(--teal);opacity:.7"></div>
+      <div class="spark-bar" style="height:100%;background:var(--teal)"></div>
+    </div>
+    <div class="t-cap" style="margin-top:8px">实时更新 · 2024-06-19</div>
+  </div>
+</div>
+
+<!-- 22. 悬浮头像 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">22</span><b>悬浮头像</b> · Overlay Avatar</div>
+  <div class="tile" style="padding:0;overflow:hidden">
+    <div class="media media-med img-nature" style="position:relative">
+      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 50%)"></div>
+      <div style="position:absolute;bottom:-24px;left:16px">
+        <div class="av av-lg" style="background:linear-gradient(135deg,var(--green),var(--teal));border:3px solid var(--surface2)">🌱</div>
+      </div>
+      <span class="tag tag-green" style="position:absolute;top:10px;right:10px">自然摄影</span>
+    </div>
+    <div style="padding:12px;padding-top:32px">
+      <div class="t-h2" style="margin-bottom:4px">林间晨雾 · 武夷山系列</div>
+      <div class="t-row t-between">
+        <span class="t-sub">摄影师：林苑</span>
+        <div class="t-row" style="gap:8px"><span class="t-cap">♥ 1.8k</span><span class="t-cap">◎ 342</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 23. 分页导航 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">23</span><b>分页导航</b> · Pagination</div>
+  <div class="tile">
+    <div class="t-cap" style="margin-bottom:10px">共检索到 <span style="color:var(--blue)">1,482</span> 条结果</div>
+    <div class="t-row" style="gap:8px;margin-bottom:12px;overflow-x:auto">
+      <button style="width:32px;height:32px;border-radius:6px;background:var(--blue);color:#fff;border:none;font-weight:600;cursor:pointer">1</button>
+      <button style="width:32px;height:32px;border-radius:6px;background:var(--surface);color:var(--text2);border:1px solid var(--border);cursor:pointer">2</button>
+      <button style="width:32px;height:32px;border-radius:6px;background:var(--surface);color:var(--text2);border:1px solid var(--border);cursor:pointer">3</button>
+      <span style="color:var(--text3);align-self:center">···</span>
+      <button style="width:32px;height:32px;border-radius:6px;background:var(--surface);color:var(--text2);border:1px solid var(--border);cursor:pointer">48</button>
+      <button style="height:32px;padding:0 10px;border-radius:6px;background:var(--surface);color:var(--text2);border:1px solid var(--border);cursor:pointer;white-space:nowrap">下一页 →</button>
+    </div>
+    <div class="t-row t-between">
+      <span class="t-cap">每页 30 条</span>
+      <span class="t-cap">第 1 / 50 页</span>
+    </div>
+  </div>
+</div>
+
+<!-- 24. 日历单元 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">24</span><b>日历单元</b> · Calendar Cell</div>
+  <div class="tile">
+    <div class="t-row t-between" style="margin-bottom:12px">
+      <span class="t-h3">六月 2024</span>
+      <div class="t-row" style="gap:6px">
+        <button style="background:none;border:1px solid var(--border);border-radius:4px;color:var(--text2);padding:2px 8px;cursor:pointer">‹</button>
+        <button style="background:none;border:1px solid var(--border);border-radius:4px;color:var(--text2);padding:2px 8px;cursor:pointer">›</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center">
+      <div class="t-cap">日</div><div class="t-cap">一</div><div class="t-cap">二</div><div class="t-cap">三</div><div class="t-cap">四</div><div class="t-cap">五</div><div class="t-cap">六</div>
+      <div style="grid-column:1" class="t-cap" style="visibility:hidden"></div>
+      <div style="padding:3px;border-radius:4px" class="t-cap">1</div><div style="padding:3px" class="t-cap">2</div>
+      <div style="padding:3px" class="t-cap">3</div><div style="padding:3px" class="t-cap">4</div><div style="padding:3px" class="t-cap">5</div><div style="padding:3px" class="t-cap">6</div><div style="padding:3px" class="t-cap">7</div>
+      <div style="padding:3px" class="t-cap">8</div><div style="padding:3px" class="t-cap">9</div><div style="padding:3px" class="t-cap">10</div>
+      <div style="padding:3px" class="t-cap">11</div><div style="padding:3px" class="t-cap">12</div><div style="padding:3px" class="t-cap">13</div><div style="padding:3px" class="t-cap">14</div>
+      <div style="padding:3px" class="t-cap">15</div><div style="padding:3px" class="t-cap">16</div><div style="padding:3px" class="t-cap">17</div>
+      <div style="padding:3px" class="t-cap">18</div>
+      <div style="padding:3px;background:var(--blue);border-radius:4px;color:#fff;font-weight:700;font-size:11px">19</div>
+      <div style="padding:3px" class="t-cap">20</div><div style="padding:3px" class="t-cap">21</div>
+      <div style="padding:3px;position:relative" class="t-cap">22<span style="position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--orange)"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 25. 侧边状态 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">25</span><b>侧边状态</b> · Side Status</div>
+  <div class="tile" style="padding:0;overflow:hidden">
+    <div style="display:flex">
+      <div style="width:5px;background:linear-gradient(to bottom,var(--green),var(--teal))"></div>
+      <div style="padding:12px;flex:1">
+        <div class="t-row t-between" style="margin-bottom:6px">
+          <span class="t-h3">医疗预约确认</span>
+          <span class="status status-on"><span class="dot dot-green"></span> 已确认</span>
+        </div>
+        <div class="t-sub" style="margin-bottom:4px">北京协和医院 · 内科门诊 · 专家号</div>
+        <div class="t-cap" style="margin-bottom:8px">就诊医生：王建国 主任医师</div>
+        <div class="t-row" style="gap:6px">
+          <span class="tag tag-teal">📅 06-22 上午</span>
+          <span class="tag tag-blue">9:30</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /grid -->
+
+<!-- ======================== SECTION 3 ======================== -->
+<p class="section-title">商品与交易类 · Commerce & Transactions</p>
+<div class="grid">
+
+<!-- 26. 多标签 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">26</span><b>商品标签</b> · Multi-Tag Product</div>
+  <div class="tile">
+    <div class="tags" style="margin-bottom:10px"><span class="tag tag-red">新品</span><span class="tag tag-yellow">爆款</span><span class="tag tag-green">现货</span><span class="tag tag-purple">独家</span></div>
+    <div class="t-h2" style="margin-bottom:4px">Sony WH-1000XM6 主动降噪耳机</div>
+    <div class="t-sub" style="margin-bottom:10px">30小时续航 · LDAC无损 · 智能对话模式</div>
+    <div class="t-row t-between">
+      <div>
+        <span class="price-cur">¥2,299</span>
+        <span class="price-old" style="margin-left:6px">¥2,999</span>
+      </div>
+      <button style="background:linear-gradient(135deg,var(--blue),var(--indigo));color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer">加入购物车</button>
+    </div>
+  </div>
+</div>
+
+<!-- 27. 排班计划 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">27</span><b>排班计划</b> · Shift Planner</div>
+  <div class="tile">
+    <div class="t-h3" style="margin-bottom:10px">🏪 本周客服排班 · 6月</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div class="t-row" style="gap:6px">
+        <span class="t-cap" style="width:50px;flex-shrink:0">周一</span>
+        <div class="pill-track" style="flex:1">
+          <div class="pill-seg" style="background:var(--blue);flex:3"></div>
+          <div class="pill-seg" style="background:var(--green);flex:4"></div>
+          <div class="pill-seg" style="background:var(--border);flex:5"></div>
+        </div>
+        <div class="av av-sm av-a">张</div>
+      </div>
+      <div class="t-row" style="gap:6px">
+        <span class="t-cap" style="width:50px;flex-shrink:0">周二</span>
+        <div class="pill-track" style="flex:1">
+          <div class="pill-seg" style="background:var(--border);flex:2"></div>
+          <div class="pill-seg" style="background:var(--purple);flex:5"></div>
+          <div class="pill-seg" style="background:var(--border);flex:5"></div>
+        </div>
+        <div class="av av-sm av-b">李</div>
+      </div>
+      <div class="t-row" style="gap:6px">
+        <span class="t-cap" style="width:50px;flex-shrink:0">周三</span>
+        <div class="pill-track" style="flex:1">
+          <div class="pill-seg" style="background:var(--orange);flex:4"></div>
+          <div class="pill-seg" style="background:var(--border);flex:3"></div>
+          <div class="pill-seg" style="background:var(--teal);flex:5"></div>
+        </div>
+        <div class="av av-sm av-c">王</div>
+      </div>
+    </div>
+    <div class="t-row" style="gap:8px;margin-top:10px">
+      <span class="t-cap" style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:var(--blue);display:inline-block"></span>早班</span>
+      <span class="t-cap" style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:var(--green);display:inline-block"></span>午班</span>
+      <span class="t-cap" style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:var(--purple);display:inline-block"></span>晚班</span>
+    </div>
+  </div>
+</div>
+
+<!-- 28. 社交动态 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">28</span><b>社交动态</b> · Social Post</div>
+  <div class="tile">
+    <div class="t-row" style="gap:10px;margin-bottom:10px">
+      <div class="av av-e av-online" style="flex-shrink:0">🎮</div>
+      <div class="t-body">
+        <div class="t-row t-between">
+          <span class="t-h3">GameMaster_小鹿</span>
+          <span class="t-cap">3小时前</span>
+        </div>
+        <div class="tags"><span class="tag tag-purple">Steam</span></div>
+      </div>
+    </div>
+    <div class="t-sub" style="margin-bottom:10px">刚通关《Elden Ring》，全DLC 100% 成就达成！影区实在太难了，建议大家先升到150级再去挑战邪龙 🐉</div>
+    <div class="media media-sm img-tech" style="border-radius:8px;margin-bottom:10px;align-items:center;justify-content:center">
+      <div style="text-align:center"><div style="font-size:36px">🏆</div><div class="t-cap" style="color:var(--yellow);font-weight:600">成就解锁 100%</div></div>
+    </div>
+    <div class="t-row" style="gap:16px">
+      <span class="t-cap" style="cursor:pointer">❤️ 2.8k</span>
+      <span class="t-cap" style="cursor:pointer">💬 347</span>
+      <span class="t-cap" style="cursor:pointer">↗️ 分享</span>
+    </div>
+  </div>
+</div>
+
+<!-- 29. 电商商品 -->
+<div class="demo" style="max-width:240px">
+  <div class="demo-label"><span class="demo-num">29</span><b>电商商品</b> · Product Card</div>
+  <div class="tile" style="padding:0;overflow:hidden">
+    <div class="media media-tall img-product" style="position:relative">
+      <div style="font-size:60px">👟</div>
+      <span class="tag tag-red" style="position:absolute;top:10px;left:10px">-30%</span>
+    </div>
+    <div style="padding:12px">
+      <div class="tags" style="margin-bottom:6px"><span class="tag tag-blue">Nike</span><span class="tag tag-green">现货</span></div>
+      <div class="t-h2" style="margin-bottom:4px;font-size:13px">Air Jordan 1 Retro High OG "Chicago"</div>
+      <div class="stars" style="margin-bottom:6px">★★★★★ <span class="t-cap">(4.9)</span></div>
+      <div class="t-row t-between">
+        <div><div class="price-cur" style="font-size:18px">¥1,499</div><div class="price-old">¥2,099</div></div>
+        <button style="background:var(--red);color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer">购买</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 30. 双人对比 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">30</span><b>对抗对比</b> · Dual Comparison</div>
+  <div class="tile">
+    <div class="t-cap" style="text-align:center;margin-bottom:12px">🎮 排位对局 · 天梯匹配中</div>
+    <div class="t-row" style="gap:8px;justify-content:space-between;align-items:center">
+      <div style="text-align:center;flex:1">
+        <div class="av av-lg av-a" style="margin:0 auto 6px">张</div>
+        <div class="t-h3">张小帅</div>
+        <div class="t-cap">钻石 I</div>
+        <div class="t-num-sm" style="color:var(--blue);font-size:16px">87%</div>
+        <div class="t-cap">胜率</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:20px;font-weight:800;color:var(--red)">VS</div>
+        <div class="t-cap" style="margin-top:4px">BO5</div>
+      </div>
+      <div style="text-align:center;flex:1">
+        <div class="av av-lg av-d" style="margin:0 auto 6px">李</div>
+        <div class="t-h3">李大剑</div>
+        <div class="t-cap">钻石 II</div>
+        <div class="t-num-sm" style="color:var(--purple);font-size:16px">72%</div>
+        <div class="t-cap">胜率</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 31. 侧栏大图 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">31</span><b>侧栏大图</b> · Feature Image</div>
+  <div class="tile">
+    <div class="t-row" style="gap:12px">
+      <div class="media" style="width:100px;min-height:100px;flex-shrink:0;border-radius:8px;overflow:hidden">
+        <div class="img-travel" style="width:100%;height:100%;min-height:100px;display:flex;align-items:center;justify-content:center;font-size:36px">🗼</div>
+      </div>
+      <div class="t-body">
+        <div class="tags" style="margin-bottom:6px"><span class="tag tag-teal">特价</span><span class="tag tag-blue">直飞</span></div>
+        <div class="t-h2" style="margin-bottom:4px;font-size:14px">巴黎·8天深度游</div>
+        <div class="t-sub" style="margin-bottom:6px;font-size:11px">含往返机票+5星酒店+全程导游</div>
+        <div class="t-cap" style="margin-bottom:8px">出发日期：07-15 · 08-10</div>
+        <div class="t-row t-between">
+          <span style="color:var(--red);font-weight:800;font-size:16px">¥12,800</span>
+          <span class="t-cap">/ 人起</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 32. 工作流 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">32</span><b>工作流</b> · Workflow Strip</div>
+  <div class="tile">
+    <div class="t-h3" style="margin-bottom:12px">📦 订单处理流程</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+      <div style="text-align:center;flex:1">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 4px;font-size:14px">✓</div>
+        <div class="t-cap" style="color:var(--green)">下单</div>
+      </div>
+      <div style="flex:1;height:2px;background:var(--green)"></div>
+      <div style="text-align:center;flex:1">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 4px;font-size:14px">✓</div>
+        <div class="t-cap" style="color:var(--green)">付款</div>
+      </div>
+      <div style="flex:1;height:2px;background:linear-gradient(90deg,var(--green),var(--border2))"></div>
+      <div style="text-align:center;flex:1">
+        <div style="width:36px;height:36px;border-radius:50%;border:2px solid var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 4px;font-size:14px">📦</div>
+        <div class="t-cap" style="color:var(--blue)">备货</div>
+      </div>
+      <div style="flex:1;height:2px;background:var(--border)"></div>
+      <div style="text-align:center;flex:1">
+        <div style="width:36px;height:36px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;margin:0 auto 4px;font-size:14px;color:var(--text3)">🚚</div>
+        <div class="t-cap">配送</div>
+      </div>
+      <div style="flex:1;height:2px;background:var(--border)"></div>
+      <div style="text-align:center;flex:1">
+        <div style="width:36px;height:36px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;margin:0 auto 4px;font-size:14px;color:var(--text3)">✅</div>
+        <div class="t-cap">签收</div>
+      </div>
+    </div>
+    <div class="t-cap" style="margin-top:10px">当前：备货中 · 预计06-20发出</div>
+  </div>
+</div>
+
+</div><!-- /grid -->
+
+<!-- ======================== SECTION 4 ======================== -->
+<p class="section-title">金融与数据类 · Finance & Analytics</p>
+<div class="grid">
+
+<!-- 33. 文字背景 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">33</span><b>文字背景</b> · Text Over BG</div>
+  <div class="tile tile-overlay" style="min-height:140px;background:linear-gradient(135deg,#0a2540,#1a4a7a)">
+    <div style="position:absolute;right:-20px;bottom:-20px;width:120px;height:120px;border-radius:50%;background:rgba(79,142,247,.1);pointer-events:none"></div>
+    <div class="tags" style="margin-bottom:10px"><span class="tag tag-blue">股票</span><span class="tag tag-green">A股</span></div>
+    <div class="t-h1" style="margin-bottom:2px">贵州茅台</div>
+    <div class="t-sub" style="margin-bottom:10px;color:rgba(255,255,255,.6)">SH: 600519</div>
+    <div class="t-row t-between">
+      <div>
+        <div style="font-size:28px;font-weight:800;color:var(--red)">¥1,742.30</div>
+        <div style="color:var(--red);font-size:12px">▲ 23.40 (1.36%)</div>
+      </div>
+      <div style="text-align:right">
+        <div class="t-cap" style="color:rgba(255,255,255,.5)">成交额</div>
+        <div class="t-sub" style="color:rgba(255,255,255,.8)">82.4亿</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 34. 微型标记 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">34</span><b>微型标记</b> · Micro Badge</div>
+  <div class="tile">
+    <div class="t-row t-between" style="margin-bottom:12px">
+      <span class="t-h3">加密货币行情</span>
+      <span class="t-cap">实时</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="t-row t-between">
+        <div class="t-row" style="gap:8px">
+          <div style="width:32px;height:32px;border-radius:50%;background:#f7931a;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0">₿</div>
+          <div><div class="t-h3" style="font-size:12px">Bitcoin</div><div class="t-cap">BTC/USDT</div></div>
+        </div>
+        <div style="text-align:right">
+          <div class="t-h3" style="font-size:14px">$67,420</div>
+          <div class="up">▲ 2.41%</div>
+        </div>
+      </div>
+      <div class="t-row t-between">
+        <div class="t-row" style="gap:8px">
+          <div style="width:32px;height:32px;border-radius:50%;background:#627eea;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">Ξ</div>
+          <div><div class="t-h3" style="font-size:12px">Ethereum</div><div class="t-cap">ETH/USDT</div></div>
+        </div>
+        <div style="text-align:right">
+          <div class="t-h3" style="font-size:14px">$3,512</div>
+          <div class="down">▼ 0.87%</div>
+        </div>
+      </div>
+      <div class="t-row t-between">
+        <div class="t-row" style="gap:8px">
+          <div style="width:32px;height:32px;border-radius:50%;background:#00aee9;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0">SOL</div>
+          <div><div class="t-h3" style="font-size:12px">Solana</div><div class="t-cap">SOL/USDT</div></div>
+        </div>
+        <div style="text-align:right">
+          <div class="t-h3" style="font-size:14px">$178.40</div>
+          <div class="up">▲ 5.23%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 35. 分段步骤 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">35</span><b>分段步骤</b> · Stepped Process</div>
+  <div class="tile">
+    <div class="t-h3" style="margin-bottom:10px">🧪 A/B 测试执行步骤</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="t-row" style="gap:8px">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">1</div>
+        <div class="t-body">
+          <div class="t-h3" style="font-size:12px;color:var(--green)">✓ 假设定义</div>
+          <div class="t-cap">变体A：蓝色CTA按钮 vs 变体B：绿色CTA</div>
+        </div>
+      </div>
+      <div class="t-row" style="gap:8px">
+        <div style="width:20px;height:20px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">2</div>
+        <div class="t-body">
+          <div class="t-h3" style="font-size:12px;color:var(--blue)">⚙ 流量分配中</div>
+          <div class="t-cap">50/50分流 · 已运行 3天 · 样本量 12,847</div>
+        </div>
+      </div>
+      <div class="t-row" style="gap:8px;opacity:.5">
+        <div style="width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3);flex-shrink:0">3</div>
+        <div>
+          <div class="t-h3" style="font-size:12px">结果分析</div>
+          <div class="t-cap">统计显著性达到 95% 后触发</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 36. 悬浮叠层 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">36</span><b>悬浮叠层</b> · Stacked Overlay</div>
+  <div class="tile" style="padding:0;overflow:hidden">
+    <div class="media media-sm img-travel" style="position:relative">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px">🌏</div>
+    </div>
+    <div style="background:var(--surface2);margin-top:-16px;border-radius:10px;padding:14px;position:relative;z-index:1;box-shadow:0 -4px 12px rgba(0,0,0,.1)">
+      <div class="t-row t-between" style="margin-bottom:6px">
+        <div class="t-h2">日本·东京 7天游</div>
+        <span class="tag tag-red">限时</span>
+      </div>
+      <div class="t-row t-between">
+        <span class="t-sub">含签证 · 机票 · 酒店</span>
+        <span style="color:var(--orange);font-weight:800;font-size:18px">¥6,580</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 37. 群组画布 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">37</span><b>群组画布</b> · Group Hub</div>
+  <div class="tile">
+    <div class="t-row t-between" style="margin-bottom:10px">
+      <div>
+        <div class="t-h2" style="margin-bottom:2px">前端技术交流群</div>
+        <div class="t-cap">1,247 名成员</div>
+      </div>
+      <button style="background:linear-gradient(135deg,var(--blue),var(--indigo));color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer">加入</button>
+    </div>
+    <div class="av-stack" style="margin-bottom:10px">
+      <div class="av av-sm av-a">赵</div><div class="av av-sm av-b">钱</div><div class="av av-sm av-c">孙</div><div class="av av-sm av-d">李</div>
+      <div class="av av-sm" style="background:var(--surface);border:1px solid var(--border);color:var(--text2);font-size:10px">+1243</div>
+    </div>
+    <div class="t-sub" style="margin-bottom:8px">专注 React / Vue / TypeScript / 性能优化领域技术分享</div>
+    <div class="tags"><span class="tag tag-blue">React</span><span class="tag tag-green">Vue3</span><span class="tag tag-yellow">TypeScript</span><span class="tag tag-purple">WebGL</span></div>
+  </div>
+</div>
+
+<!-- 38. 极窄卡片 -->
+<div class="demo" style="max-width:180px">
+  <div class="demo-label"><span class="demo-num">38</span><b>极窄卡片</b> · Tall Sidebar</div>
+  <div class="tile" style="padding:0;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#1a1a3e,#2d0057);padding:14px;text-align:center">
+      <div style="font-size:40px;margin-bottom:6px">🎵</div>
+      <div class="t-h2" style="font-size:13px;margin-bottom:2px">夜曲</div>
+      <div class="t-cap" style="color:rgba(255,255,255,.6)">周杰伦</div>
+    </div>
+    <div style="padding:12px">
+      <div class="pbar" style="margin-bottom:6px"><div class="pbar-fill" style="width:58%;background:linear-gradient(90deg,var(--purple),var(--pink))"></div></div>
+      <div class="t-row t-between" style="margin-bottom:10px">
+        <span class="t-cap">2:18</span><span class="t-cap">3:58</span>
+      </div>
+      <div class="t-row" style="justify-content:space-around">
+        <span style="cursor:pointer;color:var(--text2)">⏮</span>
+        <span style="cursor:pointer;font-size:20px">⏸</span>
+        <span style="cursor:pointer;color:var(--text2)">⏭</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 39. 分栏对账 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">39</span><b>账单明细</b> · Justified Meta</div>
+  <div class="tile">
+    <div class="t-h3" style="margin-bottom:12px">💳 本月账单 · 招商银行信用卡</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+      <div class="t-row t-between">
+        <span class="t-sub">餐饮美食</span>
+        <span class="t-h3" style="font-size:13px">¥1,248.50</span>
+      </div>
+      <div class="t-row t-between">
+        <span class="t-sub">购物娱乐</span>
+        <span class="t-h3" style="font-size:13px">¥3,720.00</span>
+      </div>
+      <div class="t-row t-between">
+        <span class="t-sub">交通出行</span>
+        <span class="t-h3" style="font-size:13px">¥487.20</span>
+      </div>
+      <div class="t-row t-between">
+        <span class="t-sub">医疗健康</span>
+        <span class="t-h3" style="font-size:13px">¥290.00</span>
+      </div>
+    </div>
+    <hr class="t-line t-dashed">
+    <div class="t-row t-between">
+      <span class="t-sub" style="font-weight:600">本期账单</span>
+      <span style="font-size:18px;font-weight:800;color:var(--red)">¥5,745.70</span>
+    </div>
+    <div class="t-cap" style="margin-top:6px">还款日：07-12 · 最低还款额 ¥574.57</div>
+  </div>
+</div>
+
+<!-- 40. 多维仪表 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">40</span><b>多维仪表</b> · Multi Board</div>
+  <div class="tile">
+    <div class="t-row t-between" style="margin-bottom:12px">
+      <span class="t-h3">📊 数据大盘 · 实时</span>
+      <span class="status status-on"><span class="dot dot-green"></span>更新中</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div style="background:var(--bg);border-radius:8px;padding:10px">
+        <div class="t-cap" style="margin-bottom:4px">日活用户</div>
+        <div class="t-num-sm" style="font-size:18px;color:var(--blue)">248.7k</div>
+        <div class="up">▲ 5.2%</div>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:10px">
+        <div class="t-cap" style="margin-bottom:4px">转化率</div>
+        <div class="t-num-sm" style="font-size:18px;color:var(--green)">3.87%</div>
+        <div class="up">▲ 0.4pt</div>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:10px">
+        <div class="t-cap" style="margin-bottom:4px">退款率</div>
+        <div class="t-num-sm" style="font-size:18px;color:var(--red)">0.82%</div>
+        <div class="down">▼ 0.1pt</div>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:10px">
+        <div class="t-cap" style="margin-bottom:4px">ARPU</div>
+        <div class="t-num-sm" style="font-size:18px;color:var(--yellow)">¥127</div>
+        <div class="up">▲ 8.3%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /grid -->
+
+<!-- ======================== SECTION 5 ======================== -->
+<p class="section-title">媒体与互动类 · Media & Interactive</p>
+<div class="grid">
+
+<!-- 41. 播放媒体 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">41</span><b>播放媒体</b> · Media Player</div>
+  <div class="tile">
+    <div class="t-row" style="gap:12px">
+      <div class="media media-sq80 img-music" style="border-radius:8px;flex-shrink:0;position:relative">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px">🎶</div>
+        <div style="position:absolute;inset:0;border-radius:8px;border:2px solid rgba(79,142,247,.4)"></div>
+      </div>
+      <div class="t-body">
+        <div class="t-h2" style="margin-bottom:2px">Shape of You</div>
+        <div class="t-sub" style="margin-bottom:8px">Ed Sheeran · ÷ (Divide)</div>
+        <div class="t-row" style="gap:6px;align-items:center;margin-bottom:8px">
+          <span class="t-cap">1:42</span>
+          <div class="pbar" style="flex:1"><div class="pbar-fill pbar-blue" style="width:42%"></div></div>
+          <span class="t-cap">3:53</span>
+        </div>
+        <div class="t-row" style="gap:12px;justify-content:center">
+          <span style="cursor:pointer;color:var(--text2);font-size:16px">⏮</span>
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px">▶</div>
+          <span style="cursor:pointer;color:var(--text2);font-size:16px">⏭</span>
+          <span style="cursor:pointer;color:var(--text3);font-size:14px">🔀</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 42. 左锚时间 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">42</span><b>左锚时间</b> · Left-Anchor Time</div>
+  <div class="tile" style="padding:0;overflow:hidden">
+    <div style="display:flex">
+      <div style="width:60px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 8px;text-align:center;flex-shrink:0">
+        <div style="font-size:24px;font-weight:800;color:var(--blue)">22</div>
+        <div class="t-cap">六月</div>
+        <div class="t-cap" style="margin-top:4px">周六</div>
+      </div>
+      <div style="padding:12px;flex:1">
+        <div class="t-h2" style="margin-bottom:4px">城市马拉松·半程组</div>
+        <div class="t-sub" style="margin-bottom:8px">天安门广场起点 · 全程 21.0975km</div>
+        <div class="tags"><span class="tag tag-orange">马拉松</span><span class="tag tag-green">报名中</span></div>
+        <div class="t-cap" style="margin-top:8px">报名截止：06-18 · 名额剩余 127 人</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 43. 时间跨度 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">43</span><b>时间跨度</b> · Duration Span</div>
+  <div class="tile">
+    <div class="t-row" style="gap:0;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="text-align:center">
+        <div style="font-size:20px;font-weight:800">14:00</div>
+        <div class="t-cap">北京</div>
+        <div class="t-cap">首都国际</div>
+      </div>
+      <div style="flex:1;padding:0 12px;text-align:center">
+        <div class="t-cap" style="margin-bottom:4px">直飞 · 2h 35m</div>
+        <div style="height:1px;background:var(--border);position:relative;margin:4px 0">
+          <div style="position:absolute;right:0;top:-5px;font-size:10px;color:var(--text2)">✈</div>
+        </div>
+        <div class="tag tag-blue" style="font-size:10px">MU2871</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:20px;font-weight:800">16:35</div>
+        <div class="t-cap">上海</div>
+        <div class="t-cap">虹桥机场</div>
+      </div>
+    </div>
+    <div class="t-row t-between">
+      <span class="t-cap">经济舱 · 2张</span>
+      <span style="color:var(--green);font-weight:700">¥880 / 人</span>
+    </div>
+  </div>
+</div>
+
+<!-- 44. 图文记录 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">44</span><b>图文记录</b> · Media History</div>
+  <div class="tile">
+    <div class="t-row" style="gap:10px;margin-bottom:10px">
+      <div class="av av-c av-online" style="flex-shrink:0;font-size:16px">🍕</div>
+      <div class="t-body">
+        <div class="t-h3">达美乐披萨 - 亮马桥店</div>
+        <div class="t-cap">已确认 · 预计 30-40 分钟送达</div>
+      </div>
+    </div>
+    <div style="background:var(--bg);border-radius:8px;padding:10px;margin-bottom:10px">
+      <div class="t-row t-between" style="margin-bottom:6px"><span class="t-sub">超级至尊披萨 9寸</span><span class="t-h3">¥79</span></div>
+      <div class="t-row t-between" style="margin-bottom:6px"><span class="t-sub">芝士蒜蓉包 × 2</span><span class="t-h3">¥36</span></div>
+      <div class="t-row t-between" style="margin-bottom:6px"><span class="t-sub">可口可乐 500ml</span><span class="t-h3">¥8</span></div>
+      <hr class="t-line t-dashed">
+      <div class="t-row t-between"><span class="t-sub" style="font-weight:600">配送费</span><span class="t-cap">¥5</span></div>
+    </div>
+    <div class="t-row t-between">
+      <span class="t-sub">合计</span>
+      <span style="color:var(--red);font-weight:800;font-size:16px">¥128</span>
+    </div>
+  </div>
+</div>
+
+<!-- 45. 状态追踪 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">45</span><b>状态追踪</b> · Status Tracking</div>
+  <div class="tile">
+    <div class="accent-line al-teal"></div>
+    <div class="t-row t-between" style="margin-bottom:10px">
+      <div class="t-h3">SF1039284729</div>
+      <span class="status status-on"><span class="dot dot-green"></span>派送中</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="t-row" style="gap:10px">
+        <div class="tl-col" style="width:16px;flex-shrink:0">
+          <div class="tl-dot" style="background:var(--green);width:12px;height:12px"></div>
+        </div>
+        <div><div class="t-h3" style="font-size:12px;color:var(--green)">派送员已取件，正在派送途中</div><div class="t-cap">今天 10:28 · 北京朝阳区</div></div>
+      </div>
+      <div class="t-row" style="gap:10px">
+        <div class="tl-col" style="width:16px;flex-shrink:0">
+          <div class="tl-dot" style="background:var(--blue);width:10px;height:10px"></div>
+        </div>
+        <div><div class="t-h3" style="font-size:12px">北京朝阳网点已揽收</div><div class="t-cap">今天 08:14</div></div>
+      </div>
+      <div class="t-row" style="gap:10px;opacity:.5">
+        <div class="tl-col" style="width:16px;flex-shrink:0">
+          <div class="tl-dot" style="background:var(--text3);width:10px;height:10px"></div>
+        </div>
+        <div><div class="t-h3" style="font-size:12px">上海转运中心转出</div><div class="t-cap">昨天 23:40</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 46. 极简时间单元 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">46</span><b>极简时间单元</b> · Compact Time</div>
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div class="tile" style="padding:8px 12px">
+      <div class="t-row t-between">
+        <div class="t-row" style="gap:8px">
+          <span class="t-cap" style="color:var(--blue);width:40px;flex-shrink:0">09:00</span>
+          <span class="t-h3" style="font-size:12px">全员周会</span>
+        </div>
+        <span class="status status-on"><span class="dot dot-green"></span>进行中</span>
+      </div>
+    </div>
+    <div class="tile" style="padding:8px 12px">
+      <div class="t-row t-between">
+        <div class="t-row" style="gap:8px">
+          <span class="t-cap" style="color:var(--text3);width:40px;flex-shrink:0">11:30</span>
+          <span class="t-h3" style="font-size:12px">产品评审</span>
+        </div>
+        <span class="tag tag-yellow">准备中</span>
+      </div>
+    </div>
+    <div class="tile" style="padding:8px 12px">
+      <div class="t-row t-between">
+        <div class="t-row" style="gap:8px">
+          <span class="t-cap" style="color:var(--text3);width:40px;flex-shrink:0">14:00</span>
+          <span class="t-h3" style="font-size:12px;color:var(--text3)">技术方案讨论</span>
+        </div>
+        <span class="t-cap">待开始</span>
+      </div>
+    </div>
+    <div class="tile" style="padding:8px 12px">
+      <div class="t-row t-between">
+        <div class="t-row" style="gap:8px">
+          <span class="t-cap" style="color:var(--text3);width:40px;flex-shrink:0">16:30</span>
+          <span class="t-h3" style="font-size:12px;color:var(--text3)">客户汇报</span>
+        </div>
+        <span class="t-cap">待开始</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 47. 横向流 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">47</span><b>横向流单元</b> · Horizontal Flow</div>
+  <div class="tile">
+    <div class="scroll-x">
+      <div style="display:flex;gap:10px;padding:4px 0;min-width:max-content">
+        <div style="text-align:center;width:64px">
+          <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#f7931a,#ffc93c);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:22px">₿</div>
+          <div class="t-cap">BTC</div>
+        </div>
+        <div style="text-align:center;width:64px">
+          <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#627eea,#8b9eff);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:22px">Ξ</div>
+          <div class="t-cap">ETH</div>
+        </div>
+        <div style="text-align:center;width:64px">
+          <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#1dd3f8,#0066ff);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:22px">◎</div>
+          <div class="t-cap">SOL</div>
+        </div>
+        <div style="text-align:center;width:64px">
+          <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#e31c6e,#ff6b9d);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff">BNB</div>
+          <div class="t-cap">BNB</div>
+        </div>
+        <div style="text-align:center;width:64px">
+          <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#2775ca,#5ca0fa);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff">USDC</div>
+          <div class="t-cap">USDC</div>
+        </div>
+      </div>
+    </div>
+    <hr class="t-line">
+    <div class="t-row t-between">
+      <span class="t-cap">市值排行 Top 5</span>
+      <span class="t-cap">← 左右滑动</span>
+    </div>
+  </div>
+</div>
+
+<!-- 48. 右偏置节点 -->
+<div class="demo" style="max-width:200px">
+  <div class="demo-label"><span class="demo-num">48</span><b>右偏置节点</b> · Right-Biased</div>
+  <div class="tile">
+    <div class="t-right" style="margin-bottom:8px">
+      <span class="t-cap" style="display:block;margin-bottom:4px">体温监测</span>
+      <div style="font-size:36px;font-weight:800;color:var(--green)">36.7°</div>
+      <div class="t-cap">正常</div>
+    </div>
+    <hr class="t-line">
+    <div class="t-right">
+      <div class="t-cap">心率 <span style="color:var(--red);font-weight:600">78 BPM</span></div>
+      <div class="t-cap">血氧 <span style="color:var(--blue);font-weight:600">98%</span></div>
+      <div class="t-cap" style="margin-top:4px">最后测量 · 5分钟前</div>
+    </div>
+  </div>
+</div>
+
+<!-- 49. 左偏置节点 -->
+<div class="demo" style="max-width:200px">
+  <div class="demo-label"><span class="demo-num">49</span><b>左偏置节点</b> · Left-Biased</div>
+  <div class="tile">
+    <div style="margin-bottom:8px">
+      <span class="t-cap" style="display:block;margin-bottom:4px">今日步数</span>
+      <div style="font-size:36px;font-weight:800;background:linear-gradient(135deg,var(--teal),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">8,742</div>
+      <div class="t-cap" style="color:var(--teal)">目标 80%</div>
+    </div>
+    <div class="pbar"><div class="pbar-fill pbar-green" style="width:80%"></div></div>
+    <hr class="t-line">
+    <div class="t-cap">消耗 <span style="color:var(--orange)">342 kcal</span></div>
+    <div class="t-cap">距目标还差 <span style="color:var(--text1)">2,258 步</span></div>
+  </div>
+</div>
+
+<!-- 50. 内置时间轴 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">50</span><b>内置时间轴</b> · Chronology</div>
+  <div class="tile">
+    <div class="t-h3" style="margin-bottom:10px">🏥 就诊记录</div>
+    <div style="position:relative;padding-left:20px">
+      <div style="position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,var(--blue),var(--teal),var(--border))"></div>
+      <div style="margin-bottom:12px;position:relative">
+        <div style="position:absolute;left:-20px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--blue);border:2px solid #fff"></div>
+        <div class="t-h3" style="font-size:12px">06-19 · 内科</div>
+        <div class="t-cap">主诉：发热 3天，体温38.5°C · 医生：王建国</div>
+      </div>
+      <div style="margin-bottom:12px;position:relative">
+        <div style="position:absolute;left:-20px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--teal);border:2px solid #fff"></div>
+        <div class="t-h3" style="font-size:12px">05-20 · 体检</div>
+        <div class="t-cap">年度全项体检 · 结果：全部正常</div>
+      </div>
+      <div style="position:relative">
+        <div style="position:absolute;left:-20px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--text3);border:2px solid #fff"></div>
+        <div class="t-h3" style="font-size:12px;color:var(--text3)">03-12 · 口腔科</div>
+        <div class="t-cap">洗牙 + 补牙 1颗</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 51. 三段分步 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">51</span><b>三段分步</b> · Three Stage</div>
+  <div class="tile">
+    <div class="t-h3" style="margin-bottom:12px">🚀 部署流水线</div>
+    <div class="t-row" style="gap:0;align-items:stretch">
+      <div style="flex:1;text-align:center;padding:10px;background:rgba(76,219,140,.08);border-radius:8px 0 0 8px;border:1px solid rgba(76,219,140,.2)">
+        <div style="font-size:18px;margin-bottom:4px">✅</div>
+        <div class="t-h3" style="font-size:11px;color:var(--green)">构建</div>
+        <div class="t-cap">2m 34s</div>
+      </div>
+      <div style="width:28px;display:flex;align-items:center;justify-content:center;color:var(--text3);flex-shrink:0">›</div>
+      <div style="flex:1;text-align:center;padding:10px;background:rgba(79,142,247,.08);border-radius:0;border:1px solid rgba(79,142,247,.2)">
+        <div style="font-size:18px;margin-bottom:4px;animation:spin .8s linear infinite;display:inline-block">⚙️</div>
+        <div class="t-h3" style="font-size:11px;color:var(--blue)">测试</div>
+        <div class="t-cap">进行中</div>
+      </div>
+      <div style="width:28px;display:flex;align-items:center;justify-content:center;color:var(--text3);flex-shrink:0">›</div>
+      <div style="flex:1;text-align:center;padding:10px;background:rgba(74,82,122,.08);border-radius:0 8px 8px 0;border:1px solid var(--border)">
+        <div style="font-size:18px;margin-bottom:4px;opacity:.4">🚀</div>
+        <div class="t-h3" style="font-size:11px;color:var(--text3)">部署</div>
+        <div class="t-cap">等待中</div>
+      </div>
+    </div>
+    <div class="t-cap" style="margin-top:10px">main → production · 触发人：苟杰</div>
+  </div>
+</div>
+
+<!-- 52. 行式日志 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">52</span><b>行式日志</b> · Log Stream</div>
+  <div class="tile" style="padding:0;overflow:hidden">
+    <div style="padding:10px 12px;border-bottom:1px solid var(--border);background:rgba(79,142,247,.05)">
+      <span class="t-mono" style="color:var(--text2)">system.log · 实时流</span>
+    </div>
+    <div style="padding:10px 12px;display:flex;flex-direction:column;gap:4px">
+      <div class="t-mono t-row" style="gap:8px"><span style="color:var(--green)">INFO</span><span style="color:var(--text3)">14:23:41</span><span style="color:var(--text2)">Server started on :8080</span></div>
+      <div class="t-mono t-row" style="gap:8px"><span style="color:var(--green)">INFO</span><span style="color:var(--text3)">14:23:42</span><span style="color:var(--text2)">DB connection established</span></div>
+      <div class="t-mono t-row" style="gap:8px"><span style="color:var(--yellow)">WARN</span><span style="color:var(--text3)">14:24:15</span><span style="color:var(--yellow)">Slow query 1.8s: SELECT *</span></div>
+      <div class="t-mono t-row" style="gap:8px"><span style="color:var(--red)">ERR</span><span style="color:var(--text3)">14:24:31</span><span style="color:var(--red)">Timeout: upstream /api/pay</span></div>
+      <div class="t-mono t-row" style="gap:8px"><span style="color:var(--green)">INFO</span><span style="color:var(--text3)">14:24:35</span><span style="color:var(--text2)">Retry successful</span></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /grid -->
+
+<!-- ======================== SECTION 6 ======================== -->
+<p class="section-title">混合特殊布局 · Special Layouts</p>
+<div class="grid">
+
+<!-- 53. 简讯 / Bulletin -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">53</span><b>简讯公告</b> · Bulletin</div>
+  <div class="tile">
+    <div class="t-row" style="gap:10px;margin-bottom:10px">
+      <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--red),var(--orange));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📢</div>
+      <div><div class="t-h3">系统维护通知</div><div class="t-cap">来自 · 运营团队 · 2小时前</div></div>
+    </div>
+    <div class="t-sub" style="margin-bottom:10px">【重要】平台将于 06-20 02:00-04:00 进行数据库迁移升级，届时支付功能暂停使用，请提前安排业务。</div>
+    <hr class="t-line">
+    <div class="t-row t-between">
+      <div class="av-stack"><div class="av av-sm av-a">已</div><div class="av av-sm av-b">读</div><div class="av av-sm av-c">✓</div></div>
+      <div class="t-row" style="gap:8px">
+        <span class="tag tag-blue">已阅</span>
+        <button style="background:none;border:1px solid var(--border2);color:var(--text2);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer">详情</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 54. 时间印章 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">54</span><b>时间印章</b> · Timestamp Stamp</div>
+  <div class="tile tile-overlay" style="min-height:150px;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364)">
+    <div style="position:absolute;top:20px;right:20px;opacity:.05;font-size:80px;font-weight:900;line-height:1;pointer-events:none">2024</div>
+    <div class="t-right" style="margin-bottom:10px">
+      <span class="t-cap" style="color:rgba(255,255,255,.5)">深海开发记录</span>
+    </div>
+    <div class="t-h1" style="font-size:22px;margin-bottom:4px">水下机器人 ROV-7</div>
+    <div class="t-sub" style="color:rgba(255,255,255,.6);margin-bottom:12px">马里亚纳海沟 · 深度 6,000m</div>
+    <div class="t-row" style="gap:8px;flex-wrap:wrap">
+      <span class="tag" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border-color:rgba(255,255,255,.2)">📡 信号正常</span>
+      <span class="tag" style="background:rgba(76,219,140,.15);color:var(--green);border-color:rgba(76,219,140,.3)">⚡ 电量 87%</span>
+    </div>
+    <div class="t-cap" style="position:absolute;bottom:14px;left:14px;color:rgba(255,255,255,.3)">记录时间：2024-06-19 · 14:32:08 UTC+8</div>
+  </div>
+</div>
+
+<!-- 55. 精简对话 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">55</span><b>精简对话</b> · Chat Compact</div>
+  <div class="tile">
+    <div class="t-row t-between" style="margin-bottom:12px">
+      <div class="t-row" style="gap:8px">
+        <div class="av av-b av-online" style="flex-shrink:0">A</div>
+        <div><div class="t-h3">AI 助手</div><div class="status status-on" style="font-size:11px"><span class="dot dot-green"></span>在线 · GPT-4o</div></div>
+      </div>
+      <span class="t-cap">19:42</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">
+      <div style="display:flex;justify-content:flex-end"><div class="bubble bubble-right">帮我写一首关于秋天的诗，要有意境</div></div>
+      <div style="display:flex;justify-content:flex-start">
+        <div class="bubble bubble-left">
+          《秋暮》<br>
+          梧桐叶落知秋深，<br>
+          霜露凝寒月更明。<br>
+          往事随风飘散去，<br>
+          一盏孤灯照长今。
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;background:var(--surface);border-radius:8px;padding:8px 10px">
+      <input style="flex:1;background:none;border:none;color:var(--text1);font-size:12px;outline:none" placeholder="继续对话…">
+      <button style="background:var(--blue);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer">↑</button>
+    </div>
+  </div>
+</div>
+
+<!-- 56. 侧图时间舱 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">56</span><b>侧图时间舱</b> · Time Capsule</div>
+  <div class="tile">
+    <div class="t-cap" style="margin-bottom:10px">🕐 今日行程 · 最近一条</div>
+    <div class="t-row" style="gap:10px">
+      <div style="flex:1;background:var(--bg);border-radius:8px;padding:10px;border-left:3px solid var(--purple)">
+        <div class="t-h3" style="margin-bottom:4px">产品发布会</div>
+        <div class="t-sub" style="margin-bottom:6px;font-size:11px">14:00 — 17:00</div>
+        <div class="t-cap">国贸三期 · 会议中心B</div>
+        <div class="tags" style="margin-top:6px"><span class="tag tag-purple">发布</span><span class="tag tag-blue">直播</span></div>
+      </div>
+      <div class="media" style="width:80px;flex-shrink:0;border-radius:8px;overflow:hidden">
+        <div class="img-tech" style="width:100%;height:100%;min-height:100px;display:flex;align-items:center;justify-content:center;font-size:28px">🖥️</div>
+      </div>
+    </div>
+    <hr class="t-line">
+    <div class="t-row t-between">
+      <span class="t-cap">距开始 2h 18min</span>
+      <span class="status status-on"><span class="dot dot-green"></span> 已确认</span>
+    </div>
+  </div>
+</div>
+
+<!-- 57. 多标签终止节点 -->
+<div class="demo">
+  <div class="demo-label"><span class="demo-num">57</span><b>多标签终止</b> · Multi-Tag End</div>
+  <div class="tile">
+    <div class="t-row t-between" style="margin-bottom:10px">
+      <div class="tags">
+        <span class="tag tag-green">✓ 已通过</span>
+        <span class="tag tag-blue">代码审查</span>
+        <span class="tag tag-purple">前端</span>
+      </div>
+      <span class="t-cap">06-19 18:00</span>
+    </div>
+    <div class="t-h2" style="margin-bottom:4px">feat: 新增黑暗模式全局切换</div>
+    <div class="t-sub" style="margin-bottom:10px;font-family:monospace;font-size:12px">+847 / -213 · 23 files changed</div>
+    <div style="background:var(--bg);border-radius:8px;padding:10px;margin-bottom:10px">
+      <div class="t-cap" style="margin-bottom:6px">Reviewer 评论</div>
+      <div class="t-row" style="gap:8px">
+        <div class="av av-sm av-b" style="flex-shrink:0">T</div>
+        <div class="t-sub" style="font-size:11px">LGTM 👍 性能表现良好，色彩对比度达标，建议补充 E2E 测试覆盖</div>
+      </div>
+    </div>
+    <div class="t-row t-between">
+      <div class="av-stack">
+        <div class="av av-sm av-a">苟</div><div class="av av-sm av-b">Tom</div>
+      </div>
+      <button style="background:linear-gradient(135deg,var(--green),var(--teal));color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer">合并 PR</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /grid -->
+
+<div style="text-align:center;padding:40px 0 20px;color:var(--text3);font-size:12px">
+  Tile Design Reference · 57 Layouts · Multi-Theme Content System
+</div>
+
+</html>

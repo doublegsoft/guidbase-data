@@ -119,7 +119,10 @@ ${""?left_pad(indent)}</div>
 <!--                                ENTRY FORM                               -->
 <!----------------------------------------------------------------------------->
 <#macro print_entry_form_variables form indent=0>
-${""?left_pad(indent)}// ${js.nameVariable(form.id)}表单校验规则
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * ${js.nameVariable(form.id)} 【${form.title!""}】表单相关变量
+${""?left_pad(indent)} */
+${""?left_pad(indent)} // 表单校验规则
 const ${js.nameVariable(form.id)}Rules = [
   <#list form.inputs as input>  
     <#if input.value("readonly") == "true"><#continue></#if>
@@ -127,7 +130,7 @@ const ${js.nameVariable(form.id)}Rules = [
   </#list>
 ]
 const { ${js.nameVariable(form.id)}Errors, validate${js.nameType(form.id)}, clear${js.nameType(form.id)}Errors } = useFieldValidation(${js.nameVariable(form.id)}Rules)
-${""?left_pad(indent)}// ${js.nameVariable(form.id)}表单相关变量
+${""?left_pad(indent)}// 表单数据载体
 ${""?left_pad(indent)}const ${js.nameVariable(form.id)}Data = reactive({
   <#list form.inputs as input>
 ${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
@@ -140,6 +143,7 @@ ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
     </#if>
   </#list>
+${""?left_pad(indent)}// 表单错误相关
 const ${js.nameVariable(form.id)}Error = ref(false)
 const ${js.nameVariable(form.id)}ErrorMessage = ref('')
 </#macro>
@@ -147,7 +151,7 @@ const ${js.nameVariable(form.id)}ErrorMessage = ref('')
 <#macro print_entry_form_methods form indent=0>
   <#local objname = form.value("object", form.id)>
 /**
- * 加载数据的界面函数
+ * 加载【${form.title!""}】编辑表单数据的界面函数
  */
 const load${js.nameType(form.id)}Data = async () => {
   isLoading.value = true
@@ -162,7 +166,7 @@ const load${js.nameType(form.id)}Data = async () => {
 }
 
 /**
- * 保存数据的界面函数
+ * 保存【${form.title!""}】编辑表单数据
  */
 const save${js.nameType(form.id)}Data = async () => {
   if (!validate${js.nameType(form.id)}(${js.nameType(form.id)}Data)) {
@@ -186,6 +190,7 @@ const save${js.nameType(form.id)}Data = async () => {
   }
 }
 
+// 防止保存【${form.title!""}】编辑表单手抖的变量和函数
 const { loading: is${js.nameType(form.id)}Submitting, run: handle${js.nameType(form.id)}Save } = useAsyncLock(save${js.nameType(form.id)}Data)
 </#macro>
 
@@ -345,12 +350,12 @@ ${""?left_pad(indent)}});
 <#macro print_display_form_methods form indent=0>
 
 /**
- * 加载数据的界面函数
+ * 加载【${form.title!""}】只读表单数据的界面函数
  */
 const load${js.nameType(form.id)}Data = async () => {
   isLoading.value = true
   try {
-    const data = await sdk.fetch${js.nameType(form.id)}Data()
+    const data = await sdk.fetch${js.nameType(form.value("object", form.id))}()
     Object.assign(${js.nameVariable(form.id)}Data, data)
   } catch (error) {
     fb.error('发生错误', error)
@@ -467,7 +472,7 @@ ${""?left_pad(indent)}}])
   <#local objname = table.value("object",table.id)>
 
 /**
- * 加载数据的界面函数
+ * 加载【${table.title!""}】分页表格数据的界面函数
  */
 const load${js.nameType(table.id)}Rows = async (params, pageNumber, pageSize) => {
   isLoading.value = true
@@ -670,7 +675,11 @@ const ${get_button_method_name(button)} = async (row) => {
     <#if (button.value("action","")) == "edit"><#-- 编辑 -->
   ${js.nameVariable(button.value("ref"))}DialogOpen.value = true  
     <#elseif (button.value("action","")) == "view"><#-- 查看 -->
+      <#if button.value("ref","") != "">
   ${js.nameVariable(button.value("ref"))}DrawerOpen.value = true
+      <#elseif button.value("page","") != "">
+      <#-- TODO -->
+      </#if>
     <#elseif (button.value("action","")) == "delete"><#-- 删除 -->
   const ok = await fb.confirm('询问', '确定要删除该条数据？')
   if (!ok) return;  
@@ -730,20 +739,12 @@ import { useFieldValidation } from '@/composables/useFieldValidation'
     </#if>
   </#list>  
   <#list page.widgets as widget>
-    <#if widget.value("viewport","") == "drawer">
-import ${js.nameType(namespace)}Drawer from '@/components/${namespace}-drawer.vue'
-      <#break>
-    </#if>
-  </#list>  
-  <#list page.widgets as widget>
-    <#if widget.value("viewport","") == "dialog">
-import ${js.nameType(namespace)}Dialog from '@/components/${namespace}-dialog.vue'
-      <#break>
-    </#if>
-  </#list>
-  <#list page.widgets as widget>
     <#if visited_types[widget.type]??><#continue></#if>
-    <#if widget.type == "excel_form">
+    <#if widget.type == "drawer">
+import ${js.nameType(namespace)}Drawer from '@/components/${namespace}-drawer.vue' 
+    <#elseif widget.type == "dialog">
+import ${js.nameType(namespace)}Dialog from '@/components/${namespace}-dialog.vue' 
+    <#elseif widget.type == "excel_form">
 import ${js.nameType(namespace)}Excelform from '@/components/${namespace}-excelform.vue'
     <#elseif widget.type == "paged_table">
 import ${js.nameType(namespace)}Pagedtable from '@/components/${namespace}-pagedtable.vue'
@@ -771,11 +772,20 @@ import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsin
     </#if>
     <#local visited_types += {widget.type: widget} />
   </#list>
+  <#list page.widgets as widget>
+    <#if (widget.type == "drawer" || widget.type == "dialog") && widget.value("page","") != "">
+import ${js.nameType(widget.value("page"))} from '@/pages/${js.nameFile(widget.value("page"))}.vue'     
+    </#if>
+  </#list>
 </#macro>
 
 <#macro print_page_variables page indent=0>
   <#list page.widgets as widget>
-    <#if widget.type == 'tabs'>
+    <#if widget.type == 'drawer'>
+${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DrawerOpen = ref(false)        
+    <#elseif widget.type == 'dialog'>
+${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(false)    
+    <#elseif widget.type == 'tabs'>
 <@print_tabs_variables tabs=widget indent=indent />
     <#elseif widget.type == 'entry_form'>
 <@print_entry_form_variables form=widget indent=indent />
@@ -822,13 +832,6 @@ import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsin
     </#if>
   </#list>
   <#list page.widgets as widget>
-    <#if widget.value("viewport","") == "drawer">
-${""?left_pad(indent)}const ${js.nameVariable(widget.id)}DrawerOpen = ref(false)      
-    <#elseif (widget.value("viewport","") == "dialog")>
-${""?left_pad(indent)}const ${js.nameVariable(widget.id)}DialogOpen = ref(false)             
-    </#if>
-  </#list>
-  <#list page.widgets as widget>
     <#if widget.type != "paged_table"><#continue></#if>
 const ${js.nameVariable(widget.id)}RowActionHandlers = { 
     <#list widget.widgets as button>     
@@ -845,13 +848,7 @@ const handle${js.nameType(widget.id)}RowAction = ({ handler, row, index }) => {
 <#macro print_page_layout page indent=0>
   <#local children = []>
   <#list page.children as child>
-    <#if child.value("viewport","") == "">
-      <#local children += [child]>
-    </#if>
-  </#list>
-  <#list children as child>
-    <#if (child.type == "paged_table" || child.type == "entry_form" || child.type == "criteria_form") &&
-         child.value("viewport","") == "">
+    <#if child.type != "dialog" && child.type != "drawer" && page.value("viewport") != "" >
 <@print_layout_container widget=child indent=indent />       
     <#else>
 <@print_layout_widget widget=child indent=indent />        
@@ -870,14 +867,29 @@ const handle${js.nameType(widget.id)}RowAction = ({ handler, row, index }) => {
 <#macro print_layout_divider indent=0></#macro>
 
 <#macro print_layout_widget widget indent=0>
-  <#if widget.value("viewport","") == "dialog">
-    <#local indent += 2>
-${""?left_pad(indent)}<${namespace}-dialog v-model="${js.nameVariable(widget.id)}DialogOpen" title="${widget.title}" size="lg">
-  <#elseif widget.value("viewport","") == "drawer">
-    <#local indent += 2>
+  <#if widget.type == "drawer">
 ${""?left_pad(indent)}<${namespace}-drawer v-model="${js.nameVariable(widget.id)}DrawerOpen" title="${widget.title}">
-  </#if>
-  <#if widget.type == "tabs">
+    <#if widget.value("page","") != "">
+      <#local pagePath = widget.value("page")>
+${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
+    <#else>
+      <#list widget.children as child>
+<@print_layout_widget widget=child indent=indent+2 />    
+      </#list>
+    </#if>
+${""?left_pad(indent)}</${namespace}-drawer>
+  <#elseif widget.type == "dialog">
+${""?left_pad(indent)}<${namespace}-dialog v-model="${js.nameVariable(widget.id)}DialogOpen" title="${widget.title}" size="lg">  
+    <#if widget.value("page","") != "">
+      <#local pagePath = widget.value("page")>
+${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
+    <#else>
+      <#list widget.children as child>
+<@print_layout_widget widget=child indent=indent+2 />    
+      </#list>
+    </#if>
+${""?left_pad(indent)}</${namespace}-dialog>
+  <#elseif widget.type == "tabs">
 <@print_layout_tabs tabs=widget indent=indent+2 />
   <#elseif widget.type == "entry_form">
 <@print_layout_entry_form form=widget indent=indent+2 />    
@@ -895,6 +907,8 @@ ${""?left_pad(indent)}<${namespace}-drawer v-model="${js.nameVariable(widget.id)
 <@print_layout_display_form form=widget indent=indent+2 />
   <#elseif widget.type == "paged_grid">
 <@print_layout_paged_grid grid=widget indent=indent+2 />
+  <#elseif widget.type == "list_view">
+<@print_layout_list_view list=widget indent=indent+2 />
   <#elseif widget.type == "chart">
 <@print_layout_chart chart=widget indent=indent+2 />
   <#elseif widget.type == "buttons">
@@ -917,10 +931,5 @@ ${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(wid
 ${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
   <#else><#-- 各个Design System的个性化风格 -->
 <@print_layout_custom widget=widget indent=indent+2 />  
-  </#if>
-  <#if widget.value("viewport","") == "dialog">
-${""?left_pad(indent)}</${namespace}-dialog>
-  <#elseif widget.value("viewport","") == "drawer">
-${""?left_pad(indent)}</${namespace}-drawer>  
   </#if>
 </#macro>

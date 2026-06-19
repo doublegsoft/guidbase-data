@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>瓦片设计参考 - 全部57种布局 (Tile Design Reference)</title>
+<style>
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background:#f0f2f5; color:#333; padding:20px; }
+    h1 { text-align:center; margin:20px 0 30px; font-size:24px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap:24px; max-width:1400px; margin:0 auto; }
+    .demo { background:#fff; border-radius:10px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+    .demo h3 { font-size:13px; color:#888; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:8px; }
+    .demo h3 b { color:#333; }
+
+    /* === TILE BASE === */
+    .tile { border:1px solid #e8e8e8; border-radius:8px; padding:12px; background:#fff; font-size:13px; }
+    .tile-row { display:flex; align-items:center; gap:8px; }
+    .tile-header { justify-content:space-between; margin-bottom:6px; }
+    .tile-body { flex:1; min-width:0; }
+    .tile-footer { margin-top:6px; justify-content:space-between; }
+    .tile-inline { flex-wrap:wrap; }
+    .tile-col { flex:1; min-width:0; }
+    .tile-col + .tile-col { margin-left:8px; }
+    .tile-justified { justify-content:space-between; margin-bottom:2px; }
+    .tile-right { text-align:right; justify-content:flex-end; }
+    .tile-left { text-align:left; justify-content:flex-start; }
+    .tile-overlay { position:relative; z-index:1; padding:12px; }
+    .tile-sep { color:#ccc; margin:0 4px; }
+
+    /* === TEXT SLOTS === */
+    .tile-primary { font-weight:600; font-size:14px; color:#1a1a1a; line-height:1.4; }
+    .tile-secondary { font-size:12px; color:#666; line-height:1.4; }
+    .tile-tertiary { font-size:11px; color:#999; line-height:1.5; margin-top:4px; }
+
+    /* === IMAGE === */
+    .tile-image, .tile-image-wrap { border-radius:6px; overflow:hidden; background:#e8e8e8; }
+    .tile-image { display:flex; align-items:center; justify-content:center; min-width:56px; min-height:56px; color:#aaa; font-size:11px; }
+    .tile-image-wrap { margin-bottom:8px; }
+    .tile-image-wrap .tile-image { width:100%; min-height:120px; }
+
+    /* === AVATAR === */
+    .tile-avatar { width:36px; height:36px; border-radius:50%; background:#4a90d9; color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; flex-shrink:0; }
+    .tile-avatar-img { width:28px; height:28px; border-radius:50%; margin-right:-8px; border:2px solid #fff; background:#4a90d9; }
+    .tile-avatars { display:flex; align-items:center; }
+
+    /* === TAGS === */
+    .tile-tags { display:flex; gap:4px; flex-wrap:wrap; }
+    .tile-tag { display:inline-block; padding:2px 8px; border-radius:4px; background:#e8f4fd; color:#4a90d9; font-size:11px; white-space:nowrap; }
+    .tile-tags-row { margin-bottom:8px; }
+
+    /* === STATUS === */
+    .tile-status { font-size:11px; font-weight:500; white-space:nowrap; }
+    .tile-status.on { color:#52c41a; }
+    .tile-status.off { color:#ff4d4f; }
+    .tile-status.warn { color:#faad14; }
+    .tile-status-col { min-width:40px; display:flex; align-items:center; justify-content:center; }
+
+    /* === TIME === */
+    .tile-time, .tile-start-time, .tile-end-time { font-size:11px; color:#999; white-space:nowrap; }
+    .tile-time-sep { color:#ccc; margin:0 2px; }
+    .tile-stage-arrow { color:#bbb; margin:0 6px; font-size:11px; }
+
+    /* === BACKGROUND === */
+    .tile-background { position:absolute; inset:0; border-radius:8px; overflow:hidden; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .tile-background img { width:100%; height:100%; object-fit:cover; opacity:.3; }
+    .tile[class*="background"] { position:relative; overflow:hidden; color:#fff; min-height:100px; }
+
+    /* === SPECIAL === */
+    .tile-timeline { display:flex; flex-direction:column; align-items:center; gap:2px; min-width:60px; font-size:10px; }
+    .tile-timeline-dot { width:8px; height:8px; border-radius:50%; background:#4a90d9; margin:4px 0; }
+    .tile-timeline-line { padding-left:12px; color:#ddd; }
+    .tile-timeline-indent { color:#ddd; }
+    .tile-step-line { font-size:11px; color:#888; margin:2px 0; display:flex; align-items:center; gap:4px; }
+    .tile-step-branch { color:#ccc; font-family:monospace; }
+    .tile-workflow-arrow { color:#bbb; margin:0 4px; font-size:10px; }
+    .tile-workflow-chain { flex-wrap:wrap; gap:2px; }
+    .tile-progress { display:flex; align-items:center; gap:4px; font-size:10px; color:#999; }
+    .tile-progress-bar { color:#ddd; }
+    .tile-three-stage { justify-content:space-around; margin-bottom:4px; }
+    .tile-stacked-card { background:#fff; border-radius:8px; padding:10px; margin-top:-20px; position:relative; z-index:2; box-shadow:0 2px 8px rgba(0,0,0,.1); }
+    .tile-overlay-content { margin-top:-20px; position:relative; z-index:2; }
+    .tile-image-tags { position:absolute; bottom:8px; left:8px; }
+    .tile-image-wrap { position:relative; }
+
+    /* === COLORS === */
+    .tile-promo-banner .tile-overlay { color:#fff; }
+    .tile-hero-profile { min-height:160px; }
+    .tile-hero-profile .tile-overlay { color:#fff; text-align:center; }
+    .tile-hero-profile .tile-avatar { margin:0 auto 8px; width:48px; height:48px; font-size:18px; }
+    .tile-immersive-highlight { min-height:120px; }
+    .tile-immersive-highlight .tile-overlay { color:#fff; }
+    .tile-text-over-background { min-height:120px; }
+    .tile-text-over-background .tile-overlay { color:#fff; }
+    .tile-ticket { min-height:130px; }
+    .tile-ticket .tile-overlay { color:#fff; }
+    .tile-timestamp-stamp { min-height:110px; }
+    .tile-timestamp-stamp .tile-overlay { color:#fff; }
+    .tile-promo-banner { min-height:140px; }
+    .tile-promo-banner .tile-overlay { color:#fff; }
+
+    .tile-media-player .tile-image { width:56px; height:56px; flex-shrink:0; }
+    .tile-left-feature-image .tile-image { width:120px; min-height:100px; flex-shrink:0; }
+    .tile-side-image-time-capsule .tile-image { min-height:60px; }
+    .tile-media-history .tile-image { width:56px; height:56px; flex-shrink:0; }
+    .tile-split-content .tile-image { width:80px; min-height:80px; flex-shrink:0; }
+    .tile-dense-detail-list .tile-image { width:48px; height:48px; flex-shrink:0; }
+    .tile-tall-sidebar { max-width:200px; }
+    .tile-tall-sidebar .tile-image { width:100%; min-height:80px; }
+
+    .tile-vertical-poster .tile-image { width:100%; min-height:140px; }
+    .tile-vertical-poster .tile-body { padding:8px 0 0; }
+
+    /* Example styling */
+    .ex-primary { font-weight:600; }
+    .ex-secondary { color:#666; }
+    .ex-tertiary { color:#999; font-size:11px; }
+    .ex-time { color:#888; font-size:11px; }
+    .ex-status { font-size:11px; }
+    .ex-status.on { color:#52c41a; }
+    .ex-status.off { color:#ff4d4f; }
+    .ex-tags { display:flex; gap:4px; flex-wrap:wrap; }
+    .ex-tags b { display:inline-block; padding:2px 8px; border-radius:4px; background:#e8f4fd; color:#4a90d9; font-size:11px; font-weight:500; }
+    .ex-avatars { display:flex; }
+    .ex-avatars i { display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:#4a90d9; color:#fff; font-size:12px; font-style:normal; margin-right:-6px; border:2px solid #fff; }
+    .ex-avatar { width:36px; height:36px; border-radius:50%; background:#4a90d9; color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; }
+    .ex-image { width:100%; height:100%; min-height:80px; background:linear-gradient(135deg, #e0e7ff, #c7d2fe); display:flex; align-items:center; justify-content:center; color:#6366f1; font-weight:600; border-radius:6px; }
+    .ex-bg { position:absolute; inset:0; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius:8px; }
+    .ex-product-img { width:100%; height:100%; min-height:100px; background:linear-gradient(135deg, #fef3c7, #fde68a); display:flex; align-items:center; justify-content:center; color:#d97706; font-weight:600; border-radius:6px; }
+
+    @media(max-width:400px) { .grid { grid-template-columns:1fr; } }
+
+</style>
+</head>
+<body>
+<h1>瓦片设计参考 · Tile Design Reference · 57 Layouts</h1>
+<div class="grid">
+<div class="demo">
+<h3><b>01. 会议与日程</b> · Meeting & Event</h3>
+
+<div class="tile tile-meeting-event">
+  <div class="tile-row tile-header">
+    <span class="tile-time"><span class="tile-time">09:30</span><span class="tile-time-sep"> - </span><span class="tile-time">18:00</span></span>
+    <span class="tile-status on">● 在线</span>
+  </div>
+  <div class="tile-body"><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div></div>
+  <div class="tile-footer"><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>02. 媒体与资讯</b> · Media & Article</h3>
+
+<div class="tile tile-media-article">
+  <div class="tile-image-wrap" style="position:relative">
+    <div class="tile-image"><div class="ex-image"><span>IMG</span></div></div>
+    <div class="tile-image-tags" style="position:absolute;bottom:8px;left:8px;"><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div></div>
+  </div>
+  <div class="tile-body"><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-tertiary">详细描述信息展示辅助文本内容</div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>03. 个人资料</b> · User Profile</h3>
+
+<div class="tile tile-user-profile">
+  <div class="tile-row">
+    <div class="tile-avatar"><span>张</span></div>
+    <div class="tile-body"><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div></div>
+    <span class="tile-status on">● 在线</span>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>04. 任务看板</b> · Task Board</h3>
+
+<div class="tile tile-task-board">
+  <div class="tile-row tile-header"><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div><span class="tile-status on">● 在线</span></div>
+  <div class="tile-body"><div class="tile-primary">项目进度报告</div></div>
+  <div class="tile-row tile-footer"><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div><span class="tile-time">18:00</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>05. 推广横幅</b> · Promo Banner</h3>
+
+<div class="tile tile-promo-banner" style="position:relative;overflow:hidden;min-height:140px;">
+  <div class="ex-bg"></div>
+  <div class="tile-overlay"><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-tertiary">详细描述信息展示辅助文本内容</div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>06. 紧凑列表</b> · Compact List</h3>
+
+<div class="tile tile-compact-list">
+  <div class="tile-row tile-inline"><span class="tile-status on">● 在线</span><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div><span class="tile-time">09:30</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>07. 图文卡片</b> · Split Content</h3>
+
+<div class="tile tile-split-content">
+  <div class="tile-row">
+    <div class="tile-image" style="width:80px;min-height:80px;flex-shrink:0"><div class="ex-image"><span>IMG</span></div></div>
+    <div class="tile-body"><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div><div class="tile-primary">项目进度报告</div><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div><span class="tile-time">09:30</span></div>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>08. 简易状态</b> · Notification</h3>
+
+<div class="tile tile-notification">
+  <div class="tile-row"><span class="tile-status on">● 在线</span><div class="tile-body"><div class="tile-primary">项目进度报告</div><div class="tile-tertiary">详细描述信息展示辅助文本内容</div></div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>09. 背景封面</b> · Hero Profile</h3>
+
+<div class="tile tile-hero-profile" style="position:relative;overflow:hidden;min-height:160px;">
+  <div class="ex-bg"></div>
+  <div class="tile-overlay" style="text-align:center">
+    <div class="tile-avatar" style="margin:0 auto 8px;width:48px;height:48px;font-size:18px"><span>张</span></div>
+    <div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>10. 时间轴节点</b> · Timeline Node</h3>
+
+<div class="tile tile-timeline-node">
+  <div class="tile-row">
+    <div class="tile-timeline"><span class="tile-time">09:30</span><span class="tile-timeline-dot"></span><span class="tile-time">18:00</span></div>
+    <div class="tile-body"><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-tertiary">详细描述信息展示辅助文本内容</div></div>
+    <div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>11. 消息留言</b> · Message</h3>
+
+<div class="tile tile-message">
+  <div class="tile-row">
+    <div class="tile-avatar"><span>张</span></div>
+    <div class="tile-body">
+      <div class="tile-row tile-header"><div class="tile-primary">项目进度报告</div><span class="tile-time">09:30</span></div>
+      <div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-tertiary">详细描述信息展示辅助文本内容</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>12. 电子票务</b> · Ticket</h3>
+
+<div class="tile tile-ticket" style="position:relative;overflow:hidden;min-height:130px;">
+  <div class="ex-bg"></div>
+  <div class="tile-overlay">
+    <div class="tile-row tile-header"><div class="tile-primary">项目进度报告</div><span class="tile-status on">● 在线</span></div>
+    <div class="tile-time"><span class="tile-time">09:30</span> ~ <span class="tile-time">18:00</span></div>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>13. 密集信息列表</b> · Dense Detail List</h3>
+
+<div class="tile tile-dense-detail-list">
+  <div class="tile-row">
+    <div class="tile-image" style="width:48px;height:48px;flex-shrink:0"><div class="ex-image"><span>IMG</span></div></div>
+    <div class="tile-body">
+      <div class="tile-primary">项目进度报告</div>
+      <div class="tile-row"><div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div></div>
+      <div class="tile-row"><div class="tile-tertiary">详细描述信息展示辅助文本内容</div><span class="tile-status on">● 在线</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>14. 竖向海报</b> · Vertical Poster</h3>
+
+<div class="tile tile-vertical-poster" style="max-width:220px;">
+  <div class="tile-image" style="min-height:140px"><div class="ex-image"><span>IMG</span></div></div>
+  <div class="tile-body"><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-time">09:30</div><div class="tile-time">18:00</div><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>15. 详情工单</b> · Issue Detail</h3>
+
+<div class="tile tile-issue-detail">
+  <div class="tile-row tile-header"><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div><span class="tile-status on">● 在线</span></div>
+  <div class="tile-body"><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-tertiary">详细描述信息展示辅助文本内容</div></div>
+  <div class="tile-row tile-footer"><div class="tile-avatar"><span>张</span></div><span class="tile-time">18:00</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>16. 团队目录</b> · Team Directory</h3>
+
+<div class="tile tile-team-directory">
+  <div class="tile-body"><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div></div>
+  <div class="tile-row tile-footer"><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>17. 沉浸高光</b> · Immersive Highlight</h3>
+
+<div class="tile tile-immersive-highlight" style="position:relative;overflow:hidden;min-height:120px;">
+  <div class="ex-bg"></div>
+  <div class="tile-overlay"><span class="tile-status on">● 在线</span><div class="tile-primary">项目进度报告</div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>18. 迷你状态</b> · Mini Status</h3>
+
+<div class="tile tile-mini-status" style="max-width:200px;">
+  <div class="tile-row tile-header"><span class="tile-status on">● 在线</span><span class="tile-time">18:00</span></div>
+  <div class="tile-primary">项目进度报告</div><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>19. 双栏内容</b> · Dual Column Content</h3>
+
+<div class="tile tile-dual-column-content">
+  <div class="tile-row">
+    <div class="tile-col"><div class="tile-primary">项目进度报告</div><div class="tile-tertiary">详细描述信息展示辅助文本内容</div><div class="tile-avatar"><span>张</span></div></div>
+    <div class="tile-col"><div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div></div>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>20. 画廊</b> · Gallery</h3>
+
+<div class="tile tile-gallery">
+  <div class="tile-image-wrap"><div class="tile-image" style="min-height:100px"><div class="ex-image"><span>IMG</span></div></div></div>
+  <div class="tile-primary">项目进度报告</div>
+  <div class="tile-row tile-footer"><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div><span class="tile-status on">● 在线</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>21. 核心指标</b> · Key Metric</h3>
+
+<div class="tile tile-key-metric" style="max-width:200px;">
+  <div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div>
+  <div class="tile-primary" style="font-size:28px;font-weight:700;">1,234</div>
+  <div class="tile-row tile-footer"><div class="tile-secondary">负责人：张三 · 优先级：高</div><span class="tile-status on">● 在线</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>22. 悬浮头像</b> · Overlay Avatar</h3>
+
+<div class="tile tile-overlay-avatar">
+  <div class="tile-image-wrap"><div class="tile-image" style="min-height:100px"><div class="ex-image"><span>IMG</span></div></div></div>
+  <div class="tile-row tile-overlay-content"><div class="tile-avatar"><span>张</span></div><div class="tile-body"><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div></div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>23. 审计记录</b> · Audit Log</h3>
+
+<div class="tile tile-audit-log">
+  <div class="tile-row">
+    <div class="tile-avatar"><span>张</span></div>
+    <div class="tile-body">
+      <div class="tile-row"><div class="tile-primary">项目进度报告</div><span class="tile-status on">● 在线</span></div>
+      <div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-time">09:30</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>24. 日历单元</b> · Calendar Cell</h3>
+
+<div class="tile tile-calendar-cell" style="max-width:180px;">
+  <div class="tile-row tile-header"><span class="tile-time">09:30</span><span class="tile-status on">● 在线</span></div>
+  <div class="tile-primary">项目进度报告</div><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>25. 侧边状态</b> · Side Status</h3>
+
+<div class="tile tile-side-status">
+  <div class="tile-row">
+    <div class="tile-status-col"><span class="tile-status on">● 在线</span></div>
+    <div class="tile-body"><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-time">09:30</div></div>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>26. 多标签</b> · Multi-Tag</h3>
+
+<div class="tile tile-multi-tag">
+  <div class="tile-tags-row"><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div></div>
+  <div class="tile-primary">项目进度报告</div>
+  <div class="tile-row tile-footer"><div class="tile-secondary">负责人：张三 · 优先级：高</div><span class="tile-time">18:00</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>27. 复杂排班</b> · Shift Planner</h3>
+
+<div class="tile tile-shift-planner">
+  <div class="tile-row tile-header"><span class="tile-time"><span class="tile-time">09:30</span> - <span class="tile-time">18:00</span></span><span class="tile-status on">● 在线</span></div>
+  <div class="tile-primary">项目进度报告</div>
+  <div class="tile-avatars-wrap" style="border:1px solid #eee;border-radius:6px;padding:6px;margin-top:6px"><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>28. 社交动态</b> · Social Post Feed</h3>
+
+<div class="tile tile-social-post-feed">
+  <div class="tile-row"><div class="tile-avatar"><span>张</span></div><div class="tile-body"><div class="tile-primary">项目进度报告</div><span class="tile-time">09:30</span></div></div>
+  <div class="tile-tertiary">详细描述信息展示辅助文本内容</div>
+  <div class="tile-image-wrap"><div class="tile-image" style="min-height:100px"><div class="ex-image"><span>IMG</span></div></div></div>
+  <div class="tile-row tile-footer"><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>29. 商品</b> · Product</h3>
+
+<div class="tile tile-product" style="max-width:220px;">
+  <div class="tile-image-wrap"><div class="tile-image" style="min-height:100px"><div class="ex-product-img"><span>PRODUCT</span></div></div></div>
+  <div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div>
+  <div class="tile-row tile-footer"><span class="tile-status on">● 在线</span><span class="tile-time">18:00</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>30. 对抗与合作</b> · Dual Profile Comparison</h3>
+
+<div class="tile tile-dual-profile-comparison">
+  <div class="tile-row tile-header" style="justify-content:space-between">
+    <div class="tile-avatar"><span>张</span></div><span class="tile-status on">● 在线</span><div class="tile-avatar" style="background:#52c41a"><span>李</span></div>
+  </div>
+  <div class="tile-row tile-justified"><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div></div>
+  <div class="tile-row tile-justified"><span class="tile-time">09:30</span><span class="tile-time">18:00</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>31. 侧栏大图</b> · Left Feature Image</h3>
+
+<div class="tile tile-left-feature-image">
+  <div class="tile-row">
+    <div class="tile-image" style="width:120px;min-height:100px;flex-shrink:0"><div class="ex-image"><span>IMG</span></div></div>
+    <div class="tile-body"><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-tertiary">详细描述信息展示辅助文本内容</div><div class="tile-row tile-inline"><span class="tile-status on">● 在线</span><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div></div></div>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>32. 宽版工作流</b> · Workflow Strip</h3>
+
+<div class="tile tile-workflow-strip">
+  <div class="tile-row tile-workflow-chain">
+    <span class="tile-time">09:30</span><span class="tile-workflow-arrow">></span>
+    <div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div><span class="tile-workflow-arrow">></span>
+    <span class="tile-status on">● 在线</span><span class="tile-workflow-arrow">></span>
+    <span class="tile-time">18:00</span>
+  </div>
+  <div class="tile-primary">项目进度报告</div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>33. 悬浮背景文字</b> · Text Over Background</h3>
+
+<div class="tile tile-text-over-background" style="position:relative;overflow:hidden;min-height:120px;">
+  <div class="ex-bg"></div>
+  <div class="tile-overlay"><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div><div class="tile-primary">项目进度报告</div><div class="tile-row"><div class="tile-avatar"><span>张</span></div><div class="tile-secondary">负责人：张三 · 优先级：高</div></div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>34. 微型标记</b> · Micro Badge</h3>
+
+<div class="tile tile-micro-badge">
+  <div class="tile-row tile-inline"><div class="tile-avatar"><span>张</span></div><div class="tile-primary">项目进度报告</div><span class="tile-status on">● 在线</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>35. 分段步骤</b> · Stepped Process</h3>
+
+<div class="tile tile-stepped-process">
+  <div class="tile-row">
+    <span class="tile-status on">● 在线</span>
+    <div class="tile-body">
+      <div class="tile-primary">项目进度报告</div>
+      <div class="tile-step-line"><span class="tile-step-branch">├─</span><div class="tile-secondary">负责人：张三 · 优先级：高</div></div>
+      <div class="tile-step-line"><span class="tile-step-branch">├─</span><span class="tile-time"><span class="tile-time">09:30</span> - <span class="tile-time">18:00</span></span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>36. 悬浮叠层</b> · Stacked Overlay</h3>
+
+<div class="tile tile-stacked-overlay">
+  <div class="tile-image-wrap"><div class="tile-image" style="min-height:100px"><div class="ex-image"><span>IMG</span></div></div></div>
+  <div class="tile-stacked-card"><div class="tile-primary">项目进度报告</div><div class="tile-row"><div class="tile-secondary">负责人：张三 · 优先级：高</div><span class="tile-status on">● 在线</span></div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>37. 群组画布</b> · Group Hub</h3>
+
+<div class="tile tile-group-hub">
+  <div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div><div class="tile-primary">项目进度报告</div><div class="tile-tertiary">详细描述信息展示辅助文本内容</div>
+  <div class="tile-row tile-footer"><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div><span class="tile-status on">● 在线</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>38. 极窄卡片</b> · Tall Sidebar</h3>
+
+<div class="tile tile-tall-sidebar" style="max-width:180px;">
+  <span class="tile-status on">● 在线</span>
+  <div class="tile-image-wrap" style="margin:8px 0"><div class="tile-image" style="min-height:80px"><div class="ex-image"><span>IMG</span></div></div></div>
+  <div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>39. 分栏对账</b> · Justified Meta</h3>
+
+<div class="tile tile-justified-meta">
+  <div class="tile-row tile-justified"><div class="tile-primary">项目进度报告</div><span class="tile-time">09:30</span></div>
+  <div class="tile-row tile-justified"><div class="tile-secondary">负责人：张三 · 优先级：高</div><span class="tile-time">18:00</span></div>
+  <div class="tile-row tile-justified"><div class="tile-avatar"><span>张</span></div><span class="tile-status on">● 在线</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>40. 多维仪表</b> · Multidimensional Board</h3>
+
+<div class="tile tile-multidimensional-board">
+  <div class="tile-row tile-header"><span class="tile-status on">● 在线</span><span class="tile-time">09:30</span></div>
+  <div class="tile-row tile-cols">
+    <div class="tile-col" style="border:1px solid #eee;border-radius:6px;padding:8px;"><div class="tile-primary">项目进度报告</div><div class="tile-tertiary">详细描述信息展示辅助文本内容</div></div>
+    <div class="tile-col" style="border:1px solid #eee;border-radius:6px;padding:8px;"><div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div></div>
+  </div>
+  <div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>41. 播放媒体</b> · Media Player</h3>
+
+<div class="tile tile-media-player">
+  <div class="tile-row">
+    <div class="tile-image" style="width:56px;height:56px;flex-shrink:0"><div class="ex-image"><span>IMG</span></div></div>
+    <div class="tile-body">
+      <div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div>
+      <div class="tile-progress"><span class="tile-time">09:30</span><span class="tile-progress-bar">──────────</span><span class="tile-time">18:00</span></div>
+    </div>
+  </div>
+  <div class="tile-row tile-footer"><div class="tile-avatar"><span>张</span></div><span class="tile-status on">● 在线</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>42. 左锚点时间</b> · Left-Anchor Time</h3>
+
+<div class="tile tile-left-anchor-time">
+  <div class="tile-row tile-header"><span class="tile-time">09:30</span><span class="tile-status on">● 在线</span></div>
+  <div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-avatar"><span>张</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>43. 时间跨度</b> · Duration Span</h3>
+
+<div class="tile tile-duration-span">
+  <div class="tile-row tile-header"><span class="tile-time"><span class="tile-time">09:30</span> - <span class="tile-time">18:00</span></span><span class="tile-status on">● 在线</span></div>
+  <div class="tile-primary">项目进度报告</div><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>44. 图文记录</b> · Media History</h3>
+
+<div class="tile tile-media-history">
+  <div class="tile-time">09:30</div>
+  <div class="tile-row">
+    <div class="tile-image" style="width:56px;height:56px;flex-shrink:0"><div class="ex-image"><span>IMG</span></div></div>
+    <div class="tile-body"><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div></div>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>45. 状态追踪</b> · Status Transition</h3>
+
+<div class="tile tile-status-transition">
+  <div class="tile-row tile-header"><span class="tile-time">09:30</span><span class="tile-status on">● 在线</span></div>
+  <div class="tile-primary">项目进度报告</div>
+  <div class="tile-row"><div class="tile-avatar"><span>张</span></div><div class="tile-secondary">负责人：张三 · 优先级：高</div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>46. 极简时间单元</b> · Compact Time</h3>
+
+<div class="tile tile-compact-time">
+  <div class="tile-row tile-inline"><span class="tile-time">09:30</span><span class="tile-sep">|</span><span class="tile-status on">● 在线</span><span class="tile-sep">|</span><div class="tile-primary">项目进度报告</div></div>
+  <div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>47. 横向流单元</b> · Horizontal Flow</h3>
+
+<div class="tile tile-horizontal-flow" style="max-width:160px;text-align:center;">
+  <div class="tile-time">09:30</div>
+  <div class="tile-primary">项目进度报告</div><span class="tile-status on">● 在线</span>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>48. 右偏置节点</b> · Right-Biased Node</h3>
+
+<div class="tile tile-right-biased-node" style="max-width:160px;">
+  <div class="tile-row tile-right"><span class="tile-time">09:30</span></div>
+  <div class="tile-primary">项目进度报告</div><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>49. 左偏置节点</b> · Left-Biased Node</h3>
+
+<div class="tile tile-left-biased-node" style="max-width:160px;">
+  <div class="tile-row tile-left"><span class="tile-time">09:30</span></div>
+  <div class="tile-right"><div class="tile-primary">项目进度报告</div><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>50. 内置时间轴</b> · Internal Chronology</h3>
+
+<div class="tile tile-internal-chronology">
+  <div class="tile-time">09:30</div>
+  <div class="tile-primary">项目进度报告</div>
+  <div class="tile-timeline-line"><span class="tile-timeline-indent">│</span></div>
+  <div class="tile-time">18:00</div>
+  <div class="tile-row"><div class="tile-secondary">负责人：张三 · 优先级：高</div><span class="tile-status on">● 在线</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>51. 三段分步</b> · Three-Stage Segment</h3>
+
+<div class="tile tile-three-stage-segment">
+  <div class="tile-row tile-three-stage"><span class="tile-time">09:30</span><span class="tile-stage-arrow">>></span><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div><span class="tile-stage-arrow">>></span><span class="tile-time">18:00</span></div>
+  <div class="tile-row tile-three-stage"><div class="tile-primary">项目进度报告</div><span class="tile-stage-arrow">>></span><div class="tile-secondary">负责人：张三 · 优先级：高</div><span class="tile-stage-arrow">>></span><span class="tile-status on">● 在线</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>52. 行式日志</b> · Horizontal Log</h3>
+
+<div class="tile tile-horizontal-log">
+  <div class="tile-row tile-inline"><div class="tile-avatar"><span>张</span></div><span class="tile-sep">|</span><span class="tile-time">09:30</span><span class="tile-sep">|</span><div class="tile-primary">项目进度报告</div><span class="tile-sep">|</span><span class="tile-status on">● 在线</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>53. 简讯</b> · Bulletin</h3>
+
+<div class="tile tile-bulletin">
+  <div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div><div class="tile-primary">项目进度报告</div><div class="tile-tertiary">详细描述信息展示辅助文本内容</div>
+  <div class="tile-row tile-footer"><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div><span class="tile-time">09:30</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>54. 时间印章</b> · Timestamp Stamp</h3>
+
+<div class="tile tile-timestamp-stamp" style="position:relative;overflow:hidden;min-height:110px;">
+  <div class="ex-bg"></div>
+  <div class="tile-overlay">
+    <div class="tile-right"><span class="tile-time">09:30</span></div>
+    <div class="tile-primary">项目进度报告</div><span class="tile-status on">● 在线</span>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>55. 精简对话</b> · Compact Chat</h3>
+
+<div class="tile tile-compact-chat">
+  <div class="tile-row">
+    <div class="tile-avatar"><span>张</span></div>
+    <div class="tile-body">
+      <div class="tile-row tile-header"><div class="tile-primary">项目进度报告</div><span class="tile-time">09:30</span></div>
+      <div class="tile-secondary">负责人：张三 · 优先级：高</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>56. 侧图时间舱</b> · Side-Image Time Capsule</h3>
+
+<div class="tile tile-side-image-time-capsule">
+  <div class="tile-time">09:30</div>
+  <div class="tile-row tile-cols">
+    <div class="tile-col" style="border:1px solid #eee;border-radius:6px;padding:8px;"><div class="tile-primary">项目进度报告</div><div class="tile-secondary">负责人：张三 · 优先级：高</div></div>
+    <div class="tile-col"><div class="tile-image" style="min-height:60px"><div class="ex-image"><span>IMG</span></div></div></div>
+  </div>
+  <div class="tile-row tile-right"><span class="tile-status on">● 在线</span></div>
+</div>
+</div>
+
+<div class="demo">
+<h3><b>57. 标签终点节点</b> · Multi-Tag End Node</h3>
+
+<div class="tile tile-multi-tag-end-node">
+  <div class="tile-row tile-header"><div class="tile-tags"><span class="tile-tag">进行中</span><span class="tile-tag">高优</span><span class="tile-tag">研发</span></div><span class="tile-time">18:00</span></div>
+  <div class="tile-primary">项目进度报告</div>
+  <div class="tile-row tile-footer"><div class="tile-avatars"><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#4a90d9;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">赵</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#52c41a;color:#fff;font-size:12px;font-style:normal;margin-right:-6px;border:2px solid #fff;">钱</i><i class="ex-av" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#faad14;color:#fff;font-size:12px;font-style:normal;border:2px solid #fff;">孙</i></div><span class="tile-status on">● 在线</span></div>
+</div>
+</div>
+</div>
+</body>
+</html>
