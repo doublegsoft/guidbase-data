@@ -45,8 +45,8 @@
           <div class="ac-fb-actions">
             <!-- confirm 类型：取消 + 确定 -->
             <template v-if="dialog.type === 'confirm'">
-              <button class="btn btn-secondary" @click="resolve(false)">取消</button>
               <button class="btn btn-danger" ref="confirmBtnRef" @click="resolve(true)">确定</button>
+              <button class="btn btn-default" @click="resolve(false)">取消</button>
             </template>
             <!-- alert 类型：单按钮 -->
             <template v-else>

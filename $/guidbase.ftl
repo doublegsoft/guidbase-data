@@ -34,7 +34,6 @@
 
 <#function name_widget_variable widget>
   <#local id = widget.id>
-  <#local id = id?substring(id?index_of('_') + 1)>
   <#return naming.nameVariable(id)>
 </#function>
 
@@ -389,12 +388,21 @@
   <#return "">
 </#function> 
 
-<#function get_child_from_tile widget level>
-  <#list widget.widgets as child>
-    <#if (child.options["level"]!"") == level>
+<#function get_child_from_tile widget prop>
+  <#list widget.children as child>
+    <#if (child.options["property"]!"") == prop>
       <#return child>
     </#if>
   </#list>
+</#function>
+
+<#function has_child_widget widget prop>
+  <#list widget.children as child>
+    <#if (child.options["property"]!"") == prop>
+      <#return true>
+    </#if>
+  </#list>
+  <#return false>
 </#function> 
 
 <#function estimate_height_of_tile widget>

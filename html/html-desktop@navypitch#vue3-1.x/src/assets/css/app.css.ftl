@@ -2331,3 +2331,5 @@ textarea.form-input {
 
 .animate-fade-in  { animation: fadeIn var(--transition-smooth); }
 .animate-slide-up { animation: slideUp var(--transition-smooth); }
+
+<#include "/$/tile.css.ftl">

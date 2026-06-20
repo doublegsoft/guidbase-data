@@ -25,343 +25,343 @@
 
   <#-- meeting_event: [start_time, end_time, status, primary, secondary, avatars] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_end_time?then(2, 0)) + (has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_avatars?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_tags?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "meeting_event">
   </#if>
   <#-- media_article: [image, tags, primary, secondary, tertiary] -->
   <#local s = ((has_image?then(2, 0)) + (has_tags?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_tertiary?then(2, 0))) - ((has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_status?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "media_article">
   </#if>
   <#-- user_profile: [avatar, primary, secondary, status] -->
   <#local s = ((has_avatar?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_status?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "user_profile">
   </#if>
   <#-- task_board: [tags, status, primary, avatars, end_time] -->
   <#local s = ((has_tags?then(2, 0)) + (has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_avatars?then(2, 0)) + (has_end_time?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_start_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "task_board">
   </#if>
   <#-- promo_banner: [background, tags, primary, secondary, tertiary] -->
   <#local s = ((has_background?then(2, 0)) + (has_tags?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_tertiary?then(2, 0))) - ((has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_status?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "promo_banner">
   </#if>
   <#-- compact_list: [status, primary, secondary, start_time] -->
   <#local s = ((has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_start_time?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "compact_list">
   </#if>
   <#-- split_content: [image, tags, primary, avatars, start_time] -->
   <#local s = ((has_image?then(2, 0)) + (has_tags?then(2, 0)) + (has_primary?then(2, 0)) + (has_avatars?then(2, 0)) + (has_start_time?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_avatar?then(1, 0)) + (has_status?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "split_content">
   </#if>
   <#-- notification: [status, primary, tertiary] -->
   <#local s = ((has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_tertiary?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "notification">
   </#if>
   <#-- hero_profile: [background, avatar, primary, secondary] -->
   <#local s = ((has_background?then(2, 0)) + (has_avatar?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_status?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "hero_profile">
   </#if>
   <#-- timeline_node: [start_time, end_time, primary, secondary, tertiary, tags] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_end_time?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_tertiary?then(2, 0)) + (has_tags?then(2, 0))) - ((has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_status?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "timeline_node">
   </#if>
   <#-- message: [avatar, primary, secondary, tertiary, start_time] -->
   <#local s = ((has_avatar?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_tertiary?then(2, 0)) + (has_start_time?then(2, 0))) - ((has_image?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_status?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "message">
   </#if>
   <#-- ticket: [background, primary, status, start_time, end_time] -->
   <#local s = ((has_background?then(2, 0)) + (has_primary?then(2, 0)) + (has_status?then(2, 0)) + (has_start_time?then(2, 0)) + (has_end_time?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "ticket">
   </#if>
   <#-- dense_detail_list: [image, primary, secondary, tertiary, tags, status] -->
   <#local s = ((has_image?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_tertiary?then(2, 0)) + (has_tags?then(2, 0)) + (has_status?then(2, 0))) - ((has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "dense_detail_list">
   </#if>
   <#-- vertical_poster: [image, primary, secondary, start_time, end_time, avatars] -->
   <#local s = ((has_image?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_start_time?then(2, 0)) + (has_end_time?then(2, 0)) + (has_avatars?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_avatar?then(1, 0)) + (has_tags?then(1, 0)) + (has_status?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "vertical_poster">
   </#if>
   <#-- issue_detail: [tags, status, primary, secondary, tertiary, avatar, end_time] -->
   <#local s = ((has_tags?then(2, 0)) + (has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_tertiary?then(2, 0)) + (has_avatar?then(2, 0)) + (has_end_time?then(2, 0))) - ((has_image?then(1, 0)) + (has_avatars?then(1, 0)) + (has_start_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "issue_detail">
   </#if>
   <#-- team_directory: [primary, secondary, avatars, tags] -->
   <#local s = ((has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_avatars?then(2, 0)) + (has_tags?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_status?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "team_directory">
   </#if>
   <#-- immersive_highlight: [background, status, primary] -->
   <#local s = ((has_background?then(2, 0)) + (has_status?then(2, 0)) + (has_primary?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "immersive_highlight">
   </#if>
   <#-- mini_status: [status, end_time, primary, tags] -->
   <#local s = ((has_status?then(2, 0)) + (has_end_time?then(2, 0)) + (has_primary?then(2, 0)) + (has_tags?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_start_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "mini_status">
   </#if>
   <#-- dual_column_content: [primary, secondary, tertiary, tags, avatar, avatars] -->
   <#local s = ((has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_tertiary?then(2, 0)) + (has_tags?then(2, 0)) + (has_avatar?then(2, 0)) + (has_avatars?then(2, 0))) - ((has_image?then(1, 0)) + (has_status?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "dual_column_content">
   </#if>
   <#-- gallery: [image, primary, avatars, status] -->
   <#local s = ((has_image?then(2, 0)) + (has_primary?then(2, 0)) + (has_avatars?then(2, 0)) + (has_status?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_avatar?then(1, 0)) + (has_tags?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "gallery">
   </#if>
   <#-- key_metric: [tags, primary, secondary, status] -->
   <#local s = ((has_tags?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_status?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "key_metric">
   </#if>
   <#-- overlay_avatar: [image, avatar, primary, secondary] -->
   <#local s = ((has_image?then(2, 0)) + (has_avatar?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_status?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "overlay_avatar">
   </#if>
   <#-- audit_log: [avatar, primary, secondary, start_time, status] -->
   <#local s = ((has_avatar?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_start_time?then(2, 0)) + (has_status?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "audit_log">
   </#if>
   <#-- calendar_cell: [start_time, status, primary, avatars] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_avatars?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_tags?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "calendar_cell">
   </#if>
   <#-- side_status: [status, primary, secondary, start_time] -->
   <#local s = ((has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_start_time?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "side_status">
   </#if>
   <#-- multi_tag: [tags, primary, secondary, end_time] -->
   <#local s = ((has_tags?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_end_time?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_status?then(1, 0)) + (has_start_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "multi_tag">
   </#if>
   <#-- shift_planner: [start_time, end_time, status, primary, avatars] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_end_time?then(2, 0)) + (has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_avatars?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_tags?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "shift_planner">
   </#if>
   <#-- social_post_feed: [avatar, primary, start_time, tertiary, image, avatars, tags] -->
   <#local s = ((has_avatar?then(2, 0)) + (has_primary?then(2, 0)) + (has_start_time?then(2, 0)) + (has_tertiary?then(2, 0)) + (has_image?then(2, 0)) + (has_avatars?then(2, 0)) + (has_tags?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_status?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "social_post_feed">
   </#if>
   <#-- product: [image, tags, primary, secondary, status, end_time] -->
   <#local s = ((has_image?then(2, 0)) + (has_tags?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_status?then(2, 0)) + (has_end_time?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_start_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "product">
   </#if>
   <#-- dual_profile_comparison: [avatar, status, primary, secondary, start_time, end_time] -->
   <#local s = ((has_avatar?then(2, 0)) + (has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_start_time?then(2, 0)) + (has_end_time?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "dual_profile_comparison">
   </#if>
   <#-- left_feature_image: [image, tags, primary, secondary, tertiary, status, avatars] -->
   <#local s = ((has_image?then(2, 0)) + (has_tags?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_tertiary?then(2, 0)) + (has_status?then(2, 0)) + (has_avatars?then(2, 0))) - ((has_avatar?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "left_feature_image">
   </#if>
   <#-- workflow_strip: [start_time, avatars, status, end_time, primary] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_avatars?then(2, 0)) + (has_status?then(2, 0)) + (has_end_time?then(2, 0)) + (has_primary?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_tags?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "workflow_strip">
   </#if>
   <#-- text_over_background: [background, tags, primary, avatar, secondary] -->
   <#local s = ((has_background?then(2, 0)) + (has_tags?then(2, 0)) + (has_primary?then(2, 0)) + (has_avatar?then(2, 0)) + (has_secondary?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatars?then(1, 0)) + (has_status?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "text_over_background">
   </#if>
   <#-- micro_badge: [avatar, primary, status] -->
   <#local s = ((has_avatar?then(2, 0)) + (has_primary?then(2, 0)) + (has_status?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "micro_badge">
   </#if>
   <#-- stepped_process: [status, primary, secondary, start_time, end_time] -->
   <#local s = ((has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_start_time?then(2, 0)) + (has_end_time?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "stepped_process">
   </#if>
   <#-- stacked_overlay: [image, primary, secondary, status] -->
   <#local s = ((has_image?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_status?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "stacked_overlay">
   </#if>
   <#-- group_hub: [avatars, primary, tertiary, tags, status] -->
   <#local s = ((has_avatars?then(2, 0)) + (has_primary?then(2, 0)) + (has_tertiary?then(2, 0)) + (has_tags?then(2, 0)) + (has_status?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "group_hub">
   </#if>
   <#-- tall_sidebar: [status, image, primary, secondary, tags, avatars] -->
   <#local s = ((has_status?then(2, 0)) + (has_image?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_tags?then(2, 0)) + (has_avatars?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_avatar?then(1, 0)) + (has_start_time?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "tall_sidebar">
   </#if>
   <#-- justified_meta: [primary, secondary, start_time, end_time, avatar, status] -->
   <#local s = ((has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_start_time?then(2, 0)) + (has_end_time?then(2, 0)) + (has_avatar?then(2, 0)) + (has_status?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "justified_meta">
   </#if>
   <#-- multidimensional_board: [status, start_time, primary, tertiary, secondary, tags, avatars] -->
   <#local s = ((has_status?then(2, 0)) + (has_start_time?then(2, 0)) + (has_primary?then(2, 0)) + (has_tertiary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_tags?then(2, 0)) + (has_avatars?then(2, 0))) - ((has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "multidimensional_board">
   </#if>
   <#-- media_player: [image, primary, secondary, start_time, end_time, avatar, status] -->
   <#local s = ((has_image?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_start_time?then(2, 0)) + (has_end_time?then(2, 0)) + (has_avatar?then(2, 0)) + (has_status?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "media_player">
   </#if>
   <#-- left_anchor_time: [start_time, status, primary, secondary, avatar] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_avatar?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "left_anchor_time">
   </#if>
   <#-- duration_span: [start_time, end_time, status, primary, avatars] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_end_time?then(2, 0)) + (has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_avatars?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_tags?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "duration_span">
   </#if>
   <#-- media_history: [start_time, image, primary, secondary, tags] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_image?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_tags?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_status?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "media_history">
   </#if>
   <#-- status_transition: [start_time, status, primary, avatar, secondary] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_avatar?then(2, 0)) + (has_secondary?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "status_transition">
   </#if>
   <#-- compact_time: [start_time, status, primary, tags] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_status?then(2, 0)) + (has_primary?then(2, 0)) + (has_tags?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "compact_time">
   </#if>
   <#-- horizontal_flow: [start_time, primary, status] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_primary?then(2, 0)) + (has_status?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "horizontal_flow">
   </#if>
   <#-- right_biased_node: [start_time, primary, tags] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_primary?then(2, 0)) + (has_tags?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_status?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "right_biased_node">
   </#if>
   <#-- left_biased_node: [start_time, primary, tags] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_primary?then(2, 0)) + (has_tags?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_status?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "left_biased_node">
   </#if>
   <#-- internal_chronology: [start_time, primary, end_time, secondary, status] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_primary?then(2, 0)) + (has_end_time?then(2, 0)) + (has_secondary?then(2, 0)) + (has_status?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "internal_chronology">
   </#if>
   <#-- three_stage_segment: [start_time, tags, end_time, primary, secondary, status] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_tags?then(2, 0)) + (has_end_time?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_status?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "three_stage_segment">
   </#if>
   <#-- horizontal_log: [avatar, start_time, primary, status] -->
   <#local s = ((has_avatar?then(2, 0)) + (has_start_time?then(2, 0)) + (has_primary?then(2, 0)) + (has_status?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "horizontal_log">
   </#if>
   <#-- bulletin: [tags, primary, tertiary, avatars, start_time] -->
   <#local s = ((has_tags?then(2, 0)) + (has_primary?then(2, 0)) + (has_tertiary?then(2, 0)) + (has_avatars?then(2, 0)) + (has_start_time?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_status?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "bulletin">
   </#if>
   <#-- timestamp_stamp: [background, start_time, primary, status] -->
   <#local s = ((has_background?then(2, 0)) + (has_start_time?then(2, 0)) + (has_primary?then(2, 0)) + (has_status?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_end_time?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "timestamp_stamp">
   </#if>
   <#-- compact_chat: [avatar, primary, secondary, start_time] -->
   <#local s = ((has_avatar?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_start_time?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_status?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "compact_chat">
   </#if>
   <#-- side_image_time_capsule: [start_time, primary, secondary, image, status] -->
   <#local s = ((has_start_time?then(2, 0)) + (has_primary?then(2, 0)) + (has_secondary?then(2, 0)) + (has_image?then(2, 0)) + (has_status?then(2, 0))) - ((has_tertiary?then(1, 0)) + (has_avatar?then(1, 0)) + (has_avatars?then(1, 0)) + (has_tags?then(1, 0)) + (has_end_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "side_image_time_capsule">
   </#if>
   <#-- multi_tag_end_node: [tags, end_time, primary, avatars, status] -->
   <#local s = ((has_tags?then(2, 0)) + (has_end_time?then(2, 0)) + (has_primary?then(2, 0)) + (has_avatars?then(2, 0)) + (has_status?then(2, 0))) - ((has_secondary?then(1, 0)) + (has_tertiary?then(1, 0)) + (has_image?then(1, 0)) + (has_avatar?then(1, 0)) + (has_start_time?then(1, 0)) + (has_background?then(1, 0)))>
-  <#if s > bestScore>
+  <#if (s > bestScore)>
     <#local bestScore = s>
     <#local bestName = "multi_tag_end_node">
   </#if>
@@ -369,7 +369,7 @@
 </#function>
 
 <#macro print_tile_layout widget indent=0>
-  <#local tile = widget.value("tile")!guess_tile(widget)>
+  <#local tile = widget.value("tile",guess_tile(widget))>
   <#if tile == "meeting_event">
 <@print_tile_meeting_event widget=widget indent=indent />
   <#elseif tile == "media_article">
@@ -503,22 +503,22 @@ ${""?left_pad(indent)}<div class="tile tile-meeting-event">
 ${""?left_pad(indent)}  <div class="tile-row tile-header">
   <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    <span class="tile-time">
-    <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}<span>{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span></#if>
+    <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}<span>{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span></#if>
     <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}<span class="tile-time-sep"> - </span></#if>
-    <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}<span>{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span></#if>
+    <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}<span>{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span></#if>
 ${""?left_pad(indent)}    </span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary") || guidbase.has_child_widget(widget, "secondary")>
 ${""?left_pad(indent)}  <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}  </div>
   </#if>
@@ -562,13 +562,13 @@ ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary") || guidbase.has_child_widget(widget, "secondary") || guidbase.has_child_widget(widget, "tertiary")>
 ${""?left_pad(indent)}  <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    <div class="tile-tertiary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-tertiary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}  </div>
   </#if>
@@ -595,14 +595,14 @@ ${""?left_pad(indent)}    </div>
   </#if>
 ${""?left_pad(indent)}    <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}    </div>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -625,12 +625,12 @@ ${""?left_pad(indent)}  <div class="tile-row tile-header">
 ${""?left_pad(indent)}    <span class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary")>
 ${""?left_pad(indent)}  <div class="tile-body">
-${""?left_pad(indent)}    <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
 ${""?left_pad(indent)}  </div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-row tile-footer">
@@ -638,7 +638,7 @@ ${""?left_pad(indent)}  <div class="tile-row tile-footer">
 ${""?left_pad(indent)}    <div class="tile-avatars"><img v-for="(av, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}" :key="idx" :src="av" class="tile-avatar-img" /></div>
   </#if>
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    <span class="tile-end-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-end-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -668,13 +668,13 @@ ${""?left_pad(indent)}  <div class="tile-overlay">
 ${""?left_pad(indent)}    <div class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    <div class="tile-tertiary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-tertiary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -690,16 +690,16 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-compact-list">
 ${""?left_pad(indent)}  <div class="tile-row tile-inline">
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <span class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <span class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -728,13 +728,13 @@ ${""?left_pad(indent)}    <div class="tile-body">
 ${""?left_pad(indent)}      <div class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}      <div class="tile-avatars"><img v-for="(av, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}" :key="idx" :src="av" class="tile-avatar-img" /></div>
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}      <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}      <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
     </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
@@ -752,14 +752,14 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-notification">
 ${""?left_pad(indent)}  <div class="tile-row">
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}    <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}      <div class="tile-tertiary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-tertiary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
@@ -793,10 +793,10 @@ ${""?left_pad(indent)}      <img :src="${guidbase.name_widget_variable(guidbase.
 ${""?left_pad(indent)}    </div>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -815,22 +815,22 @@ ${""?left_pad(indent)}<div class="tile tile-timeline-node">
 ${""?left_pad(indent)}  <div class="tile-row">
 ${""?left_pad(indent)}    <div class="tile-timeline">
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}      <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}      <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
     </#if>
 ${""?left_pad(indent)}      <span class="tile-timeline-dot"></span>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}      <span class="tile-end-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
+${""?left_pad(indent)}      <span class="tile-end-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
     </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}    <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}      <div class="tile-tertiary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-tertiary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}    </div>
   <#if guidbase.has_child_widget(widget, "tags")>
@@ -860,17 +860,17 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}    <div class="tile-body">
 ${""?left_pad(indent)}      <div class="tile-row tile-header">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}        <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}        <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}        <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}        <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
     </#if>
 ${""?left_pad(indent)}      </div>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}      <div class="tile-tertiary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-tertiary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
@@ -897,17 +897,17 @@ ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}  <div class="tile-overlay">
 ${""?left_pad(indent)}    <div class="tile-row tile-header">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}      <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}      <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
     </#if>
 ${""?left_pad(indent)}    </div>
     <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    <div class="tile-time">
-    <#if guidbase.has_child_widget(widget, "start_time")><span>{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span></#if>
+    <#if guidbase.has_child_widget(widget, "start_time")><span>{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span></#if>
     <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")> ~ </#if>
-    <#if guidbase.has_child_widget(widget, "end_time")><span>{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span></#if>
+    <#if guidbase.has_child_widget(widget, "end_time")><span>{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span></#if>
 ${""?left_pad(indent)}    </div>
     </#if>
 ${""?left_pad(indent)}  </div>
@@ -932,11 +932,11 @@ ${""?left_pad(indent)}    </div>
   </#if>
 ${""?left_pad(indent)}    <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}      <div class="tile-row">
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}        <span class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
+${""?left_pad(indent)}        <span class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
     </#if>
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}        <span class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></span>
@@ -944,10 +944,10 @@ ${""?left_pad(indent)}        <span class="tile-tags"><span v-for="(tag, idx) in
 ${""?left_pad(indent)}      </div>
 ${""?left_pad(indent)}      <div class="tile-row">
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}        <span class="tile-tertiary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</span>
+${""?left_pad(indent)}        <span class="tile-tertiary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</span>
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}        <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}        <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
     </#if>
 ${""?left_pad(indent)}      </div>
 ${""?left_pad(indent)}    </div>
@@ -981,16 +981,16 @@ ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary") || guidbase.has_child_widget(widget, "secondary") || guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time") || guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <div class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    <div class="tile-end-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-end-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    <div class="tile-avatars"><img v-for="(av, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}" :key="idx" :src="av" class="tile-avatar-img" /></div>
@@ -1019,19 +1019,19 @@ ${""?left_pad(indent)}  <div class="tile-row tile-header">
 ${""?left_pad(indent)}    <span class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary") || guidbase.has_child_widget(widget, "secondary") || guidbase.has_child_widget(widget, "tertiary")>
 ${""?left_pad(indent)}  <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    <div class="tile-tertiary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-tertiary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}  </div>
   </#if>
@@ -1042,7 +1042,7 @@ ${""?left_pad(indent)}      <img :src="${guidbase.name_widget_variable(guidbase.
 ${""?left_pad(indent)}    </div>
   </#if>
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    <span class="tile-end-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-end-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -1060,10 +1060,10 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-team-directory">
 ${""?left_pad(indent)}  <div class="tile-body">
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}  <div class="tile-row tile-footer">
@@ -1096,10 +1096,10 @@ ${""?left_pad(indent)}  </div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-overlay">
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -1118,14 +1118,14 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-mini-status">
 ${""?left_pad(indent)}  <div class="tile-row tile-header">
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    <span class="tile-end-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-end-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  <div class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
@@ -1147,10 +1147,10 @@ ${""?left_pad(indent)}<div class="tile tile-dual-column-content">
 ${""?left_pad(indent)}  <div class="tile-row">
 ${""?left_pad(indent)}    <div class="tile-col tile-col-left">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}      <div class="tile-tertiary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-tertiary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "avatar")>
 ${""?left_pad(indent)}      <div class="tile-avatar">
@@ -1160,7 +1160,7 @@ ${""?left_pad(indent)}      </div>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}    <div class="tile-col tile-col-right">
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}      <div class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
@@ -1193,14 +1193,14 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-row tile-footer">
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    <div class="tile-avatars"><img v-for="(av, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}" :key="idx" :src="av" class="tile-avatar-img" /></div>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -1222,14 +1222,14 @@ ${""?left_pad(indent)}<div class="tile tile-key-metric">
 ${""?left_pad(indent)}  <div class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-row tile-footer">
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <span class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -1263,10 +1263,10 @@ ${""?left_pad(indent)}    </div>
   </#if>
 ${""?left_pad(indent)}    <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
@@ -1292,17 +1292,17 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}    <div class="tile-body">
 ${""?left_pad(indent)}      <div class="tile-row">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}        <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}        <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}        <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}        <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
     </#if>
 ${""?left_pad(indent)}      </div>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}      <div class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
     </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
@@ -1323,14 +1323,14 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-calendar-cell">
 ${""?left_pad(indent)}  <div class="tile-row tile-header">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  <div class="tile-avatars"><img v-for="(av, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}" :key="idx" :src="av" class="tile-avatar-img" /></div>
@@ -1351,18 +1351,18 @@ ${""?left_pad(indent)}<div class="tile tile-side-status">
 ${""?left_pad(indent)}  <div class="tile-row">
   <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    <div class="tile-status-col">
-${""?left_pad(indent)}      <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}      <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
 ${""?left_pad(indent)}    </div>
   </#if>
 ${""?left_pad(indent)}    <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}      <div class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
     </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
@@ -1386,14 +1386,14 @@ ${""?left_pad(indent)}    <span class="tile-tags"><span v-for="(tag, idx) in ${g
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-row tile-footer">
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <span class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    <span class="tile-end-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-end-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -1415,17 +1415,17 @@ ${""?left_pad(indent)}<div class="tile tile-shift-planner">
 ${""?left_pad(indent)}  <div class="tile-row tile-header">
     <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    <span class="tile-time">
-      <#if guidbase.has_child_widget(widget, "start_time")><span>{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span></#if>
+      <#if guidbase.has_child_widget(widget, "start_time")><span>{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span></#if>
       <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")> - </#if>
-      <#if guidbase.has_child_widget(widget, "end_time")><span>{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span></#if>
+      <#if guidbase.has_child_widget(widget, "end_time")><span>{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span></#if>
 ${""?left_pad(indent)}    </span>
     </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  <div class="tile-avatars-wrap">
@@ -1458,15 +1458,15 @@ ${""?left_pad(indent)}    </div>
   </#if>
 ${""?left_pad(indent)}    <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}      <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}      <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
     </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}  <div class="tile-tertiary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-tertiary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "image")>
 ${""?left_pad(indent)}  <div class="tile-image-wrap">
@@ -1511,17 +1511,17 @@ ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}  <div class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}  <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-row tile-footer">
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    <span class="tile-end-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-end-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -1546,28 +1546,28 @@ ${""?left_pad(indent)}      <img :src="${guidbase.name_widget_variable(guidbase.
 ${""?left_pad(indent)}    </div>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
 ${""?left_pad(indent)}    <div class="tile-avatar">
-${""?left_pad(indent)}      <img src="" alt="{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}">
+${""?left_pad(indent)}      <img src="" alt="{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}">
 ${""?left_pad(indent)}    </div>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}  <div class="tile-row tile-footer">
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <span class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <span class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}  <div class="tile-row">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    <span class="tile-end-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-end-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -1595,17 +1595,17 @@ ${""?left_pad(indent)}    <div class="tile-body">
 ${""?left_pad(indent)}      <div class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}      <div class="tile-tertiary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-tertiary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}      <div class="tile-row tile-inline">
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}        <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}        <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
     </#if>
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}        <span class="tile-avatars"><img v-for="(av, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}" :key="idx" :src="av" class="tile-avatar-img" /></span>
@@ -1628,7 +1628,7 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-workflow-strip">
 ${""?left_pad(indent)}  <div class="tile-row tile-workflow-chain">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
 ${""?left_pad(indent)}    <span class="tile-workflow-arrow"> > </span>
   </#if>
   <#if guidbase.has_child_widget(widget, "avatars")>
@@ -1636,15 +1636,15 @@ ${""?left_pad(indent)}    <span class="tile-avatars"><img v-for="(av, idx) in ${
 ${""?left_pad(indent)}    <span class="tile-workflow-arrow"> > </span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
 ${""?left_pad(indent)}    <span class="tile-workflow-arrow"> > </span>
   </#if>
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    <span class="tile-end-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-end-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}</div>
 </#macro>
@@ -1673,7 +1673,7 @@ ${""?left_pad(indent)}  <div class="tile-overlay">
 ${""?left_pad(indent)}    <div class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}    <div class="tile-row">
     <#if guidbase.has_child_widget(widget, "avatar")>
@@ -1682,7 +1682,7 @@ ${""?left_pad(indent)}        <img :src="${guidbase.name_widget_variable(guidbas
 ${""?left_pad(indent)}      </div>
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <span class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
+${""?left_pad(indent)}      <span class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
     </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
@@ -1704,10 +1704,10 @@ ${""?left_pad(indent)}      <img :src="${guidbase.name_widget_variable(guidbase.
 ${""?left_pad(indent)}    </div>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <span class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -1727,24 +1727,24 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-stepped-process">
 ${""?left_pad(indent)}  <div class="tile-row">
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}    <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}      <div class="tile-step-line">
 ${""?left_pad(indent)}        <span class="tile-step-branch">├─</span>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}        <span class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
+${""?left_pad(indent)}        <span class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
     </#if>
 ${""?left_pad(indent)}      </div>
 ${""?left_pad(indent)}      <div class="tile-step-line">
 ${""?left_pad(indent)}        <span class="tile-step-branch">├─</span>
     <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
-    <#if guidbase.has_child_widget(widget, "start_time")><span>{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span></#if>
+    <#if guidbase.has_child_widget(widget, "start_time")><span>{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span></#if>
     <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")> - </#if>
-    <#if guidbase.has_child_widget(widget, "end_time")><span>{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span></#if>
+    <#if guidbase.has_child_widget(widget, "end_time")><span>{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span></#if>
     </#if>
 ${""?left_pad(indent)}      </div>
 ${""?left_pad(indent)}    </div>
@@ -1775,14 +1775,14 @@ ${""?left_pad(indent)}  </div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-stacked-card">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}    <div class="tile-row">
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <span class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
+${""?left_pad(indent)}      <span class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}      <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}      <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
     </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
@@ -1806,17 +1806,17 @@ ${""?left_pad(indent)}<div class="tile tile-group-hub">
 ${""?left_pad(indent)}  <div class="tile-avatars"><img v-for="(av, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}" :key="idx" :src="av" class="tile-avatar-img" /></div>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}  <div class="tile-tertiary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-tertiary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-row tile-footer">
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    <span class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -1842,7 +1842,7 @@ ${""?left_pad(indent)}</div>
 <#macro print_tile_tall_sidebar widget indent=0>
 ${""?left_pad(indent)}<div class="tile tile-tall-sidebar">
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  <div class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "image")>
 ${""?left_pad(indent)}  <div class="tile-image-wrap">
@@ -1852,10 +1852,10 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}  <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  <div class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
@@ -1879,18 +1879,18 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-justified-meta">
 ${""?left_pad(indent)}  <div class="tile-row tile-justified">
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <span class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}  <div class="tile-row tile-justified">
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <span class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    <span class="tile-end-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-end-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}  <div class="tile-row tile-justified">
@@ -1900,7 +1900,7 @@ ${""?left_pad(indent)}      <img :src="${guidbase.name_widget_variable(guidbase.
 ${""?left_pad(indent)}    </div>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -1921,24 +1921,24 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-multidimensional-board">
 ${""?left_pad(indent)}  <div class="tile-row tile-header">
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}  <div class="tile-row tile-cols">
 ${""?left_pad(indent)}    <div class="tile-col">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}      <div class="tile-tertiary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-tertiary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}    <div class="tile-col">
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}      <div class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
@@ -1971,16 +1971,16 @@ ${""?left_pad(indent)}    </div>
   </#if>
 ${""?left_pad(indent)}    <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}      <div class="tile-progress">
-      <#if guidbase.has_child_widget(widget, "start_time")><span>{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span></#if>
+      <#if guidbase.has_child_widget(widget, "start_time")><span>{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span></#if>
 ${""?left_pad(indent)}      <span class="tile-progress-bar">──────────</span>
-      <#if guidbase.has_child_widget(widget, "end_time")><span>{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span></#if>
+      <#if guidbase.has_child_widget(widget, "end_time")><span>{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span></#if>
 ${""?left_pad(indent)}      </div>
     </#if>
 ${""?left_pad(indent)}    </div>
@@ -1992,7 +1992,7 @@ ${""?left_pad(indent)}      <img :src="${guidbase.name_widget_variable(guidbase.
 ${""?left_pad(indent)}    </div>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -2012,17 +2012,17 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-left-anchor-time">
 ${""?left_pad(indent)}  <div class="tile-row tile-header">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}  <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "avatar")>
 ${""?left_pad(indent)}  <div class="tile-avatar">
@@ -2046,17 +2046,17 @@ ${""?left_pad(indent)}<div class="tile tile-duration-span">
 ${""?left_pad(indent)}  <div class="tile-row tile-header">
   <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    <span class="tile-time">
-    <#if guidbase.has_child_widget(widget, "start_time")><span>{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span></#if>
+    <#if guidbase.has_child_widget(widget, "start_time")><span>{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span></#if>
     <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")> - </#if>
-    <#if guidbase.has_child_widget(widget, "end_time")><span>{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span></#if>
+    <#if guidbase.has_child_widget(widget, "end_time")><span>{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span></#if>
 ${""?left_pad(indent)}    </span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  <div class="tile-avatars"><img v-for="(av, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}" :key="idx" :src="av" class="tile-avatar-img" /></div>
@@ -2077,7 +2077,7 @@ ${""?left_pad(indent)}</div>
 <#macro print_tile_media_history widget indent=0>
 ${""?left_pad(indent)}<div class="tile tile-media-history">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  <div class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-row">
   <#if guidbase.has_child_widget(widget, "image")>
@@ -2087,10 +2087,10 @@ ${""?left_pad(indent)}    </div>
   </#if>
 ${""?left_pad(indent)}    <div class="tile-body">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}      <div class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
@@ -2113,14 +2113,14 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-status-transition">
 ${""?left_pad(indent)}  <div class="tile-row tile-header">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-row">
   <#if guidbase.has_child_widget(widget, "avatar")>
@@ -2129,7 +2129,7 @@ ${""?left_pad(indent)}      <img :src="${guidbase.name_widget_variable(guidbase.
 ${""?left_pad(indent)}    </div>
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <span class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -2145,15 +2145,15 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-compact-time">
 ${""?left_pad(indent)}  <div class="tile-row tile-inline">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
 ${""?left_pad(indent)}    <span class="tile-sep">|</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
 ${""?left_pad(indent)}    <span class="tile-sep">|</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <span class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "tags")>
@@ -2174,13 +2174,13 @@ ${""?left_pad(indent)}</div>
 <#macro print_tile_horizontal_flow widget indent=0>
 ${""?left_pad(indent)}<div class="tile tile-horizontal-flow">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  <div class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}  <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}</div>
 </#macro>
@@ -2198,11 +2198,11 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-right-biased-node">
 ${""?left_pad(indent)}  <div class="tile-row tile-header tile-right">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  <div class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
@@ -2223,11 +2223,11 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-left-biased-node">
 ${""?left_pad(indent)}  <div class="tile-row tile-header tile-left">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary tile-right">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary tile-right">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  <div class="tile-tags tile-right"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
@@ -2248,23 +2248,23 @@ ${""?left_pad(indent)}</div>
 <#macro print_tile_internal_chronology widget indent=0>
 ${""?left_pad(indent)}<div class="tile tile-internal-chronology">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  <div class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-timeline-line">
 ${""?left_pad(indent)}    <span class="tile-timeline-indent">│</span>
   </div>
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}  <div class="tile-end-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-end-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-row">
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <span class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -2282,7 +2282,7 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="tile tile-three-stage-segment">
 ${""?left_pad(indent)}  <div class="tile-row tile-three-stage">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
 ${""?left_pad(indent)}    <span class="tile-stage-arrow">>></span>
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
@@ -2290,20 +2290,20 @@ ${""?left_pad(indent)}    <span class="tile-tags"><span v-for="(tag, idx) in ${g
 ${""?left_pad(indent)}    <span class="tile-stage-arrow">>></span>
   </#if>
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    <span class="tile-end-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-end-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}  <div class="tile-row tile-three-stage">
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <span class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
 ${""?left_pad(indent)}    <span class="tile-stage-arrow">>></span>
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    <span class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</span>
 ${""?left_pad(indent)}    <span class="tile-stage-arrow">>></span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -2325,15 +2325,15 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}    <span class="tile-sep">|</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
 ${""?left_pad(indent)}    <span class="tile-sep">|</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <span class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
 ${""?left_pad(indent)}    <span class="tile-sep">|</span>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -2356,17 +2356,17 @@ ${""?left_pad(indent)}<div class="tile tile-bulletin">
 ${""?left_pad(indent)}  <div class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></div>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}  <div class="tile-tertiary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-tertiary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-row tile-footer">
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    <div class="tile-avatars"><img v-for="(av, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}" :key="idx" :src="av" class="tile-avatar-img" /></div>
   </#if>
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -2390,13 +2390,13 @@ ${""?left_pad(indent)}  </div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-overlay">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    <div class="tile-start-time tile-right">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-start-time tile-right">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}    <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -2421,14 +2421,14 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}    <div class="tile-body">
 ${""?left_pad(indent)}      <div class="tile-row tile-header">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}        <span class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
+${""?left_pad(indent)}        <span class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</span>
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}        <span class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
+${""?left_pad(indent)}        <span class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</span>
     </#if>
 ${""?left_pad(indent)}      </div>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
@@ -2449,15 +2449,15 @@ ${""?left_pad(indent)}</div>
 <#macro print_tile_side_image_time_capsule widget indent=0>
 ${""?left_pad(indent)}<div class="tile tile-side-image-time-capsule">
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  <div class="tile-start-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-start-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-row tile-cols">
 ${""?left_pad(indent)}    <div class="tile-col">
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      <div class="tile-secondary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
+${""?left_pad(indent)}      <div class="tile-secondary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))} }}</div>
     </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}    <div class="tile-col">
@@ -2470,7 +2470,7 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}  <div class="tile-row tile-right">
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
 ${""?left_pad(indent)}  </div>
   </#if>
 ${""?left_pad(indent)}</div>
@@ -2492,18 +2492,18 @@ ${""?left_pad(indent)}  <div class="tile-row tile-header">
 ${""?left_pad(indent)}    <span class="tile-tags"><span v-for="(tag, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}" :key="idx" class="tile-tag">{{ tag }}</span></span>
   </#if>
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    <span class="tile-end-time">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-end-time">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  <div class="tile-primary">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
+${""?left_pad(indent)}  <div class="tile-primary">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))} }}</div>
   </#if>
 ${""?left_pad(indent)}  <div class="tile-row tile-footer">
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    <div class="tile-avatars"><img v-for="(av, idx) in ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}" :key="idx" :src="av" class="tile-avatar-img" /></div>
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    <span class="tile-status">{{ ${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
+${""?left_pad(indent)}    <span class="tile-status">{{ row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))} }}</span>
   </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>

@@ -1,3 +1,4 @@
+<#include "tile.ftl">
 <#include "vue3.ftl">
 <!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
@@ -69,7 +70,7 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}    <div class="card-actions">
   <#list form.children as child>
     <#if child.type != "button"><#continue></#if>
-${""?left_pad(indent)}    ${""?left_pad(indent)}<button class="btn btn-${get_button_role(child)}" @click="${get_button_method_name(child)}">${child.title}</button> 
+${""?left_pad(indent)}      <button class="btn btn-${get_button_role(child)}" @click="${get_button_method_name(child)}">${child.title}</button> 
   </#list>
 ${""?left_pad(indent)}    </div>   
 ${""?left_pad(indent)}  </div>
@@ -214,6 +215,9 @@ ${""?left_pad(indent)}  <div class="card-header">
 ${""?left_pad(indent)}    <div class="card-title">${list.title}</div>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}  <div class="card-body">
+${""?left_pad(indent)}    <div v-for="row in ${js.nameVariable(list.id)}Rows" :key="row.id || idx" style="margin-bottom:8px;">
+<@print_tile_layout widget=list indent=indent+6 />
+${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
 </#macro>

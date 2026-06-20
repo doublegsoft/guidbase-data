@@ -1,3 +1,5 @@
+<#include "tile.ftl">
+
 <#function get_button_role button>
   <#if (button.value("action")!"") == "save">
     <#return "primary">
@@ -578,7 +580,9 @@ ${""?left_pad(indent)}  @selection-change="handleSelection" />
 <!----------------------------------------------------------------------------->
 <#macro print_paged_grid_variables grid indent=0>
 
-${""?left_pad(indent)}// ${js.nameVariable(grid.id)}分页表格相关变量
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * ${js.nameVariable(grid.id)}【分页网格】相关变量
+${""?left_pad(indent)} */
 ${""?left_pad(indent)}const ${js.nameVariable(grid.id)}Ref = ref(null)
 </#macro>
 
@@ -609,8 +613,71 @@ ${""?left_pad(indent)}  id-key="${js.nameVariable(grid.value("object","object"))
 ${""?left_pad(indent)}  :fetch-data="load${js.nameType(grid.id)}Rows"
 ${""?left_pad(indent)}  :fetch-params="${js.nameVariable(grid.value("object", grid.id))}Crit">
 ${""?left_pad(indent)}  <template #default="{ row, index }">
+${""?left_pad(indent)}    <div :key="row.id || idx">
+<@print_tile_layout widget=list indent=indent+6 />
+${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </template>
 ${""?left_pad(indent)}</${namespace}-pagedgrid>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                 TIME GRID                               -->
+<!----------------------------------------------------------------------------->
+<#macro print_time_grid_variables grid indent=0>
+
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * ${js.nameVariable(grid.id)}【时间网格】相关变量
+${""?left_pad(indent)} */
+${""?left_pad(indent)}const ${js.nameVariable(grid.id)}Ref = ref(null)
+</#macro>
+
+<#macro print_time_grid_methods grid indent=0>
+  <#local objname = grid.value("object",grid.id)>
+
+/**
+ * 加载数据的界面函数
+ */
+const load${js.nameType(grid.id)}Rows = async (params, pageNumber, pageSize) => {
+  isLoading.value = true
+  try {
+    const res = await sdk.fetch${js.nameType(inflector.pluralize(objname))}(params, (pageNumber - 1) * pageSize, pageSize)
+    return res;
+  } catch (error) {
+    fb.error('发生错误', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                LIST VIEW                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_list_view_variables list indent=0>
+
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * ${js.nameVariable(list.id)}【瓦片列表】相关变量
+${""?left_pad(indent)} */
+${""?left_pad(indent)}const ${js.nameVariable(list.id)}Rows = ref([])
+</#macro>
+
+<#macro print_list_view_methods list indent=0>
+  <#local objname = list.value("object",list.id)>
+
+/**
+ * 加载数据的界面函数
+ */
+const load${js.nameType(list.id)}Rows = async (params, pageNumber, pageSize) => {
+  isLoading.value = true
+  try {
+    const res = await sdk.fetch${js.nameType(inflector.pluralize(objname))}(params, 0, -1)
+    ${js.nameVariable(list.id)}Rows.value = res.data;
+  } catch (error) {
+    fb.error('发生错误', error)
+  } finally {
+    isLoading.value = false
+  }
+}
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -618,7 +685,9 @@ ${""?left_pad(indent)}</${namespace}-pagedgrid>
 <!----------------------------------------------------------------------------->
 <#macro print_chart_variables chart indent=0>
 
-${""?left_pad(indent)}// 【${chart.title!chart.id}】数据变量和图标设置
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * ${js.nameVariable(chart.id)}【数据图表】相关变量
+${""?left_pad(indent)} */
 ${""?left_pad(indent)}const ${js.nameVariable(chart.id)}Data = ref([])
 ${""?left_pad(indent)}const ${js.nameVariable(chart.id)}Conf = computed(() =>
   <#if chart.value("chart", "") == "pie">
@@ -803,6 +872,10 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(fals
 <@print_fixed_table_variables table=widget indent=indent />
     <#elseif widget.type == 'paged_grid'>
 <@print_paged_grid_variables grid=widget indent=indent />
+    <#elseif widget.type == 'time_grid'>
+<@print_time_grid_variables grid=widget indent=indent />
+    <#elseif widget.type == 'list_view'>
+<@print_list_view_variables list=widget indent=indent />
     <#elseif widget.type == "chart">
 <@print_chart_variables chart=widget indent=indent />
     </#if>
@@ -825,6 +898,10 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(fals
 <@print_fixed_table_methods table=widget indent=indent />
     <#elseif widget.type == 'paged_grid'>
 <@print_paged_grid_methods grid=widget indent=indent />
+    <#elseif widget.type == 'time_grid'>
+<@print_time_grid_methods grid=widget indent=indent />
+    <#elseif widget.type == 'list_view'>
+<@print_list_view_methods list=widget indent=indent />
     <#elseif widget.type == "chart">
 <@print_chart_methods chart=widget indent=indent />
     <#elseif widget.type == 'button'>
@@ -854,7 +931,7 @@ const handle${js.nameType(widget.id)}RowAction = ({ handler, row, index }) => {
 <@print_layout_widget widget=child indent=indent />        
     </#if>
     <#if child?index != children?size - 1>
-<@print_layout_divider indent = indent />    
+<@print_layout_divider indent=indent+2 />    
     </#if>
   </#list>
   <#list page.children as child>

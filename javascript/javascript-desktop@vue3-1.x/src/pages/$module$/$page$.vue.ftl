@@ -34,7 +34,7 @@ onMounted(async () => {
     </#if>
   <#elseif widget.type == "entry_form" || widget.type == "display_form">
   load${js.nameType(widget.id)}Data();
-  <#elseif widget.type == "excel_form">
+  <#elseif widget.type == "excel_form" || widget.type == "list_view">
   load${js.nameType(widget.id)}Rows();
   <#elseif widget.type == "chart">
   load${js.nameType(widget.id)}Rows();
