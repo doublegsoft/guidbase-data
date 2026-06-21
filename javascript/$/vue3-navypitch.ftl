@@ -49,9 +49,9 @@ ${""?left_pad(indent)}</div>
 <#macro print_layout_entry_form form indent=0>
   <#local cols = form.value("cols","2")>
   <#local groups = form.groups()>
+  <#list groups as group>
 ${""?left_pad(indent)}<div class="card">  
 ${""?left_pad(indent)}  <div id="entry${js.nameType(form.id)}" class="card-body">
-  <#list groups as group>
     <#local rows = form.rows(group, cols?number)>
 ${""?left_pad(indent)}    <div class="form-row form-row-${cols}">
     <#list rows as row>
@@ -66,15 +66,20 @@ ${""?left_pad(indent)}      </div>
       </#list>
     </#list>
 ${""?left_pad(indent)}    </div>  
-  </#list>
+    <#if groups?size == 1 && from.has("button")>
 ${""?left_pad(indent)}    <div class="card-actions">
-  <#list form.children as child>
-    <#if child.type != "button"><#continue></#if>
+      <#list form.children as child>
+        <#if child.type != "button"><#continue></#if>
 ${""?left_pad(indent)}      <button class="btn btn-${get_button_role(child)}" @click="${get_button_method_name(child)}">${child.title}</button> 
-  </#list>
+      </#list>
 ${""?left_pad(indent)}    </div>   
+    </#if>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
+    <#if group?index != groups?size - 1>
+<@print_layout_divider indent=indent />  
+    </#if>
+  </#list>
 </#macro>
 
 <!----------------------------------------------------------------------------->

@@ -196,29 +196,6 @@ const save${js.nameType(form.id)}Data = async () => {
 const { loading: is${js.nameType(form.id)}Submitting, run: handle${js.nameType(form.id)}Save } = useAsyncLock(save${js.nameType(form.id)}Data)
 </#macro>
 
-<#macro print_layout_entry_form form indent=0>
-  <#local cols = form.value("cols")!"3">
-  <#local groups = form.groups()>
-${""?left_pad(indent)}<div id="entry${js.nameType(form.id)}">
-  <#list groups as group>
-    <#local rows = form.rows(group, cols?number)>
-${""?left_pad(indent)}  <div class="${namespace}-panel">
-${""?left_pad(indent)}    <div class="${namespace}-panel-head">${group}</div>
-${""?left_pad(indent)}    <div class="${namespace}-form ${namespace}-form--${cols}">
-    <#list rows as row>
-      <#list row as child>
-${""?left_pad(indent)}      <div class="${namespace}-field<#if child.value("span")??> ${namespace}-field--span${child.value("span")}</#if>">
-${""?left_pad(indent)}        <label class="${namespace}-field-label<#if (child.value("required")!"") == "true"> ${namespace}-field-label--required</#if>">${child.title}</label>
-<@print_layout_widget widget=child indent=indent+8 />
-${""?left_pad(indent)}      </div>
-      </#list>
-    </#list>
-${""?left_pad(indent)}    </div>    
-${""?left_pad(indent)}  </div>  
-  </#list>
-${""?left_pad(indent)}</div>
-</#macro>
-
 <!----------------------------------------------------------------------------->
 <!--                              OFFICIAL FORM                              -->
 <!----------------------------------------------------------------------------->
@@ -279,7 +256,9 @@ ${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(child.
 ${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options"  :clearable="true" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />
             </#if>
           <#elseif child.type == "multiselect">
-${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />      
+${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />    
+          <#elseif child.type == "avatar"><#-- NOT USED IN OFFICIAL FORM -->
+${""?left_pad(indent)}<${namespace}-avatarupload data-test="${js.nameVariable(child.id)}" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" />        
           <#elseif child.type == "tags">
 ${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(child.id)}" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />      
           <#elseif child.type == "longtext">
@@ -755,11 +734,13 @@ const ${get_button_method_name(button)} = async (row) => {
     </#if>
   <#else>
 const ${get_button_method_name(button)} = async () => {    
-    <#if (button.value("action","")) == "reset" && is_ref_or_ancestor(button, "entry_form")><#-- 重置 -->
+    <#if (button.value("action","")) == "reset"><#-- 重置 -->
+      <#if is_ref_or_ancestor(button, "entry_form")>
   const ok = await fb.confirm('询问', '确定要清空表单数据？')
-  if (!ok) return;
+  if (!ok) return; 
+      </#if>
       <#list ancestor.inputs as input>
-  ${get_input_model_name(input)} = '';
+  ${get_input_model_name(input)} = ${guidbase4js.get_primitive_default_value(input)};
       </#list>
     <#elseif (button.value("action","")) == "search"><#-- 重置 -->
   ${js.nameVariable(button.value("ref"))}Ref.value?.refresh()
@@ -836,8 +817,16 @@ import ${js.nameType(namespace)}Timepicker from '@/components/${namespace}-timep
 import ${js.nameType(namespace)}Cascadepicker from '@/components/${namespace}-cascadepicker.vue'    
     <#elseif widget.type == "multiselect">
 import ${js.nameType(namespace)}Multiselect from '@/components/${namespace}-multiselect.vue'   
+    <#elseif widget.type == "avatar">
+import ${js.nameType(namespace)}Avatarupload from '@/components/${namespace}-avatarupload.vue' 
     <#elseif widget.type == "tags">
 import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsinput.vue' 
+    <#elseif widget.type == "files">
+import ${js.nameType(namespace)}Fileupload from '@/components/${namespace}-fileupload.vue' 
+    <#elseif widget.type == "images">
+import ${js.nameType(namespace)}Imageupload from '@/components/${namespace}-imageupload.vue' 
+    <#elseif widget.type == "videos">
+import ${js.nameType(namespace)}Videoupload from '@/components/${namespace}-videoupload.vue' 
     </#if>
     <#local visited_types += {widget.type: widget} />
   </#list>
@@ -925,7 +914,10 @@ const handle${js.nameType(widget.id)}RowAction = ({ handler, row, index }) => {
 <#macro print_page_layout page indent=0>
   <#local children = []>
   <#list page.children as child>
-    <#if child.type != "dialog" && child.type != "drawer" && page.value("viewport") != "" >
+    <!-- ${child.container.type} -->
+    <#if child.type != "dialog" && child.type != "drawer" && 
+         child.type != "buttons" && child.type != "entry_form" && 
+         page.value("viewport") == "" >
 <@print_layout_container widget=child indent=indent />       
     <#else>
 <@print_layout_widget widget=child indent=indent />        
@@ -934,6 +926,7 @@ const handle${js.nameType(widget.id)}RowAction = ({ handler, row, index }) => {
 <@print_layout_divider indent=indent+2 />    
     </#if>
   </#list>
+  <#-- 把带有viewport的显示在最后 -->
   <#list page.children as child>
     <#if child.value("viewport","") != "">
 <@print_layout_widget widget=child indent=indent />          
@@ -1004,8 +997,16 @@ ${""?left_pad(indent)}<${namespace}-timepicker data-test="${js.nameVariable(widg
 ${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(widget.id)}" :fetch-options="sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions" v-model="${get_input_model_name(widget)}" />
   <#elseif widget.type == "multiselect">
 ${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options" v-model="${get_input_model_name(widget)}" />
+  <#elseif widget.type == "avatar">
+${""?left_pad(indent)}<${namespace}-avatarupload data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
   <#elseif widget.type == "tags">
 ${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
+<#elseif widget.type == "images">
+${""?left_pad(indent)}<${namespace}-imageupload data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
+<#elseif widget.type == "videos">
+${""?left_pad(indent)}<${namespace}-videoupload data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
+<#elseif widget.type == "files">
+${""?left_pad(indent)}<${namespace}-fileupload data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
   <#else><#-- 各个Design System的个性化风格 -->
 <@print_layout_custom widget=widget indent=indent+2 />  
   </#if>
