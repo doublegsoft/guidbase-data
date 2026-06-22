@@ -94,6 +94,8 @@ const props = defineProps({
   key: { type: String, default: 'id' },
   /** 对象数组中展示文件名的字段名 */
   text: { type: String, default: 'name' },
+  /** 对象数组中 URL 的字段名 */
+  url: { type: String, default: 'url' },
   label: { type: String, default: '' },
   placeholder: { type: String, default: '上传文件' },
   hint: { type: String, default: '' },
@@ -101,6 +103,8 @@ const props = defineProps({
   maxSizeMB: { type: Number, default: 50 },
   accept: { type: String, default: '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip' },
   disabled: { type: Boolean, default: false },
+  /** 自定义上传函数 (file, { setProgress }) => Promise<{ url }>，不传则模拟上传 */
+  customUpload: { type: Function, default: null },
 })
 
 const emit = defineEmits(['update:modelValue', 'upload', 'error', 'remove'])
@@ -116,7 +120,7 @@ watch(() => props.modelValue, (vals) => {
       if (typeof v === 'string') {
         return { id: genId(), name: v, url: v, uploading: false, progress: 0, error: false, file: null, _raw: v }
       }
-      return { id: v[props.key]||genId(), name: v[props.text]||v.name||'', url: v[props.text]||v.url||'', uploading: false, progress: 0, error: false, file: v.file||null, _raw: v }
+      return { id: v[props.key]||genId(), name: v[props.text]||v.name||'', url: v[props.url]||v.url||'', uploading: false, progress: 0, error: false, file: v.file||null, _raw: v }
     })
   }
 }, { immediate: true })
@@ -124,7 +128,7 @@ watch(() => props.modelValue, (vals) => {
 function syncModel() {
   const result = items.value.map(i => {
     if (i._raw && typeof i._raw === 'object') {
-      return { ...i._raw, [props.text]: i.file?.name || i.name, url: i.url, size: i.file?.size || 0 }
+      return { ...i._raw, [props.text]: i.file?.name || i.name, [props.url]: i.url, size: i.file?.size || 0 }
     }
     return { name: i.file?.name || i.name, url: i.url, size: i.file?.size || 0 }
   })
@@ -148,6 +152,28 @@ function addFiles(files) {
 }
 
 function simulateUpload(item) {
+  if (props.customUpload) {
+    props.customUpload(item.file, {
+      setProgress: (p) => { item.progress = Math.min(99, p) },
+    }).then(result => {
+      item.progress = 100
+      item.justDone = true
+      item.url = result.url || item.file?.name || ''
+      setTimeout(() => {
+        item.uploading = false
+        item.justDone = false
+        emit('upload', { file: item.file, ...result, index: items.value.indexOf(item) })
+        syncModel()
+      }, 350)
+    }).catch(err => {
+      item.error = true
+      item.uploading = false
+      emit('error', err?.message || '上传失败')
+    })
+    return
+  }
+
+  // Built-in simulated upload
   let elapsed = 0
   const totalDuration = 1000 + Math.random() * 2000
   const tick = 60

@@ -176,7 +176,13 @@ const props = defineProps({
   key: { type: String, default: 'id' },
 
   /** Field name for display URL (when modelValue items are objects) */
-  text: { type: String, default: 'url' },
+  url: { type: String, default: 'url' },
+
+  /** Field name for thumbnail (when modelValue items are objects) */
+  thumbnail: { type: String, default: 'thumbnailUrl' },
+
+  /** Field name for duration (when modelValue items are objects) */
+  duration: { type: String, default: 'duration' },
 
   /** Form label text */
   label: { type: String, default: '' },
@@ -204,6 +210,9 @@ const props = defineProps({
 
   /** Disabled state */
   disabled: { type: Boolean, default: false },
+
+  /** 自定义上传函数 (file, { setProgress }) => Promise<{ url, thumbnailUrl?, duration? }>，不传则模拟上传 */
+  customUpload: { type: Function, default: null },
 })
 
 /* ───────────────────────────────────────────────
@@ -238,12 +247,12 @@ watch(() => props.modelValue, (vals) => {
       if (typeof v === 'string') {
         return { id: genId(), thumbnailUrl: '', url: v, duration: 0, uploading: false, progress: 0, error: false, extracting: false, blobUrl: '', file: null, _raw: v }
       }
-      const src = v[props.text] || v.url || ''
+      const src = v[props.url] || v.url || ''
       return {
         id: v[props.key] || genId(),
-        thumbnailUrl: v.thumbnailUrl || src,
+        thumbnailUrl: v[props.thumbnail] || v.thumbnailUrl || src,
         url: src,
-        duration: v.duration || 0,
+        duration: v[props.duration] || v.duration || 0,
         uploading: false,
         progress: 0,
         error: false,
@@ -261,7 +270,7 @@ function syncModel() {
   const vals = items.value.map(i => {
     const base = { url: i.url || '', thumbnailUrl: i.thumbnailUrl || '', duration: i.duration || 0 }
     if (i._raw && typeof i._raw === 'object') {
-      return { ...i._raw, [props.text]: i.url || '', thumbnailUrl: i.thumbnailUrl || '', duration: i.duration || 0, [props.key]: i.id }
+      return { ...i._raw, [props.url]: i.url || '', [props.thumbnail]: i.thumbnailUrl || '', [props.duration]: i.duration || 0, [props.key]: i.id }
     }
     return base
   })
@@ -399,9 +408,31 @@ function onVideoSeeked(idx, e) {
    ─────────────────────────────────────────────── */
 
 function simulateUpload(item) {
+  if (props.customUpload) {
+    return props.customUpload(item.file, {
+      setProgress: (p) => { item.progress = Math.min(99, p) },
+    }).then(result => {
+      item.progress = 100
+      item.justDone = true
+      item.url = result.url || item.thumbnailUrl || ''
+      if (result.thumbnailUrl) item.thumbnailUrl = result.thumbnailUrl
+      if (result.duration != null) item.duration = result.duration
+      setTimeout(() => {
+        item.uploading = false
+        item.justDone = false
+        emit('upload', { ...result, url: item.url, thumbnailUrl: item.thumbnailUrl, duration: item.duration })
+      }, 350)
+    }).catch(err => {
+      item.error = true
+      item.uploading = false
+      emit('error', err?.message || '上传失败')
+    })
+  }
+
+  // Built-in simulated upload
   return new Promise(resolve => {
     let elapsed = 0
-    const totalDuration = 1800 + Math.random() * 2500 // 1.8~4.3s (video feels bigger)
+    const totalDuration = 1800 + Math.random() * 2500
     const tick = 80
     const interval = setInterval(() => {
       elapsed += tick

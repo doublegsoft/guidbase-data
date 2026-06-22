@@ -164,7 +164,10 @@ const props = defineProps({
   key: { type: String, default: 'id' },
 
   /** Field name for display URL (when modelValue items are objects) */
-  text: { type: String, default: 'url' },
+  url: { type: String, default: 'url' },
+
+  /** Field name for thumbnail (when modelValue items are objects) */
+  thumbnail: { type: String, default: 'thumbnailUrl' },
 
   /** Form label text */
   label: { type: String, default: '' },
@@ -189,6 +192,9 @@ const props = defineProps({
 
   /** Disabled state */
   disabled: { type: Boolean, default: false },
+
+  /** 自定义上传函数 (file, { setProgress }) => Promise<{ url }>，不传则模拟上传 */
+  customUpload: { type: Function, default: null },
 })
 
 /* ───────────────────────────────────────────────
@@ -221,10 +227,11 @@ watch(() => props.modelValue, (vals) => {
       if (typeof v === 'string') {
         return { id: genId(), previewUrl: v, url: v, uploading: false, progress: 0, error: false, file: null, _raw: v }
       }
-      const src = v[props.text] || v.url || v.previewUrl || ''
+      const src = v[props.url] || v.url || v.previewUrl || ''
+      const thumb = v[props.thumbnail] || v.thumbnailUrl || src
       return {
         id: v[props.key] || genId(),
-        previewUrl: src,
+        previewUrl: thumb,
         url: src,
         uploading: false,
         progress: 0,
@@ -243,7 +250,7 @@ function syncModel() {
     if (!val) return null
     // If item came from an object, emit updated object
     if (i._raw && typeof i._raw === 'object') {
-      return { ...i._raw, [props.text]: val, [props.key]: i.id }
+      return { ...i._raw, [props.url]: val, [props.thumbnail]: i.previewUrl || val, [props.key]: i.id }
     }
     return val  // plain URL string (newly uploaded)
   }).filter(Boolean)
@@ -323,11 +330,28 @@ async function addFiles(files) {
     }
     reader.readAsDataURL(file)
 
-    // Simulate upload progress
-    await simulateUpload(item)
-
-    item.uploading = false
-    emit('upload', { file, url: item.previewUrl, index: idx })
+    // Upload — custom or simulated
+    if (props.customUpload) {
+      try {
+        const result = await props.customUpload(file, {
+          setProgress: (p) => { item.progress = Math.min(99, p) },
+        })
+        item.progress = 100
+        item.justDone = true
+        item.url = result.url || item.previewUrl
+        setTimeout(() => { item.justDone = false }, 350)
+        item.uploading = false
+        emit('upload', { file, ...result, index: idx })
+      } catch (err) {
+        item.error = true
+        item.uploading = false
+        emit('error', err?.message || '上传失败')
+      }
+    } else {
+      await simulateUpload(item)
+      item.uploading = false
+      emit('upload', { file, url: item.previewUrl, index: idx })
+    }
   }
 
   syncModel()

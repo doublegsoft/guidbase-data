@@ -131,7 +131,12 @@ const ${js.nameVariable(form.id)}Rules = [
   {name: '${js.nameVariable(input.id)}',rules: [<#if input.value("required") == "true">{ type: 'required', message: '${input.title}必须填写！' },</#if><#if input.type == "number">{ type: 'number', message: '请正确输入${input.title}！' }</#if>]},
   </#list>
 ]
-const { ${js.nameVariable(form.id)}Errors, validate${js.nameType(form.id)}, clear${js.nameType(form.id)}Errors } = useFieldValidation(${js.nameVariable(form.id)}Rules)
+${""?left_pad(indent)}// 独立设置各个表单的校验对象
+const { 
+  errors: ${js.nameVariable(form.id)}Errors, 
+  validate: validate${js.nameType(form.id)}, 
+  clearErrors: clear${js.nameType(form.id)}Errors, 
+} = useFieldValidation(${js.nameVariable(form.id)}Rules)
 ${""?left_pad(indent)}// 表单数据载体
 ${""?left_pad(indent)}const ${js.nameVariable(form.id)}Data = reactive({
   <#list form.inputs as input>
@@ -171,7 +176,7 @@ const load${js.nameType(form.id)}Data = async () => {
  * 保存【${form.title!""}】编辑表单数据
  */
 const save${js.nameType(form.id)}Data = async () => {
-  if (!validate${js.nameType(form.id)}(${js.nameType(form.id)}Data)) {
+  if (!validate${js.nameType(form.id)}(${js.nameVariable(form.id)}Data)) {
     const msgs = Object.entries(${js.nameVariable(form.id)}Errors)
       .filter(([, msg]) => msg)
       .map(([, msg]) => `· ${r"${msg}"}`)
