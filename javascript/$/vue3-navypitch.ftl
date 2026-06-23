@@ -66,7 +66,7 @@ ${""?left_pad(indent)}      </div>
       </#list>
     </#list>
 ${""?left_pad(indent)}    </div>  
-    <#if groups?size == 1 && from.has("button")>
+    <#if groups?size == 1 && form.has("button")>
 ${""?left_pad(indent)}    <div class="card-actions">
       <#list form.children as child>
         <#if child.type != "button"><#continue></#if>

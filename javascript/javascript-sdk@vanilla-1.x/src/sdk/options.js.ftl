@@ -18,6 +18,15 @@ sdk.${js.nameVariable(widget.id)}Options = [{
   value: '${opt.code}', label: '${opt.text}',
       </#list>
 }];
+
+sdk.get${js.nameType(widget.id)}OptionLabel = function (value) {
+  for (let i = 0; i < sdk.${js.nameVariable(widget.id)}Options.length; i++) {
+    if (sdk.${js.nameVariable(widget.id)}Options[i].value == value) {
+      return sdk.${js.nameVariable(widget.id)}Options[i].label;
+    }
+  }
+  return null;
+};
   </#list>
 </#list>
 

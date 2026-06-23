@@ -1,72 +1,5 @@
 <#include "tile.ftl">
-
-<#function get_button_role button>
-  <#if (button.value("action")!"") == "save">
-    <#return "primary">
-  <#elseif (button.value("action")!"") == "search">
-    <#return "primary">  
-  <#elseif (button.value("action")!"") == "edit">
-    <#return "primary">    
-  <#elseif (button.value("action")!"") == "clear">
-    <#return "warning">
-  <#elseif (button.value("action")!"") == "reset">
-    <#return "warning">  
-  <#elseif (button.value("action")!"") == "delete">
-    <#return "danger">  
-  <#elseif (button.value("action")!"") == "cancel">
-    <#return "default">
-  <#else>
-    <#return "default">
-  </#if>
-</#function>
-
-<#function get_button_method_name button>
-  <#local methodName = "handle">
-  <#if button.ancestor("entry_form")??>
-    <#local ancestor = button.ancestor("entry_form")>
-  <#elseif button.ancestor("criteria_form")??>
-    <#local ancestor = button.ancestor("criteria_form")>
-  <#elseif button.ancestor("paged_table")??>
-    <#local ancestor = button.ancestor("paged_table")>  
-  <#elseif button.ancestor("paged_grid")??>
-    <#local ancestor = button.ancestor("paged_grid")>    
-  </#if>
-  <#if methodName == "handle">
-    <#if ancestor??>
-      <#local methodName += js.nameType(ancestor.id)>
-    <#else>
-      <#local methodName += js.nameType(button.value("ref"))>
-      <#local ancestor = button.page.byId(button.value("ref"))>
-    </#if>
-  </#if>
-  <#if button.id??>
-    <#local methodName += js.nameType(button.id)>
-  <#else>
-    <#local methodName += (js.nameType(button.value("action", "custom")))>  
-  </#if>
-  <#return methodName>
-</#function>
-
-<#function get_input_model_name input>
-  <#if input.container.type == "criteria_form">
-    <#return js.nameVariable(input.container.id) + "Crit." + js.nameVariable(input.id)>
-  <#else>
-    <#return js.nameVariable(input.container.id) + "Data." + js.nameVariable(input.id)>
-  </#if>
-</#function>
-
-<#function is_ref_or_ancestor widget typename>
-  <#if widget.ancestor(typename)??>
-    <#return true>
-  </#if>
-  <#if widget.page.byId(widget.value("ref"))??>
-    <#local ref = widget.page.byId(widget.value("ref"))>
-    <#if ref.type == typename>
-      <#return true>
-    </#if>
-  </#if>
-  <#return false>
-</#function>
+<#include "util.ftl">
 <!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
 <!----------------------------------------------------------------------------->
@@ -82,39 +15,6 @@ ${""?left_pad(indent)}const activeTab${js.nameType(tabs.id)} = ref('${js.nameVar
 </#macro>
 
 <#macro print_tabs_methods tabs indent=0>
-</#macro>
-
-<#macro print_layout_tabs tabs indent=0>
-${""?left_pad(indent)}<div class="${namespace}-tabs">
-${""?left_pad(indent)}  <div v-for="tab in tabs${js.nameType(tabs.id)}" :key="tab.key"
-${""?left_pad(indent)}       class="${namespace}-tab"
-${""?left_pad(indent)}       :class="{ '${namespace}-active': activeTab${js.nameType(tabs.id)} === tab.key }"
-${""?left_pad(indent)}       @click="activeTab${js.nameType(tabs.id)} = tab.key">
-${""?left_pad(indent)}    <span>{{ tab.label }}</span>
-${""?left_pad(indent)}    <span v-if="tab.badge" class="${namespace}-tab-badge">{{ tab.badge }}</span>
-${""?left_pad(indent)}  </div>
-  <#if tabs.contains("buttons")>
-    <#local buttons = tabs.byType("buttons")[0]>
-${""?left_pad(indent)}  <div class="${namespace}-tabs-right" v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(buttons.container.id)}'">
-    <#list buttons.children as button>
-<@print_layout_widget widget=button indent=indent+4 />
-    </#list>
-${""?left_pad(indent)}  </div>
-  </#if>
-${""?left_pad(indent)}</div>
-${""?left_pad(indent)}<div class="${namespace}-tabs-content" ref="${js.nameVariable(tabs.id)}Ref">
-  <#list tabs.children as tab>
-${""?left_pad(indent)}  <div v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(tab.id)}'" :style="{ height: ${js.nameType(tabs.id)}Height + 'px' }">
-    <#if tab.children?size == 0>
-${""?left_pad(indent)}    ${tab.title}
-    <#else>
-      <#list tab.children as child>
-<@print_layout_widget widget=child indent=indent+4 />
-      </#list>
-    </#if>
-${""?left_pad(indent)}  </div>
-  </#list>
-${""?left_pad(indent)}</div>
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -230,68 +130,6 @@ const ${js.nameVariable(form.id)}ErrorShow = ref(false)
 const ${js.nameVariable(form.id)}ErrorMessage = ref('')
 </#macro>
 
-<#macro print_layout_official_form form indent>
-  <#local cols = form.value("cols")!"3">
-  <#local groups = form.groups()>
-${""?left_pad(indent)}<div class="${namespace}-of">
-${""?left_pad(indent)}  <div ref="${js.nameVariable(form.id)}Ref" class="${namespace}-of__container">
-${""?left_pad(indent)}    <div class="${namespace}-of__header">
-${""?left_pad(indent)}      <h1>${form.title}</h1>
-${""?left_pad(indent)}      <div class="${namespace}-of__meta">
-${""?left_pad(indent)}        <span>机密程度：{{ confidentialLevel }}</span>
-${""?left_pad(indent)}        <span>流程编号：{{ flowNo }}</span>
-${""?left_pad(indent)}        <span>申请日期：{{ applyDate }}</span>
-${""?left_pad(indent)}      </div>
-${""?left_pad(indent)}    </div>
-${""?left_pad(indent)}
-${""?left_pad(indent)}    <table class="${namespace}-of__table">
-  <#list groups as group>
-    <#local rows = form.rows(group, cols?number)>
-    <#list rows as row>
-${""?left_pad(indent)}      <tr>
-      <#list row as child>
-${""?left_pad(indent)}        <td class="${namespace}-of__label<#if child.value("required","") == "true"> ${namespace}-of__required</#if>">${child.title}</td>
-${""?left_pad(indent)}        <td colspan="${child.value("span","1")?number * 2 - 1}">
-          <#if child.type == "date">
-${""?left_pad(indent)}          <${namespace}-datepicker data-test="${js.nameVariable(child.id)}" v-model="${js.nameVariable(form.id)}Data.${js.nameVariable(child.id)}" plain />
-          <#elseif child.type == "select">
-            <#if (child.value("data")!"")?starts_with("enum[")>
-${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(child.id)}" :options="sdk.${js.nameVariable(child.id)}Options" :clearable="true" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />    
-            <#else>
-${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options"  :clearable="true" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />
-            </#if>
-          <#elseif child.type == "multiselect">
-${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />    
-          <#elseif child.type == "avatar"><#-- NOT USED IN OFFICIAL FORM -->
-${""?left_pad(indent)}<${namespace}-avatarupload data-test="${js.nameVariable(child.id)}" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" />        
-          <#elseif child.type == "tags">
-${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(child.id)}" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />      
-          <#elseif child.type == "longtext">
-${""?left_pad(indent)}          <textarea
-${""?left_pad(indent)}            class="${namespace}-of__textarea"
-${""?left_pad(indent)}            :class="{ '${namespace}-of__readonly': readonly }"
-${""?left_pad(indent)}            :placeholder="${child.value("placeholder", "请填写" + child.title)}"
-${""?left_pad(indent)}            :value="${js.nameVariable(form.id)}Data.${js.nameVariable(child.id)}"
-${""?left_pad(indent)}            :readonly="readonly || ${child.value("readonly","false")}"
-${""?left_pad(indent)}            @input=""></textarea>      
-          <#else>
-${""?left_pad(indent)}          <input type="text"
-${""?left_pad(indent)}            class="${namespace}-of__input"
-${""?left_pad(indent)}            :class="{ '${namespace}-of__readonly': readonly  || ${child.value("readonly","false")} }"
-${""?left_pad(indent)}            :value="${js.nameVariable(form.id)}Data.${js.nameVariable(child.id)}"
-${""?left_pad(indent)}            :readonly="readonly || ${child.value("readonly","false")}"
-${""?left_pad(indent)}            @input="">              
-          </#if>
-${""?left_pad(indent)}        </td>
-      </#list>
-${""?left_pad(indent)}      </tr>
-    </#list>
-  </#list>
-${""?left_pad(indent)}    </table>
-${""?left_pad(indent)}  </div>
-${""?left_pad(indent)}</div>
-</#macro>
-
 <!----------------------------------------------------------------------------->
 <!--                              CRITERIA FORM                              -->
 <!----------------------------------------------------------------------------->
@@ -310,14 +148,6 @@ ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
       </#if>
     </#if>
   </#list>
-</#macro>
-
-<#macro print_layout_criteria_form form indent=0>
-${""?left_pad(indent)}<div id="criteria${js.nameType(form.id)}" class="${namespace}-toolbar">
-  <#list form.children as widget>
-<@print_layout_widget widget=widget indent=indent+2 />
-  </#list>
-${""?left_pad(indent)}</div>
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -349,23 +179,6 @@ const load${js.nameType(form.id)}Data = async () => {
     isLoading.value = false
   }
 }
-</#macro>
-
-<#macro print_layout_display_form form indent=0>
-  <#list form.groups() as group>
-${""?left_pad(indent)}<div class="${namespace}-panel">
-${""?left_pad(indent)}  <div class="${namespace}-panel-head">${group}</div>
-${""?left_pad(indent)}  <div class="${namespace}-fview ${namespace}-fview--${form.value("cols","3")}">
-  <#list form.group(group) as input>
-    <#local span = input.value("span","")>
-${""?left_pad(indent)}    <div class="${namespace}-fv<#if span != ""> ${namespace}-fv--span${span}</#if>">
-${""?left_pad(indent)}      <div class="${namespace}-fv-label">${input.title}</div>
-${""?left_pad(indent)}      <div class="${namespace}-fv-val ${namespace}-fv-val--mono">{{ ${js.nameVariable(form.id)}Data.${js.nameVariable(input.id)} }}</div>
-${""?left_pad(indent)}    </div>
-  </#list>
-${""?left_pad(indent)}  </div>
-${""?left_pad(indent)}</div>
-  </#list>
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -904,15 +717,15 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(fals
   </#list>
   <#list page.widgets as widget>
     <#if widget.type != "paged_table"><#continue></#if>
-const ${js.nameVariable(widget.id)}RowActionHandlers = { 
+${""?left_pad(indent)}const ${js.nameVariable(widget.id)}RowActionHandlers = { 
     <#list widget.widgets as button>     
       <#if button.type != "button"><#continue></#if>
-  ${get_button_method_name(button)}, 
+${""?left_pad(indent)}  ${get_button_method_name(button)}, 
     </#list>
-}
-const handle${js.nameType(widget.id)}RowAction = ({ handler, row, index }) => {
-  ${js.nameVariable(widget.id)}RowActionHandlers[handler]?.(row, index)
-}    
+${""?left_pad(indent)}}
+${""?left_pad(indent)}const handle${js.nameType(widget.id)}RowAction = ({ handler, row, index }) => {
+${""?left_pad(indent)}  ${js.nameVariable(widget.id)}RowActionHandlers[handler]?.(row, index)
+${""?left_pad(indent)}}    
   </#list>
 </#macro>
 
@@ -923,9 +736,9 @@ const handle${js.nameType(widget.id)}RowAction = ({ handler, row, index }) => {
     <#if child.type != "dialog" && child.type != "drawer" && 
          child.type != "buttons" && child.type != "entry_form" && 
          page.value("viewport") == "" >
-<@print_layout_container widget=child indent=indent />       
+<@print_layout_container widget=child indent=indent+2 />       
     <#else>
-<@print_layout_widget widget=child indent=indent />        
+<@print_layout_widget widget=child indent=indent+2 />        
     </#if>
     <#if child?index != children?size - 1>
 <@print_layout_divider indent=indent+2 />    
@@ -934,7 +747,7 @@ const handle${js.nameType(widget.id)}RowAction = ({ handler, row, index }) => {
   <#-- 把带有viewport的显示在最后 -->
   <#list page.children as child>
     <#if child.value("viewport","") != "">
-<@print_layout_widget widget=child indent=indent />          
+<@print_layout_widget widget=child indent=indent+2 />          
     </#if>
   </#list>
 </#macro>
@@ -949,7 +762,7 @@ ${""?left_pad(indent)}<${namespace}-drawer v-model="${js.nameVariable(widget.id)
 ${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
     <#else>
       <#list widget.children as child>
-<@print_layout_widget widget=child indent=indent+2 />    
+<@print_layout_widget widget=child indent=indent />    
       </#list>
     </#if>
 ${""?left_pad(indent)}</${namespace}-drawer>
@@ -960,34 +773,34 @@ ${""?left_pad(indent)}<${namespace}-dialog v-model="${js.nameVariable(widget.id)
 ${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
     <#else>
       <#list widget.children as child>
-<@print_layout_widget widget=child indent=indent+2 />    
+<@print_layout_widget widget=child indent=indent />    
       </#list>
     </#if>
 ${""?left_pad(indent)}</${namespace}-dialog>
   <#elseif widget.type == "tabs">
-<@print_layout_tabs tabs=widget indent=indent+2 />
+<@print_layout_tabs tabs=widget indent=indent />
   <#elseif widget.type == "entry_form">
-<@print_layout_entry_form form=widget indent=indent+2 />    
+<@print_layout_entry_form form=widget indent=indent />    
   <#elseif widget.type == "official_form">
-<@print_layout_official_form form=widget indent=indent+2 />   
+<@print_layout_official_form form=widget indent=indent />   
   <#elseif widget.type == "excel_form">
-<@print_layout_excel_form form=widget indent=indent+2 />      
+<@print_layout_excel_form form=widget indent=indent />      
   <#elseif widget.type == "paged_table">
-<@print_layout_paged_table table=widget indent=indent+2 />
+<@print_layout_paged_table table=widget indent=indent />
   <#elseif widget.type == "fixed_table">
-<@print_layout_fixed_table table=widget indent=indent+2 />
+<@print_layout_fixed_table table=widget indent=indent />
   <#elseif widget.type == "criteria_form">
-<@print_layout_criteria_form form=widget indent=indent+2 />
+<@print_layout_criteria_form form=widget indent=indent />
   <#elseif widget.type == "display_form">
-<@print_layout_display_form form=widget indent=indent+2 />
+<@print_layout_display_form form=widget indent=indent />
   <#elseif widget.type == "paged_grid">
-<@print_layout_paged_grid grid=widget indent=indent+2 />
+<@print_layout_paged_grid grid=widget indent=indent />
   <#elseif widget.type == "list_view">
-<@print_layout_list_view list=widget indent=indent+2 />
+<@print_layout_list_view list=widget indent=indent />
   <#elseif widget.type == "chart">
-<@print_layout_chart chart=widget indent=indent+2 />
+<@print_layout_chart chart=widget indent=indent />
   <#elseif widget.type == "buttons">
-<@print_layout_buttons buttons=widget indent=indent+2 />
+<@print_layout_buttons buttons=widget indent=indent />
   <#elseif widget.type == "select">
     <#if (widget.value("data")!"")?starts_with("enum[")>
 ${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="sdk.${js.nameVariable(widget.id)}Options" :clearable="true" v-model="${get_input_model_name(widget)}" />    
@@ -1013,6 +826,6 @@ ${""?left_pad(indent)}<${namespace}-videoupload data-test="${js.nameVariable(wid
 <#elseif widget.type == "files">
 ${""?left_pad(indent)}<${namespace}-fileupload data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
   <#else><#-- 各个Design System的个性化风格 -->
-<@print_layout_custom widget=widget indent=indent+2 />  
+<@print_layout_custom widget=widget indent=indent />  
   </#if>
 </#macro>
