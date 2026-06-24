@@ -1,26 +1,13 @@
 // app.js
 
 App({
-  /**
-   * 生命周期函数--监听小程序初始化
-   * 当小程序初始化完成时，会触发 onLaunch（全局只触发一次）
-   */
+
   onLaunch: function (options) {
-    console.log("🚀 小程序启动启动中...", options);
-
-    // 1. 执行自动登录
-    // this.autoLogin();
-
-    // 2. 获取设备系统信息并保存到全局
-    this.getSystemInfo();
+    // this.getSystemInfo();
   },
 
-  /**
-   * 生命周期函数--监听小程序显示
-   * 当小程序启动，或从后台进入前台显示时，会触发 onShow
-   */
   onShow: function (options) {
-    console.log("📱 小程序进入前台运行", options);
+    // console.log("📱 小程序进入前台运行", options);
   },
 
   /**
@@ -28,7 +15,7 @@ App({
    * 当小程序从前台进入后台运行时，会触发 onHide
    */
   onHide: function () {
-    console.log("💤 小程序进入后台挂起");
+    // console.log("💤 小程序进入后台挂起");
   },
 
   /**
@@ -36,7 +23,7 @@ App({
    * 当小程序发生脚本错误，或者 API 调用失败时，会触发 onError 并带上错误信息
    */
   onError: function (msg) {
-    console.error("⚠️ 捕获到小程序全局错误:", msg);
+    // console.error("⚠️ 捕获到小程序全局错误:", msg);
   },
 
   // ==========================================

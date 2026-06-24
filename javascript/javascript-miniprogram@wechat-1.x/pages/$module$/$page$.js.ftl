@@ -19,18 +19,22 @@ Page({
   <#if (widget.type == "select" || widget.type == "multiselect") && 
        !(widget.value("data")!"")?starts_with("enum[")>
     <#if widget.ancestor("entry_form")?? || widget.ancestor("criteria_form")??>
-  this.setData({
-    ${js.nameVariable(widget.id)}Options: await sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}AsOptions(),
-  });
+    this.setData({
+      ${js.nameVariable(widget.id)}Options: await sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}AsOptions(),
+    });
     </#if>
-  <#elseif widget.type == "entry_form" || widget.type == "display_form">
-  this.load${js.nameType(widget.id)}Data();
-  <#elseif widget.type == "excel_form" || widget.type == "list_view">
-  this.load${js.nameType(widget.id)}Rows();
-  <#elseif widget.type == "chart">
-  this.load${js.nameType(widget.id)}Rows();
   </#if>
 </#list>
+<#list page.widgets as widget>
+  <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
+  <#if widget.type == "entry_form" || widget.type == "display_form">
+    this.load${js.nameType(widget.id)}Data();
+  <#elseif widget.type == "excel_form" || widget.type == "list_view">
+    this.load${js.nameType(widget.id)}Rows();
+  <#elseif widget.type == "chart">
+    this.load${js.nameType(widget.id)}Rows();
+  </#if>
+</#list>  
   },
 
   handleBack: function () {

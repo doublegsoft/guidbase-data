@@ -10,12 +10,15 @@ ${""?left_pad(indent)} * ${js.nameVariable(form.id)} 【${form.title!""}】编�
 ${""?left_pad(indent)} */
 ${""?left_pad(indent)}// 表单数据载体
   <#list form.inputs as input>
-${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
+${""?left_pad(indent)}${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
   </#list>
 ${""?left_pad(indent)}// 表单选项数据  
   <#list form.inputs as input>
+    <#if input.type == "select">
+${""?left_pad(indent)}${js.nameVariable(input.id)}Label: null,    
+    </#if>
     <#if (input.type == "select" || input.type == "multiselect")>
-      <#if (input.value("data")!"")?starts_with("enum[")>
+      <#if input.value("data")?starts_with("enum[")>
 ${""?left_pad(indent)}${js.nameVariable(input.id)}Options: sdk.${js.nameVariable(input.id)}Options,
       <#else>
 ${""?left_pad(indent)}${js.nameVariable(input.id)}Options: [],    
@@ -39,7 +42,11 @@ ${""?left_pad(indent)}      ${js.nameVariable(input.id)}: data.${js.nameVariable
   </#list>
   <#list form.inputs as input>
     <#if input.type == "select">
-${""?left_pad(indent)}      ${js.nameVariable(input.id)}Label: null,   
+      <#if input.value("data")?starts_with("enum[")>
+${""?left_pad(indent)}      ${js.nameVariable(input.id)}Label: sdk.get${js.nameType(input.id)}OptionLabel(data.${js.nameVariable(input.id)}),       
+      <#else>
+${""?left_pad(indent)}      ${js.nameVariable(input.id)}Label: sdk.get${js.nameType(input.id)}OptionLabel(data.${js.nameVariable(input.id)}, this.data.${js.nameVariable(input.id)}Options),  
+      </#if>
     </#if>
   </#list>
 ${""?left_pad(indent)}    });
@@ -88,6 +95,18 @@ ${""?left_pad(indent)}    values.push(value);
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  this.setData({
 ${""?left_pad(indent)}    ${js.nameVariable(input.id)}: values,
+${""?left_pad(indent)}  });
+${""?left_pad(indent)}}, 
+    <#elseif input.type == "avatar">
+${""?left_pad(indent)}handle${js.nameType(input.id)}Upload: function () {
+${""?left_pad(indent)}  const that = this;
+${""?left_pad(indent)}  wx.chooseMedia({
+${""?left_pad(indent)}    count: 1,
+${""?left_pad(indent)}    mediaType: ['image'],
+${""?left_pad(indent)}    sourceType: ['album', 'camera'],
+${""?left_pad(indent)}    success: function (res) {
+${""?left_pad(indent)}      that.setData({ avatar: res.tempFiles[0].tempFilePath });
+${""?left_pad(indent)}    }
 ${""?left_pad(indent)}  });
 ${""?left_pad(indent)}},      
     <#else>
@@ -236,12 +255,12 @@ ${""?left_pad(indent)}}
   <#elseif widget.type == "display_form">
 <@print_layout_display_form form=widget indent=indent />
   <#elseif widget.type == "avatar">
-${""?left_pad(indent)}<!-- 头像 — 居中 -->
-${""?left_pad(indent)}<view class="avatar-upload${stateClasses}" bindtap="onAvatarUpload" data-field="${widget.id}">
-${""?left_pad(indent)}  <view class="avatar avatar-teal avatar-xl">
+${""?left_pad(indent)}<view class="avatar-upload${stateClasses}" bindtap="handle${js.nameType(widget.id)}Upload">
+${""?left_pad(indent)}  <view class="avatar avatar-teal avatar-xl" wx:if="{{ !${js.nameVariable(widget.id)} }}">
 ${""?left_pad(indent)}    <text>👤</text>
 ${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}  <text class="mt-6 color-teal text-sm" style="font-weight:var(--weight-semibold);">点击上传头像</text>
+${""?left_pad(indent)}  <image wx:else class="avatar avatar-xl" src="{{ ${js.nameVariable(widget.id)} }}" mode="aspectFill" style="object-fit:cover;" />
+${""?left_pad(indent)}  <text class="mt-6 color-teal text-sm" style="font-weight:var(--weight-semibold);">{{ avatar ? '点击更换头像' : '点击上传头像' }}</text>
 ${""?left_pad(indent)}</view>
   <#elseif widget.type == "date">
 ${""?left_pad(indent)}<picker class="${stateClasses?trim}" mode="date" value="{{ ${js.nameVariable(widget.id)} }}" bindchange="handle${js.nameType(widget.id)}Change">
@@ -301,9 +320,9 @@ ${""?left_pad(indent)}</view>
 ${""?left_pad(indent)}<textarea class="field-textarea${stateClasses}" placeholder="请输入${widget.title}内容" value="{{formData.${js.nameVariable(widget.id)}}}" bindinput="handle${js.nameType(widget.id)}Change" maxlength="${widget.value("maxlength", "300")}" />
   <#elseif widget.type == "images">
 ${""?left_pad(indent)}<view class="upload-row${stateClasses}">
-${""?left_pad(indent)}  <view class="upload-card" wx:for="{{formData.${js.nameVariable(widget.id)}}}" wx:key="*this">
-${""?left_pad(indent)}    <image class="upload-card-img" src="{{item}}" mode="aspectFill" />
-${""?left_pad(indent)}    <view class="upload-card-del" bindtap="handle${js.nameType(widget.id)}Remove" data-idx="{{index}}">✕</view>
+${""?left_pad(indent)}  <view class="upload-card" wx:for="{{ ${js.nameVariable(widget.id)} }}" wx:key="*this">
+${""?left_pad(indent)}    <image class="upload-card-img" src="{{ item.url }}" mode="aspectFill" />
+${""?left_pad(indent)}    <view class="upload-card-del" bindtap="handle${js.nameType(widget.id)}Remove">✕</view>
 ${""?left_pad(indent)}  </view>
 ${""?left_pad(indent)}  <view class="upload-card upload-card-add" bindtap="handle${js.nameType(widget.id)}Add">
 ${""?left_pad(indent)}    <text class="upload-card-plus">+</text>

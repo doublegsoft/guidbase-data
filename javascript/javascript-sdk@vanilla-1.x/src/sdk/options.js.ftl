@@ -6,10 +6,10 @@ if (typeof sdk === 'undefined') {
 <#list app.pages as page>
   <#list page.widgets as widget>
     <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
-    <#if widget.type != "select" || !(widget.value("data")!"")?starts_with("enum[")><#continue></#if>
+    <#if widget.type != "select"><#continue></#if>
     <#assign visited_widgets += {widget.id: widget}>
-    <#assign opts = typebase.enumtype(widget.value("data"))>
-
+    <#if widget.value("data")?starts_with("enum[")>
+      <#assign opts = typebase.enumtype(widget.value("data"))>
 sdk.${js.nameVariable(widget.id)}Options = [{
       <#list opts as opt>
         <#if opt?index != 0>
@@ -27,6 +27,17 @@ sdk.get${js.nameType(widget.id)}OptionLabel = function (value) {
   }
   return null;
 };
+    <#else>
+
+sdk.get${js.nameType(widget.id)}OptionLabel = function (value, options) {
+  for (let i = 0; i < options.length; i++) {
+    if (options[i].value == value) {
+      return options[i].label;
+    }
+  }
+  return null;
+};
+    </#if>
   </#list>
 </#list>
 
