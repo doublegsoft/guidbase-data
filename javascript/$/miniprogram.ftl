@@ -108,7 +108,55 @@ ${""?left_pad(indent)}    success: function (res) {
 ${""?left_pad(indent)}      that.setData({ avatar: res.tempFiles[0].tempFilePath });
 ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}  });
-${""?left_pad(indent)}},      
+${""?left_pad(indent)}}, 
+${""?left_pad(indent)}    <#elseif input.type == "images">
+${""?left_pad(indent)}handle${js.nameType(input.id)}Preview: function (event) {
+${""?left_pad(indent)}  var url = event.currentTarget.dataset.url;
+${""?left_pad(indent)}  var urls = this.data.${js.nameVariable(input.id)}.map(function (item) {
+${""?left_pad(indent)}    return typeof item === 'string' ? item : item.url;
+${""?left_pad(indent)}  });
+${""?left_pad(indent)}  wx.previewImage({
+${""?left_pad(indent)}    current: url,
+${""?left_pad(indent)}    urls: urls
+${""?left_pad(indent)}  });
+${""?left_pad(indent)}},   
+${""?left_pad(indent)}
+${""?left_pad(indent)}handle${js.nameType(input.id)}Add: function () {
+${""?left_pad(indent)}  const that = this;
+${""?left_pad(indent)}  wx.chooseMedia({
+${""?left_pad(indent)}    count: 1,
+${""?left_pad(indent)}    mediaType: ['image'],
+${""?left_pad(indent)}    sourceType: ['album', 'camera'],
+${""?left_pad(indent)}    success: function (res) {
+${""?left_pad(indent)}      that.setData({ avatar: res.tempFiles[0].tempFilePath });
+${""?left_pad(indent)}    }
+${""?left_pad(indent)}  });
+${""?left_pad(indent)}},  
+${""?left_pad(indent)}     
+${""?left_pad(indent)}handle${js.nameType(input.id)}Remove: function () {
+${""?left_pad(indent)}  const that = this;
+${""?left_pad(indent)}},  
+    <#elseif input.type == "tags">
+${""?left_pad(indent)}handle${js.nameType(input.id)}Add: function () {
+${""?left_pad(indent)}  var that = this;
+${""?left_pad(indent)}  wx.showModal({
+${""?left_pad(indent)}      title: '添加${input.title}',
+${""?left_pad(indent)}      editable: true,
+${""?left_pad(indent)}      placeholderText: '请输入标签内容',
+${""?left_pad(indent)}      success: function (res) {
+${""?left_pad(indent)}        if (res.confirm && res.content && res.content.trim()) {
+${""?left_pad(indent)}          that.setData({ ${js.nameVariable(input.id)}: that.data.${js.nameVariable(input.id)}.concat(res.content.trim()) });
+${""?left_pad(indent)}        }
+${""?left_pad(indent)}      }
+${""?left_pad(indent)}    });
+${""?left_pad(indent)}  },
+${""?left_pad(indent)}
+${""?left_pad(indent)}handle${js.nameType(input.id)}Remove: function (event) {
+${""?left_pad(indent)}  var idx = event.currentTarget.dataset.idx;
+${""?left_pad(indent)}  var tags = this.data.${js.nameVariable(input.id)}.slice();
+${""?left_pad(indent)}  tags.splice(idx, 1);
+${""?left_pad(indent)}  this.setData({ ${js.nameVariable(input.id)}: tags });
+${""?left_pad(indent)}},    
     <#else>
 ${""?left_pad(indent)}handle${js.nameType(input.id)}Change: function (event) {
 ${""?left_pad(indent)}  this.setData({
@@ -311,7 +359,8 @@ ${""?left_pad(indent)}  </view>
 ${""?left_pad(indent)}</view>
   <#elseif widget.type == "tags">
 ${""?left_pad(indent)}<view class="flex flex-wrap${stateClasses}" style="gap:10rpx;">
-${""?left_pad(indent)}  <view class="tag tag-teal" wx:for="{{formData.${js.nameVariable(widget.id)}}}" wx:key="*this" bindtap="handle${js.nameType(widget.id)}Remove" data-idx="{{ index }}">
+${""?left_pad(indent)}  <view class="tag tag-teal" wx:for="{{ ${js.nameVariable(widget.id)} }}" wx:key="*this" 
+${""?left_pad(indent)}        bindtap="handle${js.nameType(widget.id)}Remove" data-idx="{{ index }}">
 ${""?left_pad(indent)}    {{item}} <text style="font-weight:var(--weight-bold);opacity:0.5;">×</text>
 ${""?left_pad(indent)}  </view>
 ${""?left_pad(indent)}  <view class="tag tag-gray tag-add" bindtap="handle${js.nameType(widget.id)}Add">+ 添加</view>
@@ -321,7 +370,9 @@ ${""?left_pad(indent)}<textarea class="field-textarea${stateClasses}" placeholde
   <#elseif widget.type == "images">
 ${""?left_pad(indent)}<view class="upload-row${stateClasses}">
 ${""?left_pad(indent)}  <view class="upload-card" wx:for="{{ ${js.nameVariable(widget.id)} }}" wx:key="*this">
-${""?left_pad(indent)}    <image class="upload-card-img" src="{{ item.url }}" mode="aspectFill" />
+${""?left_pad(indent)}    <image class="upload-card-img" src="{{ item.url }}" mode="aspectFill" 
+${""?left_pad(indent)}           bindtap="handle${js.nameType(widget.id)}Preview" 
+${""?left_pad(indent)}           data-url="{{ item.url }}" data-id="{{ item.id }}"/>
 ${""?left_pad(indent)}    <view class="upload-card-del" bindtap="handle${js.nameType(widget.id)}Remove">✕</view>
 ${""?left_pad(indent)}  </view>
 ${""?left_pad(indent)}  <view class="upload-card upload-card-add" bindtap="handle${js.nameType(widget.id)}Add">

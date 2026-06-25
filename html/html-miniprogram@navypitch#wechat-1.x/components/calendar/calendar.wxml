@@ -1,0 +1,74 @@
+<!--
+  日历组件 · navypitch 风格
+  月视图 (网格) / 周视图 (7天横排)
+-->
+<wxs module="u">
+  var get = function(m,d){ return (m&&m[d])||[]; };
+  var cnt = function(m,d){ var e=get(m,d); return e?e.length:0; };
+  var take = function(m,d,n){ var e=get(m,d); return e&&e.length?e.slice(0,n):[]; };
+  var clr = function(e){ return e.color||'var(--color-amber)'; };
+  module.exports = { get:get, cnt:cnt, take:take, clr:clr };
+</wxs>
+
+<view class="cal">
+  <!-- ── 头部 (navy 底) ── -->
+  <view class="cal-hd">
+    <view class="cal-nav">
+      <!-- 左上: 月/周切换 · navypitch tabs -->
+      <view class="cal-tabs">
+        <view class="cal-tab {{ view==='month'?'cal-tab-on':'' }}" bindtap="handleToggle">月</view>
+        <view class="cal-tab {{ view==='week'?'cal-tab-on':'' }}" bindtap="handleToggle">周</view>
+      </view>
+      <!-- 中间: 标题 -->
+      <view class="cal-mid" bindtap="handleToday">
+        <text class="cal-ttl">{{ title }}</text>
+        <text class="cal-sub" wx:if="{{ sub }}">{{ sub }}</text>
+      </view>
+      <!-- 右侧: 前后导航 -->
+      <view class="cal-arrows">
+        <view class="cal-arr" bindtap="handlePrev"><text>‹</text></view>
+        <view class="cal-arr" bindtap="handleNext"><text>›</text></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ── 月视图 ── -->
+  <view class="cal-month" wx:if="{{ view==='month' }}">
+    <!-- 星期表头 -->
+    <view class="cal-wdr">
+      <text wx:for="{{ wds }}" wx:key="*this"
+        class="cal-wdc {{ index===0||index===6?'cal-wdc-we':'' }}">{{ item }}</text>
+    </view>
+    <!-- 日期网格 -->
+    <view class="cal-mg">
+      <view wx:for="{{ monthCells }}" wx:key="date"
+        class="cal-mc {{ !item.cur?'cal-mc-o':'' }} {{ item.date===sel?'cal-mc-s':'' }}"
+        data-date="{{ item.date }}" bindtap="handleDayTap">
+        <text class="cal-mn {{ item.today?'cal-mn-t':'' }}">{{ item.day }}</text>
+        <view class="cal-mdots" wx:if="{{ u.cnt(eventMap,item.date)>0 }}">
+          <view wx:for="{{ u.take(eventMap,item.date,3) }}" wx:key="title" wx:for-item="ev"
+            class="cal-dot" style="background:{{ u.clr(ev) }};"></view>
+          <text wx:if="{{ u.cnt(eventMap,item.date)>3 }}" class="cal-dm">+{{ u.cnt(eventMap,item.date)-3 }}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ── 周视图 · navypitch week-strip ── -->
+  <view class="cal-week" wx:if="{{ view==='week' }}">
+    <view class="cal-ws">
+      <view wx:for="{{ weekDays }}" wx:key="date"
+        class="cal-wd {{ item.date===sel?'cal-wd-s':'' }} {{ item.we?'cal-wd-we':'' }}"
+        data-date="{{ item.date }}" bindtap="handleDayTap">
+        <text class="cal-wd-lbl">{{ item.wd }}</text>
+        <text class="cal-wd-num {{ item.today?'cal-wd-num-t':'' }} {{ item.date===sel?'cal-wd-num-s':'' }}">{{ item.day }}</text>
+        <!-- 事件圆点 -->
+        <view class="cal-wd-dots" wx:if="{{ u.cnt(eventMap,item.date)>0 }}">
+          <view wx:for="{{ u.take(eventMap,item.date,3) }}" wx:key="title" wx:for-item="ev"
+            class="cal-dot" style="background:{{ u.clr(ev) }};"></view>
+        </view>
+        <view wx:else class="cal-wd-spacer"></view>
+      </view>
+    </view>
+  </view>
+</view>

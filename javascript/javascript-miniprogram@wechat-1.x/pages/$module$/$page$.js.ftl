@@ -37,18 +37,5 @@ Page({
 </#list>  
   },
 
-  handleBack: function () {
-    wx.navigateBack({
-      delta: 1,
-      fail: function () {
-        wx.showToast({ title: '已是第一页', icon: 'none' });
-      }
-    });
-  },
-
-  handleEdit: function () {
-    wx.showToast({ title: '进入编辑模式', icon: 'none' });
-  },
-
 <@mp.print_page_methods page=page indent=2 />  
 });

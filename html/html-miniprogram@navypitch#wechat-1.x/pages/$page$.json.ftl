@@ -1,9 +1,9 @@
 {
   "navigationBarTitleText": "${page.title}",
-  "navigationBarBackgroundColor": "#ff5000",
+  "navigationBarBackgroundColor": "#0D1B2A",
   "navigationBarTextStyle": "white",
   "enablePullDownRefresh": true,
   "usingComponents": {
-    
+    "${namespace}-calendar": "/components/calendar/calendar"
   }
 }
