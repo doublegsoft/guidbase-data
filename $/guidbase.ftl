@@ -8,6 +8,70 @@
  -->
 
 <#--
+ ###############################################################################
+ ### 获取受参数影响的响应式组件 (Get Reactive Widgets For Param)
+ ### 
+ ### 该方法用于筛查指定页面中，其数据源 URL 包含特定查询变量（参数）的组件集合。
+ ### 当这些参数发生变化时，相关的组件通常需要重新加载数据。
+ ### 
+ ### @param variable  待检测的依赖参数变量名称 (String)
+ ### @param page      当前页面对象，用于获取下属 widgets 集合 (Object)
+ ### @return          与该参数存在响应式数据依赖的组件数组 (Sequence)
+ ###############################################################################
+ -->
+<#function get_reactive_widgets variable page>
+  <#local retVal = []>
+  <#list page.widgets as widget>
+    <#if widget.value("data") == ""><#continue></#if>
+    <#local url = valuebase.url(widget.value("data"))>
+    <#if url.containVariable(variable)>
+      <#local retVal += [widget]>
+    </#if>
+  </#list>
+  <#return retVal>
+</#function>
+
+<#--
+ ###############################################################################
+ ### 生成组件数据加载方法名 (Generate Widget Load Method Name)
+ ### 
+ ### 根据组件类型（widget.type）和唯一标识（widget.id），生成符合命名规范的
+ ### 后端/前端数据加载或初始化方法名称。
+ ### 
+ ### 命名后缀规则：
+ ### - 列表/网格/表格类组件 => "load[WidgetId]Rows" （多行数据）
+ ### - 基础/展示表单类组件   => "load[WidgetId]Data" （单条数据对象）
+ ### - 日历日程类组件       => "load[WidgetId]Cells"（网格/单元格数据）
+ ### - 数据图表类组件       => "load[WidgetId]Conf" （配置与报表数据）
+ ### 
+ ### @param widget  目标组件对象 (Object)
+ ### @return       对应的数据加载方法名，不匹配已知类型时返回空字符串 (String)
+ ###############################################################################
+ -->
+<#function name_widget_method_load widget>
+  <#if widget.type == "list_view">
+    <#return "load" + js.nameType(widget.id) + "Rows">; 
+  <#elseif widget.type == "paged_table">
+    <#return "load" + js.nameType(widget.id) + "Rows">;
+  <#elseif widget.type == "paged_grid">
+    <#return "load" + js.nameType(widget.id) + "Rows">;      
+  <#elseif widget.type == "excel_form">
+    <#return "load" + js.nameType(widget.id) + "Rows">;
+  <#elseif widget.type == "entry_form">
+    <#return "load" + js.nameType(widget.id) + "Data">;  
+  <#elseif widget.type == "display_form">
+    <#return "load" + js.nameType(widget.id) + "Data">;   
+  <#elseif widget.type == "official_form">
+    <#return "load" + js.nameType(widget.id) + "Data">;     
+  <#elseif widget.type == "calendar">
+    <#return "load" + js.nameType(widget.id) + "Cells">;    
+  <#elseif widget.type == "chart">
+    <#return "load" + js.nameType(widget.id) + "Conf">;   
+  </#if>
+  <#return "">
+</#function>
+
+<#--
  ###
  ###
  ###

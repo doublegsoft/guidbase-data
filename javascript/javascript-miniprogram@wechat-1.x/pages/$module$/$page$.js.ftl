@@ -1,4 +1,5 @@
 <#import "/$/modelbase.ftl" as modelbase>
+<#import "/$/guidbase.ftl" as guidbase>
 <#import "/$/guidbase4js.ftl" as guidbase4js>
 <#if designSystem?? && designSystem == "navypitch">
 <#import "/$/miniprogram-wechat-navypitch.ftl" as mp>
@@ -27,12 +28,8 @@ Page({
 </#list>
 <#list page.widgets as widget>
   <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
-  <#if widget.type == "entry_form" || widget.type == "display_form">
-    this.load${js.nameType(widget.id)}Data();
-  <#elseif widget.type == "excel_form" || widget.type == "list_view">
-    this.load${js.nameType(widget.id)}Rows();
-  <#elseif widget.type == "chart">
-    this.load${js.nameType(widget.id)}Rows();
+  <#if guidbase.name_widget_method_load(widget) != "">
+    this.${guidbase.name_widget_method_load(widget)}();
   </#if>
 </#list>  
   },

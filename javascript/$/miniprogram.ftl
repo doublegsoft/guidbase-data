@@ -1,4 +1,4 @@
-<#include "tile.ftl">
+<#include "tile-miniprogram.ftl">
 <#include "util.ftl">
 <!----------------------------------------------------------------------------->
 <!--                                ENTRY FORM                               -->
@@ -28,7 +28,8 @@ ${""?left_pad(indent)}${js.nameVariable(input.id)}Options: [],
 </#macro>
 
 <#macro print_entry_form_methods form indent=0>
-  <#local objname = form.value("object", form.id)>
+  <#local url = valuebase.url(form.value("data", form.id))>
+  <#local objname = url.resource>
 ${""?left_pad(indent)}  
 ${""?left_pad(indent)}/**
 ${""?left_pad(indent)} * 加载【${form.title!""}】编辑表单数据的界面函数
@@ -71,7 +72,7 @@ ${""?left_pad(indent)}    return
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  is${js.nameType(form.id)}Submitting.value = true
 ${""?left_pad(indent)}  try {
-${""?left_pad(indent)}    const result = await sdk.save${js.nameType(form.value("object",form.id))}(${js.nameVariable(form.id)}Data)
+${""?left_pad(indent)}    const result = await sdk.save${js.nameType(objname)}(${js.nameVariable(form.id)}Data)
 ${""?left_pad(indent)}    if (result.success) {
 ${""?left_pad(indent)}      fb.success('成功', '保存成功');
 ${""?left_pad(indent)}    }
@@ -186,13 +187,14 @@ ${""?left_pad(indent)}${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_
 </#macro>
 
 <#macro print_display_form_methods form indent=0>
+  <#local url = valuebase.url(form.value("data"))>
 ${""?left_pad(indent)}
 ${""?left_pad(indent)}/**
 ${""?left_pad(indent)} * 加载【${form.title!""}】只读表单数据的界面函数
 ${""?left_pad(indent)} */
 ${""?left_pad(indent)}load${js.nameType(form.id)}Data: async function () {
 ${""?left_pad(indent)}  try {
-${""?left_pad(indent)}    const data = await sdk.fetch${js.nameType(form.value("object", form.id))}()
+${""?left_pad(indent)}    const data = await sdk.fetch${js.nameType(url.resource)}()
 ${""?left_pad(indent)}    this.setData({ 
   <#list form.inputs as input>
 ${""?left_pad(indent)}      ${js.nameVariable(input.id)}: data.${js.nameVariable(input.id)},   
@@ -203,7 +205,93 @@ ${""?left_pad(indent)}    fb.error('发生错误', error.message || String(error
 ${""?left_pad(indent)}  } finally {
 ${""?left_pad(indent)}    
 ${""?left_pad(indent)}  }
-${""?left_pad(indent)}}
+${""?left_pad(indent)}},
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                LIST VIEW                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_list_view_variables list indent=0>
+  <#local url = valuebase.url(list.value("data"))>
+${""?left_pad(indent)}
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * ${js.nameVariable(list.id)} 【${list.title!""}】列表视图相关变量
+${""?left_pad(indent)} */
+${""?left_pad(indent)}${js.nameVariable(list.id)}Has${js.nameType(inflector.pluralize(url.resource))}: false,
+${""?left_pad(indent)}${js.nameVariable(list.id)}${js.nameType(inflector.pluralize(url.resource))}: [],
+</#macro>
+
+<#macro print_list_view_methods list indent=0>
+  <#local url = valuebase.url(list.value("data"))>
+${""?left_pad(indent)}
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * 加载【${list.title!""}】列表视图数据的界面函数
+${""?left_pad(indent)} */
+${""?left_pad(indent)}load${js.nameType(list.id)}Rows: async function () {
+${""?left_pad(indent)}  try {
+${""?left_pad(indent)}    const page = await sdk.fetch${js.nameType(inflector.pluralize(url.resource))}({
+  <#list url.params as urlParam>
+${""?left_pad(indent)}      ${js.nameVariable(urlParam.name)}: this.data.${js.nameVariable(urlParam.value)},
+  </#list>
+${""?left_pad(indent)}    });
+${""?left_pad(indent)}    const rows = page.data;
+${""?left_pad(indent)}    this.setData({
+${""?left_pad(indent)}      ${js.nameVariable(list.id)}${js.nameType(inflector.pluralize(url.resource))}: rows,
+${""?left_pad(indent)}      ${js.nameVariable(list.id)}Has${js.nameType(inflector.pluralize(url.resource))}: rows.length > 0,
+${""?left_pad(indent)}    })
+${""?left_pad(indent)}  } catch (error) {
+${""?left_pad(indent)}    fb.error('发生错误', error.message || String(error))
+${""?left_pad(indent)}  } finally {
+${""?left_pad(indent)}    
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}},
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                 CALENDAR                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_calendar_variables calendar indent=0>
+  <#local variable = calendar.value("variable", calendar.id)>
+${""?left_pad(indent)}
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * ${js.nameVariable(calendar.id)} 【${calendar.title!""}】日历视图相关变量
+${""?left_pad(indent)} */
+${""?left_pad(indent)}${js.nameVariable(variable)}: new Date(),
+</#macro>
+
+<#macro print_calendar_methods calendar indent=0>
+  <#local url = valuebase.url(calendar.value("data"))>
+  <#local variable = calendar.value("variable", calendar.id)>
+  <#local reactiveWidgets = guidbase.get_reactive_widgets(variable, calendar.page)>
+${""?left_pad(indent)}
+${""?left_pad(indent)}handle${js.nameType(variable)}Change: async function (event) {
+${""?left_pad(indent)}  this.setData({
+${""?left_pad(indent)}    ${js.nameVariable(variable)}: event.detail.date,
+${""?left_pad(indent)}  });
+  <#list reactiveWidgets as reactiveWidget>
+${""?left_pad(indent)}  this.${guidbase.name_widget_method_load(reactiveWidget)}();
+  </#list>
+${""?left_pad(indent)}},
+${""?left_pad(indent)}
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * 加载【${calendar.title!""}】日历视图数据的界面函数
+${""?left_pad(indent)} */
+${""?left_pad(indent)}load${js.nameType(calendar.id)}Cells: async function () {
+${""?left_pad(indent)}  try {
+${""?left_pad(indent)}    const data = await sdk.fetch${js.nameType(inflector.pluralize(url.resource))}({
+  <#list url.params as urlParam>
+${""?left_pad(indent)}      ${js.nameVariable(urlParam.name)}: this.data.${js.nameVariable(urlParam.value)},
+  </#list>
+${""?left_pad(indent)}    });
+${""?left_pad(indent)}    this.setData({
+${""?left_pad(indent)}      ${js.nameVariable(calendar.id)}${js.nameType(inflector.pluralize(url.resource))}: data,
+${""?left_pad(indent)}    })
+${""?left_pad(indent)}  } catch (error) {
+${""?left_pad(indent)}    fb.error('发生错误', error.message || String(error))
+${""?left_pad(indent)}  } finally {
+${""?left_pad(indent)}    
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}},
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -244,6 +332,8 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(fals
 <@print_time_grid_variables grid=widget indent=indent />
     <#elseif widget.type == 'list_view'>
 <@print_list_view_variables list=widget indent=indent />
+    <#elseif widget.type == 'calendar'>
+<@print_calendar_variables calendar=widget indent=indent />    
     <#elseif widget.type == "chart">
 <@print_chart_variables chart=widget indent=indent />
     </#if>
@@ -270,6 +360,8 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(fals
 <@print_time_grid_methods grid=widget indent=indent />
     <#elseif widget.type == 'list_view'>
 <@print_list_view_methods list=widget indent=indent />
+    <#elseif widget.type == 'calendar'>
+<@print_calendar_methods calendar=widget indent=indent />    
     <#elseif widget.type == "chart">
 <@print_chart_methods chart=widget indent=indent />
     <#elseif widget.type == 'button'>
@@ -302,6 +394,19 @@ ${""?left_pad(indent)}}
 <@print_layout_entry_form form=widget indent=indent />
   <#elseif widget.type == "display_form">
 <@print_layout_display_form form=widget indent=indent />
+  <#elseif widget.type == "list_view">
+<@print_layout_list_view list=widget indent=indent />
+  <#elseif widget.type == "calendar">
+    <#local url = valuebase.url(widget.value("data"))>
+    <#local param = widget.value("param", widget.id)>
+${""?left_pad(indent)}<view class="<#if widget.value("placement") == "top">top-fixed</#if>">
+${""?left_pad(indent)}  <${namespace}-calendar 
+${""?left_pad(indent)}    events="{{ ${js.nameVariable(widget.id)}${js.nameType(inflector.pluralize(url.resource))} }}"
+${""?left_pad(indent)}    defaultView="week"
+${""?left_pad(indent)}    value="{{ ${js.nameVariable(param)} }}"
+${""?left_pad(indent)}    bind:dayclick="handle${js.nameType(param)}Change"
+${""?left_pad(indent)}    bind:viewchange="handleViewChange" />
+${""?left_pad(indent)}</view>
   <#elseif widget.type == "avatar">
 ${""?left_pad(indent)}<view class="avatar-upload${stateClasses}" bindtap="handle${js.nameType(widget.id)}Upload">
 ${""?left_pad(indent)}  <view class="avatar avatar-teal avatar-xl" wx:if="{{ !${js.nameVariable(widget.id)} }}">

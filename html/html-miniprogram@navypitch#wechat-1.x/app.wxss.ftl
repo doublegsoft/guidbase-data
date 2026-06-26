@@ -313,12 +313,15 @@ page {
 /* ── 4f.  Divider ──────────────────────────── */
 .divider { border: none; border-top: 2rpx solid var(--color-border); }
 
+.widget-divider { height: 16px; }
+
 /* ═══════════════════════════════════════════════════════════════════════
    5.  COMPONENTS
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ── 5a.  Card ─────────────────────────────── */
 .card {
+  margin: 0 var(--space-8) var(--space-14);
   background: var(--color-card);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
@@ -969,7 +972,7 @@ page {
 
 /* ── 11g.  Page Shell 页面容器 ────────────────── */
 .page-shell {
-  padding: 0 var(--space-8) var(--space-14);
+  /* padding: 0 var(--space-8) var(--space-14); */
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1254,3 +1257,13 @@ page {
   background: transparent;
   color: var(--color-text-sub);
 }
+
+.top-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+<#include "/$/tile.css.ftl">

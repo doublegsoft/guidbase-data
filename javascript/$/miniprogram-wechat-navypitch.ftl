@@ -1,3 +1,4 @@
+<#import "tile-miniprogram.ftl" as tile>
 <#include "miniprogram.ftl">
 
 <!----------------------------------------------------------------------------->
@@ -76,4 +77,22 @@ ${""?left_pad(indent)}    </view>
 ${""?left_pad(indent)}  </view>
 ${""?left_pad(indent)}</view>
   </#list>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                LIST VIEW                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_layout_list_view list indent=0>
+  <#local url = valuebase.url(list.value("data"))>
+${""?left_pad(indent)}<view class="card">
+${""?left_pad(indent)}  <view class="card-body">
+${""?left_pad(indent)}    <scroll-view wx:if="{{ ${js.nameVariable(list.id)}Has${js.nameType(inflector.pluralize(url.resource))} }}" 
+${""?left_pad(indent)}                 scroll-y enhanced show-scrollbar="{{ false }}" class="card-body-flush">
+${""?left_pad(indent)}      <view wx:for="{{ ${js.nameVariable(list.id)}${js.nameType(inflector.pluralize(url.resource))} }}"
+${""?left_pad(indent)}            wx:for-item="row" class="mt-8">
+<@tile.print_tile_layout widget=list indent=8 />
+${""?left_pad(indent)}      </view>
+${""?left_pad(indent)}    </scroll-view>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}</view>
 </#macro>
