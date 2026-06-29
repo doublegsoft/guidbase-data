@@ -1,5 +1,5 @@
+<#import "/$/guidbase.ftl" as guidbase>
 <#include "tile-vue3.ftl">
-<#include "util.ftl">
 <!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
 <!----------------------------------------------------------------------------->
@@ -56,7 +56,8 @@ const ${js.nameVariable(form.id)}ErrorMessage = ref('')
 </#macro>
 
 <#macro print_entry_form_methods form indent=0>
-  <#local objname = form.value("object", form.id)>
+  <#local url = valuebase.url(form.value("data"))>
+  <#local objname = url.resource>
 /**
  * 加载【${form.title!""}】编辑表单数据的界面函数
  */
@@ -164,6 +165,8 @@ ${""?left_pad(indent)}});
 </#macro>
 
 <#macro print_display_form_methods form indent=0>
+  <#local url = valuebase.url(form.value("data"))>
+  <#local objname = url.resource>
 
 /**
  * 加载【${form.title!""}】只读表单数据的界面函数
@@ -171,7 +174,7 @@ ${""?left_pad(indent)}});
 const load${js.nameType(form.id)}Data = async () => {
   isLoading.value = true
   try {
-    const data = await sdk.fetch${js.nameType(form.value("object", form.id))}()
+    const data = await sdk.fetch${js.nameType(objname)}()
     Object.assign(${js.nameVariable(form.id)}Data, data)
   } catch (error) {
     fb.error('发生错误', error)
@@ -232,7 +235,7 @@ ${""?left_pad(indent)}  @cell-change="handle${js.nameType(form.id)}CellChange" /
 <!--                               PAGED TABLE                               -->
 <!----------------------------------------------------------------------------->
 <#macro print_paged_table_variables table indent=0>
-
+${""?left_pad(indent)}
 ${""?left_pad(indent)}// ${js.nameVariable(table.id)}分页表格相关变量
 ${""?left_pad(indent)}const ${js.nameVariable(table.id)}Ref = ref(null)
 ${""?left_pad(indent)}const ${js.nameVariable(table.id)}Cols = ref([{
@@ -268,7 +271,7 @@ ${""?left_pad(indent)}}])
 </#macro>
 
 <#macro print_paged_table_methods table indent=0>
-  <#local objname = table.value("object",table.id)>
+  <#local url = valuebase.url(table.value("data"))>
 
 /**
  * 加载【${table.title!""}】分页表格数据的界面函数
@@ -276,7 +279,7 @@ ${""?left_pad(indent)}}])
 const load${js.nameType(table.id)}Rows = async (params, pageNumber, pageSize) => {
   isLoading.value = true
   try {
-    const res = await sdk.fetch${js.nameType(inflector.pluralize(objname))}(params, (pageNumber - 1) * pageSize, pageSize)
+    const res = await sdk.fetch${js.nameType(inflector.pluralize(url.resource))}(params, (pageNumber - 1) * pageSize, pageSize)
     return res;
   } catch (error) {
     fb.error('发生错误', error)
@@ -521,56 +524,46 @@ ${""?left_pad(indent)}<${namespace}-chart :option="${js.nameVariable(chart.id)}C
 <!----------------------------------------------------------------------------->
 <!--                                  BUTTON                                 -->
 <!----------------------------------------------------------------------------->
-<#macro print_paged_button_methods button indent=0>
-  <#if (button.value("action")!"") == "save">
-    <#return>
-  </#if>
-  <#-- ref优先 -->
-  <#if button.page.byId(button.value("ref"))??>
-    <#local ancestor = button.page.byId(button.value("ref"))>
-  <#elseif button.ancestor("entry_form")??>
-    <#local ancestor = button.ancestor("entry_form")>
-  <#elseif button.ancestor("criteria_form")??>
-    <#local ancestor = button.ancestor("criteria_form")>
-  <#elseif button.ancestor("paged_table")??>
-    <#local ancestor = button.ancestor("paged_table")>  
-  </#if>
-
+<#macro print_button_methods button indent=0>
+  <#local action = valuebase.action(button.value("action"))>
+  <#local method = action.method!"">
+  <#if method == "save"><#return></#if>
+  <#local widget = guidbase.get_action_widget(button)>
   <#if button.ancestor("paged_table")??>
-const ${get_button_method_name(button)} = async (row) => {    
-    <#if (button.value("action","")) == "edit"><#-- 编辑 -->
-  ${js.nameVariable(button.value("ref"))}DialogOpen.value = true  
-    <#elseif (button.value("action","")) == "view"><#-- 查看 -->
-      <#if button.value("ref","") != "">
-  ${js.nameVariable(button.value("ref"))}DrawerOpen.value = true
-      <#elseif button.value("page","") != "">
-      <#-- TODO -->
-      </#if>
-    <#elseif (button.value("action","")) == "delete"><#-- 删除 -->
+const ${guidbase.name_button_method(button)} = async (row) => {    
+    <#if widget.type == "dialog"><#-- 编辑 -->
+  ${js.nameVariable(widget.id)}Open.value = true  
+    <#elseif widget.type == "drawer"><#-- 查看 -->
+  ${js.nameVariable(widget.id)}Open.value = true
+    <#elseif method == "delete" || method == "remove"><#-- 删除 -->
   const ok = await fb.confirm('询问', '确定要删除该条数据？')
   if (!ok) return;  
     </#if>
   <#else>
-const ${get_button_method_name(button)} = async () => {    
-    <#if (button.value("action","")) == "reset"><#-- 重置 -->
-      <#if is_ref_or_ancestor(button, "entry_form")>
+const ${guidbase.name_button_method(button)} = async () => {    
+    <#if method == "reset"><#-- 重置 -->
+      <#if widget.type == "entry_form">
   const ok = await fb.confirm('询问', '确定要清空表单数据？')
   if (!ok) return; 
       </#if>
-      <#list ancestor.inputs as input>
-  ${get_input_model_name(input)} = ${guidbase4js.get_primitive_default_value(input)};
+      <#list widget.inputs as input>
+  ${guidbase.name_input_variable(input)} = ${guidbase4js.get_primitive_default_value(input)};
       </#list>
-    <#elseif (button.value("action","")) == "search"><#-- 重置 -->
-  ${js.nameVariable(button.value("ref"))}Ref.value?.refresh()
-    <#elseif (button.value("action","")) == "save"><#-- 保存 -->
-  // TODO: save${js.nameType(button.value("ref"))}Data();
-    <#elseif (button.value("action","")) == "add"><#-- 新增 -->
-  ${js.nameVariable(button.value("ref"))}DialogOpen.value = true  
-    <#elseif (button.value("action","")) == "close"><#-- 关闭 -->
+    <#elseif method == "search"><#-- 重置 -->
+  ${js.nameVariable(widget.id)}Ref.value?.refresh()
+    <#elseif method == "save"><#-- 保存 -->
+  // TODO: save${js.nameType(widget.id)}Data();
+    <#elseif method == "add"><#-- 新增 -->
+  ${js.nameVariable(widget.id)}Open.value = true  
+    <#elseif method == "edit"><#-- 新增 -->
+  ${js.nameVariable(widget.id)}Open.value = true  
+    <#elseif method == "view"><#-- 新增 -->
+  ${js.nameVariable(widget.id)}Open.value = true  
+    <#elseif method == "close"><#-- 关闭 -->
       <#if button.container.type == "entry_form">
-  ${js.nameVariable(button.container.id)}DialogOpen.value = false
+  ${js.nameVariable(button.container.id)}Open.value = false
       <#elseif button.container.type == "display_form">
-  ${js.nameVariable(button.container.id)}DrawerOpen.value = false    
+  ${js.nameVariable(button.container.id)}Open.value = false
       </#if>
     </#if>
   </#if>
@@ -658,9 +651,9 @@ import ${js.nameType(widget.value("page"))} from '@/pages/${js.nameFile(widget.v
 <#macro print_page_variables page indent=0>
   <#list page.widgets as widget>
     <#if widget.type == 'drawer'>
-${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DrawerOpen = ref(false)        
+${""?left_pad(indent)}const ${java.nameVariable(widget.id)}Open = ref(false)        
     <#elseif widget.type == 'dialog'>
-${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(false)    
+${""?left_pad(indent)}const ${java.nameVariable(widget.id)}Open = ref(false)    
     <#elseif widget.type == 'tabs'>
 <@print_tabs_variables tabs=widget indent=indent />
     <#elseif widget.type == 'entry_form'>
@@ -712,7 +705,7 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(fals
     <#elseif widget.type == "chart">
 <@print_chart_methods chart=widget indent=indent />
     <#elseif widget.type == 'button'>
-<@print_paged_button_methods button=widget indent=indent />
+<@print_button_methods button=widget indent=indent />
     </#if>
   </#list>
   <#list page.widgets as widget>
@@ -720,7 +713,7 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(fals
 ${""?left_pad(indent)}const ${js.nameVariable(widget.id)}RowActionHandlers = { 
     <#list widget.widgets as button>     
       <#if button.type != "button"><#continue></#if>
-${""?left_pad(indent)}  ${get_button_method_name(button)}, 
+${""?left_pad(indent)}  ${guidbase.name_button_method(button)}, 
     </#list>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}const handle${js.nameType(widget.id)}RowAction = ({ handler, row, index }) => {
@@ -732,22 +725,21 @@ ${""?left_pad(indent)}}
 <#macro print_page_layout page indent=0>
   <#local children = []>
   <#list page.children as child>
-    <!-- ${child.container.type} -->
     <#if child.type != "dialog" && child.type != "drawer" && 
          child.type != "buttons" && child.type != "entry_form" && 
          page.value("viewport") == "" >
-<@print_layout_container widget=child indent=indent+2 />       
+<@print_layout_container widget=child indent=indent />       
     <#else>
-<@print_layout_widget widget=child indent=indent+2 />        
+<@print_layout_widget widget=child indent=indent />        
     </#if>
     <#if child?index != children?size - 1>
-<@print_layout_divider indent=indent+2 />    
+<@print_layout_divider indent=indent />    
     </#if>
   </#list>
   <#-- 把带有viewport的显示在最后 -->
   <#list page.children as child>
     <#if child.value("viewport","") != "">
-<@print_layout_widget widget=child indent=indent+2 />          
+<@print_layout_widget widget=child indent=indent />          
     </#if>
   </#list>
 </#macro>
@@ -756,7 +748,7 @@ ${""?left_pad(indent)}}
 
 <#macro print_layout_widget widget indent=0>
   <#if widget.type == "drawer">
-${""?left_pad(indent)}<${namespace}-drawer v-model="${js.nameVariable(widget.id)}DrawerOpen" title="${widget.title}">
+${""?left_pad(indent)}<${namespace}-drawer v-model="${js.nameVariable(widget.id)}Open" title="${widget.title}">
     <#if widget.value("page","") != "">
       <#local pagePath = widget.value("page")>
 ${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
@@ -767,7 +759,7 @@ ${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
     </#if>
 ${""?left_pad(indent)}</${namespace}-drawer>
   <#elseif widget.type == "dialog">
-${""?left_pad(indent)}<${namespace}-dialog v-model="${js.nameVariable(widget.id)}DialogOpen" title="${widget.title}" size="lg">  
+${""?left_pad(indent)}<${namespace}-dialog v-model="${js.nameVariable(widget.id)}Open" title="${widget.title}" size="lg">  
     <#if widget.value("page","") != "">
       <#local pagePath = widget.value("page")>
 ${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
@@ -803,28 +795,28 @@ ${""?left_pad(indent)}</${namespace}-dialog>
 <@print_layout_buttons buttons=widget indent=indent />
   <#elseif widget.type == "select">
     <#if (widget.value("data")!"")?starts_with("enum[")>
-${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="sdk.${js.nameVariable(widget.id)}Options" :clearable="true" v-model="${get_input_model_name(widget)}" />    
+${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="sdk.${js.nameVariable(widget.id)}Options" :clearable="true" v-model="${guidbase.name_input_variable(widget)}" />    
     <#else>
-${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options"  :clearable="true" v-model="${get_input_model_name(widget)}" />
+${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options"  :clearable="true" v-model="${guidbase.name_input_variable(widget)}" />
     </#if>
   <#elseif widget.type == "date">
-${""?left_pad(indent)}<${namespace}-datepicker data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />    
+${""?left_pad(indent)}<${namespace}-datepicker data-test="${js.nameVariable(widget.id)}" v-model="${guidbase.name_input_variable(widget)}" />    
   <#elseif widget.type == "time">
-${""?left_pad(indent)}<${namespace}-timepicker data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
+${""?left_pad(indent)}<${namespace}-timepicker data-test="${js.nameVariable(widget.id)}" v-model="${guidbase.name_input_variable(widget)}" />
   <#elseif widget.type == "cascade">
-${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(widget.id)}" :fetch-options="sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions" v-model="${get_input_model_name(widget)}" />
+${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(widget.id)}" :fetch-options="sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions" v-model="${guidbase.name_input_variable(widget)}" />
   <#elseif widget.type == "multiselect">
-${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options" v-model="${get_input_model_name(widget)}" />
+${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options" v-model="${guidbase.name_input_variable(widget)}" />
   <#elseif widget.type == "avatar">
-${""?left_pad(indent)}<${namespace}-avatarupload data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
+${""?left_pad(indent)}<${namespace}-avatarupload data-test="${js.nameVariable(widget.id)}" v-model="${guidbase.name_input_variable(widget)}" />
   <#elseif widget.type == "tags">
-${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
+${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(widget.id)}" v-model="${guidbase.name_input_variable(widget)}" />
 <#elseif widget.type == "images">
-${""?left_pad(indent)}<${namespace}-imageupload data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
+${""?left_pad(indent)}<${namespace}-imageupload data-test="${js.nameVariable(widget.id)}" v-model="${guidbase.name_input_variable(widget)}" />
 <#elseif widget.type == "videos">
-${""?left_pad(indent)}<${namespace}-videoupload data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
+${""?left_pad(indent)}<${namespace}-videoupload data-test="${js.nameVariable(widget.id)}" v-model="${guidbase.name_input_variable(widget)}" />
 <#elseif widget.type == "files">
-${""?left_pad(indent)}<${namespace}-fileupload data-test="${js.nameVariable(widget.id)}" v-model="${get_input_model_name(widget)}" />
+${""?left_pad(indent)}<${namespace}-fileupload data-test="${js.nameVariable(widget.id)}" v-model="${guidbase.name_input_variable(widget)}" />
   <#else><#-- 各个Design System的个性化风格 -->
 <@print_layout_custom widget=widget indent=indent />  
   </#if>

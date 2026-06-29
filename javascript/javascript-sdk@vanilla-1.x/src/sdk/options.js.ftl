@@ -6,7 +6,8 @@ if (typeof sdk === 'undefined') {
 <#list app.pages as page>
   <#list page.widgets as widget>
     <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
-    <#if widget.type != "select"><#continue></#if>
+    <#-- select, multiselect, segment支持枚举类型 -->
+    <#if widget.type != "select" && widget.type != "multiselect" && widget.type != "segment"><#continue></#if>
     <#assign visited_widgets += {widget.id: widget}>
     <#if widget.value("data")?starts_with("enum[")>
       <#assign opts = typebase.enumtype(widget.value("data"))>

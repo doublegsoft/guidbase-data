@@ -50,25 +50,143 @@
  -->
 <#function name_widget_method_load widget>
   <#if widget.type == "list_view">
-    <#return "load" + js.nameType(widget.id) + "Rows">; 
+    <#return naming.nameVariable("load_" + widget.id + "_rows")>; 
   <#elseif widget.type == "paged_table">
-    <#return "load" + js.nameType(widget.id) + "Rows">;
+    <#return naming.nameVariable("load_" + widget.id + "_rows")>; 
   <#elseif widget.type == "paged_grid">
-    <#return "load" + js.nameType(widget.id) + "Rows">;      
+    <#return naming.nameVariable("load_" + widget.id + "_rows")>;      
   <#elseif widget.type == "excel_form">
-    <#return "load" + js.nameType(widget.id) + "Rows">;
+    <#return naming.nameVariable("load_" + widget.id + "_rows")>; 
   <#elseif widget.type == "entry_form">
-    <#return "load" + js.nameType(widget.id) + "Data">;  
+    <#return naming.nameVariable("load_" + widget.id + "_data")>; 
   <#elseif widget.type == "display_form">
-    <#return "load" + js.nameType(widget.id) + "Data">;   
+    <#return naming.nameVariable("load_" + widget.id + "_data")>;  
   <#elseif widget.type == "official_form">
-    <#return "load" + js.nameType(widget.id) + "Data">;     
+    <#return naming.nameVariable("load_" + widget.id + "_data")>; 
   <#elseif widget.type == "calendar">
-    <#return "load" + js.nameType(widget.id) + "Cells">;    
+    <#return naming.nameVariable("load_" + widget.id + "_cells")>;  
   <#elseif widget.type == "chart">
-    <#return "load" + js.nameType(widget.id) + "Conf">;   
+    <#return naming.nameVariable("load_" + widget.id + "_conf")>; 
   </#if>
   <#return "">
+</#function>
+
+<#--
+ ###############################################################################
+ ### 生成按钮事件方法名称 (Generate Button Method Name)
+ ### 
+ ### 根据按钮对象的 ID，生成对应的事件处理方法（Handler）名称。
+ ### 通常用于前端代码生成中，动态绑定按钮的点击或其他事件监听函数。
+ ### 
+ ### 命名生成规则：
+ ### - 拼接固定前缀 "handle" 字符。
+ ### - 结合 js.nameType 将按钮 ID 转换为符合规范的类型名称格式（如首字母大写）。
+ ### - 示例：若按钮 ID 为 "submit_form"，生成的名称通常为 "handleSubmitForm"。
+ ### 
+ ### @param button  目标按钮对象 (Object)
+ ### @return       生成的事件处理方法名称 (String)
+ ###############################################################################
+ -->
+<#function name_button_method button>
+  <#local ret = "handle">
+  <#local action = valuebase.action(button.value("action"))>
+  <#return "handle" + js.nameType(button.id)>
+</#function>
+
+<#--
+ ###############################################################################
+ ### 获取输入项变量名称 (Get Input Variable Name)
+ ### 
+ ### 根据输入项（input）及其容器（container）的类型，生成对应的前端变量访问路径。
+ ### 用于在前端代码中区分和绑定查询条件输入项与常规数据输入项的变量。
+ ### 
+ ### 容器类型与命名规则：
+ ### - 容器类型为 "criteria_form" => "[containerId]Crit.[inputId]" （查询条件变量）
+ ### - 其他容器类型              => "[containerId]Data.[inputId]" （常规数据变量）
+ ### 
+ ### @param input  目标输入项对象 (Object)
+ ### @return       生成的变量路径名称 (String)
+ ###############################################################################
+ -->
+<#function name_input_variable input>
+  <#if input.container.type == "criteria_form">
+    <#return js.nameVariable(input.container.id) + "Crit." + js.nameVariable(input.id)>
+  <#else>
+    <#return js.nameVariable(input.container.id) + "Data." + js.nameVariable(input.id)>
+  </#if>
+</#function>
+
+<#--
+ ###############################################################################
+ ### 获取按钮样式变体 (Get Button Style Variant)
+ ### 
+ ### 根据按钮对象中的动作类型（action），返回对应的 UI 样式变体名称。
+ ### 用于动态绑定前端组件的颜色和视觉风格。
+ ### 
+ ### 动作与样式映射规则：
+ ### - "reset"  => "warning" （警告/重置操作）
+ ### - "save"   => "primary" （主色/保存操作）
+ ### - "search" => "success" （成功/查询操作）
+ ### - "edit"   => "success" （成功/编辑操作）
+ ### - "remove" => "danger"  （危险/删除操作）
+ ### - 其他动作 => "default" （默认基础样式）
+ ### 
+ ### @param button  目标按钮对象 (Object)
+ ### @return       对应的样式变体名称 (String)
+ ###############################################################################
+ -->
+<#function get_button_variant button>
+  <#local action = valuebase.action(button.value("action"))>
+  <#if action.method??>
+    <#local method = action.method>
+    <#if method == "reset">
+      <#return "warning">
+    <#elseif method == "save">
+      <#return "primary">
+    <#elseif method == "search">
+      <#return "success">  
+    <#elseif method == "edit">
+      <#return "success">
+    <#elseif method == "open">
+      <#return "success">  
+    <#elseif method == "remove" || method == "delete">
+      <#return "danger">    
+    </#if>
+  <#elseif action.type.name() == "DRAWER">
+    <#return "success">
+  <#elseif action.type.name() == "DIALOG">
+    <#return "success">
+  <#elseif action.type.name() == "OVERLAY">
+    <#return "success">    
+  <#elseif action.type.name() == "GOTO">
+    <#return "default">  
+  </#if>
+  <#return "default">  
+</#function>
+
+<#--
+ ###############################################################################
+ ### 获取动作关联的组件 (Get Action Widget)
+ ### 
+ ### 根据按钮对象中的动作（action），获取并返回对应的页面组件（Widget）。
+ ### 用于动态定位和操作与该按钮绑定的 UI 元素。
+ ### 
+ ### 查找与定位规则：
+ ### - 优先从按钮中解析出 action 对象。
+ ### - 若 action 存在 "resource" 属性，则优先通过该资源 ID 查找并返回组件。
+ ### - 若无 "resource" 属性，则退而使用 "path" 属性的值进行组件查找与返回。
+ ### 
+ ### @param button  目标按钮对象 (Object)
+ ### @return       对应的页面组件对象 (Widget Object)
+ ###############################################################################
+ -->
+<#function get_action_widget button>
+  <#local action = valuebase.action(button.value("action"))>
+  <#if action.resource??>
+    <#return button.page.byId(action.resource)>
+  <#else>
+    <#return button.page.byId(action.path)>
+  </#if>
 </#function>
 
 <#--

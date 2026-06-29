@@ -20,6 +20,8 @@ page {
   /* Accent */
   --color-teal:       #00C9A7;
   --color-teal-hover: #00b599;
+  --color-green:      #27AE60;
+  --color-green-hover: #219a52;
   --color-amber:      #F5A623;
   --color-amber-hover:#e8981a;
   --color-red:        #E74C6F;
@@ -221,14 +223,17 @@ page {
 .btn-primary { background: var(--color-teal); color: #fff; }
 .btn-primary:active { background: var(--color-teal-hover); }
 
-.btn-secondary { background: var(--color-surface); color: var(--color-text-main); border: 2rpx solid var(--color-border); }
-.btn-secondary:active { background: #e5ecf2; }
+.btn-default { background: var(--color-surface); color: var(--color-text-main); border: 2rpx solid var(--color-border); }
+.btn-default:active { background: #e5ecf2; }
 
-.btn-amber { background: var(--color-amber); color: #fff; }
-.btn-amber:active { background: var(--color-amber-hover); }
+.btn-warning { background: var(--color-amber); color: #fff; }
+.btn-warning:active { background: var(--color-amber-hover); }
 
 .btn-danger { background: var(--color-red-dim); color: var(--color-red); border: 2rpx solid rgba(231,76,111,0.2); }
 .btn-danger:active { background: var(--color-red); color: #fff; }
+
+.btn-success { background: var(--color-green); color: #fff; }
+.btn-success:active { background: var(--color-green-hover); }
 
 .btn-outline { background: transparent; color: var(--color-teal); border: 2rpx solid var(--color-teal); }
 .btn-outline:active { background: var(--color-teal-dim); }
@@ -237,6 +242,24 @@ page {
 .btn-sm  { padding: 6rpx 22rpx; font-size: var(--text-xs); }
 .btn-lg  { padding: var(--space-7) var(--space-13); font-size: var(--text-lg); }
 .btn-block { width: 100%; }
+
+.btn-actions {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-5);
+}
+
+.btn-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
 
 /* ── 4b.  Tags / Badges ────────────────────── */
 .tag {
@@ -1265,5 +1288,174 @@ page {
   width: 100%;
   z-index: 100;
 }
+
+/* ── 查询工具栏 (segments + 按钮) ── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-card);
+}
+
+/* ── Segments 分段选择器 ── */
+.segments {
+  display: flex;
+  gap: var(--space-2);
+  flex: 1;
+  overflow-x: auto;
+}
+
+.seg {
+  padding: 10rpx 28rpx;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-sub);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.seg:active {
+  background: var(--color-surface);
+}
+
+.seg-on {
+  background: var(--color-teal);
+  color: #fff;
+  font-weight: var(--weight-bold);
+  box-shadow: 0 2rpx 12rpx rgba(0,201,167,0.3);
+}
+
+.seg-on:active {
+  background: var(--color-teal-hover);
+}
+
+/* ── 查询按钮 ── */
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 10rpx 24rpx;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-teal);
+  border: 2rpx solid var(--color-teal);
+  border-radius: var(--radius-pill);
+  flex-shrink: 0;
+  margin-left: var(--space-4);
+  transition: all var(--transition-fast);
+}
+
+.filter-btn:active {
+  background: var(--color-teal-dim);
+}
+
+.filter-btn-arrow {
+  font-size: 16rpx;
+  transition: transform var(--transition-base);
+}
+
+.filter-btn-arrow-up {
+  transform: rotate(180deg);
+}
+
+/* ── 遮罩层 ── */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 98;
+  background: rgba(13, 27, 42, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-smooth);
+}
+
+.drawer-backdrop-show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── 筛选抽屉 · 从顶部滑出覆盖内容 ── */
+.filter-drawer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: var(--color-card);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-100%);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-drawer-open {
+  transform: translateY(0);
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-5);
+  border-bottom: 2rpx solid var(--color-border);
+}
+
+.filter-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-sub);
+  flex-shrink: 0;
+  width: 100rpx;
+}
+
+.filter-value {
+  flex: 1;
+  text-align: right;
+  font-size: var(--text-md);
+  color: var(--color-text-main);
+  padding: var(--space-3) var(--space-4);
+}
+
+.filter-placeholder {
+  color: var(--color-text-muted);
+}
+
+.filter-actions {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-5);
+}
+
+.filter-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.filter-reset {
+  background: var(--color-card);
+  color: var(--color-text-sub);
+  border: 2rpx solid var(--color-border);
+}
+
+.filter-reset:active {
+  background: var(--color-surface);
+}
+
+.filter-search {
+  background: var(--color-teal);
+  color: #fff;
+}
+
+.filter-search:active {
+  background: var(--color-teal-hover);
+}
+
 
 <#include "/$/tile.css.ftl">

@@ -24,3 +24,30 @@
     <#return "''">
   </#if>
 </#function>  
+
+<#--
+ ###############################################################################
+ ### 获取 URL 参数值 - 根据参数类型（urlParam.type）格式化并返回对应的 JS 值或变量
+ ### 
+ ### 逻辑与映射关系说明：
+ ### 1. 当存在参数值 (urlParam.value) 时：
+ ###    - 'VARIABLE' => 转换为安全 JS 变量名：js.nameVariable(value)
+ ###    - 'STRING'   => 转换为带单引号的字符串：'value'
+ ###    - 'NUMBER'   => 直接返回数值
+ ### 
+ ### 2. 当无参数值或不满足上述条件时（默认兜底）：
+ ###    - 使用参数名 (urlParam.name) 转换为安全 JS 变量名：js.nameVariable(name)
+ ###############################################################################
+ -->
+<#function get_param_value urlParam>
+  <#if urlParam.value??>
+    <#if urlParam.type?string == "VARIABLE">
+      <#return js.nameVariable(urlParam.value)>
+    <#elseif urlParam.type?string == "STRING">
+      <#return "'" + urlParam.value + "'">
+    <#elseif urlParam.type?string == "NUMBER">
+      <#return urlParam.value>
+    </#if>
+  </#if>
+  <#return js.nameVariable(urlParam.name)>
+</#function>

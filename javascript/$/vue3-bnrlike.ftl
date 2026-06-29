@@ -1,3 +1,4 @@
+<#import "/$/guidbase.ftl" as guidbase>
 <#include "vue3.ftl">
 <!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
@@ -44,6 +45,9 @@ ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div id="entry${js.nameType(form.id)}">
   <#list groups as group>
     <#local rows = form.rows(group, cols?number)>
+    <#if group?index != 0>
+${""?left_pad(indent)}  <div class="${namespace}-divider"></div>    
+    </#if>
 ${""?left_pad(indent)}  <div class="${namespace}-panel">
 ${""?left_pad(indent)}    <div class="${namespace}-panel-head">${group}</div>
 ${""?left_pad(indent)}    <div class="${namespace}-form ${namespace}-form--${cols}">
@@ -140,23 +144,28 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <#macro print_layout_display_form form indent=0>
   <#local cols = form.value("cols", "3")>
+${""?left_pad(indent)}<div id="${js.nameVariable(form.id)}">  
   <#list form.groups() as group>
-${""?left_pad(indent)}<div class="${namespace}-panel">
-${""?left_pad(indent)}  <div class="${namespace}-panel-head">${group}</div>
+    <#if group?index != 0>
+${""?left_pad(indent)}  <div class="${namespace}-divider"></div>    
+    </#if>
+${""?left_pad(indent)}  <div class="${namespace}-panel">
+${""?left_pad(indent)}    <div class="${namespace}-panel-head">${group}</div>
     <#local rows = form.rows(group, cols?number)>
     <#list rows as row>
-${""?left_pad(indent)}  <div class="${namespace}-fview ${namespace}-fview--${cols}">    
+${""?left_pad(indent)}    <div class="${namespace}-fview ${namespace}-fview--${cols}">    
       <#list row as input>
         <#local span = input.value("span","")>
-${""?left_pad(indent)}    <div class="${namespace}-fv<#if span != ""> ${namespace}-fv--span${span}</#if>">
-${""?left_pad(indent)}      <div class="${namespace}-fv-label">${input.title}</div>
-${""?left_pad(indent)}      <div class="${namespace}-fv-val ${namespace}-fv-val--mono">{{ ${js.nameVariable(form.id)}Data.${js.nameVariable(input.id)} }}</div>
-${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}      <div class="${namespace}-fv<#if span != ""> ${namespace}-fv--span${span}</#if>">
+${""?left_pad(indent)}        <div class="${namespace}-fv-label">${input.title}</div>
+${""?left_pad(indent)}        <div class="${namespace}-fv-val ${namespace}-fv-val--mono">{{ ${js.nameVariable(form.id)}Data.${js.nameVariable(input.id)} }}</div>
+${""?left_pad(indent)}      </div>
       </#list>
-${""?left_pad(indent)}  </div>      
+${""?left_pad(indent)}    </div>      
     </#list>
-${""?left_pad(indent)}</div>
+${""?left_pad(indent)}  </div>
   </#list>
+${""?left_pad(indent)}</div>  
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -204,16 +213,16 @@ ${""?left_pad(indent)}  <div class="${namespace}-panel-head">${widget.title!"这
 ${""?left_pad(indent)}</div>  
   <#elseif widget.type == "button">
     <#if widget.ancestor("paged_table")??>
-${""?left_pad(indent)}<button class="${namespace}-btn btn-sm ${namespace}-btn--${get_button_role(widget)} ${namespace}-btn-gap" @click="${get_button_method_name(widget)}">${widget.title}</button>    
+${""?left_pad(indent)}<button class="${namespace}-btn btn-sm ${namespace}-btn--${guidbase.get_button_variant(widget)} ${namespace}-btn-gap" @click="${guidbase.name_button_method(widget)}">${widget.title}</button>    
     <#else>
-${""?left_pad(indent)}<button class="${namespace}-btn ${namespace}-btn--${get_button_role(widget)} ${namespace}-btn-gap" @click="${get_button_method_name(widget)}">${widget.title}</button>
+${""?left_pad(indent)}<button class="${namespace}-btn ${namespace}-btn--${guidbase.get_button_variant(widget)} ${namespace}-btn-gap" @click="${guidbase.name_button_method(widget)}">${widget.title}</button>
     </#if>
   <#elseif widget.type == "longtext">
 ${""?left_pad(indent)}<textarea class="${namespace}-textarea" data-test="${js.nameVariable(widget.id)}" 
-${""?left_pad(indent)}          v-model="${get_input_model_name(widget)}" placeholder="${widget.value("placeholder",("请输入" + widget.title))}"></textarea>  
+${""?left_pad(indent)}          v-model="${guidbase.name_input_variable(widget)}" placeholder="${widget.value("placeholder",("请输入" + widget.title))}"></textarea>  
   <#elseif widget.type == "text">
 ${""?left_pad(indent)}<input class="${namespace}-input" data-test="${js.nameVariable(widget.id)}" 
-${""?left_pad(indent)}       v-model="${get_input_model_name(widget)}" 
+${""?left_pad(indent)}       v-model="${guidbase.name_input_variable(widget)}" 
     <#if (widget.value("readonly")!"") == "true">
 ${""?left_pad(indent)}       :class="{ '${namespace}-input--readonly': true }" :disabled="true">
     <#else>
@@ -224,7 +233,7 @@ ${""?left_pad(indent)}<span class="${namespace}-field-unit">${widget.value("unit
     </#if>
   <#elseif widget.type == "number">
 ${""?left_pad(indent)}<input class="${namespace}-input" data-test="${js.nameVariable(widget.id)}" 
-${""?left_pad(indent)}       v-model="${get_input_model_name(widget)}" 
+${""?left_pad(indent)}       v-model="${guidbase.name_input_variable(widget)}" 
     <#if (widget.value("readonly")!"") == "true">
 ${""?left_pad(indent)}       :class="{ '${namespace}-input--readonly': true }" :disabled="true">
     <#else>

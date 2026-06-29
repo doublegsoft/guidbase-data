@@ -27,10 +27,15 @@ Page({
   </#if>
 </#list>
 <#list page.widgets as widget>
-  <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
-  <#if guidbase.name_widget_method_load(widget) != "">
+  <#assign init = widget.value("init")>
+  <#if init == ""><#continue></#if>
+  <#assign url = valuebase.url(init)>
+    this.setData({
+  <#list url.params as param>
+      ${js.nameVariable(param.name)}: options.${guidbase4js.get_param_value(param)},
+  </#list>    
+    });
     this.${guidbase.name_widget_method_load(widget)}();
-  </#if>
 </#list>  
   },
 

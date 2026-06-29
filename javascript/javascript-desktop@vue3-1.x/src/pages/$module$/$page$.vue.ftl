@@ -8,7 +8,9 @@
 <#import "/$/guidbase4js.ftl" as guidbase4js>
 <#assign page = pageDef>
 <template>
-<@vue3.print_page_layout page=pageDef indent=2/>
+  <div class="${namespace}-page-body">
+<@vue3.print_page_layout page=pageDef indent=4 />
+  </div>
 </template>
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
