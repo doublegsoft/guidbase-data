@@ -51,6 +51,8 @@
 <#function name_widget_method_load widget>
   <#if widget.type == "list_view">
     <#return naming.nameVariable("load_" + widget.id + "_rows")>; 
+  <#elseif widget.type == "split_list">
+    <#return naming.nameVariable("load_" + widget.id + "_groups")>; 
   <#elseif widget.type == "paged_table">
     <#return naming.nameVariable("load_" + widget.id + "_rows")>; 
   <#elseif widget.type == "paged_grid">
@@ -139,25 +141,27 @@
   <#local action = valuebase.action(button.value("action"))>
   <#if action.method??>
     <#local method = action.method>
-    <#if method == "reset">
+    <#if method == "reset" || method == "clear">
       <#return "warning">
     <#elseif method == "save">
       <#return "primary">
     <#elseif method == "search">
-      <#return "success">  
+      <#return "primary">  
     <#elseif method == "edit">
-      <#return "success">
+      <#return "primary">
     <#elseif method == "open">
       <#return "success">  
     <#elseif method == "remove" || method == "delete">
-      <#return "danger">    
+      <#return "danger">
+    <#elseif method == "close" || method == "cancel">
+      <#return "warning">      
     </#if>
   <#elseif action.type.name() == "DRAWER">
     <#return "success">
   <#elseif action.type.name() == "DIALOG">
-    <#return "success">
+    <#return "primary">
   <#elseif action.type.name() == "OVERLAY">
-    <#return "success">    
+    <#return "primary">    
   <#elseif action.type.name() == "GOTO">
     <#return "default">  
   </#if>

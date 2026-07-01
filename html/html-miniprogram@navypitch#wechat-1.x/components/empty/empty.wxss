@@ -1,0 +1,101 @@
+/* ═══════════════════════════════════════════
+   df-empty · 空状态组件
+   垂直居中布局 · 图标 → 标题 → 描述 → 按钮
+   ═══════════════════════════════════════════ */
+
+.empty-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx var(--space-10) 80rpx;
+  box-sizing: border-box;
+}
+
+/* ── 图标 ── */
+.empty-icon {
+  margin-bottom: var(--space-8);
+  line-height: 1;
+}
+
+.empty-icon text {
+  font-size: 112rpx;
+  opacity: 0.45;
+}
+
+/* ── 标题 ── */
+.empty-title {
+  margin-bottom: var(--space-4);
+}
+
+.empty-title text {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-sub);
+  text-align: center;
+}
+
+/* ── 描述 ── */
+.empty-desc {
+  margin-bottom: var(--space-8);
+  padding: 0 var(--space-10);
+}
+
+.empty-desc text {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  line-height: 1.7;
+}
+
+/* ── 操作按钮 ── */
+.empty-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx 44rpx;
+  border-radius: var(--radius-pill);
+  transition: all var(--transition-fast);
+}
+
+.empty-action:active {
+  opacity: 0.82;
+  transform: scale(0.97);
+}
+
+.empty-action text {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+/* 按钮色彩变体 */
+.empty-action-teal {
+  background: var(--color-teal);
+  box-shadow: 0 4rpx 16rpx rgba(0,201,167,0.3);
+}
+.empty-action-teal text { color: #fff; }
+
+.empty-action-amber {
+  background: var(--color-amber);
+  box-shadow: 0 4rpx 16rpx rgba(245,166,35,0.3);
+}
+.empty-action-amber text { color: #fff; }
+
+.empty-action-red {
+  background: var(--color-red);
+  box-shadow: 0 4rpx 16rpx rgba(231,76,111,0.25);
+}
+.empty-action-red text { color: #fff; }
+
+.empty-action-blue {
+  background: var(--color-blue);
+  box-shadow: 0 4rpx 16rpx rgba(59,139,235,0.3);
+}
+.empty-action-blue text { color: #fff; }
+
+.empty-action-outline {
+  background: transparent;
+  border: 2rpx solid var(--color-teal);
+  box-shadow: none;
+}
+.empty-action-outline text { color: var(--color-teal); }

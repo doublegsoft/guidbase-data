@@ -1457,5 +1457,88 @@ page {
   background: var(--color-teal-hover);
 }
 
+.split {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  background: var(--color-card);
+}
+
+.split-col-group {
+  width: 160rpx;
+  flex-shrink: 0;
+  border-right: 2rpx solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.split-group-item {
+  padding: var(--space-6) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  position: relative;
+  border-left: 4rpx solid transparent;
+  transition: all 0.12s ease;
+}
+
+.split-group-item:active {
+  opacity: 0.8;
+}
+
+.split-group-item-active {
+  background: var(--color-card);
+  border-left-color: var(--color-teal);
+}
+
+.split-group-icon {
+  font-size: 40rpx;
+  line-height: 1;
+}
+
+.split-group-item-active .hb-group-icon {
+  /* keep icon visible */
+}
+
+.split-group-name {
+  font-size: var(--text-xs);
+  color: var(--color-text-sub);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.split-group-item-active .hb-group-name {
+  color: var(--color-teal-text);
+  font-weight: var(--weight-semibold);
+}
+
+.split-group-badge {
+  position: absolute;
+  top: 8rpx;
+  right: 10rpx;
+  background: var(--color-red);
+  color: #fff;
+  font-size: 18rpx;
+  font-weight: var(--weight-bold);
+  padding: 2rpx 8rpx;
+  border-radius: var(--radius-pill);
+  line-height: 1.4;
+}
+
+.split-col-tile {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-5) var(--space-5);
+}
+
+.split-tile-sec-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-main);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 2rpx solid var(--color-border);
+}
+
 
 <#include "/$/tile.css.ftl">

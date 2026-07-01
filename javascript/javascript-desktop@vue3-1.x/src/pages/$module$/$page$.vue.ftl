@@ -11,9 +11,23 @@
   <div class="${namespace}-page-body">
 <@vue3.print_page_layout page=pageDef indent=4 />
   </div>
+<#-- drawers and dialogs -->  
+<#list page.widgets as button>
+  <#if button.type != "button"><#continue></#if>
+  <#assign action = valuebase.action(button.value("action"))>
+  <#if action.type.name() == "DRAWER">
+  <${namespace}-drawer v-model="${js.nameVariable(action.resource)}Open">
+    <${namespace}-${js.nameFile(action.resource)} />
+  </${namespace}-drawer>
+    <#elseif action.type.name() == "DIALOG">
+  <${namespace}-dialog v-model="${js.nameVariable(action.resource)}Open" size="lg">
+    <${namespace}-${js.nameFile(action.resource)} />
+  </${namespace}-dialog>
+  </#if>
+</#list>
 </template>
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, inject, onMounted, onUnmounted } from 'vue'
 <@vue3.print_page_imports page=pageDef />
 import sdk from '@/sdk/sdk.js'
 import { useFeedback } from '@/composables/useFeedback.js'
@@ -21,7 +35,14 @@ import { useFeedback } from '@/composables/useFeedback.js'
 // 数据加载状态，每页都必须有
 const fb = useFeedback()
 const isLoading = ref(true)
-
+const props = defineProps({
+<#if page.value("data") != "">
+  <#assign url = valuebase.url(page.value("data"))>
+  <#list url.params as param>
+  ${js.nameVariable(param.name)}: null,
+  </#list>  
+</#if>
+})
 <@vue3.print_page_variables page=pageDef />
 <@vue3.print_page_methods page=pageDef />
 
@@ -35,7 +56,7 @@ onMounted(async () => {
   ${js.nameVariable(widget.id)}Options.value = await sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}AsOptions();
     </#if>
   <#elseif widget.type == "entry_form" || widget.type == "display_form">
-  load${js.nameType(widget.id)}Data();
+  load${js.nameType(widget.id)}Data(props);
   <#elseif widget.type == "excel_form" || widget.type == "list_view">
   load${js.nameType(widget.id)}Rows();
   <#elseif widget.type == "chart">

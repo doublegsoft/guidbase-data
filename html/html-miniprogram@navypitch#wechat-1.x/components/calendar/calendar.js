@@ -61,7 +61,13 @@ Component({
   properties: {
     events: { type: Array, value: [], observer: '_onEv' },
     defaultView: { type: String, value: 'week' },
-    value: { type: String, value: '', observer: '_onVal' }
+    value: { type: String, value: '', observer: '_onVal' },
+    /**
+     * 周视图每个日期下方自定义内容
+     * 格式: { "2026-06-30": [{ text: "3场", color: "teal" }], ... }
+     * color 可选: teal | amber | red | blue | purple
+     */
+    weekDayExtras: { type: Object, value: {} }
   },
   data: {
     view: 'week',

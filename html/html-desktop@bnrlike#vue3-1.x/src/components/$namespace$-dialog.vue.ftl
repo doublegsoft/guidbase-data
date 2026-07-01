@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { watch } from 'vue'
+import { watch, provide } from 'vue'
 
 const props = defineProps({
   modelValue:   { type: Boolean, default: false },
@@ -41,6 +41,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'close', 'open'])
+
+provide('dialogClose', close)
 
 function close() {
   emit('update:modelValue', false)

@@ -786,6 +786,17 @@ html, body {
   flex-shrink: 0;
 }
 
+.${namespace}-dialog-body > .${namespace}-page-body,
+.${namespace}-drawer-body > .${namespace}-page-body {
+  min-height: 100%;
+  overflow-y: visible;        /* 滚动由外层 dialog-body 处理 */
+}
+
+.${namespace}-dialog-body .${namespace}-form-footer,
+.${namespace}-drawer-body .${namespace}-form-footer {
+  margin-top: auto;
+}
+
 /* ══════════════════════════════════════════════
    11. Buttons
    ══════════════════════════════════════════════ */
@@ -1536,6 +1547,17 @@ html, body {
 
 .tile-header {
   justify-content: space-between;
+}
+
+.tile-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--tile-border, #eee);
 }
 
 .tile-body {

@@ -226,19 +226,44 @@ ${""?left_pad(indent)}</view>
 </#macro>
 
 <!----------------------------------------------------------------------------->
+<!--                               SPLIT LIST                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_layout_split_list list indent=0>
+${""?left_pad(indent)}<view class="split">
+${""?left_pad(indent)}  <scroll-view class="split-col-group" scroll-y enhanced show-scrollbar="{{ false }}">
+${""?left_pad(indent)}    <view wx:for="{{ ${js.nameVariable(list.id)}Groups }}" wx:key="id"
+${""?left_pad(indent)}      class="split-group-item {{ activeDept === item.id ? 'split-group-item-active' : '' }}"
+${""?left_pad(indent)}      data-id="{{ item.id }}"
+${""?left_pad(indent)}      bindtap="handle${js.nameType(list.id)}GroupTap">
+${""?left_pad(indent)}      <view class="split-group-badge" wx:if="{{ item.badge }}">{{ item.badge }}</view>
+${""?left_pad(indent)}      <text class="split-group-name">{{ item.name }}</text>
+${""?left_pad(indent)}    </view>
+${""?left_pad(indent)}  </scroll-view>
+${""?left_pad(indent)}  <scroll-view class="split-col-tile" scroll-y enhanced show-scrollbar="{{ false }}">
+${""?left_pad(indent)}    <view class="split-tile-sec-title">{{ activeDeptName }} · 共 {{ activeDoctors.length }} 位医生</view>
+${""?left_pad(indent)}    <block wx:for="{{ ${js.nameVariable(list.id)}Rows }}" wx:key="name" wx:for-index="di">
+<@tile.print_tile_layout widget=list indent=6 />
+${""?left_pad(indent)}    </block>
+${""?left_pad(indent)}    <${namespace}-empty wx:if="{{ ${js.nameVariable(list.id)}RowsEmpty }}" />
+${""?left_pad(indent)}  </scroll-view>
+${""?left_pad(indent)}</view>
+</#macro>
+
+<!----------------------------------------------------------------------------->
 <!--                                LIST VIEW                                -->
 <!----------------------------------------------------------------------------->
 <#macro print_layout_list_view list indent=0>
   <#local url = valuebase.url(list.value("data"))>
 ${""?left_pad(indent)}<view class="card">
 ${""?left_pad(indent)}  <view class="card-body">
-${""?left_pad(indent)}    <scroll-view wx:if="{{ ${js.nameVariable(list.id)}Has${js.nameType(inflector.pluralize(url.resource))} }}" 
+${""?left_pad(indent)}    <scroll-view wx:if="{{ !${js.nameVariable(list.id)}RowsEmpty }}" 
 ${""?left_pad(indent)}                 scroll-y enhanced show-scrollbar="{{ false }}" class="card-body-flush">
-${""?left_pad(indent)}      <view wx:for="{{ ${js.nameVariable(list.id)}${js.nameType(inflector.pluralize(url.resource))} }}"
+${""?left_pad(indent)}      <view wx:for="{{ ${js.nameVariable(list.id)}Rows }}"
 ${""?left_pad(indent)}            wx:for-item="row" class="mt-8">
 <@tile.print_tile_layout widget=list indent=8 />
 ${""?left_pad(indent)}      </view>
 ${""?left_pad(indent)}    </scroll-view>
+${""?left_pad(indent)}    <${namespace}-empty wx:if="{{ ${js.nameVariable(list.id)}RowsEmpty }}" />
 ${""?left_pad(indent)}  </view>
 ${""?left_pad(indent)}</view>
 </#macro>

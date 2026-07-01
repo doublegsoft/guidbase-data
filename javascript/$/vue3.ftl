@@ -61,10 +61,10 @@ const ${js.nameVariable(form.id)}ErrorMessage = ref('')
 /**
  * 加载【${form.title!""}】编辑表单数据的界面函数
  */
-const load${js.nameType(form.id)}Data = async () => {
+const load${js.nameType(form.id)}Data = async (params) => {
   isLoading.value = true
   try {
-    const data = await sdk.fetch${js.nameType(objname)}()
+    const data = await sdk.fetch${js.nameType(objname)}(params)
     Object.assign(${js.nameVariable(form.id)}Data, data)
   } catch (error) {
     fb.error('发生错误', error)
@@ -345,7 +345,7 @@ ${""?left_pad(indent)}}])
 </#macro>
 
 <#macro print_fixed_table_methods table indent=0>
-  <#local objname = table.value("object",table.id)>
+  <#local url = valuebase.url(table.value("data"))>
 
 /**
  * 加载数据的界面函数
@@ -353,7 +353,7 @@ ${""?left_pad(indent)}}])
 const load${js.nameType(table.id)}Rows = async (params, pageNumber, pageSize) => {
   isLoading.value = true
   try {
-    const res = await sdk.fetch${js.nameType(inflector.pluralize(objname))}(params, (pageNumber - 1) * pageSize, pageSize)
+    const res = await sdk.fetch${js.nameType(inflector.pluralize(url.resource))}(params, (pageNumber - 1) * pageSize, pageSize)
     return res
   } catch (error) {
     fb.error('发生错误', error)
@@ -387,7 +387,7 @@ ${""?left_pad(indent)}const ${js.nameVariable(grid.id)}Ref = ref(null)
 </#macro>
 
 <#macro print_paged_grid_methods grid indent=0>
-  <#local objname = grid.value("object",grid.id)>
+  <#local url = valuebase.url(grid.value("data"))>
 
 /**
  * 加载数据的界面函数
@@ -395,7 +395,7 @@ ${""?left_pad(indent)}const ${js.nameVariable(grid.id)}Ref = ref(null)
 const load${js.nameType(grid.id)}Rows = async (params, pageNumber, pageSize) => {
   isLoading.value = true
   try {
-    const res = await sdk.fetch${js.nameType(inflector.pluralize(objname))}(params, (pageNumber - 1) * pageSize, pageSize)
+    const res = await sdk.fetch${js.nameType(inflector.pluralize(url.resource))}(params, (pageNumber - 1) * pageSize, pageSize)
     return res;
   } catch (error) {
     fb.error('发生错误', error)
@@ -413,8 +413,16 @@ ${""?left_pad(indent)}  id-key="${js.nameVariable(grid.value("object","object"))
 ${""?left_pad(indent)}  :fetch-data="load${js.nameType(grid.id)}Rows"
 ${""?left_pad(indent)}  :fetch-params="${js.nameVariable(grid.value("object", grid.id))}Crit">
 ${""?left_pad(indent)}  <template #default="{ row, index }">
-${""?left_pad(indent)}    <div :key="row.id || idx">
-<@print_tile_layout widget=list indent=indent+6 />
+${""?left_pad(indent)}    <div :key="row.id || idx" style="display: flex; flex-direction: column; height: 100%;">
+<@print_tile_layout widget=grid indent=indent+6 />
+  <#if grid.has("buttons")>
+    <#local buttons = grid.byType("buttons")[0]>
+${""?left_pad(indent)}      <div class="tile-actions">
+      <#list buttons.children as button>
+${""?left_pad(indent)}        <button class="pg-btn pg-btn--${guidbase.get_button_variant(button)} pg-btn--sm" @click.stop="${guidbase.name_button_method(button)}(row)">${button.title}</button>
+      </#list>
+${""?left_pad(indent)}      </div>
+  </#if>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </template>
 ${""?left_pad(indent)}</${namespace}-pagedgrid>
@@ -451,6 +459,50 @@ const load${js.nameType(grid.id)}Rows = async (params, pageNumber, pageSize) => 
 </#macro>
 
 <!----------------------------------------------------------------------------->
+<!--                               SPLIT LIST                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_split_list_variables list indent=0>
+
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * ${js.nameVariable(list.id)}【分栏列表】相关变量
+${""?left_pad(indent)} */
+${""?left_pad(indent)}const ${js.nameVariable(list.id)}Groups = ref([])
+${""?left_pad(indent)}const ${js.nameVariable(list.id)}Rows = ref([])
+</#macro>
+
+<#macro print_split_list_methods list indent=0>
+  <#local urlGroup = valuebase.url(list.value("group"))>
+  <#local urlData = valuebase.url(list.value("data"))>
+
+/**
+ * 加载数据的界面函数
+ */
+const load${js.nameType(list.id)}Groups = async (params, pageNumber, pageSize) => {
+  isLoading.value = true
+  try {
+    const res = await sdk.fetch${js.nameType(inflector.pluralize(urlGroup.resource))}(params, 0, -1)
+    ${js.nameVariable(list.id)}Groups.value = res.data;
+  } catch (error) {
+    fb.error('发生错误', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const load${js.nameType(list.id)}Rows = async (params, pageNumber, pageSize) => {
+  isLoading.value = true
+  try {
+    const res = await sdk.fetch${js.nameType(inflector.pluralize(urlData.resource))}(params, 0, -1)
+    ${js.nameVariable(list.id)}Rows.value = res.data;
+  } catch (error) {
+    fb.error('发生错误', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+</#macro>
+
+<!----------------------------------------------------------------------------->
 <!--                                LIST VIEW                                -->
 <!----------------------------------------------------------------------------->
 <#macro print_list_view_variables list indent=0>
@@ -462,7 +514,7 @@ ${""?left_pad(indent)}const ${js.nameVariable(list.id)}Rows = ref([])
 </#macro>
 
 <#macro print_list_view_methods list indent=0>
-  <#local objname = list.value("object",list.id)>
+  <#local url = valuebase.url(list.value("data"))>
 
 /**
  * 加载数据的界面函数
@@ -470,7 +522,7 @@ ${""?left_pad(indent)}const ${js.nameVariable(list.id)}Rows = ref([])
 const load${js.nameType(list.id)}Rows = async (params, pageNumber, pageSize) => {
   isLoading.value = true
   try {
-    const res = await sdk.fetch${js.nameType(inflector.pluralize(objname))}(params, 0, -1)
+    const res = await sdk.fetch${js.nameType(inflector.pluralize(url.resource))}(params, 0, -1)
     ${js.nameVariable(list.id)}Rows.value = res.data;
   } catch (error) {
     fb.error('发生错误', error)
@@ -524,13 +576,34 @@ ${""?left_pad(indent)}<${namespace}-chart :option="${js.nameVariable(chart.id)}C
 <!----------------------------------------------------------------------------->
 <!--                                  BUTTON                                 -->
 <!----------------------------------------------------------------------------->
+<#macro print_button_variables button indent=0>
+  <#local action = valuebase.action(button.value("action"))>
+  <#local method = action.method!"">
+  <#if method == "close">
+${""?left_pad(indent)}// 关闭按钮需要注入dialogClose函数  
+${""?left_pad(indent)}const dialogClose = inject('dialogClose', () => {})
+  </#if>
+</#macro>
+
 <#macro print_button_methods button indent=0>
   <#local action = valuebase.action(button.value("action"))>
   <#local method = action.method!"">
   <#if method == "save"><#return></#if>
-  <#local widget = guidbase.get_action_widget(button)>
-  <#if button.ancestor("paged_table")??>
+  <#-- 集合部件和非集合部件的按钮方法头 -->
+  <#if button.ancestor("paged_table")?? || button.ancestor("paged_grid")??>
 const ${guidbase.name_button_method(button)} = async (row) => {    
+  <#else>
+const ${guidbase.name_button_method(button)} = async () => {      
+  </#if>
+  <#if method == "close">
+  dialogClose()
+  </#if>
+  <#if !guidbase.get_action_widget(button)??>
+    <#if action.type.name() == "DIALOG" || action.type.name() == "DRAWER">
+  ${js.nameVariable(action.resource)}Open.value = true    
+    </#if>
+  <#else>
+    <#local widget = guidbase.get_action_widget(button)>
     <#if widget.type == "dialog"><#-- 编辑 -->
   ${js.nameVariable(widget.id)}Open.value = true  
     <#elseif widget.type == "drawer"><#-- 查看 -->
@@ -538,10 +611,7 @@ const ${guidbase.name_button_method(button)} = async (row) => {
     <#elseif method == "delete" || method == "remove"><#-- 删除 -->
   const ok = await fb.confirm('询问', '确定要删除该条数据？')
   if (!ok) return;  
-    </#if>
-  <#else>
-const ${guidbase.name_button_method(button)} = async () => {    
-    <#if method == "reset"><#-- 重置 -->
+    <#elseif method == "reset"><#-- 重置 -->
       <#if widget.type == "entry_form">
   const ok = await fb.confirm('询问', '确定要清空表单数据？')
   if (!ok) return; 
@@ -560,11 +630,7 @@ const ${guidbase.name_button_method(button)} = async () => {
     <#elseif method == "view"><#-- 新增 -->
   ${js.nameVariable(widget.id)}Open.value = true  
     <#elseif method == "close"><#-- 关闭 -->
-      <#if button.container.type == "entry_form">
-  ${js.nameVariable(button.container.id)}Open.value = false
-      <#elseif button.container.type == "display_form">
-  ${js.nameVariable(button.container.id)}Open.value = false
-      </#if>
+  dialogClose()   
     </#if>
   </#if>
 }
@@ -601,11 +667,7 @@ import { useFieldValidation } from '@/composables/useFieldValidation'
   </#list>  
   <#list page.widgets as widget>
     <#if visited_types[widget.type]??><#continue></#if>
-    <#if widget.type == "drawer">
-import ${js.nameType(namespace)}Drawer from '@/components/${namespace}-drawer.vue' 
-    <#elseif widget.type == "dialog">
-import ${js.nameType(namespace)}Dialog from '@/components/${namespace}-dialog.vue' 
-    <#elseif widget.type == "excel_form">
+    <#if widget.type == "excel_form">
 import ${js.nameType(namespace)}Excelform from '@/components/${namespace}-excelform.vue'
     <#elseif widget.type == "paged_table">
 import ${js.nameType(namespace)}Pagedtable from '@/components/${namespace}-pagedtable.vue'
@@ -641,20 +703,33 @@ import ${js.nameType(namespace)}Videoupload from '@/components/${namespace}-vide
     </#if>
     <#local visited_types += {widget.type: widget} />
   </#list>
+  <#local drawerImported = false>
+  <#local dialogImported = false>
+  <#-- drawer and dialog -->
   <#list page.widgets as widget>
-    <#if (widget.type == "drawer" || widget.type == "dialog") && widget.value("page","") != "">
-import ${js.nameType(widget.value("page"))} from '@/pages/${js.nameFile(widget.value("page"))}.vue'     
+    <#if widget.value("action") == ""><#continue></#if>
+    <#local action = valuebase.action(widget.value("action"))>
+    <#if action.type.name() == "DRAWER" && !drawerImported>
+      <#local drawerImported = true>
+import ${js.nameType(namespace)}Drawer from '@/components/${namespace}-drawer.vue'  
+      <#local dialogImported = true>
+    <#elseif action.type.name() == "DIALOG" && !dialogImported>   
+import ${js.nameType(namespace)}Dialog from '@/components/${namespace}-dialog.vue'       
+    </#if>
+  </#list>
+  <#-- pages -->
+  <#list page.widgets as widget>
+    <#if widget.value("action") == ""><#continue></#if>
+    <#local action = valuebase.action(widget.value("action"))>
+    <#if action.type.name() == "DRAWER" || action.type.name() == "DIALOG">
+import ${js.nameType(namespace + "_" + action.resource)} from '@/pages/${js.nameFile(action.path)}.vue'      
     </#if>
   </#list>
 </#macro>
 
 <#macro print_page_variables page indent=0>
   <#list page.widgets as widget>
-    <#if widget.type == 'drawer'>
-${""?left_pad(indent)}const ${java.nameVariable(widget.id)}Open = ref(false)        
-    <#elseif widget.type == 'dialog'>
-${""?left_pad(indent)}const ${java.nameVariable(widget.id)}Open = ref(false)    
-    <#elseif widget.type == 'tabs'>
+    <#if widget.type == 'tabs'>
 <@print_tabs_variables tabs=widget indent=indent />
     <#elseif widget.type == 'entry_form'>
 <@print_entry_form_variables form=widget indent=indent />
@@ -678,6 +753,15 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}Open = ref(false)
 <@print_list_view_variables list=widget indent=indent />
     <#elseif widget.type == "chart">
 <@print_chart_variables chart=widget indent=indent />
+    <#elseif widget.type == "button">
+<@print_button_variables button=widget indent=indent />
+    </#if>
+  </#list>
+  <#list page.widgets as widget>
+    <#if widget.value("action") == ""><#continue></#if>
+    <#local action = valuebase.action(widget.value("action"))>
+    <#if action.type.name() == "DRAWER" || action.type.name() == "DIALOG">
+${""?left_pad(indent)}const ${js.nameVariable(action.resource)}Open = ref(false) 
     </#if>
   </#list>
 </#macro>

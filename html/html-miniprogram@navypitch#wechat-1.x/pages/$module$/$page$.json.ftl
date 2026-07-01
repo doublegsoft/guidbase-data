@@ -4,6 +4,7 @@
   "navigationBarTextStyle": "white",
   "enablePullDownRefresh": false,
   "usingComponents": {
-    "${namespace}-calendar": "/components/calendar/calendar"
+    "${namespace}-calendar": "/components/calendar/calendar",
+    "${namespace}-empty": "/components/empty/empty"
   }
 }

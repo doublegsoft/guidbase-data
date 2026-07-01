@@ -7,7 +7,11 @@
   var cnt = function(m,d){ var e=get(m,d); return e?e.length:0; };
   var take = function(m,d,n){ var e=get(m,d); return e&&e.length?e.slice(0,n):[]; };
   var clr = function(e){ return e.color||'var(--color-amber)'; };
-  module.exports = { get:get, cnt:cnt, take:take, clr:clr };
+  // 周视图日期下方自定义内容
+  var hasExtra = function(extras,d){ return extras&&extras[d]?(extras[d].length||0)>0:false; };
+  var getExtras = function(extras,d){ return extras&&extras[d]?extras[d]:[]; };
+  var extraClr = function(item){ return item.color||'teal'; };
+  module.exports = { get:get, cnt:cnt, take:take, clr:clr, hasExtra:hasExtra, getExtras:getExtras, extraClr:extraClr };
 </wxs>
 
 <view class="cal">
@@ -68,6 +72,13 @@
             class="cal-dot" style="background:{{ u.clr(ev) }};"></view>
         </view>
         <view wx:else class="cal-wd-spacer"></view>
+        <!-- 自定义内容区（由 weekDayExtras 属性注入） -->
+        <view class="cal-wd-extras" wx:if="{{ u.hasExtra(weekDayExtras, item.date) }}">
+          <view wx:for="{{ u.getExtras(weekDayExtras, item.date) }}" wx:key="text" wx:for-item="ex"
+            class="cal-wd-extra-tag cal-wd-extra-{{ u.extraClr(ex) }}">
+            <text>{{ ex.text }}</text>
+          </view>
+        </view>
       </view>
     </view>
   </view>

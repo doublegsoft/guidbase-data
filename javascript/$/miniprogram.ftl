@@ -1,5 +1,4 @@
 <#include "tile-miniprogram.ftl">
-<#include "util.ftl">
 
 <!----------------------------------------------------------------------------->
 <!--                                  INPUT                                  -->
@@ -275,16 +274,104 @@ ${""?left_pad(indent)}},
 </#macro>
 
 <!----------------------------------------------------------------------------->
+<!--                               SPLIT LIST                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_split_list_variables list indent=0>
+${""?left_pad(indent)}
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * 【${js.nameVariable(list.id)}】【${list.title!""}】【分栏列表】相关变量
+${""?left_pad(indent)} */
+${""?left_pad(indent)}${js.nameVariable(list.id)}GroupsEmtpy: true,
+${""?left_pad(indent)}${js.nameVariable(list.id)}Groups: [],
+${""?left_pad(indent)}${js.nameVariable(list.id)}RowsEmpty: true,
+${""?left_pad(indent)}${js.nameVariable(list.id)}Rows: [],
+</#macro>
+
+<#macro print_split_list_methods list indent=0>
+  <#local urlGroup = valuebase.url(list.value("group"))>
+  <#local urlData = valuebase.url(list.value("data"))>
+${""?left_pad(indent)}
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * 加载【${list.title!""}】列表视图数据的界面函数
+${""?left_pad(indent)} */
+${""?left_pad(indent)}load${js.nameType(list.id)}Groups: async function () {
+${""?left_pad(indent)}  try {
+${""?left_pad(indent)}    const page = await sdk.fetch${js.nameType(inflector.pluralize(urlGroup.resource))}({
+  <#list urlGroup.params as urlParam>
+    <#if urlParam.type?string == "OBJECT">
+      <#local form = list.page.byVar("{" + urlParam.name + "}")>
+      <#list form.inputs as input>
+${""?left_pad(indent)}      ${js.nameVariable(input.id)}: this.data.${js.nameVariable(input.id)},
+      </#list>
+    <#else>
+${""?left_pad(indent)}      ${js.nameVariable(urlParam.name)}: this.data.${js.nameVariable(urlParam.value)},
+    </#if>
+  </#list>
+${""?left_pad(indent)}    });
+${""?left_pad(indent)}    const rows = page.data;
+${""?left_pad(indent)}    this.setData({
+${""?left_pad(indent)}      ${js.nameVariable(list.id)}Groups: rows,
+${""?left_pad(indent)}      ${js.nameVariable(list.id)}GroupsEmpty: rows.length == 0,
+${""?left_pad(indent)}    })
+${""?left_pad(indent)}  } catch (error) {
+${""?left_pad(indent)}    fb.error('发生错误', error.message || String(error))
+${""?left_pad(indent)}  } finally {
+${""?left_pad(indent)}    
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}},
+${""?left_pad(indent)}
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * 加载【${list.title!""}】列表视图数据的界面函数
+${""?left_pad(indent)} */
+${""?left_pad(indent)}load${js.nameType(list.id)}Rows: async function () {
+${""?left_pad(indent)}  try {
+${""?left_pad(indent)}    const page = await sdk.fetch${js.nameType(inflector.pluralize(urlData.resource))}({
+  <#list urlData.params as urlParam>
+    <#if urlParam.type?string == "OBJECT">
+      <#local form = list.page.byVar("{" + urlParam.name + "}")>
+      <#list form.inputs as input>
+${""?left_pad(indent)}      ${js.nameVariable(input.id)}: this.data.${js.nameVariable(input.id)},
+      </#list>
+    <#else>
+${""?left_pad(indent)}      ${js.nameVariable(urlParam.name)}: this.data.${js.nameVariable(urlParam.value)},
+    </#if>
+  </#list>
+${""?left_pad(indent)}    });
+${""?left_pad(indent)}    const rows = page.data;
+${""?left_pad(indent)}    this.setData({
+${""?left_pad(indent)}      ${js.nameVariable(list.id)}Rows: rows,
+${""?left_pad(indent)}      ${js.nameVariable(list.id)}RowsEmpty: rows.length == 0,
+${""?left_pad(indent)}    })
+${""?left_pad(indent)}  } catch (error) {
+${""?left_pad(indent)}    fb.error('发生错误', error.message || String(error))
+${""?left_pad(indent)}  } finally {
+${""?left_pad(indent)}    
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}},
+  <#if list.value("page") != "">
+    <#assign page = list.value("page")>
+${""?left_pad(indent)}
+${""?left_pad(indent)}handle${js.nameType(list.id)}RowTap: async function (event) {
+    <#if page?starts_with("$")>
+${""?left_pad(indent)}  wx.navigateTo({
+${""?left_pad(indent)}    url: '/pages/${page?substring(1)}?',
+${""?left_pad(indent)}  });
+    </#if>
+${""?left_pad(indent)}},  
+  </#if>
+</#macro>
+
+<!----------------------------------------------------------------------------->
 <!--                                LIST VIEW                                -->
 <!----------------------------------------------------------------------------->
 <#macro print_list_view_variables list indent=0>
   <#local url = valuebase.url(list.value("data"))>
 ${""?left_pad(indent)}
 ${""?left_pad(indent)}/**
-${""?left_pad(indent)} * ${js.nameVariable(list.id)} 【${list.title!""}】列表视图相关变量
+${""?left_pad(indent)} * 【${js.nameVariable(list.id)}】【${list.title!""}】列表视图相关变量
 ${""?left_pad(indent)} */
-${""?left_pad(indent)}${js.nameVariable(list.id)}Has${js.nameType(inflector.pluralize(url.resource))}: false,
-${""?left_pad(indent)}${js.nameVariable(list.id)}${js.nameType(inflector.pluralize(url.resource))}: [],
+${""?left_pad(indent)}${js.nameVariable(list.id)}RowsEmpty: true,
+${""?left_pad(indent)}${js.nameVariable(list.id)}Rows: [],
 </#macro>
 
 <#macro print_list_view_methods list indent=0>
@@ -299,9 +386,9 @@ ${""?left_pad(indent)}    const page = await sdk.fetch${js.nameType(inflector.pl
   <#list url.params as urlParam>
     <#if urlParam.type?string == "OBJECT">
       <#local form = list.page.byVar("{" + urlParam.name + "}")>
-        <#list form.inputs as input>
+      <#list form.inputs as input>
 ${""?left_pad(indent)}      ${js.nameVariable(input.id)}: this.data.${js.nameVariable(input.id)},
-        </#list>
+      </#list>
     <#else>
 ${""?left_pad(indent)}      ${js.nameVariable(urlParam.name)}: this.data.${js.nameVariable(urlParam.value)},
     </#if>
@@ -309,8 +396,8 @@ ${""?left_pad(indent)}      ${js.nameVariable(urlParam.name)}: this.data.${js.na
 ${""?left_pad(indent)}    });
 ${""?left_pad(indent)}    const rows = page.data;
 ${""?left_pad(indent)}    this.setData({
-${""?left_pad(indent)}      ${js.nameVariable(list.id)}${js.nameType(inflector.pluralize(url.resource))}: rows,
-${""?left_pad(indent)}      ${js.nameVariable(list.id)}Has${js.nameType(inflector.pluralize(url.resource))}: rows.length > 0,
+${""?left_pad(indent)}      ${js.nameVariable(list.id)}Rows: rows,
+${""?left_pad(indent)}      ${js.nameVariable(list.id)}RowsEmpty: rows.length == 0,
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  } catch (error) {
 ${""?left_pad(indent)}    fb.error('发生错误', error.message || String(error))
@@ -443,6 +530,8 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(fals
 <@print_time_grid_variables grid=widget indent=indent />
     <#elseif widget.type == 'list_view'>
 <@print_list_view_variables list=widget indent=indent />
+    <#elseif widget.type == 'split_list'>
+<@print_split_list_variables list=widget indent=indent />
     <#elseif widget.type == 'segment'>
 <@print_segment_variables segment=widget indent=indent />
     <#elseif widget.type == 'calendar'>
@@ -475,6 +564,8 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(fals
 <@print_time_grid_methods grid=widget indent=indent />
     <#elseif widget.type == 'list_view'>
 <@print_list_view_methods list=widget indent=indent />
+    <#elseif widget.type == 'split_list'>
+<@print_split_list_methods list=widget indent=indent />
     <#elseif widget.type == 'segment'>
 <@print_segment_methods segment=widget indent=indent />
     <#elseif widget.type == 'calendar'>
@@ -518,6 +609,8 @@ ${""?left_pad(indent)}}
 <@print_layout_criteria_form form=widget indent=indent />
   <#elseif widget.type == "list_view">
 <@print_layout_list_view list=widget indent=indent />
+  <#elseif widget.type == "split_list">
+<@print_layout_split_list list=widget indent=indent />
   <#elseif widget.type == "segment">
 <@print_layout_segment segment=widget indent=indent />
   <#elseif widget.type == "buttons">

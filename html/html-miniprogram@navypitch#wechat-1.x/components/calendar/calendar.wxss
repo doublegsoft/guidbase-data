@@ -226,6 +226,34 @@
   margin-top: var(--space-3);
 }
 
+/* ── 周视图自定义内容区 ── */
+.cal-wd-extras {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4rpx;
+  margin-top: 6rpx;
+  padding: 0 2rpx;
+}
+
+.cal-wd-extra-tag {
+  display: flex;
+  align-items: center;
+  padding: 2rpx 10rpx;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+/* 色彩变体 */
+.cal-wd-extra-teal  { background: var(--color-teal-dim);  color: var(--color-teal-text);  }
+.cal-wd-extra-amber { background: var(--color-amber-dim); color: var(--color-amber-text); }
+.cal-wd-extra-red   { background: var(--color-red-dim);   color: var(--color-red-text);   }
+.cal-wd-extra-blue  { background: var(--color-blue-dim);  color: var(--color-blue-text);  }
+.cal-wd-extra-purple{ background: var(--color-purple-dim);color: var(--color-purple-text);}
+
 /* ── 通用圆点 ── */
 .cal-dot {
   width: 10rpx;
