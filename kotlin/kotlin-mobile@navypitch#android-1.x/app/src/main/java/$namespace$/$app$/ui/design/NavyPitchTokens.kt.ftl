@@ -70,6 +70,11 @@ object NavyPitchColor {
 
   // Misc
   val White = Color(0xFFFFFFFF)
+
+  // Legacy palette (migrated from ui/theme/Color.kt)
+  val Navy800 = Color(0xFF1B2838)
+  val Teal500 = Color(0xFF4ECDC4)
+  val Gray500 = Color(0xFFADB5BD)
 }
 
 // ── 2. TYPOGRAPHY ─────────────────────────────────────────────────────
@@ -93,11 +98,11 @@ object NavyPitchType {
   val Base = FontFamily.Default
 
   // Pre-built text styles for common uses
-  val pageTitle = TextStyle(fontSize = Text4xl, fontWeight = Bold, color = NpColor.TextMain)
-  val sectionTitle = TextStyle(fontSize = TextMd, fontWeight = SemiBold, color = NpColor.TextMain)
-  val bodyText = TextStyle(fontSize = TextBase, fontWeight = Normal, color = NpColor.TextMain)
-  val caption = TextStyle(fontSize = TextXs, fontWeight = Normal, color = NpColor.TextSub)
-  val muted = TextStyle(fontSize = TextXs, fontWeight = Normal, color = NpColor.TextMuted)
+  val pageTitle = TextStyle(fontSize = Text4xl, fontWeight = Bold, color = NavyPitchColor.TextMain)
+  val sectionTitle = TextStyle(fontSize = TextMd, fontWeight = SemiBold, color = NavyPitchColor.TextMain)
+  val bodyText = TextStyle(fontSize = TextBase, fontWeight = Normal, color = NavyPitchColor.TextMain)
+  val caption = TextStyle(fontSize = TextXs, fontWeight = Normal, color = NavyPitchColor.TextSub)
+  val muted = TextStyle(fontSize = TextXs, fontWeight = Normal, color = NavyPitchColor.TextMuted)
 }
 
 // ── 3. SPACING SCALE ───────────────────────────────────────────────────
@@ -129,8 +134,8 @@ object NavyPitchRadius {
 // ── 5. SHADOWS ────────────────────────────────────────────────────────
 
 object NavyPitchShadow {
-  val Sm = Shadow(color = NpColor.ShadowLight, offset = androidx.compose.ui.geometry.Offset(0f, 2f), blurRadius = 16f)
-  val Md = Shadow(color = NpColor.ShadowMid,   offset = androidx.compose.ui.geometry.Offset(0f, 4f), blurRadius = 24f)
+  val Sm = Shadow(color = NavyPitchColor.ShadowLight, offset = androidx.compose.ui.geometry.Offset(0f, 2f), blurRadius = 16f)
+  val Md = Shadow(color = NavyPitchColor.ShadowMid,   offset = androidx.compose.ui.geometry.Offset(0f, 4f), blurRadius = 24f)
 }
 
 // ── 6. MOTION ──────────────────────────────────────────────────────────

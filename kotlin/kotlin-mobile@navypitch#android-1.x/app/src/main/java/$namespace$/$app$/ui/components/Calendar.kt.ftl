@@ -1,4 +1,4 @@
-package com.doublegsoft.calendarsplitlist.ui.components
+package ${namespace}.${java.nameNamespace(app.name)}.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -39,10 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.doublegsoft.calendarsplitlist.model.ScheduleEvent
-import com.doublegsoft.calendarsplitlist.ui.theme.Amber
-import com.doublegsoft.calendarsplitlist.ui.theme.Red
-import com.doublegsoft.calendarsplitlist.util.DateUtils
+import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchColor
+import ${namespace}.${java.nameNamespace(app.name)}.util.Dates
 import java.util.Calendar
 
 data class MonthCell(
@@ -62,11 +59,11 @@ data class WeekDay(
 )
 
 /**
- * Calendar component with month/week views. Uses theme colors for light/dark support.
+ * Calendar component with month/week views.
  */
 @Composable
 fun CalendarComponent(
-  events: List<ScheduleEvent>,
+  eventDates: Set<String>,
   selectedDate: String,
   onDateSelected: (String) -> Unit,
   onViewChange: (String) -> Unit,
@@ -75,27 +72,26 @@ fun CalendarComponent(
 ) {
   val colorScheme = MaterialTheme.colorScheme
   var currentView by remember { mutableStateOf(defaultView) }
-  val today = DateUtils.today()
+  val today = Dates.today()
 
-  val selComponents = remember(selectedDate) { DateUtils.components(selectedDate) }
+  val selComponents = remember(selectedDate) { Dates.components(selectedDate) }
   val selYear = selComponents?.first ?: Calendar.getInstance().get(Calendar.YEAR)
   val selMonth = selComponents?.second ?: Calendar.getInstance().get(Calendar.MONTH)
 
   var displayYear by remember(selYear) { mutableStateOf(selYear) }
   var displayMonth by remember(selMonth) { mutableStateOf(selMonth) }
 
-  val eventMap = remember(events) { events.groupBy { it.date } }
   val monthCells = remember(displayYear, displayMonth, today) {
     buildMonthGrid(displayYear, displayMonth, today)
   }
   val weekDays = remember(selectedDate, today) { buildWeekDays(selectedDate, today) }
 
   val title = remember(displayYear, displayMonth) {
-    DateUtils.formatTitle(displayYear, displayMonth)
+    Dates.formatTitle(displayYear, displayMonth)
   }
   val sub = remember(selectedDate) {
-    val range = DateUtils.weekRange(selectedDate)
-    if (range != null) "${range.first} - ${range.second}" else ""
+    val range = Dates.weekRange(selectedDate)
+    if (range != null) "${r"${"}range.first} - ${r"${"}range.second}" else ""
   }
 
   Column(
@@ -116,7 +112,7 @@ fun CalendarComponent(
           if (displayMonth == 0) { displayMonth = 11; displayYear-- }
           else displayMonth--
         } else {
-          onDateSelected(DateUtils.addDays(selectedDate, -7))
+          onDateSelected(Dates.addDays(selectedDate, -7))
         }
       },
       onNext = {
@@ -124,22 +120,22 @@ fun CalendarComponent(
           if (displayMonth == 11) { displayMonth = 0; displayYear++ }
           else displayMonth++
         } else {
-          onDateSelected(DateUtils.addDays(selectedDate, 7))
+          onDateSelected(Dates.addDays(selectedDate, 7))
         }
       },
       onToday = {
-        val t = DateUtils.today()
+        val t = Dates.today()
         onDateSelected(t)
-        val comps = DateUtils.components(t)
+        val comps = Dates.components(t)
         if (comps != null) { displayYear = comps.first; displayMonth = comps.second }
       }
     )
 
     if (currentView == "month") {
-      MonthGridView(cells = monthCells, selectedDate = selectedDate, eventMap = eventMap,
+      MonthGridView(cells = monthCells, selectedDate = selectedDate, eventDates = eventDates,
         onDateSelected = { onDateSelected(it) })
     } else {
-      WeekStripView(weekDays = weekDays, selectedDate = selectedDate, eventMap = eventMap,
+      WeekStripView(weekDays = weekDays, selectedDate = selectedDate, eventDates = eventDates,
         onDateSelected = { onDateSelected(it) })
     }
   }
@@ -167,7 +163,6 @@ private fun CalendarHeader(
       modifier = Modifier.fillMaxWidth(),
       verticalAlignment = Alignment.CenterVertically
     ) {
-      // Month/Week toggle pills
       Row(
         modifier = Modifier
           .clip(RoundedCornerShape(8.dp))
@@ -253,7 +248,7 @@ private fun CalendarTab(label: String, isActive: Boolean, onClick: () -> Unit) {
 private fun MonthGridView(
   cells: List<MonthCell>,
   selectedDate: String,
-  eventMap: Map<String, List<ScheduleEvent>>,
+  eventDates: Set<String>,
   onDateSelected: (String) -> Unit
 ) {
   val colorScheme = MaterialTheme.colorScheme
@@ -263,13 +258,12 @@ private fun MonthGridView(
       .background(colorScheme.surface)
       .padding(horizontal = 8.dp)
   ) {
-    // Weekday header
     Row(modifier = Modifier.fillMaxWidth()) {
-      DateUtils.weekdayNames.forEachIndexed { index, name ->
+      Dates.weekdayNames.forEachIndexed { index, name ->
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
           Text(
             text = name,
-            color = if (index == 0 || index == 6) Red.copy(alpha = 0.7f)
+            color = if (index == 0 || index == 6) NavyPitchColor.Red.copy(alpha = 0.7f)
             else colorScheme.onSurfaceVariant,
             fontSize = 11.sp,
             textAlign = TextAlign.Center
@@ -291,8 +285,7 @@ private fun MonthGridView(
         MonthDayCell(
           cell = cell,
           isSelected = cell.date == selectedDate,
-          eventCount = eventMap[cell.date]?.size ?: 0,
-          eventDots = eventMap[cell.date]?.take(3)?.map { it.color } ?: emptyList(),
+          hasEvent = cell.date in eventDates,
           onDateSelected = { onDateSelected(cell.date) }
         )
       }
@@ -304,8 +297,7 @@ private fun MonthGridView(
 private fun MonthDayCell(
   cell: MonthCell,
   isSelected: Boolean,
-  eventCount: Int,
-  eventDots: List<String>,
+  hasEvent: Boolean,
   onDateSelected: () -> Unit
 ) {
   val colorScheme = MaterialTheme.colorScheme
@@ -320,7 +312,7 @@ private fun MonthDayCell(
     isSelected -> colorScheme.onPrimary
     cell.isToday -> colorScheme.primary
     !cell.currentMonth -> colorScheme.onSurface.copy(alpha = 0.25f)
-    DateUtils.isWeekend(cell.date) -> Red.copy(alpha = 0.8f)
+    Dates.isWeekend(cell.date) -> NavyPitchColor.Red.copy(alpha = 0.8f)
     else -> colorScheme.onSurface
   }
 
@@ -334,30 +326,18 @@ private fun MonthDayCell(
   ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
       Text(
-        text = "${cell.day}",
+        text = "${r"${"}cell.day}",
         color = textColor,
         fontSize = 13.sp,
         fontWeight = if (isSelected || cell.isToday) FontWeight.Bold else FontWeight.Normal
       )
-      if (eventDots.isNotEmpty()) {
-        Row(
-          horizontalArrangement = Arrangement.spacedBy(2.dp),
-          modifier = Modifier.padding(top = 2.dp)
-        ) {
-          eventDots.forEach { colorHex ->
-            Box(
-              modifier = Modifier.size(5.dp).clip(CircleShape)
-                .background(parseColor(colorHex))
-            )
-          }
-          if (eventCount > 3) {
-            Text(
-              text = "+${eventCount - 3}",
-              color = colorScheme.onSurfaceVariant,
-              fontSize = 7.sp
-            )
-          }
-        }
+      if (hasEvent) {
+        Box(
+          modifier = Modifier
+            .size(5.dp)
+            .clip(CircleShape)
+            .background(NavyPitchColor.Teal)
+        )
       }
     }
   }
@@ -367,7 +347,7 @@ private fun MonthDayCell(
 private fun WeekStripView(
   weekDays: List<WeekDay>,
   selectedDate: String,
-  eventMap: Map<String, List<ScheduleEvent>>,
+  eventDates: Set<String>,
   onDateSelected: (String) -> Unit
 ) {
   val colorScheme = MaterialTheme.colorScheme
@@ -382,8 +362,7 @@ private fun WeekStripView(
       WeekDayCell(
         weekDay = wd,
         isSelected = wd.date == selectedDate,
-        eventDots = eventMap[wd.date]?.take(3)?.map { it.color } ?: emptyList(),
-        eventCount = eventMap[wd.date]?.size ?: 0,
+        hasEvent = wd.date in eventDates,
         onClick = { onDateSelected(wd.date) }
       )
     }
@@ -394,8 +373,7 @@ private fun WeekStripView(
 private fun RowScope.WeekDayCell(
   weekDay: WeekDay,
   isSelected: Boolean,
-  eventDots: List<String>,
-  eventCount: Int,
+  hasEvent: Boolean,
   onClick: () -> Unit
 ) {
   val colorScheme = MaterialTheme.colorScheme
@@ -407,14 +385,14 @@ private fun RowScope.WeekDayCell(
   }
 
   val labelColor = when {
-    weekDay.isWeekend -> Red.copy(alpha = 0.7f)
+    weekDay.isWeekend -> NavyPitchColor.Red.copy(alpha = 0.7f)
     else -> colorScheme.onSurfaceVariant
   }
 
   val numColor = when {
     isSelected -> colorScheme.onPrimary
     weekDay.isToday -> colorScheme.primary
-    weekDay.isWeekend -> Red.copy(alpha = 0.8f)
+    weekDay.isWeekend -> NavyPitchColor.Red.copy(alpha = 0.8f)
     else -> colorScheme.onSurface
   }
 
@@ -428,33 +406,24 @@ private fun RowScope.WeekDayCell(
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
     Text(
-      text = DateUtils.weekdayNames[weekDay.weekday],
+      text = Dates.weekdayNames[weekDay.weekday],
       color = labelColor,
       fontSize = 10.sp
     )
     Text(
-      text = "${weekDay.day}",
+      text = "${r"${"}weekDay.day}",
       color = numColor,
       fontSize = 16.sp,
       fontWeight = if (isSelected || weekDay.isToday) FontWeight.Bold else FontWeight.Normal,
       modifier = Modifier.padding(vertical = 2.dp)
     )
-    if (eventDots.isNotEmpty()) {
-      Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-        eventDots.forEach { colorHex ->
-          Box(
-            modifier = Modifier.size(5.dp).clip(CircleShape)
-              .background(parseColor(colorHex))
-          )
-        }
-        if (eventCount > 3) {
-          Text(
-            text = "+${eventCount - 3}",
-            color = colorScheme.onSurfaceVariant,
-            fontSize = 7.sp
-          )
-        }
-      }
+    if (hasEvent) {
+      Box(
+        modifier = Modifier
+          .size(5.dp)
+          .clip(CircleShape)
+          .background(NavyPitchColor.Teal)
+      )
     }
   }
 }
@@ -462,13 +431,13 @@ private fun RowScope.WeekDayCell(
 // --- Calendar math ---
 
 private fun buildMonthGrid(year: Int, month: Int, today: String): List<MonthCell> {
-  val dim = DateUtils.daysInMonth(year, month)
-  val fdom = DateUtils.firstDayOfWeek(year, month)
+  val dim = Dates.daysInMonth(year, month)
+  val fdom = Dates.firstDayOfWeek(year, month)
   val cells = mutableListOf<MonthCell>()
 
   val prevMonth = if (month == 0) 11 else month - 1
   val prevYear = if (month == 0) year - 1 else year
-  val prevDim = DateUtils.daysInMonth(prevYear, prevMonth)
+  val prevDim = Dates.daysInMonth(prevYear, prevMonth)
   for (i in fdom - 1 downTo 0) {
     val day = prevDim - i
     val date = formatDate(prevYear, prevMonth, day)
@@ -490,15 +459,15 @@ private fun buildMonthGrid(year: Int, month: Int, today: String): List<MonthCell
 }
 
 private fun buildWeekDays(dateStr: String, today: String): List<WeekDay> {
-  val range = DateUtils.weekRange(dateStr) ?: return emptyList()
-  val startCal = DateUtils.parse(range.first)?.let { Calendar.getInstance().apply { time = it } }
+  val range = Dates.weekRange(dateStr) ?: return emptyList()
+  val startCal = Dates.parse(range.first)?.let { Calendar.getInstance().apply { time = it } }
     ?: return emptyList()
   val days = mutableListOf<WeekDay>()
   for (i in 0..6) {
     val cal = startCal.clone() as Calendar
     cal.add(Calendar.DAY_OF_MONTH, i)
-    val d = DateUtils.format(cal.time)
-    val comps = DateUtils.components(d) ?: continue
+    val d = Dates.format(cal.time)
+    val comps = Dates.components(d) ?: continue
     days.add(WeekDay(date = d, day = comps.third, month = comps.second + 1,
       weekday = i, isToday = d == today, isWeekend = i == 0 || i == 6))
   }
@@ -507,9 +476,3 @@ private fun buildWeekDays(dateStr: String, today: String): List<WeekDay> {
 
 private fun formatDate(year: Int, month: Int, day: Int): String =
   "%04d-%02d-%02d".format(year, month + 1, day)
-
-private fun parseColor(hex: String): Color = try {
-  Color(android.graphics.Color.parseColor(hex))
-} catch (_: Exception) {
-  Amber
-}

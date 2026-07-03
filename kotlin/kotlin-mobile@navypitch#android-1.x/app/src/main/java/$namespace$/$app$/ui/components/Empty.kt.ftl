@@ -1,4 +1,4 @@
-package com.doublegsoft.calendarsplitlist.ui.components
+package ${namespace}.${java.nameNamespace(app.name)}.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,18 +16,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.doublegsoft.calendarsplitlist.ui.theme.Amber
-import com.doublegsoft.calendarsplitlist.ui.theme.Blue
-import com.doublegsoft.calendarsplitlist.ui.theme.Gray500
-import com.doublegsoft.calendarsplitlist.ui.theme.Navy800
-import com.doublegsoft.calendarsplitlist.ui.theme.Red
-import com.doublegsoft.calendarsplitlist.ui.theme.Teal500
+import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchColor
 
 /**
  * Action button color variants.
@@ -35,8 +29,7 @@ import com.doublegsoft.calendarsplitlist.ui.theme.Teal500
 enum class EmptyActionColor { Teal, Amber, Red, Blue, Outline }
 
 /**
- * Empty state component (mirrors mini-program components/empty/empty).
- * Displayed when a list has no content.
+ * Empty state component. Displayed when a list has no content.
  */
 @Composable
 fun EmptyComponent(
@@ -55,7 +48,6 @@ fun EmptyComponent(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center
   ) {
-    // Emoji icon
     if (icon.isNotBlank()) {
       Text(
         text = icon,
@@ -65,7 +57,6 @@ fun EmptyComponent(
       Spacer(modifier = Modifier.height(16.dp))
     }
 
-    // Title
     if (title.isNotBlank()) {
       Text(
         text = title,
@@ -77,7 +68,6 @@ fun EmptyComponent(
       Spacer(modifier = Modifier.height(8.dp))
     }
 
-    // Description
     if (description.isNotBlank()) {
       Text(
         text = description,
@@ -89,20 +79,19 @@ fun EmptyComponent(
       Spacer(modifier = Modifier.height(20.dp))
     }
 
-    // Action button
     if (actionText.isNotBlank() && onAction != null) {
       Button(
         onClick = onAction,
         colors = ButtonDefaults.buttonColors(
           containerColor = when (actionColor) {
-            EmptyActionColor.Teal -> Teal500
-            EmptyActionColor.Amber -> Amber
-            EmptyActionColor.Red -> Red
-            EmptyActionColor.Blue -> Blue
+            EmptyActionColor.Teal -> NavyPitchColor.Teal
+            EmptyActionColor.Amber -> NavyPitchColor.Amber
+            EmptyActionColor.Red -> NavyPitchColor.Red
+            EmptyActionColor.Blue -> NavyPitchColor.Blue
             EmptyActionColor.Outline -> Color.Transparent
           },
           contentColor = when (actionColor) {
-            EmptyActionColor.Outline -> Teal500
+            EmptyActionColor.Outline -> NavyPitchColor.Teal
             else -> Color.White
           }
         ),

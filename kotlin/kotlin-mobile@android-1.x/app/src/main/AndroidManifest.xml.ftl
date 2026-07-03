@@ -9,12 +9,12 @@
     android:allowBackup="true"
     android:label="@string/app_name"
     android:supportsRtl="true"
-    android:theme="@style/Theme.CalendarSplitList"
+    android:theme="@style/Theme.${java.nameType(app.name)}"
     tools:targetApi="34">
     <activity
       android:name=".MainActivity"
       android:exported="true"
-      android:theme="@style/Theme.CalendarSplitList">
+      android:theme="@style/Theme.${java.nameType(app.name)}">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
