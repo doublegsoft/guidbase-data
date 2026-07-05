@@ -1,7 +1,5 @@
 package ${namespace}.${java.nameNamespace(app.name)}.ui.design
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -15,71 +13,71 @@ import androidx.compose.ui.unit.sp
 
 // ── 1. COLOR PALETTE ──────────────────────────────────────────────────
 
-object NavyPitchColor {
+object Colors {
   // Brand / Primary
-  val Navy       = Color(0xFF0D1B2A)
-  val NavyMid    = Color(0xFF152636)
-  val NavyLight  = Color(0xFF1D3448)
-  val Steel      = Color(0xFF1B4F72)
+  val Primary      = androidx.compose.ui.graphics.Color(0xFF0D1B2A)
+  val PrimaryDark  = androidx.compose.ui.graphics.Color(0xFF152636)
+  val PrimaryLight = androidx.compose.ui.graphics.Color(0xFF1D3448)
+  val PrimaryMuted = androidx.compose.ui.graphics.Color(0xFF1B4F72)
 
-  // Accent
-  val Teal       = Color(0xFF00C9A7)
-  val TealHover  = Color(0xFF00B599)
-  val Green      = Color(0xFF27AE60)
-  val GreenHover = Color(0xFF219A52)
-  val Amber      = Color(0xFFF5A623)
-  val AmberHover = Color(0xFFE8981A)
-  val Red        = Color(0xFFE74C6F)
-  val Blue       = Color(0xFF3B8BEB)
-  val Purple     = Color(0xFF9B59B6)
+  // Semantic accent
+  val Accent       = androidx.compose.ui.graphics.Color(0xFF00C9A7)
+  val AccentHover  = androidx.compose.ui.graphics.Color(0xFF00B599)
+  val Success      = androidx.compose.ui.graphics.Color(0xFF27AE60)
+  val SuccessHover = androidx.compose.ui.graphics.Color(0xFF219A52)
+  val Warning      = androidx.compose.ui.graphics.Color(0xFFF5A623)
+  val WarningHover = androidx.compose.ui.graphics.Color(0xFFE8981A)
+  val Danger       = androidx.compose.ui.graphics.Color(0xFFE74C6F)
+  val Info         = androidx.compose.ui.graphics.Color(0xFF3B8BEB)
+  val Decorative   = androidx.compose.ui.graphics.Color(0xFF9B59B6)
 
-  // Accent — Dim backgrounds (12% opacity)
-  val TealDim   = Color(0x1F00C9A7)
-  val AmberDim  = Color(0x1FF5A623)
-  val RedDim    = Color(0x1FE74C6F)
-  val BlueDim   = Color(0x1F3B8BEB)
-  val PurpleDim = Color(0x1A9B59B6)
+  // Semantic — Dim backgrounds (12% opacity)
+  val AccentDim  = androidx.compose.ui.graphics.Color(0x1F00C9A7)
+  val WarningDim = androidx.compose.ui.graphics.Color(0x1FF5A623)
+  val DangerDim  = androidx.compose.ui.graphics.Color(0x1FE74C6F)
+  val InfoDim    = androidx.compose.ui.graphics.Color(0x1F3B8BEB)
+  val DecorativeDim  = androidx.compose.ui.graphics.Color(0x1A9B59B6)
 
-  // Accent — Tag text
-  val TealText   = Color(0xFF00A085)
-  val AmberText  = Color(0xFFC8830A)
-  val RedText    = Color(0xFFC0294F)
-  val BlueText   = Color(0xFF2A6DC7)
-  val PurpleText = Color(0xFF7D3C98)
+  // Semantic — Tag text
+  val AccentText  = androidx.compose.ui.graphics.Color(0xFF00A085)
+  val WarningText = androidx.compose.ui.graphics.Color(0xFFC8830A)
+  val DangerText  = androidx.compose.ui.graphics.Color(0xFFC0294F)
+  val InfoText    = androidx.compose.ui.graphics.Color(0xFF2A6DC7)
+  val DecorativeText  = androidx.compose.ui.graphics.Color(0xFF7D3C98)
 
   // Surfaces
-  val Surface = Color(0xFFF0F4F8)
-  val Card    = Color(0xFFFFFFFF)
-  val Bg      = Color(0xFFF5F7FA)
+  val Surface = androidx.compose.ui.graphics.Color(0xFFF0F4F8)
+  val Card    = androidx.compose.ui.graphics.Color(0xFFFFFFFF)
+  val Bg      = androidx.compose.ui.graphics.Color(0xFFF5F7FA)
 
   // Text
-  val TextMain  = Color(0xFF1A2B3C)
-  val TextSub   = Color(0xFF5A7080)
-  val TextMuted = Color(0xFF95AABA)
+  val TextMain  = androidx.compose.ui.graphics.Color(0xFF1A2B3C)
+  val TextSub   = androidx.compose.ui.graphics.Color(0xFF5A7080)
+  val TextMuted = androidx.compose.ui.graphics.Color(0xFF95AABA)
 
   // Borders
-  val Border = Color(0xFFE2EAF0)
+  val Border = androidx.compose.ui.graphics.Color(0xFFE2EAF0)
 
   // Tab bar
-  val TabText       = Color(0xFF95AABA)
-  val TabTextActive = Color(0xFF00C9A7)
+  val TabText       = androidx.compose.ui.graphics.Color(0xFF95AABA)
+  val TabTextActive = androidx.compose.ui.graphics.Color(0xFF00C9A7)
 
   // Shadows
-  val ShadowLight = Color(0x140D1B2A)
-  val ShadowMid   = Color(0x1F0D1B2A)
+  val ShadowLight = androidx.compose.ui.graphics.Color(0x140D1B2A)
+  val ShadowMid   = androidx.compose.ui.graphics.Color(0x1F0D1B2A)
 
   // Misc
-  val White = Color(0xFFFFFFFF)
+  val White = androidx.compose.ui.graphics.Color(0xFFFFFFFF)
 
   // Legacy palette (migrated from ui/theme/Color.kt)
-  val Navy800 = Color(0xFF1B2838)
-  val Teal500 = Color(0xFF4ECDC4)
-  val Gray500 = Color(0xFFADB5BD)
+  val Primary800 = androidx.compose.ui.graphics.Color(0xFF1B2838)
+  val Accent500  = androidx.compose.ui.graphics.Color(0xFF4ECDC4)
+  val Gray500    = androidx.compose.ui.graphics.Color(0xFFADB5BD)
 }
 
 // ── 2. TYPOGRAPHY ─────────────────────────────────────────────────────
 
-object NavyPitchType {
+object Types {
   // Type scale — converted from rpx to sp (roughly rpx/2 = sp)
   val Text2xs = 10.sp;  val TextXs  = 11.sp;  val TextSm  = 12.sp
   val TextBase= 13.sp;  val TextMd  = 14.sp;  val TextBody= 15.sp
@@ -98,16 +96,16 @@ object NavyPitchType {
   val Base = FontFamily.Default
 
   // Pre-built text styles for common uses
-  val pageTitle = TextStyle(fontSize = Text4xl, fontWeight = Bold, color = NavyPitchColor.TextMain)
-  val sectionTitle = TextStyle(fontSize = TextMd, fontWeight = SemiBold, color = NavyPitchColor.TextMain)
-  val bodyText = TextStyle(fontSize = TextBase, fontWeight = Normal, color = NavyPitchColor.TextMain)
-  val caption = TextStyle(fontSize = TextXs, fontWeight = Normal, color = NavyPitchColor.TextSub)
-  val muted = TextStyle(fontSize = TextXs, fontWeight = Normal, color = NavyPitchColor.TextMuted)
+  val pageTitle = TextStyle(fontSize = Text4xl, fontWeight = Bold, color = Colors.TextMain)
+  val sectionTitle = TextStyle(fontSize = TextMd, fontWeight = SemiBold, color = Colors.TextMain)
+  val bodyText = TextStyle(fontSize = TextBase, fontWeight = Normal, color = Colors.TextMain)
+  val caption = TextStyle(fontSize = TextXs, fontWeight = Normal, color = Colors.TextSub)
+  val muted = TextStyle(fontSize = TextXs, fontWeight = Normal, color = Colors.TextMuted)
 }
 
 // ── 3. SPACING SCALE ───────────────────────────────────────────────────
 
-object NavyPitchSpacing {
+object Spacings {
   val s1  = 4.dp;   val s2  = 6.dp;   val s3  = 8.dp;   val s4  = 12.dp
   val s5  = 16.dp;  val s6  = 20.dp;  val s7  = 24.dp;  val s8  = 28.dp
   val s9  = 32.dp;  val s10 = 36.dp;  val s11 = 40.dp;  val s12 = 44.dp
@@ -125,7 +123,7 @@ object NavyPitchSpacing {
 
 // ── 4. BORDER RADIUS ──────────────────────────────────────────────────
 
-object NavyPitchRadius {
+object Radii {
   val Xs   = 3.dp;  val Sm   = 6.dp;  val Md  = 8.dp
   val Lg   = 10.dp; val Xl   = 12.dp; val Xxl = 16.dp
   val Pill = 20.dp; val Full = 50.dp
@@ -133,14 +131,14 @@ object NavyPitchRadius {
 
 // ── 5. SHADOWS ────────────────────────────────────────────────────────
 
-object NavyPitchShadow {
-  val Sm = Shadow(color = NavyPitchColor.ShadowLight, offset = androidx.compose.ui.geometry.Offset(0f, 2f), blurRadius = 16f)
-  val Md = Shadow(color = NavyPitchColor.ShadowMid,   offset = androidx.compose.ui.geometry.Offset(0f, 4f), blurRadius = 24f)
+object Shadows {
+  val Sm = androidx.compose.ui.graphics.Shadow(color = Colors.ShadowLight, offset = androidx.compose.ui.geometry.Offset(0f, 2f), blurRadius = 16f)
+  val Md = androidx.compose.ui.graphics.Shadow(color = Colors.ShadowMid,   offset = androidx.compose.ui.geometry.Offset(0f, 4f), blurRadius = 24f)
 }
 
 // ── 6. MOTION ──────────────────────────────────────────────────────────
 
-object NavyPitchMotion {
+object Motions {
   const val Fast  = 120  // ms
   const val Base  = 150  // ms
   const val Smooth= 180  // ms

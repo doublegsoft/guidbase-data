@@ -38,8 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchColor
-import ${namespace}.${java.nameNamespace(app.name)}.util.Dates
+import df.displayform.ui.design.Colors
+import df.displayform.util.Dates
 import java.util.Calendar
 
 data class MonthCell(
@@ -62,7 +62,7 @@ data class WeekDay(
  * Calendar component with month/week views.
  */
 @Composable
-fun CalendarComponent(
+fun Calendar(
   eventDates: Set<String>,
   selectedDate: String,
   onDateSelected: (String) -> Unit,
@@ -263,7 +263,7 @@ private fun MonthGridView(
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
           Text(
             text = name,
-            color = if (index == 0 || index == 6) NavyPitchColor.Red.copy(alpha = 0.7f)
+            color = if (index == 0 || index == 6) Color.Red.copy(alpha = 0.7f)
             else colorScheme.onSurfaceVariant,
             fontSize = 11.sp,
             textAlign = TextAlign.Center
@@ -312,7 +312,7 @@ private fun MonthDayCell(
     isSelected -> colorScheme.onPrimary
     cell.isToday -> colorScheme.primary
     !cell.currentMonth -> colorScheme.onSurface.copy(alpha = 0.25f)
-    Dates.isWeekend(cell.date) -> NavyPitchColor.Red.copy(alpha = 0.8f)
+    Dates.isWeekend(cell.date) -> Color.Red.copy(alpha = 0.8f)
     else -> colorScheme.onSurface
   }
 
@@ -336,7 +336,7 @@ private fun MonthDayCell(
           modifier = Modifier
             .size(5.dp)
             .clip(CircleShape)
-            .background(NavyPitchColor.Teal)
+            .background(Colors.Accent)
         )
       }
     }
@@ -385,14 +385,14 @@ private fun RowScope.WeekDayCell(
   }
 
   val labelColor = when {
-    weekDay.isWeekend -> NavyPitchColor.Red.copy(alpha = 0.7f)
+    weekDay.isWeekend -> Color.Red.copy(alpha = 0.7f)
     else -> colorScheme.onSurfaceVariant
   }
 
   val numColor = when {
     isSelected -> colorScheme.onPrimary
     weekDay.isToday -> colorScheme.primary
-    weekDay.isWeekend -> NavyPitchColor.Red.copy(alpha = 0.8f)
+    weekDay.isWeekend -> Color.Red.copy(alpha = 0.8f)
     else -> colorScheme.onSurface
   }
 
@@ -422,7 +422,7 @@ private fun RowScope.WeekDayCell(
         modifier = Modifier
           .size(5.dp)
           .clip(CircleShape)
-          .background(NavyPitchColor.Teal)
+          .background(Colors.Accent)
       )
     }
   }

@@ -10,21 +10,49 @@ data class Option (
   val value: String,
   val label: String
 )
-<#assign visited_containers = {}>
+
+data class Pagination<T> (
+  val data: List<T>,
+  val total: Int
+)
+<#assign visited_objects = {}>
 <#list app.pages as page>
   <#list page.containers as container>
-    <#if visited_containers[container.id]??><#continue></#if>
     <#if container.value("data") == ""><#continue></#if>
-    <#assign visited_containers += { (container.id): container }>
     <#assign url = valuebase.url(container.value("data"))>
+    <#if visited_objects[url.resource]??><#continue></#if>
+    <#assign visited_objects += { (url.resource): url }>
 
 /**
- * 【${container.title!""}】使用的“${url.resource}” 
+ * 【${url.resource?upper_case}】
  */ 
-data class ${java.nameType(url.resource)}For${java.nameType(container.id)}(
+data class ${java.nameType(url.resource)}(
     <#list container.inputs as input>
-  val ${java.nameVariable(input.id)}: ${guidbase4kotlin.type_input_primitive(input)}?<#if input?index != input?size - 1>,</#if>
+  val ${java.nameVariable(input.id)}: ${guidbase4kotlin.type_input_primitive(input)}?,
     </#list>
+)
+
+/**
+ * 【${container.title!""}】查询对象。
+ */ 
+data class ${java.nameType(url.resource)}Query(
+  val placeholder: String?,
+)
+  </#list>
+</#list>
+<#list app.pages as page>
+  <#list page.inputs as input>
+    <#if input.value("data") == "" || input.value("data")?starts_with("enum[")><#continue></#if>
+    <#assign url = valuebase.url(input.value("data"))>
+    <#assign valueField = page.value("value", "value")>
+    <#assign labelField = page.value("label", "label")>
+  
+/**
+ * 【${url.resource?upper_case}】
+ */ 
+data class ${java.nameType(url.resource)}(
+  val ${java.nameVariable(valueField)}: String? = null,
+  val ${java.nameVariable(labelField)}: String? = null,
 )
   </#list>
 </#list>

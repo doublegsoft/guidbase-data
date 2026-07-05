@@ -28,14 +28,22 @@
   <#elseif input.type == "bool">
     <#return "Boolean">
   <#elseif input.type == "select">
-    <#return "Option">
+    <#if input.ancestor("entry_form")?? || input.ancestor("official_form")?? || input.ancestor("excel_form")??>
+      <#return "String">
+    <#else>  
+      <#return "Option">
+    </#if>
   <#elseif input.type == "image" || input.type == "avatar">
     <#return "String">  
   <#elseif input.type == "date" || input.type == "time" || input.type == "datetime">
     <#return "Date">
   <#elseif input.type == "multiselect" || input.type == "files" || 
            input.type == "images" || input.type == "videos" || input.type == "cascade">
-    <#return "List<Option>">
+    <#if input.ancestor("entry_form")?? || input.ancestor("official_form")?? || input.ancestor("excel_form")??>
+      <#return "List<String>">
+    <#else>       
+      <#return "List<Option>">
+    </#if>
   <#elseif input.type == "tags">
     <#return "List<String>">
   <#else>

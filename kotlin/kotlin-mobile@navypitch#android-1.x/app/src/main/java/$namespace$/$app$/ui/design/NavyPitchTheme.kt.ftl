@@ -14,46 +14,46 @@ import androidx.core.view.WindowCompat
  *
  * Maps NavyPitch design tokens onto a Material3 light color scheme.
  */
-private val NavyPitchLightColorScheme = lightColorScheme(
-  primary            = NavyPitchColor.Teal,
-  onPrimary          = NavyPitchColor.White,
-  primaryContainer   = NavyPitchColor.TealDim,
-  onPrimaryContainer = NavyPitchColor.TealText,
-  secondary          = NavyPitchColor.Amber,
-  onSecondary        = NavyPitchColor.White,
-  secondaryContainer = NavyPitchColor.AmberDim,
-  tertiary           = NavyPitchColor.Blue,
-  onTertiary         = NavyPitchColor.White,
-  tertiaryContainer  = NavyPitchColor.BlueDim,
-  error              = NavyPitchColor.Red,
-  onError            = NavyPitchColor.White,
-  errorContainer     = NavyPitchColor.RedDim,
-  background         = NavyPitchColor.Bg,
-  onBackground       = NavyPitchColor.TextMain,
-  surface            = NavyPitchColor.Card,
-  onSurface          = NavyPitchColor.TextMain,
-  surfaceVariant     = NavyPitchColor.Surface,
-  onSurfaceVariant   = NavyPitchColor.TextSub,
-  outline            = NavyPitchColor.Border,
-  outlineVariant     = NavyPitchColor.Border.copy(alpha = 0.5f)
+private val LightColorScheme = lightColorScheme(
+  primary            = Colors.Accent,
+  onPrimary          = Colors.White,
+  primaryContainer   = Colors.AccentDim,
+  onPrimaryContainer = Colors.AccentText,
+  secondary          = Colors.Warning,
+  onSecondary        = Colors.White,
+  secondaryContainer = Colors.WarningDim,
+  tertiary           = Colors.Info,
+  onTertiary         = Colors.White,
+  tertiaryContainer  = Colors.InfoDim,
+  error              = Colors.Danger,
+  onError            = Colors.White,
+  errorContainer     = Colors.DangerDim,
+  background         = Colors.Bg,
+  onBackground       = Colors.TextMain,
+  surface            = Colors.Card,
+  onSurface          = Colors.TextMain,
+  surfaceVariant     = Colors.Surface,
+  onSurfaceVariant   = Colors.TextSub,
+  outline            = Colors.Border,
+  outlineVariant     = Colors.Border.copy(alpha = 0.5f)
 )
 
 @Composable
-fun NavyPitchTheme(
+fun Theme(
   content: @Composable () -> Unit
 ) {
   val view = LocalView.current
   if (!view.isInEditMode) {
     SideEffect {
       val window = (view.context as Activity).window
-      window.statusBarColor = NavyPitchColor.Card.toArgb()
+      window.statusBarColor = Colors.Card.toArgb()
       WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
     }
   }
 
   MaterialTheme(
-    colorScheme = NavyPitchLightColorScheme,
-    typography = NavyPitchTypography,
+    colorScheme = LightColorScheme,
+    typography = Typography,
     content = content
   )
 }

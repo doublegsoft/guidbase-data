@@ -12,7 +12,7 @@
     android:theme="@style/Theme.${java.nameType(app.name)}"
     tools:targetApi="34">
     <activity
-      android:name=".MainActivity"
+      android:name=".activity.${java.nameType(app.pages[0].name)}Activity"
       android:exported="true"
       android:theme="@style/Theme.${java.nameType(app.name)}">
       <intent-filter>

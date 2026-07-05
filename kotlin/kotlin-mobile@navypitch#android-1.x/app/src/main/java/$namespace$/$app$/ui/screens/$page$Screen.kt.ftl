@@ -1,7 +1,5 @@
 package ${namespace}.${java.nameNamespace(app.name)}.ui.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,90 +8,107 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchButton
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchButtonSize
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchButtonVariant
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchCard
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchColor
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchDisplayForm
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchDisplayRow
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchDivider
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchEntryForm
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchFieldDate
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchFieldSelect
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchFieldText
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchMatchCard
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchPageShell
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchRadius
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchSpacing
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchType
+import ${namespace}.${java.nameNamespace(app.name)}.ui.components.*
+import ${namespace}.${java.nameNamespace(app.name)}.ui.design.*
+import ${namespace}.${java.nameNamespace(app.name)}.viewmodel.*
+import ${namespace}.${java.nameNamespace(app.name)}.model.*
 
 /**
- * Schedule event detail screen.
- * Displays full information for a single [ScheduleEvent] and supports editing.
+ * 【${page.title}】界面。
  */
 @Composable
 fun ${java.nameType(page.name)}Screen(
+  viewModel: ${java.nameType(page.name)}ViewModel,
+<#if page.value("params") != "">
+  <#list page.value("params")?split(",") as param>
+  ${java.nameVariable(param)}: String?,
+  </#list>
+</#if>
   onBack: () -> Unit
 ) {
 
-  NavyPitchPageShell(
+  PageShell(
     topBar = {
       Row(
         modifier = Modifier
           .fillMaxWidth()
-          .padding(NavyPitchSpacing.s5, NavyPitchSpacing.s5),
+          .padding(Spacings.s5, Spacings.s5),
         verticalAlignment = Alignment.CenterVertically
       ) {
-        NavyPitchButton(
+        Button(
           label = "← 返回",
           onClick = onBack,
-          variant = NavyPitchButtonVariant.Outline,
-          size = NavyPitchButtonSize.Sm
+          variant = ButtonVariant.Outline,
+          size = ButtonSize.Sm
         )
-        Spacer(Modifier.width(NavyPitchSpacing.s5))
+        Spacer(Modifier.width(Spacings.s5))
         Text(
           text = "日程详情",
-          fontSize = NavyPitchType.TextLg,
+          fontSize = Types.TextLg,
           fontWeight = FontWeight.Bold,
-          color = NavyPitchColor.TextMain,
+          color = Colors.TextMain,
           modifier = Modifier.weight(1f)
         )
-        NavyPitchButton(
+        Button(
           label = "保存",
           onClick = { },
-          variant = NavyPitchButtonVariant.Primary,
-          size = NavyPitchButtonSize.Sm
+          variant = ButtonVariant.Primary,
+          size = ButtonSize.Sm
         )
       }
-      NavyPitchDivider()
+      Divider()
     }
   ) {
-    Column(
-      modifier = Modifier
-        .fillMaxSize()
-        .verticalScroll(rememberScrollState())
-        .padding(NavyPitchSpacing.s5)
-    ) {
-      
+    val state by viewModel.viewState.collectAsState()
+    val sta = state
+    when (sta) {
+      is ${java.nameType(page.id)}ViewState.Loading -> {
+        Loading()
+      }
+      is ${java.nameType(page.id)}ViewState.Error -> {
+        Error(
+          message = sta.message,
+          retryLabel = "重试",
+          onRetry = { viewModel.loadData() }
+        )
+      }
+      is ${java.nameType(page.id)}ViewState.Success -> {
+<#list page.containers as container>    
+  <#if container.type == "entry_form" || container.type == "display_form">
+        ${java.nameType(page.id)}Body(data = sta.${java.nameVariable(container.id)}Data)
+  <#elseif container.type == "list_view">    
+        ${java.nameType(page.id)}Body(rows = sta.${java.nameVariable(container.id)}Rows)
+  </#if>
+</#list>
+      }
     }
+  }
+}
+
+@Composable
+private fun ${java.nameType(page.id)}Body(data: Demo?) {
+  if (data == null) {
+    Empty()
+    return
+  }
+
+  Column(
+    modifier = Modifier
+      .fillMaxSize()
+      .verticalScroll(rememberScrollState())
+  ) {
+    
   }
 }

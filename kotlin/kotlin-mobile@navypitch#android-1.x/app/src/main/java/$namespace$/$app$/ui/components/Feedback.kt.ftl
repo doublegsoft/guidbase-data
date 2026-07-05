@@ -1,4 +1,4 @@
-package ${namespace}.${java.nameNamespace(app.name)}.components
+package ${namespace}.${java.nameNamespace(app.name)}.ui.components
 
 import android.app.AlertDialog
 import android.content.Context

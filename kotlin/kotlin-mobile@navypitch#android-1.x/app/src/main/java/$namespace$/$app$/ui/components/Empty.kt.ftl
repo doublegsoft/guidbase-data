@@ -21,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ${namespace}.${java.nameNamespace(app.name)}.ui.design.NavyPitchColor
 
 /**
  * Action button color variants.
@@ -32,7 +31,7 @@ enum class EmptyActionColor { Teal, Amber, Red, Blue, Outline }
  * Empty state component. Displayed when a list has no content.
  */
 @Composable
-fun EmptyComponent(
+fun Empty(
   icon: String = "📭",
   title: String = "暂无数据",
   description: String = "",
@@ -84,14 +83,14 @@ fun EmptyComponent(
         onClick = onAction,
         colors = ButtonDefaults.buttonColors(
           containerColor = when (actionColor) {
-            EmptyActionColor.Teal -> NavyPitchColor.Teal
-            EmptyActionColor.Amber -> NavyPitchColor.Amber
-            EmptyActionColor.Red -> NavyPitchColor.Red
-            EmptyActionColor.Blue -> NavyPitchColor.Blue
+            EmptyActionColor.Teal -> Color(0xFF008080)
+            EmptyActionColor.Amber -> Color(0xFFFFBF00)
+            EmptyActionColor.Red -> Color.Red
+            EmptyActionColor.Blue -> Color.Blue
             EmptyActionColor.Outline -> Color.Transparent
           },
           contentColor = when (actionColor) {
-            EmptyActionColor.Outline -> NavyPitchColor.Teal
+            EmptyActionColor.Outline -> Color(0xFF008080)
             else -> Color.White
           }
         ),

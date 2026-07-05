@@ -42,32 +42,36 @@
 </#macro>
 
 <#macro print_layout_display_form form indent=0>
-@Composable
-private fun ${java.nameType(form.id)}(
-  groups: List<EventType>,
-  activeGroupId: Int?,
-  events: List<ScheduleEvent>,
-  isEmpty: Boolean,
-  activeEventTypeName: String,
-  onGroupTap: (Int) -> Unit,
-  onShowAll: () -> Unit,
-  onEventTap: (ScheduleEvent) -> Unit,
-  modifier: Modifier = Modifier
-) {
-  Row(modifier = modifier.fillMaxWidth()) {
-    GroupListPanel(
-      groups = groups, activeGroupId = activeGroupId,
-      onGroupTap = onGroupTap, onShowAll = onShowAll,
-      modifier = Modifier.width(80.dp).fillMaxHeight()
-    )
-    EventListPanel(
-      events = events, isEmpty = isEmpty,
-      activeEventTypeName = activeEventTypeName,
-      onEventTap = onEventTap,
-      modifier = Modifier.weight(1f).fillMaxHeight()
-    )
-  }
-}
+  <#list form.groups() as group>
+    <#local rows = form.rows(group, 1)>
+      <#if group?index != 0>
+${""?left_pad(indent)}Spacer(Modifier.height(Spacing.s5))
+      </#if>
+${""?left_pad(indent)}Card(
+${""?left_pad(indent)}  title = "${group}",
+${""?left_pad(indent)}  accent = Color.Accent,
+${""?left_pad(indent)}  modifier = Modifier.padding(horizontal = Spacing.s5)
+${""?left_pad(indent)}) {    
+    <#list rows as row>
+      <#list row as input>
+        <#if input.type == "date">
+${""?left_pad(indent)}  DateDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?.let { Dates.format(it) })
+        <#elseif input.type == "time">
+${""?left_pad(indent)}  TimeDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?.fmtStr()) 
+        <#elseif input.type == "number">
+${""?left_pad(indent)}  NumberDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?.numStr()) 
+        <#elseif input.type == "select">
+${""?left_pad(indent)}  SelectDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?.label, color = Color.Accent) 
+        <#elseif input.type == "longtext">
+${""?left_pad(indent)}  LongTextDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?) 
+        <#else>
+${""?left_pad(indent)}  TextDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?)        
+        </#if>
+${""?left_pad(indent)}  FieldDivider()      
+      </#list>
+    </#list>
+${""?left_pad(indent)}}    
+  </#list>
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -174,73 +178,6 @@ private fun ${java.nameType(form.id)}(
 <!----------------------------------------------------------------------------->
 <#macro print_page_imports page indent=0>
   <#local visited_types = {}>
-  <#list page.widgets as widget>
-    <#if widget.type == 'entry_form' || widget.type == 'official_form' || widget.type == "excel_form">
-import { useAsyncLock } from '@/composables/useAsyncLock'
-import { useFieldValidation } from '@/composables/useFieldValidation'
-      <#break>
-    </#if>
-  </#list>  
-  <#list page.widgets as widget>
-    <#if visited_types[widget.type]??><#continue></#if>
-    <#if widget.type == "excel_form">
-import ${js.nameType(namespace)}Excelform from '@/components/${namespace}-excelform.vue'
-    <#elseif widget.type == "paged_table">
-import ${js.nameType(namespace)}Pagedtable from '@/components/${namespace}-pagedtable.vue'
-    <#elseif widget.type == "fixed_table">
-import ${js.nameType(namespace)}Fixedtable from '@/components/${namespace}-fixedtable.vue'
-    <#elseif widget.type == "paged_grid">
-import ${js.nameType(namespace)}Pagedgrid from '@/components/${namespace}-pagedgrid.vue'      
-    <#elseif widget.type == "week_grid">
-import ${js.nameType(namespace)}Weekgrid from '@/components/${namespace}-weekgrid.vue'
-    <#elseif widget.type == "chart">
-import ${js.nameType(namespace)}Chart from '@/components/${namespace}-chart.vue'    
-import { createChart } from '@/sdk/charts'    
-    <#elseif widget.type == "select">
-import ${js.nameType(namespace)}Dropdown from '@/components/${namespace}-dropdown.vue'  
-    <#elseif widget.type == "date">
-import ${js.nameType(namespace)}Datepicker from '@/components/${namespace}-datepicker.vue'  
-    <#elseif widget.type == "time">
-import ${js.nameType(namespace)}Timepicker from '@/components/${namespace}-timepicker.vue'  
-    <#elseif widget.type == "cascade">
-import ${js.nameType(namespace)}Cascadepicker from '@/components/${namespace}-cascadepicker.vue'    
-    <#elseif widget.type == "multiselect">
-import ${js.nameType(namespace)}Multiselect from '@/components/${namespace}-multiselect.vue'   
-    <#elseif widget.type == "avatar">
-import ${js.nameType(namespace)}Avatarupload from '@/components/${namespace}-avatarupload.vue' 
-    <#elseif widget.type == "tags">
-import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsinput.vue' 
-    <#elseif widget.type == "files">
-import ${js.nameType(namespace)}Fileupload from '@/components/${namespace}-fileupload.vue' 
-    <#elseif widget.type == "images">
-import ${js.nameType(namespace)}Imageupload from '@/components/${namespace}-imageupload.vue' 
-    <#elseif widget.type == "videos">
-import ${js.nameType(namespace)}Videoupload from '@/components/${namespace}-videoupload.vue' 
-    </#if>
-    <#local visited_types += {widget.type: widget} />
-  </#list>
-  <#local drawerImported = false>
-  <#local dialogImported = false>
-  <#-- drawer and dialog -->
-  <#list page.widgets as widget>
-    <#if widget.value("action") == ""><#continue></#if>
-    <#local action = valuebase.action(widget.value("action"))>
-    <#if action.type.name() == "DRAWER" && !drawerImported>
-      <#local drawerImported = true>
-import ${js.nameType(namespace)}Drawer from '@/components/${namespace}-drawer.vue'  
-      <#local dialogImported = true>
-    <#elseif action.type.name() == "DIALOG" && !dialogImported>   
-import ${js.nameType(namespace)}Dialog from '@/components/${namespace}-dialog.vue'       
-    </#if>
-  </#list>
-  <#-- pages -->
-  <#list page.widgets as widget>
-    <#if widget.value("action") == ""><#continue></#if>
-    <#local action = valuebase.action(widget.value("action"))>
-    <#if action.type.name() == "DRAWER" || action.type.name() == "DIALOG">
-import ${js.nameType(namespace + "_" + action.resource)} from '@/pages/${js.nameFile(action.path)}.vue'      
-    </#if>
-  </#list>
 </#macro>
 
 <#macro print_page_variables page indent=0>
