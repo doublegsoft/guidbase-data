@@ -5,8 +5,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
-import df.displayform.model.*
-import df.displayform.sdk.payload.*
+import ${namespace}.${java.nameNamespace(app.name)}.model.*
+import ${namespace}.${java.nameNamespace(app.name)}.sdk.payload.*
 
 class MemoryRepository : Repository {
 <#assign visited_objects = {}>

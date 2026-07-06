@@ -28,16 +28,10 @@ data class Pagination<T> (
  */ 
 data class ${java.nameType(url.resource)}(
     <#list container.inputs as input>
-  val ${java.nameVariable(input.id)}: ${guidbase4kotlin.type_input_primitive(input)}?,
+  val ${java.nameVariable(input.id)}: ${guidbase4kotlin.type_input_primitive(input)}? = null,
     </#list>
 )
 
-/**
- * 【${container.title!""}】查询对象。
- */ 
-data class ${java.nameType(url.resource)}Query(
-  val placeholder: String?,
-)
   </#list>
 </#list>
 <#list app.pages as page>

@@ -24,9 +24,9 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import df.displayform.ui.design.Colors
-import df.displayform.ui.design.Spacings
-import df.displayform.ui.design.Types
+import ${namespace}.${java.nameNamespace(app.name)}.ui.design.Colors
+import ${namespace}.${java.nameNamespace(app.name)}.ui.design.Spacings
+import ${namespace}.${java.nameNamespace(app.name)}.ui.design.Types
 
 /**
  * Loading state component with custom animated spinner.

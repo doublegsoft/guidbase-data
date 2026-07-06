@@ -2,9 +2,12 @@ package ${namespace}.${java.nameNamespace(app.name)}.ui.design
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -15,13 +18,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,12 +34,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 // ═══════════════════════════════════════════════════════════════════════════
 // INTERNAL — shared row layouts
@@ -141,7 +143,7 @@ fun TextDisplay(
       text = value?.ifBlank { "—" } ?: "—",
       fontSize = Types.TextSm,
       fontWeight = FontWeight.Medium,
-      color = Colors.TextMain,
+      color = if (value.isNullOrBlank()) Colors.TextMuted else Colors.TextMain,
       maxLines = 1,
       overflow = TextOverflow.Ellipsis,
       modifier = Modifier.weight(1f)
@@ -165,8 +167,7 @@ fun NumberDisplay(
       text = value?.ifBlank { "—" } ?: "—",
       fontSize = Types.TextSm,
       fontWeight = FontWeight.Medium,
-      color = Colors.TextMain,
-      textAlign = TextAlign.End,
+      color = if (value.isNullOrBlank()) Colors.TextMuted else Colors.TextMain,
       modifier = Modifier.weight(1f)
     )
   }
@@ -214,6 +215,18 @@ fun SelectDisplay(
 ) {
   FieldRow(label = label, labelWidth = labelWidth, modifier = modifier) {
     val display = value?.ifBlank { null } ?: "—"
+    if (display == "—") {
+      Text(
+        text = value?.ifBlank { "—" } ?: "—",
+        fontSize = Types.TextSm,
+        fontWeight = FontWeight.Medium,
+        color = Colors.TextMuted,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.weight(1f)
+      )
+      return@FieldRow
+    }
     Box(
       modifier = Modifier
         .clip(RoundedCornerShape(Radii.Pill))
@@ -340,12 +353,71 @@ fun LongTextDisplay(
       text = value?.ifBlank { "—" } ?: "—",
       fontSize = Types.TextSm,
       fontWeight = FontWeight.Medium,
-      color = Colors.TextMain,
+      color = if (value.isNullOrBlank()) Colors.TextMuted else Colors.TextMain,
       maxLines = maxLines,
       overflow = TextOverflow.Ellipsis,
       modifier = Modifier.weight(1f)
     )
   }
+}
+
+// ── Shared Custom BasicTextField for Sleek/Compact Style ─────────────────
+
+@Composable
+private fun BaseCompactTextField(
+  value: String,
+  onValueChange: (String) -> Unit,
+  modifier: Modifier = Modifier,
+  placeholder: String = "",
+  readOnly: Boolean = false,
+  singleLine: Boolean = true,
+  minLines: Int = 1,
+  keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+  trailingIcon: @Composable (() -> Unit)? = null
+) {
+  BasicTextField(
+    value = value,
+    onValueChange = onValueChange,
+    readOnly = readOnly,
+    singleLine = singleLine,
+    minLines = minLines,
+    keyboardOptions = keyboardOptions,
+    textStyle = TextStyle(
+      fontSize = 12.sp, // 精简字体尺寸
+      color = Colors.TextMain
+    ),
+    modifier = modifier,
+    decorationBox = { innerTextField ->
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .defaultMinSize(minHeight = 32.dp) // 将默认高度从 36dp+ 严控在 32dp
+          .background(Colors.Surface, RoundedCornerShape(Radii.Xs))
+          .border(
+            width = 1.dp,
+            color = Colors.Border,
+            shape = RoundedCornerShape(Radii.Xs)
+          )
+          .padding(horizontal = Spacings.s3, vertical = 6.dp), // 压缩上下内边距
+        verticalAlignment = if (singleLine) Alignment.CenterVertically else Alignment.Top
+      ) {
+        Box(modifier = Modifier.weight(1f)) {
+          if (value.isEmpty() && placeholder.isNotEmpty()) {
+            Text(
+              text = placeholder,
+              fontSize = 12.sp,
+              color = Colors.TextMuted
+            )
+          }
+          innerTextField()
+        }
+        if (trailingIcon != null) {
+          Spacer(Modifier.width(Spacings.s2))
+          trailingIcon()
+        }
+      }
+    }
+  )
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -362,14 +434,11 @@ fun TextInput(
   modifier: Modifier = Modifier
 ) {
   InputRow(label = label, required = required, modifier = modifier) {
-    OutlinedTextField(
+    BaseCompactTextField(
       value = value,
       onValueChange = onValueChange,
-      placeholder = { if (placeholder.isNotBlank()) Text(placeholder, fontSize = Types.TextSm, color = Colors.TextMuted) },
-      modifier = Modifier.fillMaxWidth(),
-      shape = RoundedCornerShape(Radii.Sm),
-      singleLine = true,
-      textStyle = MaterialTheme.typography.bodyMedium.copy(color = Colors.TextMain)
+      placeholder = placeholder,
+      modifier = Modifier.fillMaxWidth()
     )
   }
 }
@@ -388,15 +457,12 @@ fun NumberInput(
   modifier: Modifier = Modifier
 ) {
   InputRow(label = label, required = required, modifier = modifier) {
-    OutlinedTextField(
+    BaseCompactTextField(
       value = value,
       onValueChange = onValueChange,
-      placeholder = { if (placeholder.isNotBlank()) Text(placeholder, fontSize = Types.TextSm, color = Colors.TextMuted) },
+      placeholder = placeholder,
       modifier = Modifier.fillMaxWidth(),
-      shape = RoundedCornerShape(Radii.Sm),
-      singleLine = true,
-      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-      textStyle = MaterialTheme.typography.bodyMedium.copy(color = Colors.TextMain)
+      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
     )
   }
 }
@@ -414,15 +480,12 @@ fun DateInput(
   modifier: Modifier = Modifier
 ) {
   InputRow(label = label, required = required, modifier = modifier) {
-    OutlinedTextField(
+    BaseCompactTextField(
       value = value,
       onValueChange = onValueChange,
-      placeholder = { Text("YYYY-MM-DD", fontSize = Types.TextSm, color = Colors.TextMuted) },
+      placeholder = "YYYY-MM-DD",
       modifier = Modifier.fillMaxWidth(),
-      shape = RoundedCornerShape(Radii.Sm),
-      singleLine = true,
-      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-      textStyle = MaterialTheme.typography.bodyMedium.copy(color = Colors.TextMain)
+      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )
   }
 }
@@ -440,15 +503,12 @@ fun TimeInput(
   modifier: Modifier = Modifier
 ) {
   InputRow(label = label, required = required, modifier = modifier) {
-    OutlinedTextField(
+    BaseCompactTextField(
       value = value,
       onValueChange = onValueChange,
-      placeholder = { Text("HH:mm", fontSize = Types.TextSm, color = Colors.TextMuted) },
+      placeholder = "HH:mm",
       modifier = Modifier.fillMaxWidth(),
-      shape = RoundedCornerShape(Radii.Sm),
-      singleLine = true,
-      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-      textStyle = MaterialTheme.typography.bodyMedium.copy(color = Colors.TextMain)
+      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )
   }
 }
@@ -457,7 +517,7 @@ fun TimeInput(
 // SELECT INPUT — label + dropdown
 // ═══════════════════════════════════════════════════════════════════════════
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun SelectInput(
   label: String,
@@ -470,28 +530,30 @@ fun SelectInput(
   var expanded by remember { mutableStateOf(false) }
 
   InputRow(label = label, required = required, modifier = modifier) {
-    ExposedDropdownMenuBox(
-      expanded = expanded,
-      onExpandedChange = { expanded = it }
-    ) {
-      OutlinedTextField(
+    Box {
+      BaseCompactTextField(
         value = value,
         onValueChange = {},
         readOnly = true,
-        modifier = Modifier.fillMaxWidth().menuAnchor(),
-        shape = RoundedCornerShape(Radii.Sm),
-        singleLine = true,
-        textStyle = MaterialTheme.typography.bodyMedium.copy(color = Colors.TextMain),
-        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+        modifier = Modifier
+          .fillMaxWidth()
+          .clickable(
+            onClick = { expanded = true },
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null
+          ),
+        trailingIcon = {
+          ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+        }
       )
-      ExposedDropdownMenu(
+      DropdownMenu(
         expanded = expanded,
-        onDismissRequest = { expanded = false }
+        onDismissRequest = { expanded = false },
+        modifier = Modifier.fillMaxWidth(0.9f)
       ) {
         options.forEach { option ->
           DropdownMenuItem(
-            text = { Text(option) },
+            text = { Text(option, fontSize = Types.TextSm) },
             onClick = {
               onValueChange(option)
               expanded = false
@@ -518,15 +580,13 @@ fun LongTextInput(
   modifier: Modifier = Modifier
 ) {
   InputRow(label = label, required = required, modifier = modifier) {
-    OutlinedTextField(
+    BaseCompactTextField(
       value = value,
       onValueChange = onValueChange,
-      placeholder = { if (placeholder.isNotBlank()) Text(placeholder, fontSize = Types.TextSm, color = Colors.TextMuted) },
+      placeholder = placeholder,
       modifier = Modifier.fillMaxWidth(),
-      shape = RoundedCornerShape(Radii.Sm),
       singleLine = false,
-      minLines = minLines,
-      textStyle = MaterialTheme.typography.bodyMedium.copy(color = Colors.TextMain)
+      minLines = minLines
     )
   }
 }

@@ -1,6 +1,9 @@
+<#import "/$/guidbase.ftl" as guidbase>
 <#import "/$/guidbase4kotlin.ftl" as guidbase4kotlin>
+<#assign pageParams = guidbase.get_page_params(page)>
 package ${namespace}.${java.nameNamespace(app.name)}.viewmodel 
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,18 +40,23 @@ sealed interface ${java.nameType(page.name)}ViewState {
 }
 
 class ${java.nameType(page.name)}ViewModel(
-  private val repository: Repository
+  private val repository: Repository,
+  private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     
   private val _viewState = MutableStateFlow<${java.nameType(page.name)}ViewState>(${java.nameType(page.name)}ViewState.Loading)
   val viewState: StateFlow<${java.nameType(page.name)}ViewState> = _viewState.asStateFlow()
 
+<#list pageParams as param>
+  private val ${java.nameVariable(param)}: String? = savedStateHandle["${java.nameVariable(param)}"]
+</#list>
+
   /**
    * 页面加载后，加载加载所有业务数据。
    */
-  fun loadData() {
+  fun loadData() {   
     viewModelScope.launch {
-      _viewState.value = ${java.nameType(page.name)}ViewState.Loading
+      _viewState.value = ${java.nameType(page.name)}ViewState.Loading   
       try {
 <#list page.containers as container>
   <#if container.value("data") == ""><#continue></#if>

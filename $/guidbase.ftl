@@ -194,6 +194,34 @@
 </#function>
 
 <#--
+ ###############################################################################
+ ### 获取页面参数 (Get Page Parameters)
+ ### 
+ ### 根据页面对象中的 "params" 属性，解析并返回一个清洗后的参数列表。
+ ### 用于动态提取、分割和净化页面绑定的配置参数。
+ ### 
+ ### 查找与定位规则：
+ ### - 从页面对象中获取 "params" 属性的值。
+ ### - 若 "params" 为空字符串，直接返回空列表。
+ ### - 若 "params" 不为空，则以逗号 (",") 为分隔符进行拆分，并去除每个参数的前后空格。
+ ### 
+ ### @param page  页面对象 (Object)
+ ### @return      格式化后的参数列表 (List of Strings)
+ ###############################################################################
+ -->
+<#function get_page_params page>
+  <#local ret = []>
+  <#if page.value("params") == "">
+    <#return ret>
+  </#if>
+  <#local params = page.value("params")?split(",")>
+  <#list params as param>
+    <#local ret += [param?trim]>
+  </#list>
+  <#return ret>
+</#function>
+
+<#--
  ###
  ###
  ###

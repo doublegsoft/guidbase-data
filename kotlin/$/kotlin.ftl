@@ -1,7 +1,4 @@
---- START OF FILE Paste July 02, 2026 - 8:22AM ---
-
 <#import "/$/guidbase.ftl" as guidbase>
-<#include "tile-vue3.ftl">
 <!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
 <!----------------------------------------------------------------------------->
@@ -39,35 +36,6 @@
 </#macro>
 
 <#macro print_display_form_methods form indent=0>
-</#macro>
-
-<#macro print_layout_display_form form indent=0>
-@Composable
-private fun ${java.nameType(form.id)}(
-  groups: List<EventType>,
-  activeGroupId: Int?,
-  events: List<ScheduleEvent>,
-  isEmpty: Boolean,
-  activeEventTypeName: String,
-  onGroupTap: (Int) -> Unit,
-  onShowAll: () -> Unit,
-  onEventTap: (ScheduleEvent) -> Unit,
-  modifier: Modifier = Modifier
-) {
-  Row(modifier = modifier.fillMaxWidth()) {
-    GroupListPanel(
-      groups = groups, activeGroupId = activeGroupId,
-      onGroupTap = onGroupTap, onShowAll = onShowAll,
-      modifier = Modifier.width(80.dp).fillMaxHeight()
-    )
-    EventListPanel(
-      events = events, isEmpty = isEmpty,
-      activeEventTypeName = activeEventTypeName,
-      onEventTap = onEventTap,
-      modifier = Modifier.weight(1f).fillMaxHeight()
-    )
-  }
-}
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -323,28 +291,15 @@ ${""?left_pad(indent)}}
 </#macro>
 
 <#macro print_page_layout page indent=0>
-  <#local children = []>
   <#list page.children as child>
-    <#if child.type != "dialog" && child.type != "drawer" && 
-         child.type != "buttons" && child.type != "entry_form" && 
-         page.value("viewport") == "" >
-<@print_layout_container widget=child indent=indent />       
-    <#else>
-<@print_layout_widget widget=child indent=indent />        
-    </#if>
-    <#if child?index != children?size - 1>
-<@print_layout_divider indent=indent />    
-    </#if>
-  </#list>
-  <#-- 把带有viewport的显示在最后 -->
-  <#list page.children as child>
-    <#if child.value("viewport","") != "">
 <@print_layout_widget widget=child indent=indent />          
-    </#if>
   </#list>
 </#macro>
 
 <#macro print_layout_divider indent=0></#macro>
 
 <#macro print_layout_widget widget indent=0>
+  <#if widget.type == "display_form">
+<@print_layout_display_form form=widget indent=indent />  
+  </#if>
 </#macro>

@@ -13,12 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import df.displayform.ui.design.Button
-import df.displayform.ui.design.ButtonSize
-import df.displayform.ui.design.ButtonVariant
-import df.displayform.ui.design.Colors
-import df.displayform.ui.design.Spacings
-import df.displayform.ui.design.Types
+import ${namespace}.${java.nameNamespace(app.name)}.ui.design.Button
+import ${namespace}.${java.nameNamespace(app.name)}.ui.design.ButtonSize
+import ${namespace}.${java.nameNamespace(app.name)}.ui.design.ButtonVariant
+import ${namespace}.${java.nameNamespace(app.name)}.ui.design.Colors
+import ${namespace}.${java.nameNamespace(app.name)}.ui.design.Spacings
+import ${namespace}.${java.nameNamespace(app.name)}.ui.design.Types
 
 /**
  * Error state component with retry action.

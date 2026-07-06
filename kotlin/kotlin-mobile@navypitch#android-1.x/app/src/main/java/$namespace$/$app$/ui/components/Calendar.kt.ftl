@@ -38,8 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import df.displayform.ui.design.Colors
-import df.displayform.util.Dates
+import ${namespace}.${java.nameNamespace(app.name)}.ui.design.Colors
+import ${namespace}.${java.nameNamespace(app.name)}.util.Dates
 import java.util.Calendar
 
 data class MonthCell(
@@ -464,7 +464,7 @@ private fun buildWeekDays(dateStr: String, today: String): List<WeekDay> {
     ?: return emptyList()
   val days = mutableListOf<WeekDay>()
   for (i in 0..6) {
-    val cal = startCal.clone() as Calendar
+    val cal = Calendar.getInstance().apply { time = startCal.time }
     cal.add(Calendar.DAY_OF_MONTH, i)
     val d = Dates.format(cal.time)
     val comps = Dates.components(d) ?: continue

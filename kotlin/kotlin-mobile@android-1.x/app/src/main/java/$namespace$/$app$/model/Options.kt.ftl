@@ -1,4 +1,4 @@
-package ${namespace}.${java.nameNamespace(app.name)}.sdk.repository
+package ${namespace}.${java.nameNamespace(app.name)}.model
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

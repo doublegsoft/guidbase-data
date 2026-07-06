@@ -1,3 +1,4 @@
+<#import "/$/kotlin-navypitch.ftl" as kotlin>
 package ${namespace}.${java.nameNamespace(app.name)}.ui.screens
 
 import androidx.compose.foundation.layout.Box
@@ -14,7 +15,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +29,7 @@ import ${namespace}.${java.nameNamespace(app.name)}.ui.components.*
 import ${namespace}.${java.nameNamespace(app.name)}.ui.design.*
 import ${namespace}.${java.nameNamespace(app.name)}.viewmodel.*
 import ${namespace}.${java.nameNamespace(app.name)}.model.*
+import ${namespace}.${java.nameNamespace(app.name)}.util.*
 
 /**
  * 【${page.title}】界面。
@@ -31,11 +37,6 @@ import ${namespace}.${java.nameNamespace(app.name)}.model.*
 @Composable
 fun ${java.nameType(page.name)}Screen(
   viewModel: ${java.nameType(page.name)}ViewModel,
-<#if page.value("params") != "">
-  <#list page.value("params")?split(",") as param>
-  ${java.nameVariable(param)}: String?,
-  </#list>
-</#if>
   onBack: () -> Unit
 ) {
 
@@ -71,6 +72,10 @@ fun ${java.nameType(page.name)}Screen(
       Divider()
     }
   ) {
+    LaunchedEffect(Unit) {
+      viewModel.loadData()
+    }
+
     val state by viewModel.viewState.collectAsState()
     val sta = state
     when (sta) {
@@ -103,12 +108,11 @@ private fun ${java.nameType(page.id)}Body(data: Demo?) {
     Empty()
     return
   }
-
   Column(
     modifier = Modifier
       .fillMaxSize()
       .verticalScroll(rememberScrollState())
   ) {
-    
+<@kotlin.print_page_layout page=page indent=4 /> 
   }
 }

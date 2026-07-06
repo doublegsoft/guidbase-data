@@ -1,7 +1,5 @@
---- START OF FILE Paste July 02, 2026 - 8:22AM ---
-
 <#import "/$/guidbase.ftl" as guidbase>
-<#include "tile-vue3.ftl">
+<#include "kotlin.ftl">
 <!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
 <!----------------------------------------------------------------------------->
@@ -18,6 +16,65 @@
 </#macro>
 
 <#macro print_entry_form_methods form indent=0>
+</#macro>
+
+<#macro print_layout_entry_form form indent=0>
+  <#-- State variables for each input field -->
+  <#list form.inputs as input>
+    <#if input.type == "date" || input.type == "time" || input.type == "datetime">
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)}?.let { Dates.format(it) } ?: "") }
+    <#elseif input.type == "number">
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)}?.toPlainString() ?: "") }
+    <#elseif input.type == "select">
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf((data?.${java.nameVariable(input.id)} as? Option)?.label ?: data?.${java.nameVariable(input.id)}?.toString() ?: "") }
+    <#elseif input.type == "cascade" || input.type == "multiselect">
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf((data?.${java.nameVariable(input.id)} as? List<*>)?.map { (it as? Option)?.label ?: it.toString() } ?: emptyList()) }
+    <#elseif input.type == "tags">
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)} ?: emptyList()) }
+    <#else>
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)} ?: "") }
+    </#if>
+  </#list>
+  <#-- Layout groups and rows -->
+  <#list form.groups() as group>
+    <#local rows = form.rows(group, 1)>
+      <#if group?index != 0>
+${""?left_pad(indent)}Spacer(Modifier.height(Spacings.s5))
+      </#if>
+${""?left_pad(indent)}Card(
+${""?left_pad(indent)}  title = "${group}",
+${""?left_pad(indent)}  accent = Colors.Accent,
+${""?left_pad(indent)}  modifier = Modifier.padding(horizontal = Spacings.s5)
+${""?left_pad(indent)}) {
+    <#list rows as row>
+      <#list row as input>
+        <#local required = input.value("required") == "true">
+        <#if input.type == "date">
+${""?left_pad(indent)}  DateInput(label = "${input.title}", value = ${java.nameVariable(input.id)}, onValueChange = { ${java.nameVariable(input.id)} = it }<#if required>, required = true</#if>)
+        <#elseif input.type == "time">
+${""?left_pad(indent)}  TimeInput(label = "${input.title}", value = ${java.nameVariable(input.id)}, onValueChange = { ${java.nameVariable(input.id)} = it }<#if required>, required = true</#if>)
+        <#elseif input.type == "number">
+${""?left_pad(indent)}  NumberInput(label = "${input.title}", value = ${java.nameVariable(input.id)}, onValueChange = { ${java.nameVariable(input.id)} = it }<#if required>, required = true</#if>)
+        <#elseif input.type == "select">
+          <#if input.value("data")?starts_with("enum[")>
+${""?left_pad(indent)}  SelectInput(label = "${input.title}", value = ${java.nameVariable(input.id)}, options = get${java.nameType(input.id)}Options().map { it.label }, onValueChange = { ${java.nameVariable(input.id)} = it }<#if required>, required = true</#if>)
+          <#else>
+${""?left_pad(indent)}  SelectInput(label = "${input.title}", value = ${java.nameVariable(input.id)}, options = emptyList(), onValueChange = { ${java.nameVariable(input.id)} = it }<#if required>, required = true</#if>)
+          </#if>
+        <#elseif input.type == "longtext">
+${""?left_pad(indent)}  LongTextInput(label = "${input.title}", value = ${java.nameVariable(input.id)}, onValueChange = { ${java.nameVariable(input.id)} = it }<#if required>, required = true</#if>)
+        <#elseif input.type == "cascade" || input.type == "multiselect">
+${""?left_pad(indent)}  TextInput(label = "${input.title}", value = ${java.nameVariable(input.id)}.joinToString(", "), onValueChange = { }, placeholder = "TODO: cascade/multiselect")
+        <#elseif input.type == "tags">
+${""?left_pad(indent)}  TextInput(label = "${input.title}", value = ${java.nameVariable(input.id)}.joinToString(", "), onValueChange = { }, placeholder = "TODO: tags")
+        <#else>
+${""?left_pad(indent)}  TextInput(label = "${input.title}", value = ${java.nameVariable(input.id)}, onValueChange = { ${java.nameVariable(input.id)} = it }<#if required>, required = true</#if>)
+        </#if>
+${""?left_pad(indent)}  FieldDivider()
+      </#list>
+    </#list>
+${""?left_pad(indent)}}
+  </#list>
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -45,32 +102,36 @@
   <#list form.groups() as group>
     <#local rows = form.rows(group, 1)>
       <#if group?index != 0>
-${""?left_pad(indent)}Spacer(Modifier.height(Spacing.s5))
+${""?left_pad(indent)}Spacer(Modifier.height(Spacings.s5))
       </#if>
 ${""?left_pad(indent)}Card(
 ${""?left_pad(indent)}  title = "${group}",
-${""?left_pad(indent)}  accent = Color.Accent,
-${""?left_pad(indent)}  modifier = Modifier.padding(horizontal = Spacing.s5)
+${""?left_pad(indent)}  accent = Colors.Accent,
+${""?left_pad(indent)}  modifier = Modifier.padding(horizontal = Spacings.s5)
 ${""?left_pad(indent)}) {    
     <#list rows as row>
       <#list row as input>
         <#if input.type == "date">
 ${""?left_pad(indent)}  DateDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?.let { Dates.format(it) })
         <#elseif input.type == "time">
-${""?left_pad(indent)}  TimeDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?.fmtStr()) 
+${""?left_pad(indent)}  TimeDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?.let { Dates.format(it) }) 
         <#elseif input.type == "number">
-${""?left_pad(indent)}  NumberDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?.numStr()) 
+${""?left_pad(indent)}  NumberDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?.toPlainString()) 
         <#elseif input.type == "select">
-${""?left_pad(indent)}  SelectDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?.label, color = Color.Accent) 
+${""?left_pad(indent)}  SelectDisplay(label = "${input.title}", value = (data.${java.nameVariable(input.id)} as? Option)?.label ?: data.${java.nameVariable(input.id)}?.toString(), color = Colors.Accent)
         <#elseif input.type == "longtext">
-${""?left_pad(indent)}  LongTextDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?) 
+${""?left_pad(indent)}  LongTextDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)})
+        <#elseif input.type == "cascade" || input.type == "multiselect">
+${""?left_pad(indent)}  OptionsDisplay(label = "${input.title}", options = (data.${java.nameVariable(input.id)} as? List<*>)?.map { (it as? Option)?.label ?: it.toString() } ?: emptyList())
+        <#elseif input.type == "tags">
+${""?left_pad(indent)}  TagsDisplay(label = "${input.title}", tags = data.${java.nameVariable(input.id)} ?: emptyList())
         <#else>
-${""?left_pad(indent)}  TextDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)}?)        
+${""?left_pad(indent)}  TextDisplay(label = "${input.title}", value = data.${java.nameVariable(input.id)})
         </#if>
-${""?left_pad(indent)}  FieldDivider()      
+${""?left_pad(indent)}  FieldDivider()
       </#list>
     </#list>
-${""?left_pad(indent)}}    
+${""?left_pad(indent)}}
   </#list>
 </#macro>
 
@@ -260,28 +321,17 @@ ${""?left_pad(indent)}}
 </#macro>
 
 <#macro print_page_layout page indent=0>
-  <#local children = []>
   <#list page.children as child>
-    <#if child.type != "dialog" && child.type != "drawer" && 
-         child.type != "buttons" && child.type != "entry_form" && 
-         page.value("viewport") == "" >
-<@print_layout_container widget=child indent=indent />       
-    <#else>
-<@print_layout_widget widget=child indent=indent />        
-    </#if>
-    <#if child?index != children?size - 1>
-<@print_layout_divider indent=indent />    
-    </#if>
-  </#list>
-  <#-- 把带有viewport的显示在最后 -->
-  <#list page.children as child>
-    <#if child.value("viewport","") != "">
 <@print_layout_widget widget=child indent=indent />          
-    </#if>
   </#list>
 </#macro>
 
 <#macro print_layout_divider indent=0></#macro>
 
 <#macro print_layout_widget widget indent=0>
+  <#if widget.type == "display_form">
+<@print_layout_display_form form=widget indent=indent />
+  <#elseif widget.type == "entry_form">
+<@print_layout_entry_form form=widget indent=indent />
+  </#if>
 </#macro>
