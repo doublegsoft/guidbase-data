@@ -42,11 +42,7 @@ object ${java.nameType(url.resource)}Assembler {
       <#elseif input.type == "tags">
       ${java.nameVariable(input.id)} = Safe.strings(rawMap["${java.nameVariable(input.id)}"]),
       <#elseif input.type == "multiselect" || input.type == "files" || input.type == "images" || input.type == "videos" || input.type == "cascade">
-        <#if isForm>
-      ${java.nameVariable(input.id)} = Safe.strings(rawMap["${java.nameVariable(input.id)}"]),
-        <#else>
       ${java.nameVariable(input.id)} = Safe.options(rawMap["${java.nameVariable(input.id)}"]),
-        </#if>
       <#else>
       ${java.nameVariable(input.id)} = Safe.string(rawMap["${java.nameVariable(input.id)}"]),
       </#if>

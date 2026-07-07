@@ -39,11 +39,7 @@
     <#return "Date">
   <#elseif input.type == "multiselect" || input.type == "files" || 
            input.type == "images" || input.type == "videos" || input.type == "cascade">
-    <#if input.ancestor("entry_form")?? || input.ancestor("official_form")?? || input.ancestor("excel_form")??>
-      <#return "List<String>">
-    <#else>       
-      <#return "List<Option>">
-    </#if>
+    <#return "List<Option>">
   <#elseif input.type == "tags">
     <#return "List<String>">
   <#else>

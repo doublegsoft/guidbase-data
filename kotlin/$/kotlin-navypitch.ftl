@@ -28,8 +28,10 @@ ${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableSt
     <#elseif input.type == "select">
 ${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf((data?.${java.nameVariable(input.id)} as? Option)?.label ?: data?.${java.nameVariable(input.id)}?.toString() ?: "") }
     <#elseif input.type == "cascade" || input.type == "multiselect">
-${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf((data?.${java.nameVariable(input.id)} as? List<*>)?.map { (it as? Option)?.label ?: it.toString() } ?: emptyList()) }
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)} ?: emptyList()) }
     <#elseif input.type == "tags">
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)} ?: emptyList()) }
+    <#elseif input.type == "images" || input.type == "videos" || input.type == "files">
 ${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)} ?: emptyList()) }
     <#else>
 ${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)} ?: "") }
@@ -63,14 +65,24 @@ ${""?left_pad(indent)}  SelectInput(label = "${input.title}", value = ${java.nam
           </#if>
         <#elseif input.type == "longtext">
 ${""?left_pad(indent)}  LongTextInput(label = "${input.title}", value = ${java.nameVariable(input.id)}, onValueChange = { ${java.nameVariable(input.id)} = it }<#if required>, required = true</#if>)
-        <#elseif input.type == "cascade" || input.type == "multiselect">
-${""?left_pad(indent)}  TextInput(label = "${input.title}", value = ${java.nameVariable(input.id)}.joinToString(", "), onValueChange = { }, placeholder = "TODO: cascade/multiselect")
+        <#elseif input.type == "cascade">
+${""?left_pad(indent)}  CascadeSelect(label = "${input.title}", selectedPath = ${java.nameVariable(input.id)}, topOptions = emptyList(), childrenProvider = { emptyList() }, onPathChange = { ${java.nameVariable(input.id)} = it })
+        <#elseif input.type == "multiselect">
+${""?left_pad(indent)}  MultiSelect(label = "${input.title}", selected = ${java.nameVariable(input.id)}, options = emptyList(), onSelectionChange = { ${java.nameVariable(input.id)} = it })
         <#elseif input.type == "tags">
-${""?left_pad(indent)}  TextInput(label = "${input.title}", value = ${java.nameVariable(input.id)}.joinToString(", "), onValueChange = { }, placeholder = "TODO: tags")
+${""?left_pad(indent)}  TagsInput(label = "${input.title}", tags = ${java.nameVariable(input.id)}, onTagsChange = { ${java.nameVariable(input.id)} = it })
+        <#elseif input.type == "avatar">
+${""?left_pad(indent)}  AvatarInput(label = "${input.title}", uri = ${java.nameVariable(input.id)}, onUriChange = { ${java.nameVariable(input.id)} = it })        
+        <#elseif input.type == "images">
+${""?left_pad(indent)}  ImagesInput(label = "${input.title}", options = ${java.nameVariable(input.id)}, onOptionsChange = { ${java.nameVariable(input.id)} = it })
+        <#elseif input.type == "videos">
+${""?left_pad(indent)}  VideosInput(label = "${input.title}", options = ${java.nameVariable(input.id)}, onOptionsChange = { ${java.nameVariable(input.id)} = it })
+        <#elseif input.type == "files">
+${""?left_pad(indent)}  FilesInput(label = "${input.title}", options = ${java.nameVariable(input.id)}, onOptionsChange = { ${java.nameVariable(input.id)} = it })
         <#else>
 ${""?left_pad(indent)}  TextInput(label = "${input.title}", value = ${java.nameVariable(input.id)}, onValueChange = { ${java.nameVariable(input.id)} = it }<#if required>, required = true</#if>)
         </#if>
-${""?left_pad(indent)}  FieldDivider()
+${""?left_pad(indent)}  Spacer(Modifier.height(Spacings.s5))
       </#list>
     </#list>
 ${""?left_pad(indent)}}
