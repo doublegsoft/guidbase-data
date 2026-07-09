@@ -83,4 +83,10 @@ object Dates {
     val dow = cal.get(Calendar.DAY_OF_WEEK)
     return dow == Calendar.SUNDAY || dow == Calendar.SATURDAY
   }
+
+  fun date(year: Int, month: Int, day: Int, hour: Int = 0, minute: Int = 0): Date {
+    return Calendar.getInstance().apply {
+      set(year, month - 1, day, hour, minute, 0)
+    }.time
+  }
 }

@@ -20,6 +20,12 @@ object Colors {
   val PrimaryLight = androidx.compose.ui.graphics.Color(0xFF1D3448)
   val PrimaryMuted = androidx.compose.ui.graphics.Color(0xFF1B4F72)
 
+  // Brand / Secondary
+  val Secondary      = androidx.compose.ui.graphics.Color(0xFF1B3A5C)
+  val SecondaryDark  = androidx.compose.ui.graphics.Color(0xFF12273D)
+  val SecondaryLight = androidx.compose.ui.graphics.Color(0xFF2A5078)
+  val SecondaryMuted = androidx.compose.ui.graphics.Color(0xFF236094)
+
   // Semantic accent
   val Accent       = androidx.compose.ui.graphics.Color(0xFF00C9A7)
   val AccentHover  = androidx.compose.ui.graphics.Color(0xFF00B599)
@@ -51,9 +57,11 @@ object Colors {
   val Bg      = androidx.compose.ui.graphics.Color(0xFFF5F7FA)
 
   // Text
-  val TextMain  = androidx.compose.ui.graphics.Color(0xFF1A2B3C)
-  val TextSub   = androidx.compose.ui.graphics.Color(0xFF5A7080)
-  val TextMuted = androidx.compose.ui.graphics.Color(0xFF95AABA)
+  val TextMain      = androidx.compose.ui.graphics.Color(0xFF1A2B3C)
+  val TextSecondary = androidx.compose.ui.graphics.Color(0xFF4A6070)
+  val TextSub       = androidx.compose.ui.graphics.Color(0xFF5A7080)
+  val TextTertiary  = androidx.compose.ui.graphics.Color(0xFF7A8E9E)
+  val TextMuted     = androidx.compose.ui.graphics.Color(0xFF95AABA)
 
   // Borders
   val Border = androidx.compose.ui.graphics.Color(0xFFE2EAF0)

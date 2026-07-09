@@ -222,6 +222,80 @@
 </#function>
 
 <#--
+ ###############################################################################
+ ### 判断是否包含加载更多 (Check If Page Has Load More)
+ ### 
+ ### 根据页面对象中的 "containers" 和 "children" 属性，判断该页面是否支持加载更多功能。
+ ### 主要用于检测页面底部是否为可滚动的列表或网格视图。
+ ### 
+ ### 查找与定位规则：
+ ### - 检查页面的容器数量，若 "containers" 数量大于 1，则直接返回 false。
+ ### - 获取页面的最后一个子元素 ("children" 列表中的最后一项)。
+ ### - 若最后一个子元素的类型 ("type") 为 "list_view" 或 "grid_view"，则返回 true，否则返回 false。
+ ### 
+ ### @param page  页面对象 (Object)
+ ### @return      是否支持加载更多 (Boolean)
+ ###############################################################################
+ -->
+<#function has_loading_more page>
+  <#if (page.containers?size > 1)>
+    <#return false>
+  </#if>
+  <#local lastChild = page.children[page.children?size - 1]>
+  <#if lastChild.type == "list_view" || lastChild.type == "grid_view">
+    <#return true>
+  </#if>
+  <#return false>
+</#function>
+
+<#--
+ ###############################################################################
+ ### 获取页面关联资源对象 (Get Page Resource Object)
+ ### 
+ ### 遍历页面中的组件列表，获取首个包含有效数据（"data"）的组件所关联的资源。
+ ### 
+ ### 查找与定位规则：
+ ### - 依次遍历页面对象（page）中的组件列表（widgets）。
+ ### - 检查每个组件的 "data" 属性，如果该属性值为空，则跳过当前组件。
+ ### - 遇到首个包含非空 "data" 属性的组件时，解析该数据的 URL 并返回对应的资源（resource）。
+ ### 
+ ### @param page  页面对象 (Object)
+ ### @return      解析后的资源对象或路径，若未找到有效数据则返回空 (Resource Object / Null)
+ ###############################################################################
+ -->
+<#function get_page_object page>
+  <#list page.widgets as widget>
+    <#if widget.value("data") == ""><#continue></#if>
+    <#return valuebase.url(widget.value("data")).resource>
+  </#list>
+</#function>
+
+<#--
+ ###############################################################################
+ ### 获取加载更多组件 (Get Load More Widget)
+ ### 
+ ### 遍历页面中的组件，寻找第一个类型为列表视图（list_view）或分页网格（paged_grid）
+ ### 且包含有效数据的组件对象。
+ ### 
+ ### 查找与定位规则：
+ ### - 依次遍历页面对象（page）中的组件列表（widgets）。
+ ### - 检查组件的 "data" 属性，若值为空字符串则忽略并继续。
+ ### - 评估组件的类型（type），若为 "list_view" 或 "paged_grid"，则返回该组件。
+ ### 
+ ### @param page  页面对象 (Object)
+ ### @return      符合条件的加载更多组件对象，若未找到则无返回值 (Widget Object / Null)
+ ###############################################################################
+ -->
+<#function get_loading_more_widget page>
+  <#list page.widgets as widget>
+    <#if widget.value("data") == ""><#continue></#if>
+    <#if widget.type == "list_view" || widget.type == "paged_grid">
+      <#return widget>
+    </#if>
+  </#list>
+</#function>
+
+<#--
  ###
  ###
  ###

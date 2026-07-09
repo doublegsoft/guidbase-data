@@ -12,6 +12,23 @@
 <!--                                ENTRY FORM                               -->
 <!----------------------------------------------------------------------------->
 <#macro print_entry_form_variables form indent=0>
+  <#list form.inputs as input>
+    <#if input.type == "date" || input.type == "time" || input.type == "datetime">
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)}?.let { Dates.format(it) } ?: "") }
+    <#elseif input.type == "number">
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)}?.toString() ?: "") }
+    <#elseif input.type == "select">
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf((data?.${java.nameVariable(input.id)} as? Option)?.label ?: data?.${java.nameVariable(input.id)}?.toString() ?: "") }
+    <#elseif input.type == "cascade" || input.type == "multiselect">
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)} ?: emptyList()) }
+    <#elseif input.type == "tags">
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)} ?: emptyList()) }
+    <#elseif input.type == "images" || input.type == "videos" || input.type == "files">
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)} ?: emptyList()) }
+    <#else>
+${""?left_pad(indent)}var ${java.nameVariable(input.id)} by remember { mutableStateOf(data?.${java.nameVariable(input.id)} ?: "") }
+    </#if>
+  </#list>
 </#macro>
 
 <#macro print_entry_form_methods form indent=0>
@@ -108,6 +125,17 @@
 <!--                                LIST VIEW                                -->
 <!----------------------------------------------------------------------------->
 <#macro print_list_view_variables list indent=0>
+${""?left_pad(indent)}val ${java.nameVariable(list.id)}State = rememberLazyListState()
+${""?left_pad(indent)}val shouldLoadMore by remember {
+${""?left_pad(indent)}  derivedStateOf {
+${""?left_pad(indent)}    val lastIndex = ${java.nameVariable(list.id)}State.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+${""?left_pad(indent)}    val total = ${java.nameVariable(list.id)}State.layoutInfo.totalItemsCount
+${""?left_pad(indent)}    hasMore && !isLoadingMore && total > 0 && lastIndex >= total - 3
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}}
+${""?left_pad(indent)}LaunchedEffect(shouldLoadMore) {
+${""?left_pad(indent)}  if (shouldLoadMore) onLoadMore()
+${""?left_pad(indent)}}
 </#macro>
 
 <#macro print_list_view_methods list indent=0>
@@ -142,73 +170,6 @@
 <!----------------------------------------------------------------------------->
 <#macro print_page_imports page indent=0>
   <#local visited_types = {}>
-  <#list page.widgets as widget>
-    <#if widget.type == 'entry_form' || widget.type == 'official_form' || widget.type == "excel_form">
-import { useAsyncLock } from '@/composables/useAsyncLock'
-import { useFieldValidation } from '@/composables/useFieldValidation'
-      <#break>
-    </#if>
-  </#list>  
-  <#list page.widgets as widget>
-    <#if visited_types[widget.type]??><#continue></#if>
-    <#if widget.type == "excel_form">
-import ${js.nameType(namespace)}Excelform from '@/components/${namespace}-excelform.vue'
-    <#elseif widget.type == "paged_table">
-import ${js.nameType(namespace)}Pagedtable from '@/components/${namespace}-pagedtable.vue'
-    <#elseif widget.type == "fixed_table">
-import ${js.nameType(namespace)}Fixedtable from '@/components/${namespace}-fixedtable.vue'
-    <#elseif widget.type == "paged_grid">
-import ${js.nameType(namespace)}Pagedgrid from '@/components/${namespace}-pagedgrid.vue'      
-    <#elseif widget.type == "week_grid">
-import ${js.nameType(namespace)}Weekgrid from '@/components/${namespace}-weekgrid.vue'
-    <#elseif widget.type == "chart">
-import ${js.nameType(namespace)}Chart from '@/components/${namespace}-chart.vue'    
-import { createChart } from '@/sdk/charts'    
-    <#elseif widget.type == "select">
-import ${js.nameType(namespace)}Dropdown from '@/components/${namespace}-dropdown.vue'  
-    <#elseif widget.type == "date">
-import ${js.nameType(namespace)}Datepicker from '@/components/${namespace}-datepicker.vue'  
-    <#elseif widget.type == "time">
-import ${js.nameType(namespace)}Timepicker from '@/components/${namespace}-timepicker.vue'  
-    <#elseif widget.type == "cascade">
-import ${js.nameType(namespace)}Cascadepicker from '@/components/${namespace}-cascadepicker.vue'    
-    <#elseif widget.type == "multiselect">
-import ${js.nameType(namespace)}Multiselect from '@/components/${namespace}-multiselect.vue'   
-    <#elseif widget.type == "avatar">
-import ${js.nameType(namespace)}Avatarupload from '@/components/${namespace}-avatarupload.vue' 
-    <#elseif widget.type == "tags">
-import ${js.nameType(namespace)}Tagsinput from '@/components/${namespace}-tagsinput.vue' 
-    <#elseif widget.type == "files">
-import ${js.nameType(namespace)}Fileupload from '@/components/${namespace}-fileupload.vue' 
-    <#elseif widget.type == "images">
-import ${js.nameType(namespace)}Imageupload from '@/components/${namespace}-imageupload.vue' 
-    <#elseif widget.type == "videos">
-import ${js.nameType(namespace)}Videoupload from '@/components/${namespace}-videoupload.vue' 
-    </#if>
-    <#local visited_types += {widget.type: widget} />
-  </#list>
-  <#local drawerImported = false>
-  <#local dialogImported = false>
-  <#-- drawer and dialog -->
-  <#list page.widgets as widget>
-    <#if widget.value("action") == ""><#continue></#if>
-    <#local action = valuebase.action(widget.value("action"))>
-    <#if action.type.name() == "DRAWER" && !drawerImported>
-      <#local drawerImported = true>
-import ${js.nameType(namespace)}Drawer from '@/components/${namespace}-drawer.vue'  
-      <#local dialogImported = true>
-    <#elseif action.type.name() == "DIALOG" && !dialogImported>   
-import ${js.nameType(namespace)}Dialog from '@/components/${namespace}-dialog.vue'       
-    </#if>
-  </#list>
-  <#-- pages -->
-  <#list page.widgets as widget>
-    <#if widget.value("action") == ""><#continue></#if>
-    <#local action = valuebase.action(widget.value("action"))>
-    <#if action.type.name() == "DRAWER" || action.type.name() == "DIALOG">
-import ${js.nameType(namespace + "_" + action.resource)} from '@/pages/${js.nameFile(action.path)}.vue'      
-    </#if>
-  </#list>
 </#macro>
 
 <#macro print_page_variables page indent=0>
@@ -300,6 +261,10 @@ ${""?left_pad(indent)}}
 
 <#macro print_layout_widget widget indent=0>
   <#if widget.type == "display_form">
-<@print_layout_display_form form=widget indent=indent />  
+<@print_layout_display_form form=widget indent=indent />
+  <#elseif widget.type == "entry_form">
+<@print_layout_entry_form form=widget indent=indent />
+  <#elseif widget.type == "list_view">
+<@print_layout_list_view list=widget indent=indent />
   </#if>
 </#macro>

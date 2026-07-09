@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
@@ -63,12 +64,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import df.entryform.model.Option
+import ${namespace}.${java.nameNamespace(app.name)}.model.Option
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -403,6 +405,7 @@ private fun BaseCompactTextField(
   singleLine: Boolean = true,
   minLines: Int = 1,
   keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+  keyboardActions: KeyboardActions = KeyboardActions.Default,
   trailingIcon: @Composable (() -> Unit)? = null
 ) {
   BasicTextField(
@@ -412,6 +415,7 @@ private fun BaseCompactTextField(
     singleLine = singleLine,
     minLines = minLines,
     keyboardOptions = keyboardOptions,
+    keyboardActions = keyboardActions,
     textStyle = TextStyle(
       fontSize = 12.sp, // 精简字体尺寸
       color = Colors.TextMain
@@ -539,6 +543,7 @@ fun DateInput(
   value: String,
   onValueChange: (String) -> Unit,
   required: Boolean = false,
+  placeholder: String = "YYYY-MM-DD",
   modifier: Modifier = Modifier
 ) {
   var showDialog by remember { mutableStateOf(false) }
@@ -577,7 +582,7 @@ fun DateInput(
   InputRow(label = label, required = required, modifier = modifier) {
     ClickableField(
       value = value,
-      placeholder = "YYYY-MM-DD",
+      placeholder = placeholder,
       trailingIcon = { Text("📅", fontSize = 14.sp) },
       onClick = { showDialog = true },
       modifier = Modifier.fillMaxWidth()
@@ -596,6 +601,7 @@ fun TimeInput(
   value: String,
   onValueChange: (String) -> Unit,
   required: Boolean = false,
+  placeholder: String = "HH:mm",
   modifier: Modifier = Modifier
 ) {
   var showDialog by remember { mutableStateOf(false) }
@@ -629,7 +635,7 @@ fun TimeInput(
   InputRow(label = label, required = required, modifier = modifier) {
     ClickableField(
       value = value,
-      placeholder = "HH:mm",
+      placeholder = placeholder,
       trailingIcon = { Text("🕐", fontSize = 14.sp) },
       onClick = { showDialog = true },
       modifier = Modifier.fillMaxWidth()
@@ -649,6 +655,7 @@ fun SelectInput(
   options: List<String>,
   onValueChange: (String) -> Unit,
   required: Boolean = false,
+  placeholder: String = "请选择",
   modifier: Modifier = Modifier
 ) {
   var expanded by remember { mutableStateOf(false) }
@@ -657,7 +664,7 @@ fun SelectInput(
     Box {
       ClickableField(
         value = value,
-        placeholder = "",
+        placeholder = placeholder,
         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
         onClick = { expanded = true },
         modifier = Modifier.fillMaxWidth()
@@ -1134,6 +1141,7 @@ fun TagsInput(
   suggestions: List<String> = emptyList(),
   required: Boolean = false,
   maxCount: Int = 20,
+  placeholder: String = "输入标签，回车添加",
   modifier: Modifier = Modifier
 ) {
   var text by remember { mutableStateOf("") }
@@ -1179,9 +1187,19 @@ fun TagsInput(
             text = it
             showSuggestions = it.isNotBlank() && filtered.isNotEmpty()
           },
-          placeholder = "输入标签，回车添加",
+          placeholder = placeholder,
           modifier = Modifier.fillMaxWidth(),
-          keyboardOptions = KeyboardOptions.Default
+          keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+          keyboardActions = KeyboardActions(
+            onDone = {
+              val trimmed = text.trim()
+              if (trimmed.isNotEmpty() && tags.size < maxCount && trimmed !in tags) {
+                onTagsChange(tags + trimmed)
+                text = ""
+                showSuggestions = false
+              }
+            }
+          )
         )
         DropdownMenu(
           expanded = showSuggestions,
@@ -1222,6 +1240,7 @@ fun MultiSelect(
   options: List<Option>,
   onSelectionChange: (List<Option>) -> Unit,
   required: Boolean = false,
+  placeholder: String = "请选择",
   modifier: Modifier = Modifier
 ) {
   var expanded by remember { mutableStateOf(false) }
@@ -1259,7 +1278,7 @@ fun MultiSelect(
       Box {
         ClickableField(
           value = if (selected.isEmpty()) "" else "已选 ${r"${"}selected.size} 项",
-          placeholder = "",
+          placeholder = placeholder,
           trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
           onClick = { expanded = true },
           modifier = Modifier.fillMaxWidth()
@@ -1318,6 +1337,7 @@ fun CascadeSelect(
   onPathChange: (List<Option>) -> Unit,
   childrenProvider: (Option) -> List<Option>,
   required: Boolean = false,
+  placeholder: String = "请选择",
   modifier: Modifier = Modifier
 ) {
   var expanded by remember { mutableStateOf(false) }
@@ -1333,7 +1353,7 @@ fun CascadeSelect(
     Box {
       ClickableField(
         value = if (selectedPath.isEmpty()) "" else selectedPath.joinToString(" › ") { it.label },
-        placeholder = "请选择",
+        placeholder = placeholder,
         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
         onClick = {
           navStack = listOf(topOptions)
