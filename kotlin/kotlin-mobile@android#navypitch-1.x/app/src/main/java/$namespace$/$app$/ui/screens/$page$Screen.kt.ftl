@@ -38,7 +38,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,7 +54,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ${namespace}.${java.nameNamespace(app.name)}.ui.components.*
 import ${namespace}.${java.nameNamespace(app.name)}.ui.design.*
+import ${namespace}.${java.nameNamespace(app.name)}.sdk.payload.*
 import ${namespace}.${java.nameNamespace(app.name)}.viewmodel.*
+import ${namespace}.${java.nameNamespace(app.name)}.behavior.*
 import ${namespace}.${java.nameNamespace(app.name)}.model.*
 import ${namespace}.${java.nameNamespace(app.name)}.util.*
 
@@ -104,27 +110,25 @@ fun ${java.nameType(page.name)}Screen(
 
     val state by viewModel.viewState.collectAsState()
     val sta = state
-    when (sta) {
-      is ${java.nameType(page.id)}ViewState.Loading -> {
+<#list page.containers as container>
+  <#if container.value("data") == "">#continue></#if>    
+    when (val widgetState = sta.${java.nameVariable(container.id)}State) {
+      is ${java.nameType(container.id)}State.Loading -> {
         Loading()
       }
-      is ${java.nameType(page.id)}ViewState.Error -> {
+      is ${java.nameType(container.id)}State.Error -> {
         Error(
-          message = sta.message,
+          message = widgetState.message,
           retryLabel = "重试",
           onRetry = { viewModel.refresh() }
         )
       }
-      is ${java.nameType(page.id)}ViewState.Success -> {
-<#list page.containers as container>    
+      is ${java.nameType(container.id)}State.Success -> {  
   <#if container.type == "entry_form" || container.type == "display_form">
         ${java.nameType(page.id)}Body(data = sta.${java.nameVariable(container.id)}Data)
   <#elseif container.type == "list_view">    
-        ${java.nameType(page.id)}Body(
-          rows = sta.${java.nameVariable(container.id)}Rows.toList(),
-          isLoadingMore = sta.isLoadingMore,
-          hasMore = sta.hasMore,
-          onLoadMore = { viewModel.loadMore() }
+        ${java.nameType(container.id)}Body(
+          paging = viewModel.${java.nameVariable(container.id)}Paging,
         )
   </#if>
 </#list>
@@ -133,89 +137,4 @@ fun ${java.nameType(page.name)}Screen(
   }
 }
 <#-- 【Body】函数 -->
-<#list page.containers as container>    
-  <#if container.value("data") == ""><#continue></#if>
-  <#assign url = valuebase.url(container.value("data"))>  
-
-@Composable  
-  <#if container.type == "entry_form" || container.type == "display_form">
-private fun ${java.nameType(page.id)}Body(data: ${java.nameType(url.resource)}?) { 
-  if (data == null) {
-  <#elseif container.type == "list_view"> 
-    <#if guidbase.has_loading_more(page)>
-private fun ListFormPageBody(
-  rows: List<${java.nameType(url.resource)}>?,
-  isLoadingMore: Boolean,
-  hasMore: Boolean,
-  onLoadMore: () -> Unit
-) {    
-    <#else>
-private fun ${java.nameType(page.id)}Body(rows: List<${java.nameType(url.resource)}>?) { 
-    </#if>
-  if (rows.isNullOrEmpty()) {
-  <#else>
-private fun ${java.nameType(page.id)}Body() { 
-  if (true) {  
-  </#if>  
-    Empty()
-    return
-  }
-<@kotlin.print_page_variables page=page indent=2 />
-
-<#if guidbase.has_loading_more(page)>
-  LazyColumn(
-    state = ${java.nameVariable(guidbase.get_loading_more_widget(page).id)}State,
-    modifier = Modifier
-      .fillMaxSize()
-      .padding(top = Spacings.s5)
-  ) {
-<#else>
-  Column(
-    modifier = Modifier
-      .fillMaxSize()
-      .verticalScroll(rememberScrollState())
-      .padding(top = Spacings.s5)
-  ) {
-</#if>
-<@kotlin.print_page_layout page=page indent=4 /> 
-  }
-}  
-</#list>
-<#-- 页面可以加载更多时，额外的【加载动画】 -->
-<#if guidbase.has_loading_more(page)>
-
-@Composable
-private fun LoadMoreSpinner() {
-  val transition = rememberInfiniteTransition(label = "loadMore")
-  val rotation by transition.animateFloat(
-    initialValue = 0f,
-    targetValue = 360f,
-    animationSpec = infiniteRepeatable(
-      animation = tween(durationMillis = 900, easing = LinearEasing),
-      repeatMode = RepeatMode.Restart
-    ),
-    label = "rotation"
-  )
-  Canvas(
-    modifier = Modifier
-      .size(24.dp)
-      .rotate(rotation)
-  ) {
-    drawArc(
-      color = Colors.Border,
-      startAngle = 0f,
-      sweepAngle = 360f,
-      useCenter = false,
-      style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round)
-    )
-    drawArc(
-      color = Colors.Accent,
-      startAngle = 0f,
-      sweepAngle = 270f,
-      useCenter = false,
-      style = Stroke(width = 2.5.dp.toPx(), cap = StrokeCap.Round)
-    )
-  }
-}
-</#if>
-
+<@kotlin.print_layout_page_methods page=page />

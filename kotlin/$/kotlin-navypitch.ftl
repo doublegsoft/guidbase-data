@@ -193,26 +193,15 @@ ${""?left_pad(indent)}}
 <!--                                LIST VIEW                                -->
 <!----------------------------------------------------------------------------->
 <#macro print_layout_list_view list indent=0>
-${""?left_pad(indent)}items(rows) { item ->
+${""?left_pad(indent)}items(snapshot.rows) { item ->
 <@print_tile_layout widget=list indent=indent+2 />
 ${""?left_pad(indent)}  Spacer(Modifier.height(Spacings.s5))
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}item {
-${""?left_pad(indent)}  Box(
-${""?left_pad(indent)}    modifier = Modifier
-${""?left_pad(indent)}      .fillMaxWidth()
-${""?left_pad(indent)}      .padding(Spacings.s4),
-${""?left_pad(indent)}    contentAlignment = Alignment.Center
-${""?left_pad(indent)}  ) {
-${""?left_pad(indent)}    when {
-${""?left_pad(indent)}      isLoadingMore -> LoadMoreSpinner()
-${""?left_pad(indent)}      !hasMore -> Text(
-${""?left_pad(indent)}      text = "没有更多数据了",
-${""?left_pad(indent)}      fontSize = Types.TextSm,
-${""?left_pad(indent)}      color = Colors.TextMuted
-${""?left_pad(indent)}      )
-${""?left_pad(indent)}    }
-${""?left_pad(indent)}  }
+${""?left_pad(indent)}  PagingFooter(
+${""?left_pad(indent)}    isLoadingMore = snapshot.isLoading,
+${""?left_pad(indent)}    hasMore = snapshot.hasMore,
+${""?left_pad(indent)}  )
 ${""?left_pad(indent)}}
 </#macro>
 

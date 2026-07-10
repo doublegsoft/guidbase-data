@@ -139,6 +139,69 @@ ${""?left_pad(indent)}}
 </#macro>
 
 <#macro print_list_view_methods list indent=0>
+  <#local url = valuebase.url(list.value("data"))>
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * 加载更多方法 —— 委托给 PagingBehavior。
+${""?left_pad(indent)} */
+${""?left_pad(indent)}fun load${java.nameType(conlisttainer.id)}More() {
+${""?left_pad(indent)}  val current = _viewState.${java.nameVariable(list.id)}State.value
+${""?left_pad(indent)}  if (current !is ${java.nameType(page.name)}ViewState.${java.nameVariable(list.id)}State.Success || 
+${""?left_pad(indent)}      current.${java.nameVariable(list.id)}State.isLoadingMore || 
+${""?left_pad(indent)}      !current.${java.nameVariable(list.id)}State.hasMore) 
+${""?left_pad(indent)}    return
+${""?left_pad(indent)}
+${""?left_pad(indent)}  viewModelScope.launch {
+${""?left_pad(indent)}    _viewState.${java.nameVariable(list.id)}State.value = current.${java.nameVariable(list.id)}State.copy(isLoadingMore = true)
+${""?left_pad(indent)}    try {
+${""?left_pad(indent)}      ${java.nameVariable(list.id)}Paging.loadMore()
+${""?left_pad(indent)}      _viewState.${java.nameVariable(list.id)}State.value = ${java.nameType(page.name)}ViewState.${java.nameVariable(list.id)}State.Success(${java.nameVariable(list.id)}Rows = paging.snapshot)
+${""?left_pad(indent)}    } catch (e: Exception) {
+${""?left_pad(indent)}      // 加载更多失败时保持现有数据，仅重置 loading 状态
+${""?left_pad(indent)}      _viewState.${java.nameVariable(list.id)}State.value = current.copy(isLoadingMore = false)
+${""?left_pad(indent)}    }
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}}
+</#macro>
+
+<#macro print_layout_list_view_methods list indent=0>
+  <#local url = valuebase.url(list.value("data"))>
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * 【${list.title}】布局
+${""?left_pad(indent)} */  
+${""?left_pad(indent)}@Composable
+${""?left_pad(indent)}private fun ${java.nameType(list.id)}Body(
+${""?left_pad(indent)}  paging: PagingBehavior<${java.nameType(url.resource)}, ${java.nameType(url.resource)}Query>,
+${""?left_pad(indent)}) {
+${""?left_pad(indent)}  // 用 Compose State 镜像 paging 的普通字段，使 Compose 能感知变化
+${""?left_pad(indent)}  val snapshot by paging.snapshotFlow.collectAsState()
+${""?left_pad(indent)}
+${""?left_pad(indent)}  if (paging.snapshot.rows.isNullOrEmpty()) {
+${""?left_pad(indent)}    Empty()
+${""?left_pad(indent)}    return
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  val ${java.nameVariable(list.id)}State = rememberLazyListState()
+${""?left_pad(indent)}  // snapshotFlow 追踪本地 State 变化，collect 顺序执行不取消，天然解耦检测与执行
+${""?left_pad(indent)}  LaunchedEffect(Unit) {
+${""?left_pad(indent)}    snapshotFlow {
+${""?left_pad(indent)}      val lastIndex = demoListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+${""?left_pad(indent)}      val total = demoListState.layoutInfo.totalItemsCount
+${""?left_pad(indent)}      snapshot.hasMore && !snapshot.isLoading && total > 0 && lastIndex >= total - 3
+${""?left_pad(indent)}    }.collect { shouldLoad ->
+${""?left_pad(indent)}      if (shouldLoad) {
+${""?left_pad(indent)}        paging.loadMore()
+${""?left_pad(indent)}      }
+${""?left_pad(indent)}    }
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  LazyColumn(
+${""?left_pad(indent)}    state = ${java.nameVariable(list.id)}State,
+${""?left_pad(indent)}    modifier = Modifier
+${""?left_pad(indent)}      .fillMaxSize()
+${""?left_pad(indent)}      .padding(top = Spacings.s5)
+${""?left_pad(indent)}  ) {
+<@print_layout_list_view list=list indent=4 />
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}} 
+${""?left_pad(indent)}
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -248,6 +311,14 @@ ${""?left_pad(indent)}}
 ${""?left_pad(indent)}const handle${js.nameType(widget.id)}RowAction = ({ handler, row, index }) => {
 ${""?left_pad(indent)}  ${js.nameVariable(widget.id)}RowActionHandlers[handler]?.(row, index)
 ${""?left_pad(indent)}}    
+  </#list>
+</#macro>
+
+<#macro print_layout_page_methods page indent=0>
+  <#list page.widgets as widget>
+    <#if widget.type == 'list_view'>
+<@print_layout_list_view_methods list=widget indent=indent />    
+    </#if>
   </#list>
 </#macro>
 
