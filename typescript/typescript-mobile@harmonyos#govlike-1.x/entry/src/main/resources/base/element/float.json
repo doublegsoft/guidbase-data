@@ -1,0 +1,10 @@
+{
+  "float": [
+    { "name": "sp_xs", "value": "4vp" },
+    { "name": "sp_sm", "value": "6vp" },
+    { "name": "sp_md", "value": "12vp" },
+    { "name": "sp_lg", "value": "16vp" },
+    { "name": "radius_sm", "value": "2vp" },
+    { "name": "radius_md", "value": "4vp" }
+  ]
+}

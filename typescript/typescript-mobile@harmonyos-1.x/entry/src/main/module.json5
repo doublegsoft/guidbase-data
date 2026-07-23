@@ -1,0 +1,33 @@
+{
+  "module": {
+    "name": "default",
+    "type": "entry",
+    "description": "",
+    "mainElement": "DefaultAbility",
+    "deviceTypes": [
+      "phone"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",
+    "abilities": [{
+      "name": "DefaultAbility",
+      "srcEntry": "./ets/abilities/DefaultAbility.ets",
+      "description": "",
+      "icon": "$media:layered_image",
+      "label": "$string:ability_label",
+      "startWindowIcon": "$media:startIcon",
+      "startWindowBackground": "$color:bg_page",
+      "exported": true,
+      "skills": [{
+        "entities": [
+          "entity.system.home"
+        ],
+        "actions": [
+          "ohos.want.action.home"
+        ]
+      }]
+    }],
+    "extensionAbilities": []
+  }
+}
