@@ -319,6 +319,21 @@ export struct FormSection {
 }
 
 @Component
+export struct FormSectionTitle {
+  private title: string = ''
+
+  build() {
+    Row() {
+      Rect({ width: 4, height: 14 }).fill($r('app.color.primary')).radius(2)
+      Text(this.title).fontSize(14).fontWeight(FontWeight.Bold)
+        .fontColor($r('app.color.primary_dark')).margin({ left: 8 })
+    }
+    .width('100%').padding({ left: 16, right: 16, top: 14, bottom: 10 })
+    .border({ width: { bottom: 1 }, color: $r('app.color.border_light') })
+  }
+}
+
+@Component
 export struct Avatar {
   private text: string | null = ''
   private avatarSize: number = 48
@@ -361,7 +376,7 @@ export struct InputRow {
     Row() {
       Text(this.label).fontSize(13).fontColor($r('app.color.text_muted'))
         .fontWeight(FontWeight.Bold).width(56).flexShrink(0)
-      TextInput({ text: this.value, placeholder: `请输入${this.label}` })
+      TextInput({ text: this.value, placeholder: ${r"`请输入${this.label}`"} })
         .type(this.multiline ? InputType.Normal : this.inputType)
         .placeholderColor($r('app.color.text_light'))
         .placeholderFont({size: 14})
@@ -387,7 +402,7 @@ export struct DateRow {
     Row() {
       Text(this.label).fontSize(13).fontColor($r('app.color.text_muted'))
         .fontWeight(FontWeight.Bold).width(56).flexShrink(0)
-      Text(this.value || `请选择${this.label}`)
+      Text(this.value || ${r"`请选择${this.label}`"})
         .fontSize(14).padding({left: 17})
         .fontColor(this.value ? $r('app.color.text') : $r('app.color.text_light'))
         .layoutWeight(1)
@@ -405,7 +420,7 @@ export struct DateRow {
             const m: number = result.month as number + 1
             const md: string = String(m).padStart(2, '0')
             const dd: string = String(result.day).padStart(2, '0')
-            const str: string = `${result.year}-${md}-${dd}`
+            const str: string = ${r"`${result.year}-${md}-${dd}`"}
             if (this.onSelect) { this.onSelect(str) }
           }
         }
@@ -425,7 +440,7 @@ export struct DropdownRow {
     Row() {
       Text(this.label).fontSize(13).fontColor($r('app.color.text_muted'))
         .fontWeight(FontWeight.Bold).width(56).flexShrink(0)
-      Text(this.value || `请选择${this.label}`)
+      Text(this.value || ${r"`请选择${this.label}`"})
         .fontSize(14).padding({left: 17})
         .fontColor(this.value ? $r('app.color.text') : $r('app.color.text_light'))
         .layoutWeight(1)

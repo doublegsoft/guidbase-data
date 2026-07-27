@@ -247,38 +247,85 @@ ${""?left_pad(indent)}.backgroundColor($r('app.color.bg_page'))
 <!--                              ENTRY FORM                                 -->
 <!----------------------------------------------------------------------------->
 <#macro print_entry_form_layout form indent=0>
+  <#local url = valuebase.url(form.value("data"))>
 ${""?left_pad(indent)}Column() {
-${""?left_pad(indent)}  ForEach(this.${js.nameVariable(form.id)}Fields, (field: any) => {
-${""?left_pad(indent)}    Column() {
-${""?left_pad(indent)}      Row() {
-${""?left_pad(indent)}        Text(field.label)
-${""?left_pad(indent)}          .fontSize(14)
-${""?left_pad(indent)}          .fontColor($r('app.color.text'))
-${""?left_pad(indent)}        if (field.required) {
-${""?left_pad(indent)}          Text('*')
-${""?left_pad(indent)}            .fontColor($r('app.color.danger'))
-${""?left_pad(indent)}            .margin({ left: 4 })
-${""?left_pad(indent)}        }
-${""?left_pad(indent)}      }
-${""?left_pad(indent)}      .width('100%')
-${""?left_pad(indent)}      .margin({ bottom: 8 })
-${""?left_pad(indent)}
-${""?left_pad(indent)}      TextInput({ text: field.value, placeholder: field.placeholder })
-${""?left_pad(indent)}        .width('100%')
-${""?left_pad(indent)}        .placeholderColor($r('app.color.text_light'))
-${""?left_pad(indent)}        .onChange((val: string) => { this.handle${js.nameType(form.id)}FieldChange(field.id, val) })
-${""?left_pad(indent)}    }
-${""?left_pad(indent)}    .margin({ bottom: 16 })
-${""?left_pad(indent)}  })
-${""?left_pad(indent)}
-${""?left_pad(indent)}  Button('提交')
-${""?left_pad(indent)}    .backgroundColor($r('app.color.primary'))
-${""?left_pad(indent)}    .width('100%')
-${""?left_pad(indent)}    .margin({ top: 16 })
-${""?left_pad(indent)}    .onClick(() => { this.handle${js.nameType(form.id)}Submit() })
+  <#list form.groups() as group>
+${""?left_pad(indent)}  Column() {
+${""?left_pad(indent)}    FormSectionTitle({ title: '${group}' }) 
+    <#local rows = form.rows(group, 1)>
+    <#list rows as row>
+      <#list row as input>
+        <#if input.type == "date">
+${""?left_pad(indent)}    DateRow({ label: '日期', value: this.${ts.nameVariable(form.id)}.${ts.nameVariable(input.id)},
+${""?left_pad(indent)}              onSelect: (v: string) => { this.${ts.nameVariable(form.id)}.${ts.nameVariable(input.id)} = v } })
+        <#elseif input.type == "select">
+${""?left_pad(indent)}    DropdownRow({ label: '单选', value: this.${ts.nameVariable(form.id)}.${ts.nameVariable(input.id)},
+${""?left_pad(indent)}                  options: this.selOptions,
+${""?left_pad(indent)}                  onSelect: (v: string) => { this.${ts.nameVariable(form.id)}.${ts.nameVariable(input.id)} = v } })
+        <#else>
+${""?left_pad(indent)}    InputRow({ label: '姓名', value: this.${ts.nameVariable(form.id)}.${ts.nameVariable(input.id)},
+${""?left_pad(indent)}               onChange: (v: string) => { this.${ts.nameVariable(form.id)}.${ts.nameVariable(input.id)} = v } })
+        </#if>      
+      </#list>
+    </#list>
+${""?left_pad(indent)}  }    
+  </#list>
+${""?left_pad(indent)}  Row() {
+${""?left_pad(indent)}    Button(this.isSaving ? '保存中...' : '保存')
+${""?left_pad(indent)}    .width('100%').fontSize(15).fontWeight(FontWeight.Bold).fontColor(Color.White)
+${""?left_pad(indent)}    .backgroundColor($r('app.color.primary')).borderRadius(10)
+${""?left_pad(indent)}    .padding({ top: 12, bottom: 12 })
+${""?left_pad(indent)}    .enabled(!this.isSaving)
+${""?left_pad(indent)}    .onClick(() => { this.handleSave() })
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  .width('100%').padding({ left: 20, right: 20, top: 12, bottom: 24 })
+${""?left_pad(indent)}  .backgroundColor($r('app.color.bg'))
+${""?left_pad(indent)}  .border({ width: { top: 1 }, color: $r('app.color.border_light') })
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(16)
 ${""?left_pad(indent)}.backgroundColor($r('app.color.bg'))
+</#macro>
+
+<#macro print_entry_form_variables form indent=0>
+  <#local url = valuebase.url(form.value("data"))>
+${""?left_pad(indent)}
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * 【${form.id}】只读表单相关变量，包括表单数据、正在加载等变量
+${""?left_pad(indent)} */
+${""?left_pad(indent)}@State
+${""?left_pad(indent)}private ${ts.nameVariable(form.id)}Data: ${ts.nameType(url.resource)} | null = null
+${""?left_pad(indent)}@State
+${""?left_pad(indent)}private isLoading${ts.nameType(form.id)}: boolean = false
+${""?left_pad(indent)}@State
+${""?left_pad(indent)}private isSaving${ts.nameType(form.id)}: boolean = false
+</#macro>
+
+<#macro print_entry_form_methods form indent=0>
+  <#local url = valuebase.url(form.value("data"))>
+  <#local obj = model.findObjectByName(url.resource)>
+  <#local idAttr = obj.identifiableAttribute>
+${""?left_pad(indent)}  
+${""?left_pad(indent)}aboutToAppear(): void {
+${""?left_pad(indent)}  const uiContext = this.getUIContext();
+${""?left_pad(indent)}  const router = uiContext.getRouter();
+${""?left_pad(indent)}  const params = router.getParams() as Record<string, Object>
+${""?left_pad(indent)}  let ${modelbase.get_attribute_sql_name(idAttr)}: number = 0
+${""?left_pad(indent)}  if (params && params['${modelbase.get_attribute_sql_name(idAttr)}']) {
+${""?left_pad(indent)}    ${modelbase.get_attribute_sql_name(idAttr)} = params['${modelbase.get_attribute_sql_name(idAttr)}'] as number
+${""?left_pad(indent)}    this.load${ts.nameType(form.id)}Data(${modelbase.get_attribute_sql_name(idAttr)})
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}}
+${""?left_pad(indent)}  
+${""?left_pad(indent)}async load${ts.nameType(form.id)}Data(${modelbase.get_attribute_sql_name(idAttr)}: ${guidbase4ts.type_attribute_primitive(idAttr)}): Promise<void> {
+${""?left_pad(indent)}  const result = await sdk.fetch${ts.nameType(url.resource)}({
+${""?left_pad(indent)}    '${modelbase.get_attribute_sql_name(idAttr)}': ${modelbase.get_attribute_sql_name(idAttr)},
+${""?left_pad(indent)}  })
+${""?left_pad(indent)}  this.${ts.nameVariable(form.id)}Data = result
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}async save${ts.nameType(form.id)}Data(): Promise<void> {
+${""?left_pad(indent)}  
+${""?left_pad(indent)}}
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -326,12 +373,12 @@ ${""?left_pad(indent)}private isLoading${ts.nameType(form.id)}: boolean = false
 ${""?left_pad(indent)}  
 ${""?left_pad(indent)}aboutToAppear(): void {
 ${""?left_pad(indent)}  const uiContext = this.getUIContext();
-${""?left_pad(indent)}    const router = uiContext.getRouter();
-${""?left_pad(indent)}    const params = router.getParams() as Record<string, Object>
-${""?left_pad(indent)}    let ${modelbase.get_attribute_sql_name(idAttr)}: number = 0
-${""?left_pad(indent)}    if (params && params['${modelbase.get_attribute_sql_name(idAttr)}']) {
-${""?left_pad(indent)}      ${modelbase.get_attribute_sql_name(idAttr)} = params['${modelbase.get_attribute_sql_name(idAttr)}'] as number
-${""?left_pad(indent)}    }
+${""?left_pad(indent)}  const router = uiContext.getRouter();
+${""?left_pad(indent)}  const params = router.getParams() as Record<string, Object>
+${""?left_pad(indent)}  let ${modelbase.get_attribute_sql_name(idAttr)}: number = 0
+${""?left_pad(indent)}  if (params && params['${modelbase.get_attribute_sql_name(idAttr)}']) {
+${""?left_pad(indent)}    ${modelbase.get_attribute_sql_name(idAttr)} = params['${modelbase.get_attribute_sql_name(idAttr)}'] as number
+${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  this.load${ts.nameType(form.id)}Data(${modelbase.get_attribute_sql_name(idAttr)})
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}  
@@ -341,7 +388,6 @@ ${""?left_pad(indent)}    '${modelbase.get_attribute_sql_name(idAttr)}': ${model
 ${""?left_pad(indent)}  })
 ${""?left_pad(indent)}  this.${ts.nameVariable(form.id)}Data = result
 ${""?left_pad(indent)}}
-${""?left_pad(indent)}
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -490,6 +536,7 @@ ${""?left_pad(indent)}  .onChange((val: string) => { this.handle${js.nameType(in
 <@print_list_view_variables list=widget indent=indent />
   <#elseif widget.type == "grid_view">
   <#elseif widget.type == "entry_form">
+<@print_entry_form_variables form=widget indent=indent />  
   <#elseif widget.type == "criteria_form">
   <#elseif widget.type == "display_form">
 <@print_display_form_variables form=widget indent=indent />  
@@ -510,6 +557,7 @@ ${""?left_pad(indent)}  .onChange((val: string) => { this.handle${js.nameType(in
 <@print_list_view_methods list=widget indent=indent />
   <#elseif widget.type == "grid_view">
   <#elseif widget.type == "entry_form">
+<@print_entry_form_methods form=widget indent=indent />  
   <#elseif widget.type == "criteria_form">
   <#elseif widget.type == "display_form">
 <@print_display_form_methods form=widget indent=indent />  

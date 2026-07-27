@@ -11,7 +11,7 @@
   <#assign usingObjs += [url.resource]>
 </#list>
 import { router } from '@kit.ArkUI'
-import { AdaptiveText, Tag, Navbar, FormSection } from '../../components/components'
+import { AdaptiveText, Tag, Navbar, FormSection, FormSectionTitle, InputRow, DateRow, DropdownRow } from '../../components/components'
 import { sdk,<#list usingObjs as objname> ${ts.nameType(objname)},</#list> } from 'sdk'
 
 /**
