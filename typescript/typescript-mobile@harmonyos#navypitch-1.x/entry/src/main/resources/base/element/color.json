@@ -1,0 +1,43 @@
+{
+  "color": [
+
+    { "name": "navbar_gradient_start", "value": "#0D1B2A" },
+    { "name": "navbar_gradient_mid", "value": "#152636" },
+    { "name": "navbar_gradient_end", "value": "#1D3448" },
+    { "name": "navbar_white_15", "value": "#26FFFFFF" },
+    { "name": "navbar_shadow", "value": "#26000000" },
+
+    { "name": "primary", "value": "#00C9A7" },
+    { "name": "primary_dark", "value": "#00b599" },
+    { "name": "primary_bg", "value": "#1F00C9A7" },
+    { "name": "primary_border", "value": "#4000C9A7" },
+
+    { "name": "gold", "value": "#F5A623" },
+    { "name": "gold_dark", "value": "#e8981a" },
+
+    { "name": "success", "value": "#00C9A7" },
+    { "name": "success_dark", "value": "#00a085" },
+    { "name": "success_bg", "value": "#1F00C9A7" },
+    { "name": "success_border", "value": "#4000C9A7" },
+
+    { "name": "danger", "value": "#E74C6F" },
+    { "name": "danger_dark", "value": "#c0294f" },
+    { "name": "danger_bg", "value": "#1FE74C6F" },
+    { "name": "danger_border", "value": "#40E74C6F" },
+
+    { "name": "warning", "value": "#F5A623" },
+    { "name": "warning_bg", "value": "#1FF5A623" },
+    { "name": "warning_border", "value": "#40F5A623" },
+
+    { "name": "text", "value": "#1A2B3C" },
+    { "name": "text_muted", "value": "#5A7080" },
+    { "name": "text_light", "value": "#95AABA" },
+    { "name": "text_disabled", "value": "#B0C0CC" },
+
+    { "name": "border", "value": "#E2EAF0" },
+    { "name": "border_light", "value": "#E2EAF0" },
+    { "name": "bg", "value": "#FFFFFF" },
+    { "name": "bg_page", "value": "#F0F4F8" },
+    { "name": "bg_hover", "value": "#F7FAFC" }
+  ]
+}

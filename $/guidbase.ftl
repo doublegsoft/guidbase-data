@@ -296,6 +296,87 @@
 </#function>
 
 <#--
+ ###############################################################################
+ ### 获取可标识的组件 (Get Identifiable Widget)
+ ### 
+ ### 遍历组件的子元素，寻找第一个类型为隐藏（hidden）的子组件。
+ ### 若未找到符合条件的子组件，则返回一个包含默认占位 ID 的对象。
+ ### 
+ ### 查找与定位规则：
+ ### - 依次遍历传入组件对象（widget）中的子组件列表（children）。
+ ### - 使用安全运算符 `![]` 处理子组件列表，避免因属性为空或未定义而触发异常。
+ ### - 评估每个子组件的类型（type），若为 "hidden"，则返回该子组件。
+ ### - 若遍历完毕仍未找到符合条件的子组件，则返回默认占位符对象 `{'id': 'TODO'}`。
+ ### 
+ ### @param widget  父组件对象 (Object)
+ ### @return        隐藏类型的子组件或默认占位对象 (Object)
+ ###############################################################################
+ -->
+<#function get_widget_identifiable widget>
+  <#list widget.children![] as child>
+    <#if child.type == 'hidden'>
+      <#return child>
+    </#if>
+  </#list>
+  <#return {'id': 'TODO'}>
+</#function>
+
+按照您之前认可的高标准双语及业务化注释风格，已为 get_main_page 函数添加了详细的块级注释：
+
+<#--
+ ###############################################################################
+ ### 获取主页面 (Get Main Page)
+ ### 
+ ### 遍历页面列表，寻找并返回被设定为主页（首页）的页面对象。
+ ### 若未明确指定主页，则默认将列表中的第一个页面视为主页返回。
+ ### 
+ ### 查找与定位规则：
+ ### - 依次遍历页面对象列表（pages）。
+ ### - 检查每个页面的 "main" 配置属性值（通过 page.value("main") 获取）。
+ ### - 若该配置值不为空，则判定该页面为主页，并立即返回该页面对象。
+ ### - 若所有页面均未配置主页属性，作为兜底策略，默认返回列表中的第一个页面（pages[0]）。
+ ### 
+ ### @param app    应用程序对象
+ ### @return       被选定为主页的页面对象 (Page Object)
+ ###############################################################################
+ -->
+<#function get_main_page app>
+  <#list app.pages as page>
+    <#if page.value("main") != "">
+      <#return page>
+    </#if>
+  </#list>
+  <#return pages[0]>
+</#function>
+
+<#--
+ ###############################################################################
+ ### 获取指定页面 (Get Specific Page)
+ ### 
+ ### 根据页面名称在应用中检索并返回对应的页面对象。
+ ### 常用于页面跳转配置解析、特定页面属性查询等业务场景。
+ ### 
+ ### 查找与定位规则：
+ ### - 依次遍历应用对象（app）中的页面列表（pages）。
+ ### - 将每个页面的名称（name）与目标页面名称（pageName）进行比对。
+ ### - 一旦名称完全匹配，立即返回该页面对象。
+ ### - 若遍历完毕仍未找到匹配的页面，则无返回值（默认返回空）。
+ ### 
+ ### @param app       应用对象 (App Object)
+ ### @param pagename  目标页面名称 (String)
+ ### @return          匹配的页面对象，若未找到则无返回值 (Page Object / Null)
+ ###############################################################################
+ -->
+<#function get_page app panename>
+  <#list app.pages as page>
+    <#if page.name == panename>
+      <#return page>
+    </#if>
+  </#list>
+</#function>
+
+
+<#--
  ###
  ###
  ###
@@ -336,23 +417,6 @@
 <#function get_widget_width position>
   <#if (position.size.width <= 0)><#return 12></#if>
   <#return (position.size.width / 100 * 12)?round>
-</#function>
-
-<#--
- ### Gets the identifiable in widget.
- ###
- ### @param widget
- ###        the widget defined in guidbase
- ###
- ### @return the child identifiable widget
- -->
-<#function get_widget_identifiable widget>
-  <#list widget.children![] as child>
-    <#if child.role == 'hidden'>
-      <#return child>
-    </#if>
-  </#list>
-  <#return {'id': 'TODO'}>
 </#function>
 
 <#--

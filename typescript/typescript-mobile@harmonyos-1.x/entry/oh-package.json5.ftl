@@ -6,6 +6,6 @@
   "author": "",
   "license": "",
   "dependencies": {
-
+    "sdk": "file:../sdk"
   }
 }

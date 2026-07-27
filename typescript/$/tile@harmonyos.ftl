@@ -1,4 +1,3 @@
-<#include "/$/guidbase-tile.ftl">
 <#--
 会议与日程 (Meeting & Event)
 +-----------------------------------------------+
@@ -15,22 +14,22 @@ ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
   <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    Row() {
-    <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))</#if>
-    <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" - ").fontSize(12).fontColor($r('app.color.text_muted'))</#if>
-    <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))</#if>
+    <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })</#if>
+    <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      AdaptiveText({ value: " - ", fontSize: 12, fontColor: $r('app.color.text_muted') })</#if>
+    <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })</#if>
 ${""?left_pad(indent)}    }
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
   </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "primary") || guidbase.has_child_widget(widget, "secondary")>
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').alignItems(HorizontalAlign.Start).margin({ bottom: 8 })
   </#if>
@@ -67,7 +66,7 @@ ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Row() {
 ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}        Text(tag).fontSize(10).fontColor($r('app.color.bg')).backgroundColor($r('app.color.primary')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}        AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.bg') }).backgroundColor($r('app.color.primary')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }.margin(8)
     </#if>
@@ -76,13 +75,13 @@ ${""?left_pad(indent)}  }.width('100%').margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "primary") || guidbase.has_child_widget(widget, "secondary") || guidbase.has_child_widget(widget, "tertiary")>
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted')).margin({ bottom: 2 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') }).margin({ bottom: 2 })
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}, fontSize: 12, fontColor: $r('app.color.text_light') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').alignItems(HorizontalAlign.Start)
   </#if>
@@ -106,14 +105,14 @@ ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_c
   </#if>
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.layoutWeight(1).alignItems(HorizontalAlign.Start)
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
   </#if>
 ${""?left_pad(indent)}}.width('100%').padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
 </#macro>
@@ -134,16 +133,16 @@ ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Row() {
 ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}        Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}        AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 8 }).width('100%')
   </#if>
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "avatars")>
@@ -154,7 +153,7 @@ ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -181,18 +180,18 @@ ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Row() {
 ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}        Text(tag).fontSize(10).fontColor($r('app.color.bg')).backgroundColor($r('app.color.primary')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}        AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.bg') }).backgroundColor($r('app.color.primary')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }.margin({ bottom: 8 })
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(18).fontColor($r('app.color.bg')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 18, fontColor: $r('app.color.bg'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.border_light')).margin({ bottom: 2 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.border_light') }).margin({ bottom: 2 })
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).fontSize(12).fontColor($r('app.color.border_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}, fontSize: 12, fontColor: $r('app.color.border_light') })
     </#if>
 ${""?left_pad(indent)}  }.alignItems(HorizontalAlign.Start).padding(12).width('100%')
 ${""?left_pad(indent)}}.borderRadius(8)
@@ -207,16 +206,16 @@ ${""?left_pad(indent)}}.borderRadius(8)
 <#macro print_tile_compact_list widget indent=0>
 ${""?left_pad(indent)}Row() {
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(14).fontColor($r('app.color.primary')).margin({ right: 8 })
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 14, fontColor: $r('app.color.primary') }).margin({ right: 8 })
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontWeight(FontWeight.Medium).fontColor($r('app.color.text')).layoutWeight(1)
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Medium }).layoutWeight(1)
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted')).margin({ right: 8 })
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') }).margin({ right: 8 })
   </#if>
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_light') })
   </#if>
 ${""?left_pad(indent)}}.width('100%').padding({ top: 10, bottom: 10, left: 12, right: 12 }).backgroundColor($r('app.color.bg')).border({ width: { bottom: 1 }, color: $r('app.color.border_light') })
 </#macro>
@@ -240,12 +239,12 @@ ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Row() {
 ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}        Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}        AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }.margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    Row() {
@@ -255,7 +254,7 @@ ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }.margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.alignItems(HorizontalAlign.Start).layoutWeight(1)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -271,14 +270,14 @@ ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRa
 <#macro print_tile_notification widget indent=0>
 ${""?left_pad(indent)}Row() {
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(14).fontColor($r('app.color.primary')).margin({ right: 12 })
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 14, fontColor: $r('app.color.primary') }).margin({ right: 12 })
   </#if>
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Medium).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Medium }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}, fontSize: 12, fontColor: $r('app.color.text_light') })
     </#if>
 ${""?left_pad(indent)}  }.alignItems(HorizontalAlign.Start).layoutWeight(1)
 ${""?left_pad(indent)}}.width('100%').padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -307,10 +306,10 @@ ${""?left_pad(indent)}  Column() {
 ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))}).width(64).height(64).borderRadius(32).border({ width: 2, color: $r('app.color.bg') }).margin({ bottom: 8 })
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(18).fontColor($r('app.color.bg')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 18, fontColor: $r('app.color.bg'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.border_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.border_light') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').alignItems(HorizontalAlign.Center).padding({ top: 40 })
 ${""?left_pad(indent)}}.borderRadius(8)
@@ -328,28 +327,28 @@ ${""?left_pad(indent)}}.borderRadius(8)
 ${""?left_pad(indent) }Row() {
 ${""?left_pad(indent) }  Column() {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent) }    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent) }    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent) }    Column().width(8).height(8).borderRadius(4).backgroundColor($r('app.color.primary')).margin({ top: 4, bottom: 4 })
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent) }    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent) }    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent) }  }.width(60).alignItems(HorizontalAlign.Center).margin({ right: 12 })
 ${""?left_pad(indent) }  Column() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent) }    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent) }    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent) }    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted')).margin({ bottom: 2 })
+${""?left_pad(indent) }    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') }).margin({ bottom: 2 })
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent) }    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent) }    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}, fontSize: 12, fontColor: $r('app.color.text_light') })
     </#if>
 ${""?left_pad(indent) }  }.layoutWeight(1).alignItems(HorizontalAlign.Start)
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent) }  Row() {
 ${""?left_pad(indent) }    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent) }      Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ left: 4 })
+${""?left_pad(indent) }      AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ left: 4 })
 ${""?left_pad(indent) }    })
 ${""?left_pad(indent) }  }
   </#if>
@@ -374,19 +373,19 @@ ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get
 ${""?left_pad(indent)}    Column() {
 ${""?left_pad(indent)}      Row() {
         <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}        Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold)
+${""?left_pad(indent)}        AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold })
         </#if>
         <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}        Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}        AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
         </#if>
 ${""?left_pad(indent)}      }.width('100%').justifyContent(FlexAlign.SpaceBetween)
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted')).margin({ top: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') }).margin({ top: 4 })
       </#if>
 ${""?left_pad(indent)}    }.layoutWeight(1).alignItems(HorizontalAlign.Start)
 ${""?left_pad(indent)}  }.width('100%').margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).fontSize(14).fontColor($r('app.color.text')).margin({ left: 52 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}, fontSize: 14, fontColor: $r('app.color.text') }).margin({ left: 52 }).width('100%')
   </#if>
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
 </#macro>
@@ -409,17 +408,17 @@ ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_c
 ${""?left_pad(indent)}  Column() {
 ${""?left_pad(indent)}    Row() {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.bg')).fontWeight(FontWeight.Bold)
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.bg'), fontWeight: FontWeight.Bold })
       </#if>
       <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary')).backgroundColor($r('app.color.bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4)
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4)
       </#if>
 ${""?left_pad(indent)}    }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
     <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    Row() {
-      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.border_light'))</#if>
-      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" ~ ").fontSize(12).fontColor($r('app.color.border_light'))</#if>
-      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.border_light'))</#if>
+      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.border_light') })</#if>
+      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      AdaptiveText({ value: " ~ ", fontSize: 12, fontColor: $r('app.color.border_light') })</#if>
+      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.border_light') })</#if>
 ${""?left_pad(indent)}    }
     </#if>
 ${""?left_pad(indent)}  }.padding(12).width('100%')
@@ -441,26 +440,26 @@ ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_c
   </#if>
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 }).width('100%')
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 }).width('100%')
     </#if>
 ${""?left_pad(indent)}    Row() {
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted')).layoutWeight(1)
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') }).layoutWeight(1)
       </#if>
       <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}      Row() {
 ${""?left_pad(indent)}        ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}          Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ left: 4 })
+${""?left_pad(indent)}          AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ left: 4 })
 ${""?left_pad(indent)}        })
 ${""?left_pad(indent)}      }
       </#if>
 ${""?left_pad(indent)}    }.width('100%').margin({ bottom: 4 })
 ${""?left_pad(indent)}    Row() {
       <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).fontSize(12).fontColor($r('app.color.text_light')).layoutWeight(1)
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}, fontSize: 12, fontColor: $r('app.color.text_light') }).layoutWeight(1)
       </#if>
       <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
       </#if>
 ${""?left_pad(indent)}    }.width('100%')
 ${""?left_pad(indent)}  }.layoutWeight(1)
@@ -491,16 +490,16 @@ ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_c
   <#if guidbase.has_child_widget(widget, "primary") || guidbase.has_child_widget(widget, "secondary") || guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time") || guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted')).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_light')).margin({ bottom: 2 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_light') }).margin({ bottom: 2 })
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_light')).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_light') }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    Row() {
@@ -532,24 +531,24 @@ ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Row() {
 ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}        Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}        AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "primary") || guidbase.has_child_widget(widget, "secondary") || guidbase.has_child_widget(widget, "tertiary")>
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted')).margin({ bottom: 2 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') }).margin({ bottom: 2 })
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}, fontSize: 12, fontColor: $r('app.color.text_light') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').alignItems(HorizontalAlign.Start).margin({ bottom: 8 })
   </#if>
@@ -558,7 +557,7 @@ ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))}).width(24).height(24).borderRadius(12)
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -577,10 +576,10 @@ ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRa
 ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').alignItems(HorizontalAlign.Start).margin({ bottom: 8 })
 ${""?left_pad(indent)}  Row() {
@@ -594,7 +593,7 @@ ${""?left_pad(indent)}    }
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Row() {
 ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}        Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ left: 4 })
+${""?left_pad(indent)}        AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ left: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }
     </#if>
@@ -619,10 +618,10 @@ ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_c
   </#if>
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary')).backgroundColor($r('app.color.bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ bottom: 6 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ bottom: 6 })
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(18).fontColor($r('app.color.bg')).fontWeight(FontWeight.Bold)
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 18, fontColor: $r('app.color.bg'), fontWeight: FontWeight.Bold })
     </#if>
 ${""?left_pad(indent)}  }.alignItems(HorizontalAlign.Start).padding(12).width('100%')
 ${""?left_pad(indent)}}.borderRadius(8)
@@ -641,19 +640,19 @@ ${""?left_pad(indent)}}.borderRadius(8)
 ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 8 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}      Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  }.width('100%')
   </#if>
@@ -673,10 +672,10 @@ ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRa
 ${""?left_pad(indent)}Row() {
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).fontSize(12).fontColor($r('app.color.text_light')).margin({ bottom: 8 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}, fontSize: 12, fontColor: $r('app.color.text_light') }).margin({ bottom: 8 })
     </#if>
     <#if guidbase.has_child_widget(widget, "avatar")>
 ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))}).width(32).height(32).borderRadius(16)
@@ -684,12 +683,12 @@ ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get
 ${""?left_pad(indent)}  }.layoutWeight(1).alignItems(HorizontalAlign.Start).margin({ right: 12 })
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted')).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Row() {
 ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}        Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}        AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }.margin({ bottom: 8 })
     </#if>
@@ -720,7 +719,7 @@ ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))}).width('100%').height(150).borderRadius(4).objectFit(ImageFit.Cover).margin({ bottom: 8 })
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 8 }).width('100%')
   </#if>
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "avatars")>
@@ -731,7 +730,7 @@ ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -752,19 +751,19 @@ ${""?left_pad(indent)}Column() {
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}      Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  }.width('100%').margin({ bottom: 8 })
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(24).fontColor($r('app.color.primary')).fontWeight(FontWeight.Bold).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 24, fontColor: $r('app.color.primary'), fontWeight: FontWeight.Bold }).margin({ bottom: 8 }).width('100%')
   </#if>
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -792,10 +791,10 @@ ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get
     </#if>
 ${""?left_pad(indent)}    Column() {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
       </#if>
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') })
       </#if>
 ${""?left_pad(indent)}    }.layoutWeight(1).alignItems(HorizontalAlign.Start)
 ${""?left_pad(indent)}  }.width('100%').padding(12)
@@ -818,17 +817,17 @@ ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_c
 ${""?left_pad(indent)}  Column() {
 ${""?left_pad(indent)}    Row() {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold)
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold })
       </#if>
       <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
       </#if>
 ${""?left_pad(indent)}    }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 4 })
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted')).margin({ bottom: 2 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') }).margin({ bottom: 2 })
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_light') })
     </#if>
 ${""?left_pad(indent)}  }.layoutWeight(1).alignItems(HorizontalAlign.Start)
 ${""?left_pad(indent)}}.width('100%').padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -848,14 +847,14 @@ ${""?left_pad(indent)}}.width('100%').padding(12).backgroundColor($r('app.color.
 ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontColor($r('app.color.text')).fontWeight(FontWeight.Medium).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Medium }).margin({ bottom: 8 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  Row() {
@@ -879,18 +878,18 @@ ${""?left_pad(indent)}}.padding(8).backgroundColor($r('app.color.bg')).borderRad
 ${""?left_pad(indent)}Row() {
   <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}  Column() {
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
 ${""?left_pad(indent)}  }.width(40).justifyContent(FlexAlign.Center).margin({ right: 12 })
   </#if>
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted')).margin({ bottom: 2 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') }).margin({ bottom: 2 })
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_light') })
     </#if>
 ${""?left_pad(indent)}  }.layoutWeight(1).alignItems(HorizontalAlign.Start)
 ${""?left_pad(indent)}}.width('100%').padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -910,19 +909,19 @@ ${""?left_pad(indent)}Column() {
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}      Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  }.width('100%').margin({ bottom: 8 })
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 8 }).width('100%')
   </#if>
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_light') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -944,17 +943,17 @@ ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    Row() {
-      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))</#if>
-      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" - ").fontSize(12).fontColor($r('app.color.text_muted'))</#if>
-      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))</#if>
+      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })</#if>
+      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      AdaptiveText({ value: " - ", fontSize: 12, fontColor: $r('app.color.text_muted') })</#if>
+      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })</#if>
 ${""?left_pad(indent)}    }
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 8 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  Row() {
@@ -987,15 +986,15 @@ ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get
     </#if>
 ${""?left_pad(indent)}    Column() {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontWeight(FontWeight.Bold).fontColor($r('app.color.text'))
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold })
       </#if>
       <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted')).margin({ top: 2 })
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') }).margin({ top: 2 })
       </#if>
 ${""?left_pad(indent)}    }.alignItems(HorizontalAlign.Start)
 ${""?left_pad(indent)}  }.width('100%').margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).fontSize(14).fontColor($r('app.color.text')).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}, fontSize: 14, fontColor: $r('app.color.text') }).margin({ bottom: 8 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "image")>
 ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))}).width('100%').height(200).borderRadius(4).objectFit(ImageFit.Cover).margin({ bottom: 8 })
@@ -1011,7 +1010,7 @@ ${""?left_pad(indent)}    }
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Row() {
 ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}        Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}        AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }
     </#if>
@@ -1039,22 +1038,22 @@ ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_c
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}      Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  }.width('100%').margin({ bottom: 8 })
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted')).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') }).margin({ bottom: 8 }).width('100%')
   </#if>
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_light') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -1077,7 +1076,7 @@ ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))}).width(40).height(40).borderRadius(20)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(14).fontWeight(FontWeight.Bold).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 14, fontColor: $r('app.color.primary'), fontWeight: FontWeight.Bold })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
 ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).width(40).height(40).borderRadius(20)
@@ -1085,18 +1084,18 @@ ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontColor($r('app.color.text'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text') })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -1121,22 +1120,22 @@ ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Row() {
 ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}        Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}        AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }.margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted')).margin({ bottom: 2 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') }).margin({ bottom: 2 })
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).fontSize(12).fontColor($r('app.color.text_light')).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}, fontSize: 12, fontColor: $r('app.color.text_light') }).margin({ bottom: 4 })
     </#if>
 ${""?left_pad(indent)}    Row() {
       <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary')).margin({ right: 8 })
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') }).margin({ right: 8 })
       </#if>
       <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}      Row() {
@@ -1162,8 +1161,8 @@ ${""?left_pad(indent)}}.width('100%').padding(12).backgroundColor($r('app.color.
 ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
-${""?left_pad(indent)}    Text(" > ").fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
+${""?left_pad(indent)}    AdaptiveText({ value: " > ", fontSize: 12, fontColor: $r('app.color.text_light') })
     </#if>
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    Row() {
@@ -1171,18 +1170,18 @@ ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase
 ${""?left_pad(indent)}        Image(av).width(20).height(20).borderRadius(10).margin({ right: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }
-${""?left_pad(indent)}    Text(" > ").fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: " > ", fontSize: 12, fontColor: $r('app.color.text_light') })
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
-${""?left_pad(indent)}    Text(" > ").fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
+${""?left_pad(indent)}    AdaptiveText({ value: " > ", fontSize: 12, fontColor: $r('app.color.text_light') })
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).width('100%')
   </#if>
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
 </#macro>
@@ -1208,23 +1207,23 @@ ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Row() {
 ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}        Text(tag).fontSize(10).fontColor($r('app.color.bg')).backgroundColor($r('app.color.primary')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}        AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.bg') }).backgroundColor($r('app.color.primary')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }.margin({ bottom: 8 })
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(18).fontColor($r('app.color.bg')).fontWeight(FontWeight.Bold).margin({ bottom: 8 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 18, fontColor: $r('app.color.bg'), fontWeight: FontWeight.Bold }).margin({ bottom: 8 })
     </#if>
 ${""?left_pad(indent)}    Row() {
       <#if guidbase.has_child_widget(widget, "avatar")>
 ${""?left_pad(indent)}      Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))}).width(24).height(24).borderRadius(12).margin({ right: 8 })
       </#if>
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.border_light'))
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.border_light') })
       </#if>
-${""?left_pad(indent)}    }.width('100%')
-${""?left_pad(indent)}  }.alignItems(HorizontalAlign.Start).padding(12).width('100%')
-${""?left_pad(indent)}}.borderRadius(8)
+    }.width('100%')
+  }.alignItems(HorizontalAlign.Start).padding(12).width('100%')
+}.borderRadius(8)
 </#macro>
 
 <#--
@@ -1239,10 +1238,10 @@ ${""?left_pad(indent)}Row() {
 ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))}).width(24).height(24).borderRadius(12).margin({ right: 8 })
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontWeight(FontWeight.Medium).fontColor($r('app.color.text')).layoutWeight(1)
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Medium }).layoutWeight(1)
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
   </#if>
 ${""?left_pad(indent)}}.width('100%').padding({ top: 8, bottom: 8, left: 12, right: 12 }).backgroundColor($r('app.color.bg')).borderRadius(4)
 </#macro>
@@ -1260,24 +1259,24 @@ ${""?left_pad(indent)}}.width('100%').padding({ top: 8, bottom: 8, left: 12, rig
 <#macro print_tile_stepped_process widget indent=0>
 ${""?left_pad(indent)}Row() {
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(14).fontColor($r('app.color.primary')).margin({ right: 12 })
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 14, fontColor: $r('app.color.primary') }).margin({ right: 12 })
   </#if>
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
 ${""?left_pad(indent)}    Row() {
-${""?left_pad(indent)}      Text("├─ ").fontSize(12).fontColor($r('app.color.text_light'))
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}      AdaptiveText({ value: "├─ ", fontSize: 12, fontColor: $r('app.color.text_light') })
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
 ${""?left_pad(indent)}    }.margin({ bottom: 2 })
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    Row() {
-${""?left_pad(indent)}      Text("├─ ").fontSize(12).fontColor($r('app.color.text_light'))
-      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_light'))</#if>
-      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" - ").fontSize(12).fontColor($r('app.color.text_light'))</#if>
-      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_light'))</#if>
+${""?left_pad(indent)}      AdaptiveText({ value: "├─ ", fontSize: 12, fontColor: $r('app.color.text_light') })
+      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_light') })</#if>
+      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      AdaptiveText({ value: " - ", fontSize: 12, fontColor: $r('app.color.text_light') })</#if>
+      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_light') })</#if>
 ${""?left_pad(indent)}    }
     </#if>
 ${""?left_pad(indent)}  }.layoutWeight(1).alignItems(HorizontalAlign.Start)
@@ -1303,14 +1302,14 @@ ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_c
   </#if>
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
 ${""?left_pad(indent)}    Row() {
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
 ${""?left_pad(indent)}    }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}  }.backgroundColor($r('app.color.bg')).padding(10).borderRadius(6).margin(8)
@@ -1338,21 +1337,21 @@ ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  }.width('100%').margin({ bottom: 8 })
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).fontSize(12).fontColor($r('app.color.text_light')).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}, fontSize: 12, fontColor: $r('app.color.text_light') }).margin({ bottom: 8 }).width('100%')
   </#if>
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Row() {
 ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}        Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}        AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -1378,21 +1377,21 @@ ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRa
 <#macro print_tile_tall_sidebar widget indent=0>
 ${""?left_pad(indent)}Column() {
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary')).margin({ bottom: 8 })
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') }).margin({ bottom: 8 })
   </#if>
   <#if guidbase.has_child_widget(widget, "image")>
 ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))}).width('100%').height(100).borderRadius(4).objectFit(ImageFit.Cover).margin({ bottom: 8 })
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted')).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') }).margin({ bottom: 8 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}      Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  }.width('100%').margin({ bottom: 8 })
   </#if>
@@ -1419,18 +1418,18 @@ ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRa
 ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold)
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold })
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 4 })
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_light') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
 ${""?left_pad(indent)}  Row() {
@@ -1438,7 +1437,7 @@ ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))}).width(24).height(24).borderRadius(12)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -1459,29 +1458,29 @@ ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRa
 ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
 ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    Column() {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
       </#if>
       <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}, fontSize: 12, fontColor: $r('app.color.text_light') })
       </#if>
 ${""?left_pad(indent)}    }.layoutWeight(1).alignItems(HorizontalAlign.Start)
 ${""?left_pad(indent)}    Column() {
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted')).margin({ bottom: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') }).margin({ bottom: 4 })
       </#if>
       <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}      Row() {
 ${""?left_pad(indent)}        ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}          Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}          AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}        })
 ${""?left_pad(indent)}      }
       </#if>
@@ -1515,16 +1514,16 @@ ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get
     </#if>
 ${""?left_pad(indent)}    Column() {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
       </#if>
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted')).margin({ bottom: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') }).margin({ bottom: 4 })
       </#if>
       <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}      Row() {
-        <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}        Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(10).fontColor($r('app.color.text_light'))</#if>
+        <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}        AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 10, fontColor: $r('app.color.text_light') })</#if>
 ${""?left_pad(indent)}        Row().height(2).layoutWeight(1).backgroundColor($r('app.color.border_light')).margin({ left: 6, right: 6 })
-        <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}        Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(10).fontColor($r('app.color.text_light'))</#if>
+        <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}        AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 10, fontColor: $r('app.color.text_light') })</#if>
 ${""?left_pad(indent)}      }.width('100%')
       </#if>
 ${""?left_pad(indent)}    }.layoutWeight(1).alignItems(HorizontalAlign.Start)
@@ -1534,7 +1533,7 @@ ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))}).width(24).height(24).borderRadius(12)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -1554,17 +1553,17 @@ ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRa
 ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted')).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') }).margin({ bottom: 8 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "avatar")>
 ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))}).width(24).height(24).borderRadius(12).margin({ top: 4 })
@@ -1586,17 +1585,17 @@ ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    Row() {
-      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))</#if>
-      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" - ").fontSize(12).fontColor($r('app.color.text_muted'))</#if>
-      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))</#if>
+      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })</#if>
+      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      AdaptiveText({ value: " - ", fontSize: 12, fontColor: $r('app.color.text_muted') })</#if>
+      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })</#if>
 ${""?left_pad(indent)}    }
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 8 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  Row() {
@@ -1621,7 +1620,7 @@ ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRa
 <#macro print_tile_media_history widget indent=0>
 ${""?left_pad(indent)}Column() {
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted')).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') }).margin({ bottom: 8 }).width('100%')
   </#if>
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "image")>
@@ -1629,15 +1628,15 @@ ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get
     </#if>
 ${""?left_pad(indent)}    Column() {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
       </#if>
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted')).margin({ bottom: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') }).margin({ bottom: 4 })
       </#if>
       <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}      Row() {
 ${""?left_pad(indent)}        ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}          Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}          AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}        })
 ${""?left_pad(indent)}      }
       </#if>
@@ -1659,21 +1658,21 @@ ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRa
 ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 8 }).width('100%')
   </#if>
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "avatar")>
 ${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))}).width(24).height(24).borderRadius(12).margin({ right: 8 })
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted')).layoutWeight(1)
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') }).layoutWeight(1)
     </#if>
 ${""?left_pad(indent)}  }.width('100%').alignItems(VerticalAlign.Center)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -1690,21 +1689,21 @@ ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRa
 ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
-${""?left_pad(indent)}    Text(" | ").fontSize(12).fontColor($r('app.color.border_light')).margin({ left: 4, right: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
+${""?left_pad(indent)}    AdaptiveText({ value: " | ", fontSize: 12, fontColor: $r('app.color.border_light') }).margin({ left: 4, right: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
-${""?left_pad(indent)}    Text(" | ").fontSize(12).fontColor($r('app.color.border_light')).margin({ left: 4, right: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
+${""?left_pad(indent)}    AdaptiveText({ value: " | ", fontSize: 12, fontColor: $r('app.color.border_light') }).margin({ left: 4, right: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontColor($r('app.color.text')).fontWeight(FontWeight.Medium)
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Medium })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').margin({ bottom: 4 })
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}      Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  }.width('100%')
   </#if>
@@ -1723,13 +1722,13 @@ ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRa
 <#macro print_tile_horizontal_flow widget indent=0>
 ${""?left_pad(indent)}Column() {
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted')).margin({ bottom: 6 })
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') }).margin({ bottom: 6 })
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontColor($r('app.color.text')).fontWeight(FontWeight.Bold).margin({ bottom: 4 })
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
   </#if>
 ${""?left_pad(indent)}}.padding(8).backgroundColor($r('app.color.bg')).borderRadius(4).alignItems(HorizontalAlign.Start)
 </#macro>
@@ -1747,16 +1746,16 @@ ${""?left_pad(indent)}}.padding(8).backgroundColor($r('app.color.bg')).borderRad
 ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.End).margin({ bottom: 6 })
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontColor($r('app.color.text')).fontWeight(FontWeight.Medium).margin({ bottom: 6 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Medium }).margin({ bottom: 6 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}      Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  }.width('100%')
   </#if>
@@ -1776,16 +1775,16 @@ ${""?left_pad(indent)}}.padding(8).backgroundColor($r('app.color.bg')).borderRad
 ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.Start).margin({ bottom: 6 })
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontColor($r('app.color.text')).fontWeight(FontWeight.Medium).margin({ bottom: 6 }).width('100%').textAlign(TextAlign.End)
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Medium, textAlign: TextAlign.End }).margin({ bottom: 6 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}      Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ left: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ left: 4 })
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.End)
   </#if>
@@ -1805,23 +1804,23 @@ ${""?left_pad(indent)}}.padding(8).backgroundColor($r('app.color.bg')).borderRad
 <#macro print_tile_internal_chronology widget indent=0>
 ${""?left_pad(indent)}Column() {
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_light')).margin({ bottom: 2 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_light') }).margin({ bottom: 2 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontWeight(FontWeight.Bold).fontColor($r('app.color.text')).margin({ bottom: 4 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 }).width('100%')
   </#if>
 ${""?left_pad(indent)}  Row() {
-${""?left_pad(indent)}    Text("│").fontSize(14).fontColor($r('app.color.border')).margin({ left: 8, bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: "│", fontSize: 14, fontColor: $r('app.color.border') }).margin({ left: 8, bottom: 4 })
 ${""?left_pad(indent)}  }.width('100%')
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_light')).margin({ bottom: 2 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_light') }).margin({ bottom: 2 }).width('100%')
   </#if>
 ${""?left_pad(indent)}  Row() {
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') })
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
   </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -1839,32 +1838,32 @@ ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRa
 ${""?left_pad(indent)}Column() {
 ${""?left_pad(indent)}  Row() {
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
-${""?left_pad(indent)}    Text(" >> ").fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
+${""?left_pad(indent)}    AdaptiveText({ value: " >> ", fontSize: 12, fontColor: $r('app.color.text_light') })
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Row() {
 ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}        Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}        AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }
-${""?left_pad(indent)}    Text(" >> ").fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: " >> ", fontSize: 12, fontColor: $r('app.color.text_light') })
   </#if>
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
   </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
 ${""?left_pad(indent)}  Row() {
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontWeight(FontWeight.Bold).fontColor($r('app.color.text'))
-${""?left_pad(indent)}    Text(" >> ").fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold })
+${""?left_pad(indent)}    AdaptiveText({ value: " >> ", fontSize: 12, fontColor: $r('app.color.text_light') })
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted'))
-${""?left_pad(indent)}    Text(" >> ").fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
+${""?left_pad(indent)}    AdaptiveText({ value: " >> ", fontSize: 12, fontColor: $r('app.color.text_light') })
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
   </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -1880,18 +1879,18 @@ ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRa
 ${""?left_pad(indent)}Row() {
   <#if guidbase.has_child_widget(widget, "avatar")>
 ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))}).width(24).height(24).borderRadius(12)
-${""?left_pad(indent)}  Text(" | ").fontSize(12).fontColor($r('app.color.border_light')).margin({ left: 4, right: 4 })
+${""?left_pad(indent)}  AdaptiveText({ value: " | ", fontSize: 12, fontColor: $r('app.color.border_light') }).margin({ left: 4, right: 4 })
   </#if>
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
-${""?left_pad(indent)}  Text(" | ").fontSize(12).fontColor($r('app.color.border_light')).margin({ left: 4, right: 4 })
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
+${""?left_pad(indent)}  AdaptiveText({ value: " | ", fontSize: 12, fontColor: $r('app.color.border_light') }).margin({ left: 4, right: 4 })
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontWeight(FontWeight.Medium).fontColor($r('app.color.text')).layoutWeight(1)
-${""?left_pad(indent)}  Text(" | ").fontSize(12).fontColor($r('app.color.border_light')).margin({ left: 4, right: 4 })
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Medium }).layoutWeight(1)
+${""?left_pad(indent)}  AdaptiveText({ value: " | ", fontSize: 12, fontColor: $r('app.color.border_light') }).margin({ left: 4, right: 4 })
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
   </#if>
 ${""?left_pad(indent)}}.width('100%').padding({ top: 8, bottom: 8, left: 12, right: 12 }).backgroundColor($r('app.color.bg')).borderRadius(6)
 </#macro>
@@ -1912,15 +1911,15 @@ ${""?left_pad(indent)}Column() {
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}      Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  }.width('100%').margin({ bottom: 8 })
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontWeight(FontWeight.Bold).fontColor($r('app.color.text')).margin({ bottom: 4 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 }).width('100%')
   </#if>
   <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).fontSize(12).fontColor($r('app.color.text_light')).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}, fontSize: 12, fontColor: $r('app.color.text_light') }).margin({ bottom: 8 }).width('100%')
   </#if>
 ${""?left_pad(indent)}  Row() {
   <#if guidbase.has_child_widget(widget, "avatars")>
@@ -1931,7 +1930,7 @@ ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }
   </#if>
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
   </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -1953,13 +1952,13 @@ ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_c
   </#if>
 ${""?left_pad(indent)}  Column() {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.border_light')).margin({ bottom: 4 }).width('100%').textAlign(TextAlign.End)
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.border_light'), textAlign: TextAlign.End }).margin({ bottom: 4 }).width('100%')
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontWeight(FontWeight.Bold).fontColor($r('app.color.bg')).margin({ bottom: 4 })
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.bg'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary')).backgroundColor($r('app.color.bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4)
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4)
     </#if>
 ${""?left_pad(indent)}  }.alignItems(HorizontalAlign.Start).padding(12).width('100%')
 ${""?left_pad(indent)}}.borderRadius(8)
@@ -1981,14 +1980,14 @@ ${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_c
 ${""?left_pad(indent)}  Column() {
 ${""?left_pad(indent)}    Row() {
         <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(14).fontWeight(FontWeight.Bold).fontColor($r('app.color.text'))
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 14, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold })
         </#if>
         <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_light'))
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_light') })
         </#if>
 ${""?left_pad(indent)}    }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 4 })
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.layoutWeight(1).alignItems(HorizontalAlign.Start)
 ${""?left_pad(indent)}}.width('100%').padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -2008,26 +2007,26 @@ ${""?left_pad(indent)}}.width('100%').padding(12).backgroundColor($r('app.color.
 <#macro print_tile_side_image_time_capsule widget indent=0>
 ${""?left_pad(indent)}Column() {
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).fontSize(12).fontColor($r('app.color.text_muted')).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') }).margin({ bottom: 8 }).width('100%')
   </#if>
 ${""?left_pad(indent)}  Row() {
 ${""?left_pad(indent)}    Column() {
         <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontWeight(FontWeight.Bold).fontColor($r('app.color.text')).margin({ bottom: 4 })
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 4 })
         </#if>
         <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).fontSize(14).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}      AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}, fontSize: 14, fontColor: $r('app.color.text_muted') })
         </#if>
 ${""?left_pad(indent)}    }.layoutWeight(1).alignItems(HorizontalAlign.Start).margin({ right: 12 })
 ${""?left_pad(indent)}    Row() {
         <#if guidbase.has_child_widget(widget, "image")>
 ${""?left_pad(indent)}      Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))}).width(60).height(60).borderRadius(4).objectFit(ImageFit.Cover)
         </#if>
-${""?left_pad(indent)}    }
+    }
 ${""?left_pad(indent)}  }.width('100%').margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}  Row() {
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.End)
   </#if>
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)
@@ -2048,16 +2047,16 @@ ${""?left_pad(indent)}  Row() {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Row() {
 ${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, (tag: string) => {
-${""?left_pad(indent)}        Text(tag).fontSize(10).fontColor($r('app.color.primary')).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
+${""?left_pad(indent)}        AdaptiveText({ value: tag, fontSize: 10, fontColor: $r('app.color.primary') }).backgroundColor($r('app.color.primary_bg')).padding({ left: 6, right: 6, top: 2, bottom: 2 }).borderRadius(4).margin({ right: 4 })
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).fontSize(12).fontColor($r('app.color.text_muted'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}, fontSize: 12, fontColor: $r('app.color.text_muted') })
     </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween).margin({ bottom: 8 })
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).fontSize(16).fontWeight(FontWeight.Bold).fontColor($r('app.color.text')).margin({ bottom: 8 }).width('100%')
+${""?left_pad(indent)}  AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}, fontSize: 16, fontColor: $r('app.color.text'), fontWeight: FontWeight.Bold }).margin({ bottom: 8 }).width('100%')
   </#if>
 ${""?left_pad(indent)}  Row() {
   <#if guidbase.has_child_widget(widget, "avatars")>
@@ -2068,7 +2067,7 @@ ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).fontSize(12).fontColor($r('app.color.primary'))
+${""?left_pad(indent)}    AdaptiveText({ value: row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}, fontSize: 12, fontColor: $r('app.color.primary') })
   </#if>
 ${""?left_pad(indent)}  }.width('100%').justifyContent(FlexAlign.SpaceBetween)
 ${""?left_pad(indent)}}.padding(12).backgroundColor($r('app.color.bg')).borderRadius(8)

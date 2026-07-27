@@ -1,3 +1,4 @@
+<#import "/$/guidbase.ftl" as guidbase>
 <#--
  ###############################################################################
  ### 瓦片猜测器 - 根据 widget.children 的 level 匹配最合适的瓦片样式
@@ -366,121 +367,136 @@
   <#return bestName>
 </#function>
 
-<#macro print_tile_layout widget indent=0>
-  <#local tile = widget.value("tile",guess_tile(widget))>
-  <#if tile == "meeting_event">
-<@print_tile_meeting_event widget=widget indent=indent />
-  <#elseif tile == "media_article">
-<@print_tile_media_article widget=widget indent=indent />
-  <#elseif tile == "user_profile">
-<@print_tile_user_profile widget=widget indent=indent />
-  <#elseif tile == "task_board">
-<@print_tile_task_board widget=widget indent=indent />
-  <#elseif tile == "promo_banner">
-<@print_tile_promo_banner widget=widget indent=indent />
-  <#elseif tile == "compact_list">
-<@print_tile_compact_list widget=widget indent=indent />
-  <#elseif tile == "split_content">
-<@print_tile_split_content widget=widget indent=indent />
-  <#elseif tile == "notification">
-<@print_tile_notification widget=widget indent=indent />
-  <#elseif tile == "hero_profile">
-<@print_tile_hero_profile widget=widget indent=indent />
-  <#elseif tile == "timeline_node">
-<@print_tile_timeline_node widget=widget indent=indent />
-  <#elseif tile == "message">
-<@print_tile_message widget=widget indent=indent />
-  <#elseif tile == "ticket">
-<@print_tile_ticket widget=widget indent=indent />
-  <#elseif tile == "dense_detail_list">
-<@print_tile_dense_detail_list widget=widget indent=indent />
-  <#elseif tile == "vertical_poster">
-<@print_tile_vertical_poster widget=widget indent=indent />
-  <#elseif tile == "issue_detail">
-<@print_tile_issue_detail widget=widget indent=indent />
-  <#elseif tile == "team_directory">
-<@print_tile_team_directory widget=widget indent=indent />
-  <#elseif tile == "immersive_highlight">
-<@print_tile_immersive_highlight widget=widget indent=indent />
-  <#elseif tile == "mini_status">
-<@print_tile_mini_status widget=widget indent=indent />
-  <#elseif tile == "dual_column_content">
-<@print_tile_dual_column_content widget=widget indent=indent />
-  <#elseif tile == "gallery">
-<@print_tile_gallery widget=widget indent=indent />
-  <#elseif tile == "key_metric">
-<@print_tile_key_metric widget=widget indent=indent />
-  <#elseif tile == "overlay_avatar">
-<@print_tile_overlay_avatar widget=widget indent=indent />
-  <#elseif tile == "audit_log">
-<@print_tile_audit_log widget=widget indent=indent />
-  <#elseif tile == "calendar_cell">
-<@print_tile_calendar_cell widget=widget indent=indent />
-  <#elseif tile == "side_status">
-<@print_tile_side_status widget=widget indent=indent />
-  <#elseif tile == "multi_tag">
-<@print_tile_multi_tag widget=widget indent=indent />
-  <#elseif tile == "shift_planner">
-<@print_tile_shift_planner widget=widget indent=indent />
-  <#elseif tile == "social_post_feed">
-<@print_tile_social_post_feed widget=widget indent=indent />
-  <#elseif tile == "product">
-<@print_tile_product widget=widget indent=indent />
-  <#elseif tile == "dual_profile_comparison">
-<@print_tile_dual_profile_comparison widget=widget indent=indent />
-  <#elseif tile == "left_feature_image">
-<@print_tile_left_feature_image widget=widget indent=indent />
-  <#elseif tile == "workflow_strip">
-<@print_tile_workflow_strip widget=widget indent=indent />
-  <#elseif tile == "text_over_background">
-<@print_tile_text_over_background widget=widget indent=indent />
-  <#elseif tile == "micro_badge">
-<@print_tile_micro_badge widget=widget indent=indent />
-  <#elseif tile == "stepped_process">
-<@print_tile_stepped_process widget=widget indent=indent />
-  <#elseif tile == "stacked_overlay">
-<@print_tile_stacked_overlay widget=widget indent=indent />
-  <#elseif tile == "group_hub">
-<@print_tile_group_hub widget=widget indent=indent />
-  <#elseif tile == "tall_sidebar">
-<@print_tile_tall_sidebar widget=widget indent=indent />
-  <#elseif tile == "justified_meta">
-<@print_tile_justified_meta widget=widget indent=indent />
-  <#elseif tile == "multidimensional_board">
-<@print_tile_multidimensional_board widget=widget indent=indent />
-  <#elseif tile == "media_player">
-<@print_tile_media_player widget=widget indent=indent />
-  <#elseif tile == "left_anchor_time">
-<@print_tile_left_anchor_time widget=widget indent=indent />
-  <#elseif tile == "duration_span">
-<@print_tile_duration_span widget=widget indent=indent />
-  <#elseif tile == "media_history">
-<@print_tile_media_history widget=widget indent=indent />
-  <#elseif tile == "status_transition">
-<@print_tile_status_transition widget=widget indent=indent />
-  <#elseif tile == "compact_time">
-<@print_tile_compact_time widget=widget indent=indent />
-  <#elseif tile == "horizontal_flow">
-<@print_tile_horizontal_flow widget=widget indent=indent />
-  <#elseif tile == "right_biased_node">
-<@print_tile_right_biased_node widget=widget indent=indent />
-  <#elseif tile == "left_biased_node">
-<@print_tile_left_biased_node widget=widget indent=indent />
-  <#elseif tile == "internal_chronology">
-<@print_tile_internal_chronology widget=widget indent=indent />
-  <#elseif tile == "three_stage_segment">
-<@print_tile_three_stage_segment widget=widget indent=indent />
-  <#elseif tile == "horizontal_log">
-<@print_tile_horizontal_log widget=widget indent=indent />
-  <#elseif tile == "bulletin">
-<@print_tile_bulletin widget=widget indent=indent />
-  <#elseif tile == "timestamp_stamp">
-<@print_tile_timestamp_stamp widget=widget indent=indent />
-  <#elseif tile == "compact_chat">
-<@print_tile_compact_chat widget=widget indent=indent />
-  <#elseif tile == "side_image_time_capsule">
-<@print_tile_side_image_time_capsule widget=widget indent=indent />
-  <#elseif tile == "multi_tag_end_node">
-<@print_tile_multi_tag_end_node widget=widget indent=indent />
+<#--
+ ###############################################################################
+ ### 渲染布局瓦片组件 (Render Layout Tile Widget)
+ ### 
+ ### 根据组件的瓦片类型（tile name），动态路由并调用对应的具体瓦片渲染宏。
+ ### 
+ ### 路由与渲染规则：
+ ### - 首先尝试从传入的 widget 中获取 "tile" 属性值，若不存在则调用 guess_tile(widget) 进行推断。
+ ### - 根据解析出的瓦片类型名称（tilename），通过多重条件分支（if-elseif）进行分发。
+ ### - 最终调用 @tile 命名空间下对应的具体渲染宏，并传递 widget 对象与缩进层级。
+ ### 
+ ### @param widget  瓦片组件对象 (Widget Object)
+ ### @param indent  缩进层级，默认值为 0 (Indentation Level, Integer, Default: 0)
+ ###############################################################################
+ -->
+<#macro print_layout_tile widget indent=0>
+  <#local tilename = widget.value("tile", guess_tile(widget))>
+  <#if tilename == "meeting_event">
+<@tile.print_tile_meeting_event widget=widget indent=indent />
+  <#elseif tilename == "media_article">
+<@tile.print_tile_media_article widget=widget indent=indent />
+  <#elseif tilename == "user_profile">
+<@tile.print_tile_user_profile widget=widget indent=indent />
+  <#elseif tilename == "task_board">
+<@tile.print_tile_task_board widget=widget indent=indent />
+  <#elseif tilename == "promo_banner">
+<@tile.print_tile_promo_banner widget=widget indent=indent />
+  <#elseif tilename == "compact_list">
+<@tile.print_tile_compact_list widget=widget indent=indent />
+  <#elseif tilename == "split_content">
+<@tile.print_tile_split_content widget=widget indent=indent />
+  <#elseif tilename == "notification">
+<@tile.print_tile_notification widget=widget indent=indent />
+  <#elseif tilename == "hero_profile">
+<@tile.print_tile_hero_profile widget=widget indent=indent />
+  <#elseif tilename == "timeline_node">
+<@tile.print_tile_timeline_node widget=widget indent=indent />
+  <#elseif tilename == "message">
+<@tile.print_tile_message widget=widget indent=indent />
+  <#elseif tilename == "ticket">
+<@tile.print_tile_ticket widget=widget indent=indent />
+  <#elseif tilename == "dense_detail_list">
+<@tile.print_tile_dense_detail_list widget=widget indent=indent />
+  <#elseif tilename == "vertical_poster">
+<@tile.print_tile_vertical_poster widget=widget indent=indent />
+  <#elseif tilename == "issue_detail">
+<@tile.print_tile_issue_detail widget=widget indent=indent />
+  <#elseif tilename == "team_directory">
+<@tile.print_tile_team_directory widget=widget indent=indent />
+  <#elseif tilename == "immersive_highlight">
+<@tile.print_tile_immersive_highlight widget=widget indent=indent />
+  <#elseif tilename == "mini_status">
+<@tile.print_tile_mini_status widget=widget indent=indent />
+  <#elseif tilename == "dual_column_content">
+<@tile.print_tile_dual_column_content widget=widget indent=indent />
+  <#elseif tilename == "gallery">
+<@tile.print_tile_gallery widget=widget indent=indent />
+  <#elseif tilename == "key_metric">
+<@tile.print_tile_key_metric widget=widget indent=indent />
+  <#elseif tilename == "overlay_avatar">
+<@tile.print_tile_overlay_avatar widget=widget indent=indent />
+  <#elseif tilename == "audit_log">
+<@tile.print_tile_audit_log widget=widget indent=indent />
+  <#elseif tilename == "calendar_cell">
+<@tile.print_tile_calendar_cell widget=widget indent=indent />
+  <#elseif tilename == "side_status">
+<@tile.print_tile_side_status widget=widget indent=indent />
+  <#elseif tilename == "multi_tag">
+<@tile.print_tile_multi_tag widget=widget indent=indent />
+  <#elseif tilename == "shift_planner">
+<@tile.print_tile_shift_planner widget=widget indent=indent />
+  <#elseif tilename == "social_post_feed">
+<@tile.print_tile_social_post_feed widget=widget indent=indent />
+  <#elseif tilename == "product">
+<@tile.print_tile_product widget=widget indent=indent />
+  <#elseif tilename == "dual_profile_comparison">
+<@tile.print_tile_dual_profile_comparison widget=widget indent=indent />
+  <#elseif tilename == "left_feature_image">
+<@tile.print_tile_left_feature_image widget=widget indent=indent />
+  <#elseif tilename == "workflow_strip">
+<@tile.print_tile_workflow_strip widget=widget indent=indent />
+  <#elseif tilename == "text_over_background">
+<@tile.print_tile_text_over_background widget=widget indent=indent />
+  <#elseif tilename == "micro_badge">
+<@tile.print_tile_micro_badge widget=widget indent=indent />
+  <#elseif tilename == "stepped_process">
+<@tile.print_tile_stepped_process widget=widget indent=indent />
+  <#elseif tilename == "stacked_overlay">
+<@tile.print_tile_stacked_overlay widget=widget indent=indent />
+  <#elseif tilename == "group_hub">
+<@tile.print_tile_group_hub widget=widget indent=indent />
+  <#elseif tilename == "tall_sidebar">
+<@tile.print_tile_tall_sidebar widget=widget indent=indent />
+  <#elseif tilename == "justified_meta">
+<@tile.print_tile_justified_meta widget=widget indent=indent />
+  <#elseif tilename == "multidimensional_board">
+<@tile.print_tile_multidimensional_board widget=widget indent=indent />
+  <#elseif tilename == "media_player">
+<@tile.print_tile_media_player widget=widget indent=indent />
+  <#elseif tilename == "left_anchor_time">
+<@tile.print_tile_left_anchor_time widget=widget indent=indent />
+  <#elseif tilename == "duration_span">
+<@tile.print_tile_duration_span widget=widget indent=indent />
+  <#elseif tilename == "media_history">
+<@tile.print_tile_media_history widget=widget indent=indent />
+  <#elseif tilename == "status_transition">
+<@tile.print_tile_status_transition widget=widget indent=indent />
+  <#elseif tilename == "compact_time">
+<@tile.print_tile_compact_time widget=widget indent=indent />
+  <#elseif tilename == "horizontal_flow">
+<@tile.print_tile_horizontal_flow widget=widget indent=indent />
+  <#elseif tilename == "right_biased_node">
+<@tile.print_tile_right_biased_node widget=widget indent=indent />
+  <#elseif tilename == "left_biased_node">
+<@tile.print_tile_left_biased_node widget=widget indent=indent />
+  <#elseif tilename == "internal_chronology">
+<@tile.print_tile_internal_chronology widget=widget indent=indent />
+  <#elseif tilename == "three_stage_segment">
+<@tile.print_tile_three_stage_segment widget=widget indent=indent />
+  <#elseif tilename == "horizontal_log">
+<@tile.print_tile_horizontal_log widget=widget indent=indent />
+  <#elseif tilename == "bulletin">
+<@tile.print_tile_bulletin widget=widget indent=indent />
+  <#elseif tilename == "timestamp_stamp">
+<@tile.print_tile_timestamp_stamp widget=widget indent=indent />
+  <#elseif tilename == "compact_chat">
+<@tile.print_tile_compact_chat widget=widget indent=indent />
+  <#elseif tilename == "side_image_time_capsule">
+<@tile.print_tile_side_image_time_capsule widget=widget indent=indent />
+  <#elseif tilename == "multi_tag_end_node">
+<@tile.print_tile_multi_tag_end_node widget=widget indent=indent />
   </#if>
 </#macro>

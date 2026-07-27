@@ -1,5 +1,9 @@
 {
   "color": [
+    { "name": "navbar_gradient_start", "value": "#7A0000" },
+    { "name": "navbar_gradient_mid", "value": "#A30000" },
+    { "name": "navbar_gradient_end", "value": "#BE0000" },
+
     { "name": "primary", "value": "#BE0000" },
     { "name": "primary_dark", "value": "#8A0000" },
     { "name": "primary_bg", "value": "#FFF3F3" },

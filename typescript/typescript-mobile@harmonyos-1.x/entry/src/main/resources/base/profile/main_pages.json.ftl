@@ -1,7 +1,8 @@
 {
   "src": [
 <#list app.pages as page>    
-    "pages/${ts.nameType(page.name)}Index"<#if page?index != app.pages?size - 1>,</#if>
+    "pages/${page.module}/${ts.nameType(page.name)}",
 </#list>
+    "pages/HomePage"
   ]
 }

@@ -1,0 +1,10 @@
+{
+  "name": "sdk",
+  "version": "1.0.0",
+  "description": "Remote API SDK — encapsulates all remote access interfaces.",
+  "main": "Index.ets",
+  "author": "",
+  "license": "",
+  "dependencies": {
+  }
+}
