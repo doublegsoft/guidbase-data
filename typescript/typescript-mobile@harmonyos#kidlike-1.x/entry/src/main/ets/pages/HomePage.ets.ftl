@@ -1,3 +1,5 @@
+import { router } from '@kit.ArkUI'
+
 /**
  * 儿童教育应用 — 首页
  *
@@ -44,6 +46,12 @@ struct HomePage {
     { icon: '🏆', label: '成就' }, { icon: '👤', label: '我的' }
   ]
 
+  private shortcuts: ShortcutItem[] = [
+<#list app.pages as page>    
+    { icon: '📋', title: '${page.title}', desc: '${page.title}示例页面', route: 'pages/${ts.nameNamespace(page.module)}/${ts.nameType(page.name)}' },
+</#list>
+  ]
+
   @State greeting: string = '今天学了吗？'
 
   build() {
@@ -52,6 +60,7 @@ struct HomePage {
       this.buildHeader()
       Scroll() {
         Column() {
+          
           Column() { this.buildStreakBar() }
             .width('100%').padding({ left: 18, right: 18, top: 6, bottom: 6 })
 
@@ -59,6 +68,9 @@ struct HomePage {
             .width('100%').padding({ left: 18, right: 18, bottom: 6 })
 
           Column() { this.buildChallenge() }
+            .width('100%').padding({ left: 18, right: 18, bottom: 6 })
+
+          Column() { this.buildShortcutList() }
             .width('100%').padding({ left: 18, right: 18, bottom: 6 })
 
           this.buildSectionTitle('继续学习', '全部课程 →')
@@ -144,7 +156,7 @@ struct HomePage {
               .fontWeight(FontWeight.Medium).margin({ bottom: 3 })
 
             Row() {
-              Row().width(`${subj.progress}%`).height('100%').borderRadius(3)
+              Row().width(${r"`${subj.progress}%`"}).height('100%').borderRadius(3)
                 .backgroundColor(subj.bar)
             }
             .width('100%').height(5).borderRadius(3).backgroundColor(subj.barBg)
@@ -178,6 +190,39 @@ struct HomePage {
     .width('100%').padding({ left: 14, right: 14, top: 14, bottom: 12 }).borderRadius(18)
     .backgroundColor($r('app.color.success'))
     .border({ width: 1, color: $r('app.color.success_dark') })
+  }
+
+  @Builder
+  buildShortcutList() {
+    Column({ space: 8 }) {
+      ForEach(this.shortcuts, (item: ShortcutItem) => {
+        Row({ space: 12 }) {
+          Row() { Text(item.icon).fontSize(26) }
+            .width(46).height(46).borderRadius(14)
+            .backgroundColor($r('app.color.primary_bg'))
+            .justifyContent(FlexAlign.Center)
+          Column({ space: 3 }) {
+            Text(item.title).fontSize(14).fontColor($r('app.color.text')).fontWeight(FontWeight.Medium)
+            Text(item.desc).fontSize(11).fontColor($r('app.color.text_muted'))
+          }.alignItems(HorizontalAlign.Start).layoutWeight(1)
+          Text('进入 →').fontSize(12).fontColor($r('app.color.primary')).fontWeight(FontWeight.Medium)
+            .padding({ left: 14, right: 14, top: 6, bottom: 6 }).borderRadius(20)
+            .backgroundColor($r('app.color.primary_bg'))
+        }
+        .width('100%').padding({ left: 14, right: 14, top: 14, bottom: 12 }).borderRadius(18)
+        .backgroundColor($r('app.color.bg'))
+        .border({ width: 1, color: $r('app.color.border_light') })
+        .onClick(() => {
+          const uiContext = this.getUIContext();
+          const router = uiContext.getRouter();
+          router.pushUrl({
+            url: item.route
+          }).catch(() => {
+            // nothing to do
+          })
+        })
+      })
+    }.width('100%')
   }
 
   @Builder
@@ -267,3 +312,4 @@ interface CourseItem {
 
 interface ToolItem { icon: string; label: string; bg: ResourceColor; fg: ResourceColor }
 interface TabItem { icon: string; label: string }
+interface ShortcutItem { icon: string; title: string; desc: string; route: string }

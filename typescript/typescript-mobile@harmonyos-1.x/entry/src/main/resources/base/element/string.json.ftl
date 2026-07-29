@@ -10,7 +10,7 @@
     },
     {
       "name": "ability_label",
-      "value": "label"
+      "value": "${app.name?upper_case}"
     },
     {
       "name": "grid_title_label",

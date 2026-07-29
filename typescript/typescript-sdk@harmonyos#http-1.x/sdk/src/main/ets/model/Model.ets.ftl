@@ -8,6 +8,11 @@ export interface Pagination<T> {
   total: number;
   data: T[];     
 }
+
+export interface Option {
+  value: string;
+  label: string;
+}
 <#list model.objects as obj>
 
 /**

@@ -17,8 +17,10 @@
     <#return "boolean">
   <#elseif type == "date" || type == "datetime" || type == "timestamp" || type == "time">
     <#return "string"> 
+  <#elseif attr.type.custom>
+    <#return "number">
   <#else>
-    <#return "any">
+    <#return "string">
   </#if>
 </#function>
 
@@ -40,7 +42,9 @@
 <#function value_attribute_test attr>
   <#local value = tatabase.value(attr)>
   <#local type = type_attribute_primitive(attr)>
-  <#if type == "number" || type == "boolean">
+  <#if attr.type.custom>
+    <#return tatabase.number(1, 100, 0)>
+  <#elseif type == "number" || type == "boolean">
     <#return value>
   <#else>
     <#return "'" + value + "'">

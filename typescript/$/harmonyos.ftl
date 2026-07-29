@@ -119,7 +119,7 @@ ${""?left_pad(indent)}  List({ space: 8 }) {
 ${""?left_pad(indent)}    ForEach(this.${js.nameVariable(list.id)}Rows, (row: ${ts.nameType(url.resource)}) => {
 ${""?left_pad(indent)}      ListItem() {
 ${""?left_pad(indent)}        Column() {
-<@guidbase_tile.print_layout_tile widget=list indent=indent+10 />
+<@guidbase_tile.print_tile_layout widget=list indent=indent+10 />
 ${""?left_pad(indent)}        }
 ${""?left_pad(indent)}      }
 ${""?left_pad(indent)}      .onClick(() => {  
@@ -127,17 +127,10 @@ ${""?left_pad(indent)}        this.handle${ts.nameType(list.id)}Click(row)
 ${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}    ListItem() {
-${""?left_pad(indent)}      Row() {
-${""?left_pad(indent)}        if (this.isLoading${ts.nameType(list.id)}) {
-${""?left_pad(indent)}          LoadingProgress().width(20).height(20).color($r('app.color.primary'))
-${""?left_pad(indent)}          Text('加载中...').fontSize(13).fontColor($r('app.color.text_muted')).margin({ left: 8 })
-${""?left_pad(indent)}        } else {
-${""?left_pad(indent)}          Text('上拉加载更多').fontSize(13).fontColor($r('app.color.text_muted'))
-${""?left_pad(indent)}        }
-${""?left_pad(indent)}      }
-${""?left_pad(indent)}      .width('100%')
-${""?left_pad(indent)}      .justifyContent(FlexAlign.Center)
-${""?left_pad(indent)}      .padding({ top: 12, bottom: 12 })
+${""?left_pad(indent)}      LoadingFooter({
+${""?left_pad(indent)}        isLoading: this.isLoading${ts.nameType(list.id)},
+${""?left_pad(indent)}        hasData: this.${ts.nameVariable(list.id)}Rows.length > 0
+${""?left_pad(indent)}      })
 ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .width('100%')
@@ -179,13 +172,13 @@ ${""?left_pad(indent)}}
 ${""?left_pad(indent)}  
 ${""?left_pad(indent)}async load${ts.nameType(list.id)}Rows(): Promise<void> {
 ${""?left_pad(indent)}  const result = await sdk.fetch${ts.nameType(inflector.pluralize(url.resource))}({})
-${""?left_pad(indent)}  this.${ts.nameVariable(list.id)}Rows = result.data
+${""?left_pad(indent)}  this.${ts.nameVariable(list.id)}Rows = this.${ts.nameVariable(list.id)}Rows.concat(result.data)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}
 ${""?left_pad(indent)}async handle${ts.nameType(list.id)}Refresh(): Promise<void> {
 ${""?left_pad(indent)}  this.isRefreshing${ts.nameType(list.id)} = true
-${""?left_pad(indent)}  const result = await sdk.fetch${ts.nameType(inflector.pluralize(url.resource))}({})
-${""?left_pad(indent)}  this.demoListRows = result.data
+${""?left_pad(indent)}  this.${ts.nameVariable(list.id)}Rows = []
+${""?left_pad(indent)}  this.load${ts.nameType(list.id)}Rows()
 ${""?left_pad(indent)}  this.isRefreshing${ts.nameType(list.id)} = false
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}
@@ -194,8 +187,7 @@ ${""?left_pad(indent)}  if (this.isLoading${ts.nameType(list.id)}) {
 ${""?left_pad(indent)}    return
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  this.isLoading${ts.nameType(list.id)} = true
-${""?left_pad(indent)}  const result = await sdk.fetch${ts.nameType(inflector.pluralize(url.resource))}({})
-${""?left_pad(indent)}  this.${ts.nameVariable(list.id)}Rows = this.${ts.nameVariable(list.id)}Rows.concat(result.data)
+${""?left_pad(indent)}  this.load${ts.nameType(list.id)}Rows()
 ${""?left_pad(indent)}  this.isLoading${ts.nameType(list.id)} = false
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}
@@ -215,32 +207,133 @@ ${""?left_pad(indent)}}
 <!--                               GRID VIEW                                 -->
 <!----------------------------------------------------------------------------->
 <#macro print_grid_view_layout grid indent=0>
-${""?left_pad(indent)}Grid() {
-${""?left_pad(indent)}  ForEach(this.${js.nameVariable(grid.id)}Items, (item: any) => {
-${""?left_pad(indent)}    GridItem() {
-${""?left_pad(indent)}      Column() {
-${""?left_pad(indent)}        Image(item.iconUrl)
-${""?left_pad(indent)}          .width(60)
-${""?left_pad(indent)}          .height(60)
-${""?left_pad(indent)}          .objectFit(ImageFit.Contain)
-${""?left_pad(indent)}          .margin({ bottom: 8 })
-${""?left_pad(indent)}        Text(item.title)
-${""?left_pad(indent)}          .fontSize(14)
-${""?left_pad(indent)}          .fontColor($r('app.color.text'))
+  <#local url = valuebase.url(grid.value("data"))>
+${""?left_pad(indent)}Refresh({ refreshing: $$this.isRefreshing${ts.nameType(grid.id)} }) {
+${""?left_pad(indent)}  WaterFlow() {
+${""?left_pad(indent)}    ForEach(this.${ts.nameVariable(grid.id)}Rows, (row: ${ts.nameType(url.resource)}, index: number) => {
+${""?left_pad(indent)}      FlowItem() {
+${""?left_pad(indent)}        this.build${ts.nameType(grid.id)}Tile(row)
 ${""?left_pad(indent)}      }
 ${""?left_pad(indent)}      .width('100%')
-${""?left_pad(indent)}      .padding(12)
-${""?left_pad(indent)}      .backgroundColor($r('app.color.bg'))
-${""?left_pad(indent)}      .borderRadius(8)
-${""?left_pad(indent)}      .onClick(() => { this.handle${js.nameType(grid.id)}ItemClick(item) })
-${""?left_pad(indent)}    }
+${""?left_pad(indent)}      .onClick(() => { this.handle${ts.nameType(grid.id)}Click(row) })
+${""?left_pad(indent)}    })
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  .columnsTemplate('1fr 1fr')
+${""?left_pad(indent)}  .columnsGap(8)
+${""?left_pad(indent)}  .rowsGap(8)
+${""?left_pad(indent)}  .width('100%')
+${""?left_pad(indent)}  .layoutWeight(1)
+${""?left_pad(indent)}  .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+${""?left_pad(indent)}  .backgroundColor($r('app.color.bg_page'))
+${""?left_pad(indent)}  .onReachEnd(() => {
+${""?left_pad(indent)}    this.handle${ts.nameType(grid.id)}Load()
+${""?left_pad(indent)}  })
+${""?left_pad(indent)}} 
+${""?left_pad(indent)}.layoutWeight(1)
+${""?left_pad(indent)}.onRefreshing(() => {
+${""?left_pad(indent)}  this.handle${ts.nameType(grid.id)}Refresh()
+${""?left_pad(indent)}})
+${""?left_pad(indent)}LoadingFooter({
+${""?left_pad(indent)}  isLoading: this.isLoading${ts.nameType(grid.id)},
+${""?left_pad(indent)}  hasData: this.${ts.nameVariable(grid.id)}Rows.length > 0
+${""?left_pad(indent)}})
+</#macro>
+
+<#macro print_grid_view_variables grid indent=0>
+  <#local url = valuebase.url(grid.value("data"))>
+${""?left_pad(indent)}
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * 【${grid.id}】列表视图相关变量，包括列表数据、左列数据、右列数据、正在刷新、正在加载等变量
+${""?left_pad(indent)} */
+${""?left_pad(indent)}@State
+${""?left_pad(indent)}private ${ts.nameVariable(grid.id)}Rows: ${ts.nameType(url.resource)}[] = []
+${""?left_pad(indent)}@State
+${""?left_pad(indent)}private left${ts.nameType(grid.id)}: ${ts.nameType(url.resource)}[] = []
+${""?left_pad(indent)}@State
+${""?left_pad(indent)}private right${ts.nameType(grid.id)}: ${ts.nameType(url.resource)}[] = []
+${""?left_pad(indent)}@State
+${""?left_pad(indent)}private isRefreshing${ts.nameType(grid.id)}: boolean = false
+${""?left_pad(indent)}@State
+${""?left_pad(indent)}private isLoading${ts.nameType(grid.id)}: boolean = false
+</#macro>
+
+<#macro print_grid_view_methods grid indent=0>
+  <#local url = valuebase.url(grid.value("data"))>
+  <#local next = valuebase.url(grid.value("next"))>
+  <#local nextPage = guidbase.get_page(app, next.resource)>
+  <#local obj = model.findObjectByName(url.resource)>
+  <#local idAttr = obj.identifiableAttribute>
+${""?left_pad(indent)}  
+${""?left_pad(indent)}aboutToAppear(): void {
+${""?left_pad(indent)}  this.load${ts.nameType(grid.id)}Rows()
+${""?left_pad(indent)}}
+${""?left_pad(indent)}  
+${""?left_pad(indent)}async load${ts.nameType(grid.id)}Rows(): Promise<void> {
+${""?left_pad(indent)}  const result = await sdk.fetch${ts.nameType(inflector.pluralize(url.resource))}({})
+${""?left_pad(indent)}  this.${ts.nameVariable(grid.id)}Rows = this.${ts.nameVariable(grid.id)}Rows.concat(result.data)
+${""?left_pad(indent)}  this.distributeToColumns();
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}async handle${ts.nameType(grid.id)}Refresh(): Promise<void> {
+${""?left_pad(indent)}  this.isRefreshing${ts.nameType(grid.id)} = true
+${""?left_pad(indent)}  this.${ts.nameVariable(grid.id)}Rows = []
+${""?left_pad(indent)}  this.load${ts.nameType(grid.id)}Rows()
+${""?left_pad(indent)}  this.isRefreshing${ts.nameType(grid.id)} = false
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}async handle${ts.nameType(grid.id)}Load(): Promise<void> {
+${""?left_pad(indent)}  if (this.isLoading${ts.nameType(grid.id)}) {
+${""?left_pad(indent)}    return
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  this.isLoading${ts.nameType(grid.id)} = true
+${""?left_pad(indent)}  this.load${ts.nameType(grid.id)}Rows()
+${""?left_pad(indent)}  this.isLoading${ts.nameType(grid.id)} = false
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}handle${ts.nameType(grid.id)}Click(row: ${ts.nameType(url.resource)}) {
+${""?left_pad(indent)}  const uiContext = this.getUIContext();
+${""?left_pad(indent)}  const router = uiContext.getRouter();
+${""?left_pad(indent)}  router.pushUrl({
+${""?left_pad(indent)}    url: 'pages/${nextPage.module}/${ts.nameType(nextPage.name)}',
+${""?left_pad(indent)}    params: { ${modelbase.get_attribute_sql_name(idAttr)}: row.${modelbase.get_attribute_sql_name(idAttr)} }
+${""?left_pad(indent)}  }).catch(() => {
+${""?left_pad(indent)}    // nothing to do
 ${""?left_pad(indent)}  })
 ${""?left_pad(indent)}}
-${""?left_pad(indent)}.columnsTemplate('1fr 1fr')
-${""?left_pad(indent)}.rowsGap(8)
-${""?left_pad(indent)}.columnsGap(8)
-${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.backgroundColor($r('app.color.bg_page'))
+${""?left_pad(indent)}
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * 贪心分配：每张卡片放到当前总高较短的一列，保持两列视觉平衡。
+${""?left_pad(indent)} */
+${""?left_pad(indent)}distributeToColumns(): void {
+${""?left_pad(indent)}  const left: ${ts.nameType(url.resource)}[] = []
+${""?left_pad(indent)}  const right: ${ts.nameType(url.resource)}[] = []
+${""?left_pad(indent)}  let leftH = 0
+${""?left_pad(indent)}  let rightH = 0
+${""?left_pad(indent)}
+${""?left_pad(indent)}  for (let i = 0; i < this.${ts.nameVariable(grid.id)}Rows.length; i++) {
+${""?left_pad(indent)}    const row = this.${ts.nameVariable(grid.id)}Rows[i]
+${""?left_pad(indent)}    // 预估高度：丰富卡更高
+${""?left_pad(indent)}    const estHeight = (i % 3 === 0) ? 380 : 220
+${""?left_pad(indent)}    if (leftH <= rightH) {
+${""?left_pad(indent)}      left.push(row)
+${""?left_pad(indent)}      leftH += estHeight
+${""?left_pad(indent)}    } else {
+${""?left_pad(indent)}      right.push(row)
+${""?left_pad(indent)}      rightH += estHeight
+${""?left_pad(indent)}    }
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}
+${""?left_pad(indent)}  this.left${ts.nameType(grid.id)} = left
+${""?left_pad(indent)}  this.right${ts.nameType(grid.id)} = right
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}@Builder
+${""?left_pad(indent)}build${ts.nameType(grid.id)}Tile(row: ${ts.nameType(url.resource)}) {
+<@guidbase_tile.print_tile_layout widget=grid indent=indent+2 /> 
+${""?left_pad(indent)}  .onClick(() => {  
+${""?left_pad(indent)}    this.handle${ts.nameType(grid.id)}Click(row)
+${""?left_pad(indent)}  })
+${""?left_pad(indent)}}
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -248,42 +341,34 @@ ${""?left_pad(indent)}.backgroundColor($r('app.color.bg_page'))
 <!----------------------------------------------------------------------------->
 <#macro print_entry_form_layout form indent=0>
   <#local url = valuebase.url(form.value("data"))>
-${""?left_pad(indent)}Column() {
-  <#list form.groups() as group>
+${""?left_pad(indent)}Scroll() {  
 ${""?left_pad(indent)}  Column() {
-${""?left_pad(indent)}    FormSectionTitle({ title: '${group}' }) 
+  <#list form.groups() as group>
+${""?left_pad(indent)}    Column() {
+${""?left_pad(indent)}      FormSectionTitle({ title: '${group}' }) 
     <#local rows = form.rows(group, 1)>
     <#list rows as row>
       <#list row as input>
-        <#if input.type == "date">
-${""?left_pad(indent)}    DateRow({ label: '日期', value: this.${ts.nameVariable(form.id)}.${ts.nameVariable(input.id)},
-${""?left_pad(indent)}              onSelect: (v: string) => { this.${ts.nameVariable(form.id)}.${ts.nameVariable(input.id)} = v } })
-        <#elseif input.type == "select">
-${""?left_pad(indent)}    DropdownRow({ label: '单选', value: this.${ts.nameVariable(form.id)}.${ts.nameVariable(input.id)},
-${""?left_pad(indent)}                  options: this.selOptions,
-${""?left_pad(indent)}                  onSelect: (v: string) => { this.${ts.nameVariable(form.id)}.${ts.nameVariable(input.id)} = v } })
-        <#else>
-${""?left_pad(indent)}    InputRow({ label: '姓名', value: this.${ts.nameVariable(form.id)}.${ts.nameVariable(input.id)},
-${""?left_pad(indent)}               onChange: (v: string) => { this.${ts.nameVariable(form.id)}.${ts.nameVariable(input.id)} = v } })
-        </#if>      
+<@print_input_layout input=input indent=indent+6 />         
       </#list>
     </#list>
-${""?left_pad(indent)}  }    
+${""?left_pad(indent)}    }    
   </#list>
-${""?left_pad(indent)}  Row() {
-${""?left_pad(indent)}    Button(this.isSaving ? '保存中...' : '保存')
-${""?left_pad(indent)}    .width('100%').fontSize(15).fontWeight(FontWeight.Bold).fontColor(Color.White)
-${""?left_pad(indent)}    .backgroundColor($r('app.color.primary')).borderRadius(10)
-${""?left_pad(indent)}    .padding({ top: 12, bottom: 12 })
-${""?left_pad(indent)}    .enabled(!this.isSaving)
-${""?left_pad(indent)}    .onClick(() => { this.handleSave() })
+${""?left_pad(indent)}    Row() {
+${""?left_pad(indent)}      Button(this.isSaving${ts.nameType(form.id)} ? '保存中...' : '保存')
+${""?left_pad(indent)}      .width('100%').fontSize(15).fontWeight(FontWeight.Bold).fontColor(Color.White)
+${""?left_pad(indent)}      .backgroundColor($r('app.color.primary')).borderRadius(10)
+${""?left_pad(indent)}      .padding({ top: 12, bottom: 12 })
+${""?left_pad(indent)}      .enabled(!this.isSaving${ts.nameType(form.id)})
+${""?left_pad(indent)}      .onClick(() => { this.handle${ts.nameType(form.id)}Save() })
+${""?left_pad(indent)}    }
+${""?left_pad(indent)}    .width('100%').padding({ left: 20, right: 20, top: 12, bottom: 24 })
+${""?left_pad(indent)}    .backgroundColor($r('app.color.bg'))
+${""?left_pad(indent)}    .border({ width: { top: 1 }, color: $r('app.color.border_light') })
 ${""?left_pad(indent)}  }
-${""?left_pad(indent)}  .width('100%').padding({ left: 20, right: 20, top: 12, bottom: 24 })
+${""?left_pad(indent)}  .padding(16)
 ${""?left_pad(indent)}  .backgroundColor($r('app.color.bg'))
-${""?left_pad(indent)}  .border({ width: { top: 1 }, color: $r('app.color.border_light') })
 ${""?left_pad(indent)}}
-${""?left_pad(indent)}.padding(16)
-${""?left_pad(indent)}.backgroundColor($r('app.color.bg'))
 </#macro>
 
 <#macro print_entry_form_variables form indent=0>
@@ -293,11 +378,20 @@ ${""?left_pad(indent)}/**
 ${""?left_pad(indent)} * 【${form.id}】只读表单相关变量，包括表单数据、正在加载等变量
 ${""?left_pad(indent)} */
 ${""?left_pad(indent)}@State
-${""?left_pad(indent)}private ${ts.nameVariable(form.id)}Data: ${ts.nameType(url.resource)} | null = null
+${""?left_pad(indent)}private ${ts.nameVariable(form.id)}Data: ${ts.nameType(url.resource)} | null = sdk.new${ts.nameType(url.resource)}()
 ${""?left_pad(indent)}@State
 ${""?left_pad(indent)}private isLoading${ts.nameType(form.id)}: boolean = false
 ${""?left_pad(indent)}@State
 ${""?left_pad(indent)}private isSaving${ts.nameType(form.id)}: boolean = false
+  <#list form.inputs as input>
+    <#if input.type != "select" && input.type != "multiselect" && input.type != "cascade"><#continue></#if>
+${""?left_pad(indent)}@State
+    <#if input.value("data")?starts_with("enum")>
+${""?left_pad(indent)}private ${ts.nameVariable(input.id)}Options: Option[] = sdk.get${ts.nameType(input.id)}Options()    
+    <#else>
+${""?left_pad(indent)}private ${ts.nameVariable(input.id)}Options: Option[] = []
+    </#if>
+  </#list>
 </#macro>
 
 <#macro print_entry_form_methods form indent=0>
@@ -323,7 +417,7 @@ ${""?left_pad(indent)}  })
 ${""?left_pad(indent)}  this.${ts.nameVariable(form.id)}Data = result
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}
-${""?left_pad(indent)}async save${ts.nameType(form.id)}Data(): Promise<void> {
+${""?left_pad(indent)}async handle${ts.nameType(form.id)}Save(): Promise<void> {
 ${""?left_pad(indent)}  
 ${""?left_pad(indent)}}
 </#macro>
@@ -333,25 +427,27 @@ ${""?left_pad(indent)}}
 <!----------------------------------------------------------------------------->
 <#macro print_display_form_layout form indent=0>
   <#local url = valuebase.url(form.value("data"))>
-${""?left_pad(indent)}Column() {
+${""?left_pad(indent)}Scroll() {  
+${""?left_pad(indent)}  Column() {
   <#list form.groups() as group>
-${""?left_pad(indent)}  FormSection({
-${""?left_pad(indent)}    title: '${group}',
-${""?left_pad(indent)}    rows: [
+${""?left_pad(indent)}    FormSection({
+${""?left_pad(indent)}      title: '${group}',
+${""?left_pad(indent)}      rows: [
     <#local rows = form.rows(group, 1)>
     <#list rows as row>
       <#list row as input>
         <#if input.type == "hidden"><#continue></#if>
-${""?left_pad(indent)}      { label: '${input.title}', value: String(this.${ts.nameVariable(form.id)}Data!.${ts.nameVariable(input.id)}) },    
+${""?left_pad(indent)}        { label: '${input.title}', value: String(this.${ts.nameVariable(form.id)}Data!.${ts.nameVariable(input.id)}) },    
       </#list>
     </#list>
-${""?left_pad(indent)}    ],
-${""?left_pad(indent)}  })   
+${""?left_pad(indent)}      ],
+${""?left_pad(indent)}    })   
   </#list>
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  .padding(16)
+${""?left_pad(indent)}  .backgroundColor($r('app.color.bg'))
+${""?left_pad(indent)}  .borderRadius(8)
 ${""?left_pad(indent)}}
-${""?left_pad(indent)}.padding(16)
-${""?left_pad(indent)}.backgroundColor($r('app.color.bg'))
-${""?left_pad(indent)}.borderRadius(8)
 </#macro>
 
 <#macro print_display_form_variables form indent=0>
@@ -484,12 +580,39 @@ ${""?left_pad(indent)}  .onClick(() => { this.handle${js.nameType(button.id)}Tap
 <!--                                  INPUT                                  -->
 <!----------------------------------------------------------------------------->
 <#macro print_input_layout input indent=0>
-${""?left_pad(indent)}TextInput({ text: this.${js.nameVariable(input.id)}, placeholder: '请输入${input.title}' })
-${""?left_pad(indent)}  .placeholderColor($r('app.color.text_light'))
-${""?left_pad(indent)}  .fontColor($r('app.color.text'))
-${""?left_pad(indent)}  .backgroundColor($r('app.color.bg'))
-${""?left_pad(indent)}  .border({ width: 1, color: $r('app.color.border'), radius: 4 })
-${""?left_pad(indent)}  .onChange((val: string) => { this.handle${js.nameType(input.id)}Change(val) })
+  <#if input.type == "hidden"><#return></#if>
+  <#if input.type == "date">
+${""?left_pad(indent)}DateRow({ 
+${""?left_pad(indent)}  label: '${input.title}', value: String(this.${ts.nameVariable(input.container.id)}Data?.${ts.nameVariable(input.id)}),
+${""?left_pad(indent)}  onSelect: (v: string) => { this.${ts.nameVariable(input.container.id)}Data!.${ts.nameVariable(input.id)} = v } 
+${""?left_pad(indent)}})
+  <#elseif input.type == "select">
+${""?left_pad(indent)}DropdownRow({ 
+${""?left_pad(indent)}  label: '${input.title}', value: String(this.${ts.nameVariable(input.container.id)}Data?.${ts.nameVariable(input.id)}),
+${""?left_pad(indent)}  options: this.${ts.nameVariable(input.id)}Options,
+    <#if input.value("data")?starts_with("enum[") || input.value("data") == "">
+${""?left_pad(indent)}  onSelect: (v: string) => { this.${ts.nameVariable(input.container.id)}Data!.${ts.nameVariable(input.id)} = v } 
+    <#else>
+${""?left_pad(indent)}  onSelect: (v: string) => { this.${ts.nameVariable(input.container.id)}Data!.${ts.nameVariable(input.id)} = parseInt(v) }           
+    </#if>
+${""?left_pad(indent)}})
+  <#elseif input.type == "multiselect">
+${""?left_pad(indent)}MultiSelectRow({ 
+${""?left_pad(indent)}  label: '${input.title}', value: String(this.${ts.nameVariable(input.container.id)}Data?.${ts.nameVariable(input.id)}),
+${""?left_pad(indent)}  options: this.${ts.nameVariable(input.id)}Options,
+${""?left_pad(indent)}  onSelect: (v: string) => { this.${ts.nameVariable(input.container.id)}Data!.${ts.nameVariable(input.id)} = v }           
+${""?left_pad(indent)}})
+  <#elseif input.type == "number">
+${""?left_pad(indent)}InputRow({ 
+${""?left_pad(indent)}  label: '${input.title}', value: String(this.${ts.nameVariable(input.container.id)}Data?.${ts.nameVariable(input.id)}),
+${""?left_pad(indent)}  onChange: (v: string) => { this.${ts.nameVariable(input.container.id)}Data!.${ts.nameVariable(input.id)} = parseFloat(v) } 
+${""?left_pad(indent)}})
+  <#elseif input.type == "text">
+${""?left_pad(indent)}InputRow({ 
+${""?left_pad(indent)}  label: '${input.title}', value: String(this.${ts.nameVariable(input.container.id)}Data?.${ts.nameVariable(input.id)}),
+${""?left_pad(indent)}  onChange: (v: string) => { this.${ts.nameVariable(input.container.id)}Data!.${ts.nameVariable(input.id)} = v } 
+${""?left_pad(indent)}})
+  </#if>   
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -535,6 +658,7 @@ ${""?left_pad(indent)}  .onChange((val: string) => { this.handle${js.nameType(in
   <#elseif widget.type == "list_view">
 <@print_list_view_variables list=widget indent=indent />
   <#elseif widget.type == "grid_view">
+<@print_grid_view_variables grid=widget indent=indent />  
   <#elseif widget.type == "entry_form">
 <@print_entry_form_variables form=widget indent=indent />  
   <#elseif widget.type == "criteria_form">
@@ -556,6 +680,7 @@ ${""?left_pad(indent)}  .onChange((val: string) => { this.handle${js.nameType(in
   <#elseif widget.type == "list_view">
 <@print_list_view_methods list=widget indent=indent />
   <#elseif widget.type == "grid_view">
+<@print_grid_view_methods grid=widget indent=indent />  
   <#elseif widget.type == "entry_form">
 <@print_entry_form_methods form=widget indent=indent />  
   <#elseif widget.type == "criteria_form">

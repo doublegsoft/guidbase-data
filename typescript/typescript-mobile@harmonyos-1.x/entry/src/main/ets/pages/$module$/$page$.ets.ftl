@@ -5,14 +5,16 @@
 <#import "/$/harmonyos.ftl" as harmonyos>
 <#assign usingObjs = []>
 <#list page.widgets as widget>
-  <#if widget.value("data") == ""><#continue></#if>
+  <#if widget.value("data") == "" || widget.value("data")?starts_with("enum")><#continue></#if>
   <#assign url = valuebase.url(widget.value("data"))>
   <#if usingObjs?seq_contains(url.resource)><#continue></#if>
   <#assign usingObjs += [url.resource]>
 </#list>
 import { router } from '@kit.ArkUI'
-import { AdaptiveText, Tag, Navbar, FormSection, FormSectionTitle, InputRow, DateRow, DropdownRow } from '../../components/components'
-import { sdk,<#list usingObjs as objname> ${ts.nameType(objname)},</#list> } from 'sdk'
+import { AdaptiveText, Tag, Navbar, FormSection, FormSectionTitle, 
+  InputRow, DateRow, DropdownRow, MultiSelectRow, LoadingFooter 
+} from '../../components/components'
+import { sdk, Option,<#list usingObjs as objname> ${ts.nameType(objname)},</#list> } from 'sdk'
 
 /**
  * 【${page.title}】页面。
