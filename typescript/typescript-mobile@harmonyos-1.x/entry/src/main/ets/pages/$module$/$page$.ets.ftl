@@ -12,7 +12,8 @@
 </#list>
 import { router } from '@kit.ArkUI'
 import { AdaptiveText, Tag, Navbar, FormSection, FormSectionTitle, 
-  InputRow, DateRow, DropdownRow, MultiSelectRow, LoadingFooter 
+  InputRow, DateRow, DropdownRow, MultiSelectRow, ReadonlyRow,
+  LoadingFooter,
 } from '../../components/components'
 import { sdk, Option,<#list usingObjs as objname> ${ts.nameType(objname)},</#list> } from 'sdk'
 

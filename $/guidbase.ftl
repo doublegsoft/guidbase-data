@@ -209,7 +209,7 @@
  ### @return      格式化后的参数列表 (List of Strings)
  ###############################################################################
  -->
-<#function get_page_params page>
+<#--  <#function get_page_params page>
   <#local ret = []>
   <#if page.value("params") == "">
     <#return ret>
@@ -219,7 +219,7 @@
     <#local ret += [param?trim]>
   </#list>
   <#return ret>
-</#function>
+</#function>  -->
 
 <#--
  ###############################################################################
@@ -371,6 +371,30 @@
       <#return page>
     </#if>
   </#list>
+</#function>
+
+<#--
+ ###############################################################################
+ ### 获取页面所需的所有参数名称 (Get All Parameter Names Required by the Page)
+ ### 
+ ### 遍历指定页面中的所有组件，解析其数据源绑定的 URL 路径，
+ ### 提取并去重所有查询参数（Query Parameters），以便在页面初始化或跳转时声明对应的路由参数。
+ ### 
+ ### @param page  页面对象 (Page Object)
+ ### @return      该页面所有去重后的路由/查询参数名称序列 (Sequence of Unique Parameter Keys)
+ ###############################################################################
+ -->
+<#function get_page_params page>
+  <#local ret = {}>
+  <#list page.widgets as widget>
+    <#local data = widget.value("data")>
+    <#if data == ""><#continue></#if>
+    <#local url = valuebase.url(data)>
+    <#list url.params as param>
+      <#local ret += {param.name: param}>
+    </#list>
+  </#list>
+  <#return ret?values>
 </#function>
 
 

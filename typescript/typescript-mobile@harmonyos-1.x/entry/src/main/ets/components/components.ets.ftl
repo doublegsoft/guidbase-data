@@ -22,7 +22,7 @@ function fmtVal(v: string | number | boolean | null | undefined): string {
 @Component
 export struct Navbar {
   // ---- 首页模式 ----
-  private logoText: string = '${app.name}';
+  private logoText: string = 'entry_form';
   private logoEmText: string = '【主系统】';
   // ---- 子页导航模式 ----
   navTitle: string = '';
@@ -378,6 +378,7 @@ export struct Avatar {
 export struct InputRow {
   label: string = ''
   @Prop value: string = ''
+  @Prop readonly: boolean = false
   inputType: InputType = InputType.Normal
   multiline: boolean = false
   onChange?: (v: string) => void
@@ -393,6 +394,7 @@ export struct InputRow {
         .fontSize(14).fontColor($r('app.color.text'))
         .backgroundColor($r('app.color.bg'))
         .layoutWeight(1)
+        .enabled(!this.readonly)
         .onChange((v: string) => {
           if (this.onChange) { this.onChange(v) }
         })
@@ -406,6 +408,7 @@ export struct InputRow {
 export struct DateRow {
   label: string = ''
   @Prop value: string = ''
+  @Prop readonly: boolean = false
   onSelect?: (v: string) => void
 
   build() {
@@ -421,6 +424,7 @@ export struct DateRow {
     .width('100%').height(48).padding({ left: 16, right: 16 })
     .border({ width: { bottom: 1 }, color: $r('app.color.border_light') })
     .onClick(() => {
+      if (this.readonly) { return }
       DatePickerDialog.show({
         start: new Date('2000-1-1'),
         end: new Date('2100-1-1'),
@@ -443,6 +447,7 @@ export struct DateRow {
 export struct DropdownRow {
   label: string = ''
   @Prop value: string = ''
+  @Prop readonly: boolean = false
   options: Option[] = []
   onSelect?: (v: string) => void
 
@@ -466,13 +471,14 @@ export struct DropdownRow {
         .fontWeight(FontWeight.Bold).width(56).flexShrink(0)
       Text(this.getLabel() || '请选择' + this.label)
         .fontSize(14).padding({left: 17})
-        .fontColor(this.value ? $r('app.color.text') : $r('app.color.text_light'))
+        .fontColor(this.value && this.value != 'null' ? $r('app.color.text') : $r('app.color.text_light'))
         .layoutWeight(1)
       Text('▼').fontSize(12).fontColor($r('app.color.text_muted'))
     }
     .width('100%').height(48).padding({ left: 16, right: 16 })
     .border({ width: { bottom: 1 }, color: $r('app.color.border_light') })
     .onClick(() => {
+      if (this.readonly) { return }
       const labels: string[] = this.getLabels()
       if (labels.length === 0) { return }
       TextPickerDialog.show({
@@ -496,6 +502,7 @@ export struct DropdownRow {
 export struct TimeRow {
   label: string = ''
   @Prop value: string = ''
+  @Prop readonly: boolean = false
   onSelect?: (v: string) => void
 
   build() {
@@ -511,6 +518,7 @@ export struct TimeRow {
     .width('100%').height(48).padding({ left: 16, right: 16 })
     .border({ width: { bottom: 1 }, color: $r('app.color.border_light') })
     .onClick(() => {
+      if (this.readonly) { return }
       TimePickerDialog.show({
         selected: new Date(),
         onAccept: (result: TimePickerResult) => {
@@ -534,6 +542,7 @@ export struct TimeRow {
 export struct CascadeRow {
   label: string = ''
   @Prop value: string = ''
+  @Prop readonly: boolean = false
   options: string[] = []
   onSelect?: (v: string) => void
 
@@ -550,6 +559,7 @@ export struct CascadeRow {
     .width('100%').height(48).padding({ left: 16, right: 16 })
     .border({ width: { bottom: 1 }, color: $r('app.color.border_light') })
     .onClick(() => {
+      if (this.readonly) { return }
       if (this.options.length > 0) {
         TextPickerDialog.show({
           range: this.options,
@@ -574,9 +584,9 @@ export struct CascadeRow {
 @CustomDialog
 struct MultiSelectDialog {
   controller: CustomDialogController
-  @Prop title: string = '请选择'
-  @Prop options: Option[] = []
-  @Prop initialSelected: string[] = []
+  title: string = '请选择'
+  options: Option[] = []
+  initialSelected: string[] = []
   onConfirm?: (result: string) => void
 
   @State private checked: string[] = []
@@ -652,9 +662,7 @@ struct MultiSelectDialog {
               Checkbox({ name: opt.value, group: 'multiSelectGroup' })
                 .select(this.isChecked(opt.value))
                 .selectedColor($r('app.color.primary'))
-                .onChange((checked: boolean) => {
-                  this.toggle(opt.value)
-                })
+                .enabled(false)
               Text(opt.label)
                 .fontSize(14).fontColor($r('app.color.text'))
                 .margin({ left: 8 })
@@ -681,6 +689,7 @@ struct MultiSelectDialog {
 export struct MultiSelectRow {
   label: string = ''
   @Prop value: string = ''           // 逗号分隔的已选值
+  @Prop readonly: boolean = false
   options: Option[] = []
   onSelect?: (v: string) => void
 
@@ -724,12 +733,9 @@ export struct MultiSelectRow {
   build() {
     Column() {
       Row() {
-        // ---- 左侧标签 ----
         Text(this.label)
           .fontSize(13).fontColor($r('app.color.text_muted'))
           .fontWeight(FontWeight.Bold).width(56).flexShrink(0)
-
-        // ---- 已选 Chip 标签流式布局 ----
         if (this.selectedItems().length > 0) {
           Flex({ wrap: FlexWrap.Wrap }) {
             ForEach(this.selectedItems(), (item: string) => {
@@ -770,7 +776,10 @@ export struct MultiSelectRow {
     .padding({ left: 16, right: 12, top: 10, bottom: 10 })
     .constraintSize({ minHeight: 48 })
     .border({ width: { bottom: 1 }, color: $r('app.color.border_light') })
-    .onClick(() => { this.openDialog() })
+    .onClick(() => {
+      if (this.readonly) { return }
+      this.openDialog()
+    })
   }
 }
 
@@ -781,6 +790,7 @@ export struct MultiSelectRow {
 export struct TagInputRow {
   label: string = ''
   @Prop value: string = ''
+  @Prop readonly: boolean = false
   onChange?: (v: string) => void
 
   build() {
@@ -793,6 +803,7 @@ export struct TagInputRow {
         .fontSize(14).fontColor($r('app.color.text'))
         .backgroundColor($r('app.color.bg'))
         .layoutWeight(1)
+        .enabled(!this.readonly)
         .onChange((v: string) => {
           if (this.onChange) { this.onChange(v) }
         })
@@ -809,6 +820,7 @@ export struct TagInputRow {
 export struct TextAreaRow {
   label: string = ''
   @Prop value: string = ''
+  @Prop readonly: boolean = false
   onChange?: (v: string) => void
 
   build() {
@@ -823,6 +835,7 @@ export struct TextAreaRow {
         .backgroundColor($r('app.color.bg'))
         .layoutWeight(1)
         .maxLength(500)
+        .enabled(!this.readonly)
         .onChange((v: string) => {
           if (this.onChange) { this.onChange(v) }
         })
@@ -840,6 +853,7 @@ export struct TextAreaRow {
 export struct ImagePickerRow {
   label: string = ''
   @Prop value: string = ''
+  @Prop readonly: boolean = false
   onSelect?: (v: string) => void
 
   private fileList(): string[] {
@@ -881,6 +895,7 @@ export struct ImagePickerRow {
     .constraintSize({ minHeight: 48 })
     .border({ width: { bottom: 1 }, color: $r('app.color.border_light') })
     .onClick(() => {
+      if (this.readonly) { return }
       TextPickerDialog.show({
         range: ['示例图片1.jpg', '示例图片2.jpg', '示例图片3.jpg', '清除选择'],
         selected: 0,
@@ -907,6 +922,7 @@ export struct ImagePickerRow {
 export struct VideoPickerRow {
   label: string = ''
   @Prop value: string = ''
+  @Prop readonly: boolean = false
   onSelect?: (v: string) => void
 
   private fileList(): string[] {
@@ -948,6 +964,7 @@ export struct VideoPickerRow {
     .constraintSize({ minHeight: 48 })
     .border({ width: { bottom: 1 }, color: $r('app.color.border_light') })
     .onClick(() => {
+      if (this.readonly) { return }
       TextPickerDialog.show({
         range: ['示例视频1.mp4', '示例视频2.mp4', '示例视频3.mp4', '清除选择'],
         selected: 0,
@@ -974,6 +991,7 @@ export struct VideoPickerRow {
 export struct FilePickerRow {
   label: string = ''
   @Prop value: string = ''
+  @Prop readonly: boolean = false
   onSelect?: (v: string) => void
 
   build() {
@@ -989,6 +1007,7 @@ export struct FilePickerRow {
     .width('100%').height(48).padding({ left: 16, right: 16 })
     .border({ width: { bottom: 1 }, color: $r('app.color.border_light') })
     .onClick(() => {
+      if (this.readonly) { return }
       TextPickerDialog.show({
         range: ['示例文档1.pdf', '示例文档2.docx', '示例文档3.xlsx', '清除选择'],
         selected: 0,
@@ -1015,6 +1034,7 @@ export struct FilePickerRow {
 export struct AvatarPickerRow {
   label: string = ''
   @Prop value: string = ''
+  @Prop readonly: boolean = false
   onSelect?: (v: string) => void
 
   build() {
@@ -1041,6 +1061,7 @@ export struct AvatarPickerRow {
     .width('100%').height(56).padding({ left: 16, right: 16 })
     .border({ width: { bottom: 1 }, color: $r('app.color.border_light') })
     .onClick(() => {
+      if (this.readonly) { return }
       TextPickerDialog.show({
         range: ['头像选项A', '头像选项B', '头像选项C', '清除头像'],
         selected: 0,
@@ -1057,6 +1078,29 @@ export struct AvatarPickerRow {
         }
       })
     })
+  }
+}
+
+/**
+ * ReadonlyRow - 只读行组件，纯展示 label + value，无交互。
+ */
+@Component
+export struct ReadonlyRow {
+  label: string = ''
+  @Prop value: string = ''
+
+  build() {
+    Row() {
+      Text(this.label)
+        .fontSize(13).fontColor($r('app.color.text_muted'))
+        .fontWeight(FontWeight.Bold).width(56).flexShrink(0)
+      Text(fmtVal(this.value) || '-')
+        .fontSize(14).fontColor($r('app.color.text'))
+        .padding({left: 17})
+        .layoutWeight(1)
+    }
+    .width('100%').height(48).padding({ left: 16, right: 16 })
+    .border({ width: { bottom: 1 }, color: $r('app.color.border_light') })
   }
 }
 

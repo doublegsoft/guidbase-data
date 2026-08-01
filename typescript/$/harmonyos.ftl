@@ -400,6 +400,14 @@ ${""?left_pad(indent)}private ${ts.nameVariable(input.id)}Options: Option[] = []
   <#local idAttr = obj.identifiableAttribute>
 ${""?left_pad(indent)}  
 ${""?left_pad(indent)}aboutToAppear(): void {
+  <#list form.inputs as input>
+    <#if (input.type == "select" || input.type == "multiselect") && input.value("data") != "" && !input.value("data")?starts_with("enum")>
+      <#local inputUrl = valuebase.url(input.value("data"))>
+${""?left_pad(indent)}  sdk.fetch${ts.nameType(inputUrl.resource)}AsOptions().then(opts => {
+${""?left_pad(indent)}    this.${ts.nameVariable(input.id)}Options = opts;
+${""?left_pad(indent)}  })     
+    </#if>
+  </#list>  
 ${""?left_pad(indent)}  const uiContext = this.getUIContext();
 ${""?left_pad(indent)}  const router = uiContext.getRouter();
 ${""?left_pad(indent)}  const params = router.getParams() as Record<string, Object>
@@ -581,6 +589,12 @@ ${""?left_pad(indent)}  .onClick(() => { this.handle${js.nameType(button.id)}Tap
 <!----------------------------------------------------------------------------->
 <#macro print_input_layout input indent=0>
   <#if input.type == "hidden"><#return></#if>
+  <#if input.value("readonly") == "true">
+${""?left_pad(indent)}ReadonlyRow({ 
+${""?left_pad(indent)}  label: '${input.title}', value: String(this.${ts.nameVariable(input.container.id)}Data?.${ts.nameVariable(input.id)}),
+${""?left_pad(indent)}})  
+    <#return>
+  </#if>
   <#if input.type == "date">
 ${""?left_pad(indent)}DateRow({ 
 ${""?left_pad(indent)}  label: '${input.title}', value: String(this.${ts.nameVariable(input.container.id)}Data?.${ts.nameVariable(input.id)}),
@@ -600,19 +614,22 @@ ${""?left_pad(indent)}})
 ${""?left_pad(indent)}MultiSelectRow({ 
 ${""?left_pad(indent)}  label: '${input.title}', value: String(this.${ts.nameVariable(input.container.id)}Data?.${ts.nameVariable(input.id)}),
 ${""?left_pad(indent)}  options: this.${ts.nameVariable(input.id)}Options,
-${""?left_pad(indent)}  onSelect: (v: string) => { this.${ts.nameVariable(input.container.id)}Data!.${ts.nameVariable(input.id)} = v }           
+${""?left_pad(indent)}  onSelect: (v: string) => { this.${ts.nameVariable(input.container.id)}Data!.${ts.nameVariable(input.id)} = v }         
 ${""?left_pad(indent)}})
   <#elseif input.type == "number">
 ${""?left_pad(indent)}InputRow({ 
 ${""?left_pad(indent)}  label: '${input.title}', value: String(this.${ts.nameVariable(input.container.id)}Data?.${ts.nameVariable(input.id)}),
-${""?left_pad(indent)}  onChange: (v: string) => { this.${ts.nameVariable(input.container.id)}Data!.${ts.nameVariable(input.id)} = parseFloat(v) } 
+${""?left_pad(indent)}  onChange: (v: string) => { this.${ts.nameVariable(input.container.id)}Data!.${ts.nameVariable(input.id)} = parseFloat(v) },
 ${""?left_pad(indent)}})
   <#elseif input.type == "text">
 ${""?left_pad(indent)}InputRow({ 
 ${""?left_pad(indent)}  label: '${input.title}', value: String(this.${ts.nameVariable(input.container.id)}Data?.${ts.nameVariable(input.id)}),
-${""?left_pad(indent)}  onChange: (v: string) => { this.${ts.nameVariable(input.container.id)}Data!.${ts.nameVariable(input.id)} = v } 
+${""?left_pad(indent)}  onChange: (v: string) => { this.${ts.nameVariable(input.container.id)}Data!.${ts.nameVariable(input.id)} = v },
 ${""?left_pad(indent)}})
   </#if>   
+</#macro>
+
+<#macro print_input_variables input indent=0>
 </#macro>
 
 <!----------------------------------------------------------------------------->
