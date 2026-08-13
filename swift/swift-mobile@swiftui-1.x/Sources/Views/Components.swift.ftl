@@ -318,6 +318,7 @@ struct FormSectionTitle: View {
  */
 struct Avatar: View {
   var text: String? = ""
+  var imageUrl: URL? = nil // 新增：头像图片的 URL
   var avatarSize: CGFloat = 48
 
   private var initial: String {
@@ -328,21 +329,47 @@ struct Avatar: View {
   }
 
   var body: some View {
+    Group {
+      if let imageUrl = imageUrl {
+        AsyncImage(url: imageUrl) { phase in
+          switch phase {
+          case .success(let image):
+            // 图片加载成功
+            image
+              .resizable()
+              .scaledToFill()
+          case .failure, .empty:
+            // 加载失败或加载中时显示首字母占位
+            placeholderView
+          @unknown default:
+            placeholderView
+          }
+        }
+      } else {
+        // 没有图片地址时直接显示首字母
+        placeholderView
+      }
+    }
+    .frame(width: avatarSize, height: avatarSize)
+    .cornerRadius(avatarSize / 2) // 统一裁剪为圆形
+  }
+
+  // 提取出来的首字母占位视图
+  private var placeholderView: some View {
     Text(initial)
       .font(.system(size: avatarSize / 2.5, weight: .bold))
       .foregroundColor(.white)
-      .frame(width: avatarSize, height: avatarSize)
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(
         LinearGradient(
           gradient: Gradient(colors: [
-            Color.headerGradientStart,
+            Color.headerGradientStart, // 需确保您的项目中已定义此颜色
             Color.primary
           ]),
           startPoint: .topLeading,
           endPoint: .bottomTrailing
         )
       )
-      .cornerRadius(avatarSize / 2)
   }
 }
 
@@ -406,7 +433,7 @@ struct DateRow: View {
         .foregroundColor(Color.textSecondary)
         .frame(width: 56, alignment: .leading)
 
-      Text(value == nil ? "请选择" + label : DateUtils.yyyymmdd.string(from: value!))
+      Text(value == nil ? "请选择" + label : FormatUtils.Date.toYMD(value!))
         .font(.system(size: 14))
         .foregroundColor(value == nil ? Color.textMuted : Color.textPrimary)
         .frame(maxWidth: .infinity, alignment: .leading)

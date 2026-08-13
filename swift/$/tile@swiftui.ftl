@@ -1,3 +1,19 @@
+已为您将 FreeMarker 模版中原本基于 Asset 字符串名称定义的 Color("...") 替换为新 Swift 设计系统中的强类型静态属性。
+
+具体映射关系如下：
+
+  - Color("bg") ➔ Color.surface（代表卡片背景/容器底色及前景色，由于其定义为白色，也适合用于主色标签等前景色）
+  - Color("primary") ➔ Color.primary
+  - Color("text") ➔ Color.textPrimary
+  - Color("text_muted") ➔ Color.textSecondary
+  - Color("text_light") ➔ Color.textMuted
+  - Color("border_light") ➔ Color.divider
+  - Color("primary_bg") ➔ Color.primary.opacity(0.1)（轻量级主色调底色，常用于轻量级标签等）
+
+以下是更新后的完整模版代码：
+
+<#import "/$/guidbase4swift.ftl" as guidbase4swift>
+
 <#--
 会议与日程 (Meeting & Event)
 +-----------------------------------------------+
@@ -14,14 +30,14 @@ ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 0) {
 ${""?left_pad(indent)}  HStack {
   <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-    <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))</#if>
-    <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" - ").font(.system(size: 12)).foregroundColor(Color("text_muted"))</#if>
-    <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))</#if>
+    <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)</#if>
+    <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" - ").font(.system(size: 12)).foregroundColor(Color.textSecondary)</#if>
+    <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)</#if>
 ${""?left_pad(indent)}    }
   </#if>
 ${""?left_pad(indent)}    Spacer()
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
   </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
@@ -29,10 +45,10 @@ ${""?left_pad(indent)}  .padding(.bottom, 8)
   <#if guidbase.has_child_widget(widget, "primary") || guidbase.has_child_widget(widget, "secondary")>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
@@ -40,7 +56,7 @@ ${""?left_pad(indent)}  .padding(.bottom, 8)
   </#if>
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}      Image(av)
 ${""?left_pad(indent)}        .resizable()
 ${""?left_pad(indent)}        .aspectRatio(contentMode: .fill)
@@ -53,7 +69,7 @@ ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -76,7 +92,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 0) {
   <#if guidbase.has_child_widget(widget, "image")>
 ${""?left_pad(indent)}  ZStack(alignment: .bottomLeading) {
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}    Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}      .resizable()
 ${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}      .frame(height: 150)
@@ -84,13 +100,13 @@ ${""?left_pad(indent)}      .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}      .cornerRadius(4)
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}        Text(tag)
 ${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("bg"))
+${""?left_pad(indent)}          .foregroundColor(Color.surface)
 ${""?left_pad(indent)}          .padding(.horizontal, 6)
 ${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary"))
+${""?left_pad(indent)}          .background(Color.primary)
 ${""?left_pad(indent)}          .cornerRadius(4)
 ${""?left_pad(indent)}          .padding(.trailing, 4)
 ${""?left_pad(indent)}      }
@@ -104,20 +120,20 @@ ${""?left_pad(indent)}  .padding(.bottom, 8)
   <#if guidbase.has_child_widget(widget, "primary") || guidbase.has_child_widget(widget, "secondary") || guidbase.has_child_widget(widget, "tertiary")>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "tertiary")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -134,28 +150,24 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_user_profile widget indent=0>
 ${""?left_pad(indent)}HStack(alignment: .center, spacing: 12) {
   <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}    .resizable()
-${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}    .frame(width: 48, height: 48)
-${""?left_pad(indent)}    .cornerRadius(24)
+${""?left_pad(indent)}  Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
   </#if>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  Spacer()
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.frame(maxWidth: .infinity)
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -174,13 +186,13 @@ ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 0) {
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}        Text(tag)
 ${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("primary"))
+${""?left_pad(indent)}          .foregroundColor(Color.primary)
 ${""?left_pad(indent)}          .padding(.horizontal, 6)
 ${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary_bg"))
+${""?left_pad(indent)}          .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}          .cornerRadius(4)
 ${""?left_pad(indent)}          .padding(.trailing, 4)
 ${""?left_pad(indent)}      }
@@ -188,18 +200,18 @@ ${""?left_pad(indent)}    }
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  .padding(.bottom, 8)
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).padding(.bottom, 8).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).padding(.bottom, 8).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}        Image(av)
 ${""?left_pad(indent)}          .resizable()
 ${""?left_pad(indent)}          .aspectRatio(contentMode: .fill)
@@ -211,13 +223,13 @@ ${""?left_pad(indent)}    }
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -236,7 +248,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_promo_banner widget indent=0>
 ${""?left_pad(indent)}ZStack(alignment: .bottomLeading) {
   <#if guidbase.has_child_widget(widget, "background")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "background"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "background")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(height: 180)
@@ -245,13 +257,13 @@ ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}        Text(tag)
 ${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("bg"))
+${""?left_pad(indent)}          .foregroundColor(Color.surface)
 ${""?left_pad(indent)}          .padding(.horizontal, 6)
 ${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary"))
+${""?left_pad(indent)}          .background(Color.primary)
 ${""?left_pad(indent)}          .cornerRadius(4)
 ${""?left_pad(indent)}          .padding(.trailing, 4)
 ${""?left_pad(indent)}      }
@@ -259,13 +271,13 @@ ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}    .padding(.bottom, 8)
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 18)).fontWeight(.bold).foregroundColor(Color("bg"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 18)).fontWeight(.bold).foregroundColor(Color.surface)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("border_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.divider)
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).font(.system(size: 12)).foregroundColor(Color("border_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "tertiary")}).font(.system(size: 12)).foregroundColor(Color.divider)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .padding(12)
@@ -283,24 +295,24 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_compact_list widget indent=0>
 ${""?left_pad(indent)}HStack(alignment: .center, spacing: 8) {
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 14)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 14)).foregroundColor(Color.primary)
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.medium).foregroundColor(Color("text"))
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.medium).foregroundColor(Color.textPrimary)
   </#if>
 ${""?left_pad(indent)}  Spacer()
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
   </#if>
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.frame(maxWidth: .infinity)
 ${""?left_pad(indent)}.padding(.vertical, 10)
 ${""?left_pad(indent)}.padding(.horizontal, 12)
-${""?left_pad(indent)}.background(Color("bg"))
-${""?left_pad(indent)}.overlay(Rectangle().frame(height: 1).foregroundColor(Color("border_light")), alignment: .bottom)
+${""?left_pad(indent)}.background(Color.surface)
+${""?left_pad(indent)}.overlay(Rectangle().frame(height: 1).foregroundColor(Color.divider), alignment: .bottom)
 </#macro>
 
 <#--
@@ -316,7 +328,7 @@ ${""?left_pad(indent)}.overlay(Rectangle().frame(height: 1).foregroundColor(Colo
 <#macro print_tile_split_content widget indent=0>
 ${""?left_pad(indent)}HStack(alignment: .top, spacing: 12) {
   <#if guidbase.has_child_widget(widget, "image")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(width: 80, height: 80)
@@ -325,13 +337,13 @@ ${""?left_pad(indent)}    .cornerRadius(4)
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}        Text(tag)
 ${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("primary"))
+${""?left_pad(indent)}          .foregroundColor(Color.primary)
 ${""?left_pad(indent)}          .padding(.horizontal, 6)
 ${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary_bg"))
+${""?left_pad(indent)}          .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}          .cornerRadius(4)
 ${""?left_pad(indent)}          .padding(.trailing, 4)
 ${""?left_pad(indent)}      }
@@ -339,11 +351,11 @@ ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}    .padding(.bottom, 4)
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}        Image(av)
 ${""?left_pad(indent)}          .resizable()
 ${""?left_pad(indent)}          .aspectRatio(contentMode: .fill)
@@ -355,13 +367,13 @@ ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}    .padding(.bottom, 4)
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -375,21 +387,21 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_notification widget indent=0>
 ${""?left_pad(indent)}HStack(alignment: .top, spacing: 12) {
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 14)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 14)).foregroundColor(Color.primary)
   </#if>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.medium).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.medium).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "tertiary")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  Spacer()
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.frame(maxWidth: .infinity)
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -409,7 +421,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_hero_profile widget indent=0>
 ${""?left_pad(indent)}ZStack(alignment: .topLeading) {
   <#if guidbase.has_child_widget(widget, "background")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "background"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "background")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(height: 200)
@@ -417,19 +429,19 @@ ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
   </#if>
 ${""?left_pad(indent)}  VStack(alignment: .center, spacing: 8) {
     <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
+${""?left_pad(indent)}    Avatar(${guidbase4swift.format_widget_variable(widget, "avatar")})
 ${""?left_pad(indent)}      .resizable()
 ${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}      .frame(width: 64, height: 64)
 ${""?left_pad(indent)}      .cornerRadius(32)
-${""?left_pad(indent)}      .overlay(RoundedRectangle(cornerRadius: 32).stroke(Color("bg"), lineWidth: 2))
+${""?left_pad(indent)}      .overlay(RoundedRectangle(cornerRadius: 32).stroke(Color.surface, lineWidth: 2))
 ${""?left_pad(indent)}      .padding(.bottom, 8)
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 18)).fontWeight(.bold).foregroundColor(Color("bg"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 18)).fontWeight(.bold).foregroundColor(Color.surface)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("border_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.divider)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
@@ -450,35 +462,35 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent) }HStack(alignment: .top, spacing: 12) {
 ${""?left_pad(indent) }  VStack(alignment: .center, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent) }    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent) }    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
-${""?left_pad(indent) }    Circle().fill(Color("primary")).frame(width: 8, height: 8).padding(.vertical, 4)
+${""?left_pad(indent) }    Circle().fill(Color.primary).frame(width: 8, height: 8).padding(.vertical, 4)
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent) }    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent) }    Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent) }  }
 ${""?left_pad(indent) }  .frame(width: 60)
 ${""?left_pad(indent) }  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent) }    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent) }    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent) }    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent) }    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent) }    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent) }    Text(${guidbase4swift.format_widget_variable(widget, "tertiary")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
 ${""?left_pad(indent) }  }
 ${""?left_pad(indent) }  Spacer()
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent) }  HStack(spacing: 4) {
-${""?left_pad(indent) }    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent) }    ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent) }      Text(tag)
 ${""?left_pad(indent) }        .font(.system(size: 10))
-${""?left_pad(indent) }        .foregroundColor(Color("primary"))
+${""?left_pad(indent) }        .foregroundColor(Color.primary)
 ${""?left_pad(indent) }        .padding(.horizontal, 6)
 ${""?left_pad(indent) }        .padding(.vertical, 2)
-${""?left_pad(indent) }        .background(Color("primary_bg"))
+${""?left_pad(indent) }        .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent) }        .cornerRadius(4)
 ${""?left_pad(indent) }        .padding(.leading, 4)
 ${""?left_pad(indent) }    }
@@ -487,7 +499,7 @@ ${""?left_pad(indent) }  }
 ${""?left_pad(indent) }}
 ${""?left_pad(indent)}.frame(maxWidth: .infinity)
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -504,39 +516,35 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack(alignment: .top, spacing: 12) {
     <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}      .resizable()
-${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}      .frame(width: 40, height: 40)
-${""?left_pad(indent)}      .cornerRadius(20)
+${""?left_pad(indent)}    Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
     </#if>
 ${""?left_pad(indent)}    VStack(alignment: .leading, spacing: 4) {
 ${""?left_pad(indent)}      HStack {
         <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}        Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}        Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color.textPrimary)
         </#if>
         <#if guidbase.has_child_widget(widget, "start_time")>
 ${""?left_pad(indent)}        Spacer()
-${""?left_pad(indent)}        Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}        Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
         </#if>
 ${""?left_pad(indent)}      }
 ${""?left_pad(indent)}      .frame(maxWidth: .infinity)
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
       </#if>
-${""?left_pad(indent)}    }
+    }
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
   <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))})
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "tertiary")})
 ${""?left_pad(indent)}    .font(.system(size: 14))
-${""?left_pad(indent)}    .foregroundColor(Color("text"))
+${""?left_pad(indent)}    .foregroundColor(Color.textPrimary)
 ${""?left_pad(indent)}    .padding(.leading, 52)
 ${""?left_pad(indent)}    .frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -553,7 +561,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_ticket widget indent=0>
 ${""?left_pad(indent)}ZStack(alignment: .bottomLeading) {
   <#if guidbase.has_child_widget(widget, "background")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "background"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "background")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(height: 120)
@@ -562,25 +570,25 @@ ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}    HStack {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("bg"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.surface)
       </#if>
       <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}      Spacer()
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))})
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "status")})
 ${""?left_pad(indent)}        .font(.system(size: 12))
-${""?left_pad(indent)}        .foregroundColor(Color("primary"))
+${""?left_pad(indent)}        .foregroundColor(Color.primary)
 ${""?left_pad(indent)}        .padding(.horizontal, 6)
 ${""?left_pad(indent)}        .padding(.vertical, 2)
-${""?left_pad(indent)}        .background(Color("bg"))
+${""?left_pad(indent)}        .background(Color.surface)
 ${""?left_pad(indent)}        .cornerRadius(4)
       </#if>
 ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
     <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("border_light"))</#if>
-      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" ~ ").font(.system(size: 12)).foregroundColor(Color("border_light"))</#if>
-      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("border_light"))</#if>
+      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.divider)</#if>
+      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" ~ ").font(.system(size: 12)).foregroundColor(Color.divider)</#if>
+      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.divider)</#if>
 ${""?left_pad(indent)}    }
     </#if>
 ${""?left_pad(indent)}  }
@@ -601,7 +609,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_dense_detail_list widget indent=0>
 ${""?left_pad(indent)}HStack(alignment: .top, spacing: 12) {
   <#if guidbase.has_child_widget(widget, "image")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(width: 60, height: 60)
@@ -609,22 +617,22 @@ ${""?left_pad(indent)}    .cornerRadius(4)
   </#if>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading)
     </#if>
 ${""?left_pad(indent)}    HStack {
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
       </#if>
       <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}      Spacer()
 ${""?left_pad(indent)}      HStack(spacing: 4) {
-${""?left_pad(indent)}        ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}        ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}          Text(tag)
 ${""?left_pad(indent)}            .font(.system(size: 10))
-${""?left_pad(indent)}            .foregroundColor(Color("primary"))
+${""?left_pad(indent)}            .foregroundColor(Color.primary)
 ${""?left_pad(indent)}            .padding(.horizontal, 6)
 ${""?left_pad(indent)}            .padding(.vertical, 2)
-${""?left_pad(indent)}            .background(Color("primary_bg"))
+${""?left_pad(indent)}            .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}            .cornerRadius(4)
 ${""?left_pad(indent)}            .padding(.leading, 4)
 ${""?left_pad(indent)}        }
@@ -634,19 +642,19 @@ ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}    HStack {
       <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "tertiary")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
       </#if>
       <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}      Spacer()
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
       </#if>
-${""?left_pad(indent)}    }
+    }
 ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .layoutWeight(1)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -669,7 +677,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_vertical_poster widget indent=0>
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 0) {
   <#if guidbase.has_child_widget(widget, "image")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(height: 200)
@@ -679,20 +687,20 @@ ${""?left_pad(indent)}    .clipShape(RoundedCorner(radius: 8, corners: [.topLeft
   <#if guidbase.has_child_widget(widget, "primary") || guidbase.has_child_widget(widget, "secondary") || guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time") || guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}        Image(av)
 ${""?left_pad(indent)}          .resizable()
 ${""?left_pad(indent)}          .aspectRatio(contentMode: .fill)
@@ -707,7 +715,7 @@ ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}  .padding(12)
   </#if>
 ${""?left_pad(indent)}}
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -728,13 +736,13 @@ ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}        Text(tag)
 ${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("primary"))
+${""?left_pad(indent)}          .foregroundColor(Color.primary)
 ${""?left_pad(indent)}          .padding(.horizontal, 6)
 ${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary_bg"))
+${""?left_pad(indent)}          .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}          .cornerRadius(4)
 ${""?left_pad(indent)}          .padding(.trailing, 4)
 ${""?left_pad(indent)}      }
@@ -742,41 +750,37 @@ ${""?left_pad(indent)}    }
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
   <#if guidbase.has_child_widget(widget, "primary") || guidbase.has_child_widget(widget, "secondary") || guidbase.has_child_widget(widget, "tertiary")>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "tertiary")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}      .resizable()
-${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}      .frame(width: 24, height: 24)
-${""?left_pad(indent)}      .cornerRadius(12)
+${""?left_pad(indent)}    Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -793,17 +797,17 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}        Image(av)
 ${""?left_pad(indent)}          .resizable()
 ${""?left_pad(indent)}          .aspectRatio(contentMode: .fill)
@@ -816,13 +820,13 @@ ${""?left_pad(indent)}    }
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Spacer()
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}        Text(tag)
 ${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("primary"))
+${""?left_pad(indent)}          .foregroundColor(Color.primary)
 ${""?left_pad(indent)}          .padding(.horizontal, 6)
 ${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary_bg"))
+${""?left_pad(indent)}          .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}          .cornerRadius(4)
 ${""?left_pad(indent)}          .padding(.leading, 4)
 ${""?left_pad(indent)}      }
@@ -832,7 +836,7 @@ ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -849,7 +853,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_immersive_highlight widget indent=0>
 ${""?left_pad(indent)}ZStack(alignment: .bottomLeading) {
   <#if guidbase.has_child_widget(widget, "background")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "background"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "background")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(height: 200)
@@ -857,17 +861,17 @@ ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
   </#if>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 6) {
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))})
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")})
 ${""?left_pad(indent)}      .font(.system(size: 12))
-${""?left_pad(indent)}      .foregroundColor(Color("primary"))
+${""?left_pad(indent)}      .foregroundColor(Color.primary)
 ${""?left_pad(indent)}      .padding(.horizontal, 6)
 ${""?left_pad(indent)}      .padding(.vertical, 2)
-${""?left_pad(indent)}      .background(Color("bg"))
+${""?left_pad(indent)}      .background(Color.surface)
 ${""?left_pad(indent)}      .cornerRadius(4)
 ${""?left_pad(indent)}      .padding(.bottom, 6)
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 18)).fontWeight(.bold).foregroundColor(Color("bg"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 18)).fontWeight(.bold).foregroundColor(Color.surface)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .padding(12)
@@ -889,34 +893,34 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}      Text(tag)
 ${""?left_pad(indent)}        .font(.system(size: 10))
-${""?left_pad(indent)}        .foregroundColor(Color("primary"))
+${""?left_pad(indent)}        .foregroundColor(Color.primary)
 ${""?left_pad(indent)}        .padding(.horizontal, 6)
 ${""?left_pad(indent)}        .padding(.vertical, 2)
-${""?left_pad(indent)}        .background(Color("primary_bg"))
+${""?left_pad(indent)}        .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}        .cornerRadius(4)
 ${""?left_pad(indent)}        .padding(.trailing, 4)
 ${""?left_pad(indent)}    }
-${""?left_pad(indent)}  }
+  }
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -933,33 +937,29 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}HStack(alignment: .top, spacing: 12) {
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "tertiary")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
     <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}      .resizable()
-${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}      .frame(width: 32, height: 32)
-${""?left_pad(indent)}      .cornerRadius(16)
+${""?left_pad(indent)}    Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}        Text(tag)
 ${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("primary"))
+${""?left_pad(indent)}          .foregroundColor(Color.primary)
 ${""?left_pad(indent)}          .padding(.horizontal, 6)
 ${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary_bg"))
+${""?left_pad(indent)}          .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}          .cornerRadius(4)
 ${""?left_pad(indent)}          .padding(.trailing, 4)
 ${""?left_pad(indent)}      }
@@ -968,7 +968,7 @@ ${""?left_pad(indent)}    .padding(.bottom, 8)
     </#if>
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}        Image(av)
 ${""?left_pad(indent)}          .resizable()
 ${""?left_pad(indent)}          .aspectRatio(contentMode: .fill)
@@ -983,7 +983,7 @@ ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.frame(maxWidth: .infinity)
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1000,7 +1000,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_gallery widget indent=0>
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
   <#if guidbase.has_child_widget(widget, "image")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(height: 150)
@@ -1008,12 +1008,12 @@ ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}    .cornerRadius(4)
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}        Image(av)
 ${""?left_pad(indent)}          .resizable()
 ${""?left_pad(indent)}          .aspectRatio(contentMode: .fill)
@@ -1025,13 +1025,13 @@ ${""?left_pad(indent)}    }
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1049,13 +1049,13 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}      Text(tag)
 ${""?left_pad(indent)}        .font(.system(size: 10))
-${""?left_pad(indent)}        .foregroundColor(Color("primary"))
+${""?left_pad(indent)}        .foregroundColor(Color.primary)
 ${""?left_pad(indent)}        .padding(.horizontal, 6)
 ${""?left_pad(indent)}        .padding(.vertical, 2)
-${""?left_pad(indent)}        .background(Color("primary_bg"))
+${""?left_pad(indent)}        .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}        .cornerRadius(4)
 ${""?left_pad(indent)}        .padding(.trailing, 4)
 ${""?left_pad(indent)}    }
@@ -1063,21 +1063,21 @@ ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 24)).fontWeight(.bold).foregroundColor(Color("primary")).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 24)).fontWeight(.bold).foregroundColor(Color.primary).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1095,7 +1095,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_overlay_avatar widget indent=0>
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 0) {
   <#if guidbase.has_child_widget(widget, "image")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(height: 120)
@@ -1104,28 +1104,23 @@ ${""?left_pad(indent)}    .clipShape(RoundedCorner(radius: 8, corners: [.topLeft
   </#if>
 ${""?left_pad(indent)}  HStack(alignment: .top, spacing: 12) {
     <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}      .resizable()
-${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}      .frame(width: 48, height: 48)
-${""?left_pad(indent)}      .cornerRadius(24)
-${""?left_pad(indent)}      .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color("bg"), lineWidth: 2))
-${""?left_pad(indent)}      .offset(y: -24)
-${""?left_pad(indent)}      .padding(.trailing, 12)
+${""?left_pad(indent)}    Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
     </#if>
+    <#if guidbase.has_child_widget(widget, "primary") || guidbase.has_child_widget(widget, "secondary")>
 ${""?left_pad(indent)}    VStack(alignment: .leading, spacing: 4) {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
       </#if>
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary)
       </#if>
 ${""?left_pad(indent)}    }
+    </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .padding(.horizontal, 12)
 ${""?left_pad(indent)}  .padding(.bottom, 12)
 ${""?left_pad(indent)}}
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1140,34 +1135,30 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_audit_log widget indent=0>
 ${""?left_pad(indent)}HStack(alignment: .top, spacing: 12) {
   <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}    .resizable()
-${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}    .frame(width: 40, height: 40)
-${""?left_pad(indent)}    .cornerRadius(20)
+${""?left_pad(indent)}  Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
   </#if>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
 ${""?left_pad(indent)}    HStack {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color.textPrimary)
       </#if>
       <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}      Spacer()
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
       </#if>
-${""?left_pad(indent)}    }
+    }
 ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.frame(maxWidth: .infinity)
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1185,20 +1176,20 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.medium).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.medium).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  HStack(spacing: 2) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}      Image(av)
 ${""?left_pad(indent)}        .resizable()
 ${""?left_pad(indent)}        .aspectRatio(contentMode: .fill)
@@ -1211,7 +1202,7 @@ ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(8)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(4)
 </#macro>
 
@@ -1227,25 +1218,25 @@ ${""?left_pad(indent)}.cornerRadius(4)
 ${""?left_pad(indent)}HStack(alignment: .center, spacing: 12) {
   <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}  VStack {
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(width: 40)
   </#if>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.frame(maxWidth: .infinity)
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1262,13 +1253,13 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}      Text(tag)
 ${""?left_pad(indent)}        .font(.system(size: 10))
-${""?left_pad(indent)}        .foregroundColor(Color("primary"))
+${""?left_pad(indent)}        .foregroundColor(Color.primary)
 ${""?left_pad(indent)}        .padding(.horizontal, 6)
 ${""?left_pad(indent)}        .padding(.vertical, 2)
-${""?left_pad(indent)}        .background(Color("primary_bg"))
+${""?left_pad(indent)}        .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}        .cornerRadius(4)
 ${""?left_pad(indent)}        .padding(.trailing, 4)
 ${""?left_pad(indent)}    }
@@ -1276,21 +1267,21 @@ ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1310,23 +1301,23 @@ ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))</#if>
-      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" - ").font(.system(size: 12)).foregroundColor(Color("text_muted"))</#if>
-      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))</#if>
+      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)</#if>
+      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" - ").font(.system(size: 12)).foregroundColor(Color.textSecondary)</#if>
+      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)</#if>
 ${""?left_pad(indent)}    }
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}      Image(av)
 ${""?left_pad(indent)}        .resizable()
 ${""?left_pad(indent)}        .aspectRatio(contentMode: .fill)
@@ -1339,7 +1330,7 @@ ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1360,27 +1351,23 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack(alignment: .center, spacing: 12) {
     <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}      .resizable()
-${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}      .frame(width: 40, height: 40)
-${""?left_pad(indent)}      .cornerRadius(20)
+${""?left_pad(indent)}    Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
     </#if>
 ${""?left_pad(indent)}    VStack(alignment: .leading, spacing: 4) {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color.textPrimary)
       </#if>
       <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
       </#if>
-${""?left_pad(indent)}    }
+    }
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
   <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).font(.system(size: 14)).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "tertiary")}).font(.system(size: 14)).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
   <#if guidbase.has_child_widget(widget, "image")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(height: 200)
@@ -1390,7 +1377,7 @@ ${""?left_pad(indent)}    .cornerRadius(4)
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}        Image(av)
 ${""?left_pad(indent)}          .resizable()
 ${""?left_pad(indent)}          .aspectRatio(contentMode: .fill)
@@ -1398,28 +1385,28 @@ ${""?left_pad(indent)}          .frame(width: 20, height: 20)
 ${""?left_pad(indent)}          .cornerRadius(10)
 ${""?left_pad(indent)}          .padding(.trailing, 4)
 ${""?left_pad(indent)}      }
-${""?left_pad(indent)}    }
+    }
     </#if>
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    Spacer()
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}        Text(tag)
 ${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("primary"))
+${""?left_pad(indent)}          .foregroundColor(Color.primary)
 ${""?left_pad(indent)}          .padding(.horizontal, 6)
 ${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary_bg"))
+${""?left_pad(indent)}          .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}          .cornerRadius(4)
 ${""?left_pad(indent)}          .padding(.leading, 4)
 ${""?left_pad(indent)}      }
-${""?left_pad(indent)}    }
+    }
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1438,7 +1425,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_product widget indent=0>
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
   <#if guidbase.has_child_widget(widget, "image")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(height: 150)
@@ -1447,38 +1434,38 @@ ${""?left_pad(indent)}    .cornerRadius(4)
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}      Text(tag)
 ${""?left_pad(indent)}        .font(.system(size: 10))
-${""?left_pad(indent)}        .foregroundColor(Color("primary"))
+${""?left_pad(indent)}        .foregroundColor(Color.primary)
 ${""?left_pad(indent)}        .padding(.horizontal, 6)
 ${""?left_pad(indent)}        .padding(.vertical, 2)
-${""?left_pad(indent)}        .background(Color("primary_bg"))
+${""?left_pad(indent)}        .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}        .cornerRadius(4)
 ${""?left_pad(indent)}        .padding(.trailing, 4)
 ${""?left_pad(indent)}    }
-${""?left_pad(indent)}  }
+  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted")).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1496,19 +1483,15 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}      .resizable()
-${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}      .frame(width: 40, height: 40)
-${""?left_pad(indent)}      .cornerRadius(20)
+${""?left_pad(indent)}    Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color.primary)
 ${""?left_pad(indent)}    Spacer()
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))})
+${""?left_pad(indent)}    Image(${guidbase4swift.format_widget_variable(widget, "secondary")})
 ${""?left_pad(indent)}      .resizable()
 ${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}      .frame(width: 40, height: 40)
@@ -1518,27 +1501,27 @@ ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textPrimary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1555,7 +1538,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_left_feature_image widget indent=0>
 ${""?left_pad(indent)}HStack(alignment: .top, spacing: 12) {
   <#if guidbase.has_child_widget(widget, "image")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(width: 100, height: 100)
@@ -1564,13 +1547,13 @@ ${""?left_pad(indent)}    .cornerRadius(4)
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}        Text(tag)
 ${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("primary"))
+${""?left_pad(indent)}          .foregroundColor(Color.primary)
 ${""?left_pad(indent)}          .padding(.horizontal, 6)
 ${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary_bg"))
+${""?left_pad(indent)}          .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}          .cornerRadius(4)
 ${""?left_pad(indent)}          .padding(.trailing, 4)
 ${""?left_pad(indent)}      }
@@ -1578,22 +1561,22 @@ ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}    .padding(.bottom, 4)
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "tertiary")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
 ${""?left_pad(indent)}    HStack {
       <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
       </#if>
       <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}      Spacer()
 ${""?left_pad(indent)}      HStack(spacing: 2) {
-${""?left_pad(indent)}        ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}        ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}          Image(av)
 ${""?left_pad(indent)}            .resizable()
 ${""?left_pad(indent)}            .aspectRatio(contentMode: .fill)
@@ -1603,14 +1586,14 @@ ${""?left_pad(indent)}            .padding(.trailing, 2)
 ${""?left_pad(indent)}        }
 ${""?left_pad(indent)}      }
       </#if>
-${""?left_pad(indent)}    }
+    }
 ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .layoutWeight(1)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.frame(maxWidth: .infinity)
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1626,12 +1609,12 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack(spacing: 4) {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
-${""?left_pad(indent)}    Text(" > ").font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
+${""?left_pad(indent)}    Text(" > ").font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
     <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}        Image(av)
 ${""?left_pad(indent)}          .resizable()
 ${""?left_pad(indent)}          .aspectRatio(contentMode: .fill)
@@ -1640,23 +1623,23 @@ ${""?left_pad(indent)}          .cornerRadius(10)
 ${""?left_pad(indent)}          .padding(.trailing, 4)
 ${""?left_pad(indent)}      }
 ${""?left_pad(indent)}    }
-${""?left_pad(indent)}    Text(" > ").font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(" > ").font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
-${""?left_pad(indent)}    Text(" > ").font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
+${""?left_pad(indent)}    Text(" > ").font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1675,7 +1658,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_text_over_background widget indent=0>
 ${""?left_pad(indent)}ZStack(alignment: .bottomLeading) {
   <#if guidbase.has_child_widget(widget, "background")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "background"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "background")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(height: 200)
@@ -1684,13 +1667,13 @@ ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 6) {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}        Text(tag)
 ${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("bg"))
+${""?left_pad(indent)}          .foregroundColor(Color.surface)
 ${""?left_pad(indent)}          .padding(.horizontal, 6)
 ${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary"))
+${""?left_pad(indent)}          .background(Color.primary)
 ${""?left_pad(indent)}          .cornerRadius(4)
 ${""?left_pad(indent)}          .padding(.trailing, 4)
 ${""?left_pad(indent)}      }
@@ -1698,26 +1681,21 @@ ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}    .padding(.bottom, 8)
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 18)).fontWeight(.bold).foregroundColor(Color("bg")).padding(.bottom, 8)
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 18)).fontWeight(.bold).foregroundColor(Color.surface).padding(.bottom, 8)
     </#if>
 ${""?left_pad(indent)}    HStack {
       <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}      Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}        .resizable()
-${""?left_pad(indent)}        .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}        .frame(width: 24, height: 24)
-${""?left_pad(indent)}        .cornerRadius(12)
-${""?left_pad(indent)}        .padding(.trailing, 8)
+${""?left_pad(indent)}      Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
       </#if>
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("border_light"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.divider)
       </#if>
 ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}    .frame(maxWidth: .infinity, alignment: .leading)
-${""?left_pad(indent)}  }
-${""?left_pad(indent)}  .padding(12)
-${""?left_pad(indent)}}
-${""?left_pad(indent)}.cornerRadius(8)
+  }
+  .padding(12)
+}
+.cornerRadius(8)
 </#macro>
 
 <#--
@@ -1729,24 +1707,20 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_micro_badge widget indent=0>
 ${""?left_pad(indent)}HStack(alignment: .center, spacing: 8) {
   <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}    .resizable()
-${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}    .frame(width: 24, height: 24)
-${""?left_pad(indent)}    .cornerRadius(12)
+${""?left_pad(indent)}  Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.medium).foregroundColor(Color("text"))
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.medium).foregroundColor(Color.textPrimary)
   </#if>
 ${""?left_pad(indent)}  Spacer()
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.frame(maxWidth: .infinity)
 ${""?left_pad(indent)}.padding(.vertical, 8)
 ${""?left_pad(indent)}.padding(.horizontal, 12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(4)
 </#macro>
 
@@ -1763,25 +1737,25 @@ ${""?left_pad(indent)}.cornerRadius(4)
 <#macro print_tile_stepped_process widget indent=0>
 ${""?left_pad(indent)}HStack(alignment: .top, spacing: 12) {
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 14)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 14)).foregroundColor(Color.primary)
   </#if>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
 ${""?left_pad(indent)}    HStack(spacing: 2) {
-${""?left_pad(indent)}      Text("├─ ").font(.system(size: 12)).foregroundColor(Color("text_light"))
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}      Text("├─ ").font(.system(size: 12)).foregroundColor(Color.textMuted)
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
 ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}    .padding(.bottom, 2)
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    HStack(spacing: 2) {
-${""?left_pad(indent)}      Text("├─ ").font(.system(size: 12)).foregroundColor(Color("text_light"))
-      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))</#if>
-      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" - ").font(.system(size: 12)).foregroundColor(Color("text_light"))</#if>
-      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))</#if>
+${""?left_pad(indent)}      Text("├─ ").font(.system(size: 12)).foregroundColor(Color.textMuted)
+      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textMuted)</#if>
+      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" - ").font(.system(size: 12)).foregroundColor(Color.textMuted)</#if>
+      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textMuted)</#if>
 ${""?left_pad(indent)}    }
     </#if>
 ${""?left_pad(indent)}  }
@@ -1789,7 +1763,7 @@ ${""?left_pad(indent)}  .layoutWeight(1)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.frame(maxWidth: .infinity)
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1808,7 +1782,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_stacked_overlay widget indent=0>
 ${""?left_pad(indent)}ZStack(alignment: .bottom) {
   <#if guidbase.has_child_widget(widget, "image")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(height: 160)
@@ -1816,21 +1790,21 @@ ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
   </#if>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
 ${""?left_pad(indent)}    HStack {
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}      Spacer()
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
 ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .padding(10)
-${""?left_pad(indent)}  .background(Color("bg"))
+${""?left_pad(indent)}  .background(Color.surface)
 ${""?left_pad(indent)}  .cornerRadius(6)
 ${""?left_pad(indent)}  .padding(8)
 ${""?left_pad(indent)}}
@@ -1852,7 +1826,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}      Image(av)
 ${""?left_pad(indent)}        .resizable()
 ${""?left_pad(indent)}        .aspectRatio(contentMode: .fill)
@@ -1865,35 +1839,35 @@ ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}  .padding(.bottom, 8)
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
   <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).font(.system(size: 12)).foregroundColor(Color("text_light")).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "tertiary")}).font(.system(size: 12)).foregroundColor(Color.textMuted).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
   </#if>
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}        Text(tag)
 ${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("primary"))
+${""?left_pad(indent)}          .foregroundColor(Color.primary)
 ${""?left_pad(indent)}          .padding(.horizontal, 6)
 ${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary_bg"))
+${""?left_pad(indent)}          .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}          .cornerRadius(4)
 ${""?left_pad(indent)}          .padding(.trailing, 4)
 ${""?left_pad(indent)}      }
-${""?left_pad(indent)}    }
+    }
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -1917,10 +1891,10 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_tall_sidebar widget indent=0>
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary")).padding(.bottom, 8)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary).padding(.bottom, 8)
   </#if>
   <#if guidbase.has_child_widget(widget, "image")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(height: 100)
@@ -1929,20 +1903,20 @@ ${""?left_pad(indent)}    .cornerRadius(4)
 ${""?left_pad(indent)}    .padding(.bottom, 8)
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted")).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}      Text(tag)
 ${""?left_pad(indent)}        .font(.system(size: 10))
-${""?left_pad(indent)}        .foregroundColor(Color("primary"))
+${""?left_pad(indent)}        .foregroundColor(Color.primary)
 ${""?left_pad(indent)}        .padding(.horizontal, 6)
 ${""?left_pad(indent)}        .padding(.vertical, 2)
-${""?left_pad(indent)}        .background(Color("primary_bg"))
+${""?left_pad(indent)}        .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}        .cornerRadius(4)
 ${""?left_pad(indent)}        .padding(.trailing, 4)
 ${""?left_pad(indent)}    }
@@ -1952,7 +1926,7 @@ ${""?left_pad(indent)}  .padding(.bottom, 8)
   </#if>
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}      Image(av)
 ${""?left_pad(indent)}        .resizable()
 ${""?left_pad(indent)}        .aspectRatio(contentMode: .fill)
@@ -1960,12 +1934,11 @@ ${""?left_pad(indent)}        .frame(width: 20, height: 20)
 ${""?left_pad(indent)}        .cornerRadius(10)
 ${""?left_pad(indent)}        .padding(.trailing, 4)
 ${""?left_pad(indent)}    }
-${""?left_pad(indent)}  }
-${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
+  }
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}.frame(width: 120)
 </#macro>
@@ -1983,43 +1956,39 @@ ${""?left_pad(indent)}.frame(width: 120)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color.textPrimary)
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  .padding(.bottom, 4)
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  .padding(.bottom, 8)
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}      .resizable()
-${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}      .frame(width: 24, height: 24)
-${""?left_pad(indent)}      .cornerRadius(12)
+${""?left_pad(indent)}    Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -2038,11 +2007,11 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
     <#if guidbase.has_child_widget(widget, "start_time")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
@@ -2050,39 +2019,39 @@ ${""?left_pad(indent)}  .padding(.bottom, 8)
 ${""?left_pad(indent)}  HStack(alignment: .top, spacing: 12) {
 ${""?left_pad(indent)}    VStack(alignment: .leading, spacing: 4) {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color.textPrimary)
       </#if>
       <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "tertiary")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
       </#if>
 ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}    .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}    VStack(alignment: .leading, spacing: 4) {
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
       </#if>
       <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}      HStack(spacing: 4) {
-${""?left_pad(indent)}        ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}        ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}          Text(tag)
 ${""?left_pad(indent)}            .font(.system(size: 10))
-${""?left_pad(indent)}            .foregroundColor(Color("primary"))
+${""?left_pad(indent)}            .foregroundColor(Color.primary)
 ${""?left_pad(indent)}            .padding(.horizontal, 6)
 ${""?left_pad(indent)}            .padding(.vertical, 2)
-${""?left_pad(indent)}            .background(Color("primary_bg"))
+${""?left_pad(indent)}            .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}            .cornerRadius(4)
 ${""?left_pad(indent)}            .padding(.trailing, 4)
 ${""?left_pad(indent)}        }
 ${""?left_pad(indent)}      }
       </#if>
-${""?left_pad(indent)}    }
+    }
 ${""?left_pad(indent)}    .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  .padding(.bottom, 8)
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}      Image(av)
 ${""?left_pad(indent)}        .resizable()
 ${""?left_pad(indent)}        .aspectRatio(contentMode: .fill)
@@ -2090,12 +2059,12 @@ ${""?left_pad(indent)}        .frame(width: 20, height: 20)
 ${""?left_pad(indent)}        .cornerRadius(10)
 ${""?left_pad(indent)}        .padding(.trailing, 4)
 ${""?left_pad(indent)}    }
-${""?left_pad(indent)}  }
+  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -2113,7 +2082,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack(alignment: .top, spacing: 12) {
     <#if guidbase.has_child_widget(widget, "image")>
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}    Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}      .resizable()
 ${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}      .frame(width: 60, height: 60)
@@ -2121,40 +2090,36 @@ ${""?left_pad(indent)}      .cornerRadius(4)
     </#if>
 ${""?left_pad(indent)}    VStack(alignment: .leading, spacing: 4) {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
       </#if>
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
       </#if>
       <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}      HStack(spacing: 6) {
-        <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}        Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 10)).foregroundColor(Color("text_light"))</#if>
-${""?left_pad(indent)}        Rectangle().frame(height: 2).foregroundColor(Color("border_light"))
-        <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}        Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 10)).foregroundColor(Color("text_light"))</#if>
+        <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}        Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 10)).foregroundColor(Color.textMuted)</#if>
+${""?left_pad(indent)}        Rectangle().frame(height: 2).foregroundColor(Color.divider)
+        <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}        Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 10)).foregroundColor(Color.textMuted)</#if>
 ${""?left_pad(indent)}      }
 ${""?left_pad(indent)}      .frame(maxWidth: .infinity)
       </#if>
-${""?left_pad(indent)}    }
+    }
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}  .padding(.bottom, 8)
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}      .resizable()
-${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}      .frame(width: 24, height: 24)
-${""?left_pad(indent)}      .cornerRadius(12)
+${""?left_pad(indent)}    Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -2172,32 +2137,27 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  .padding(.bottom, 8)
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 4)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 4)
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted")).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
   </#if>
   <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}    .resizable()
-${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}    .frame(width: 24, height: 24)
-${""?left_pad(indent)}    .cornerRadius(12)
-${""?left_pad(indent)}    .padding(.top, 4)
+${""?left_pad(indent)}  Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -2215,24 +2175,24 @@ ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "start_time") || guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))</#if>
-      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" - ").font(.system(size: 12)).foregroundColor(Color("text_muted"))</#if>
-      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))</#if>
-${""?left_pad(indent)}    }
+      <#if guidbase.has_child_widget(widget, "start_time")>${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)</#if>
+      <#if guidbase.has_child_widget(widget, "start_time") && guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(" - ").font(.system(size: 12)).foregroundColor(Color.textSecondary)</#if>
+      <#if guidbase.has_child_widget(widget, "end_time")>${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)</#if>
+    }
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  .padding(.bottom, 8)
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
   </#if>
   <#if guidbase.has_child_widget(widget, "avatars")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
 ${""?left_pad(indent)}      Image(av)
 ${""?left_pad(indent)}        .resizable()
 ${""?left_pad(indent)}        .aspectRatio(contentMode: .fill)
@@ -2240,12 +2200,12 @@ ${""?left_pad(indent)}        .frame(width: 20, height: 20)
 ${""?left_pad(indent)}        .cornerRadius(10)
 ${""?left_pad(indent)}        .padding(.trailing, 4)
 ${""?left_pad(indent)}    }
-${""?left_pad(indent)}  }
+  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -2262,11 +2222,11 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_media_history widget indent=0>
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted")).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
   </#if>
 ${""?left_pad(indent)}  HStack(alignment: .top, spacing: 12) {
     <#if guidbase.has_child_widget(widget, "image")>
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}    Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}      .resizable()
 ${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}      .frame(width: 60, height: 60)
@@ -2274,33 +2234,33 @@ ${""?left_pad(indent)}      .cornerRadius(4)
     </#if>
 ${""?left_pad(indent)}    VStack(alignment: .leading, spacing: 4) {
       <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color.textPrimary)
       </#if>
       <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
       </#if>
       <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}      HStack(spacing: 4) {
-${""?left_pad(indent)}        ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}        ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}          Text(tag)
 ${""?left_pad(indent)}            .font(.system(size: 10))
-${""?left_pad(indent)}            .foregroundColor(Color("primary"))
+${""?left_pad(indent)}            .foregroundColor(Color.primary)
 ${""?left_pad(indent)}            .padding(.horizontal, 6)
 ${""?left_pad(indent)}            .padding(.vertical, 2)
-${""?left_pad(indent)}            .background(Color("primary_bg"))
+${""?left_pad(indent)}            .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}            .cornerRadius(4)
 ${""?left_pad(indent)}            .padding(.trailing, 4)
 ${""?left_pad(indent)}        }
-${""?left_pad(indent)}      }
+      }
       </#if>
-${""?left_pad(indent)}    }
-${""?left_pad(indent)}    .frame(maxWidth: .infinity, alignment: .leading)
-${""?left_pad(indent)}  }
-${""?left_pad(indent)}  .frame(maxWidth: .infinity)
-${""?left_pad(indent)}}
-${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
-${""?left_pad(indent)}.cornerRadius(8)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+  .frame(maxWidth: .infinity)
+}
+.padding(12)
+.background(Color.surface)
+.cornerRadius(8)
 </#macro>
 
 <#--
@@ -2316,34 +2276,30 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  .padding(.bottom, 8)
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
   </#if>
 ${""?left_pad(indent)}  HStack(alignment: .center, spacing: 8) {
     <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}    Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}      .resizable()
-${""?left_pad(indent)}      .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}      .frame(width: 24, height: 24)
-${""?left_pad(indent)}      .cornerRadius(12)
+${""?left_pad(indent)}    Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
     </#if>
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -2358,37 +2314,36 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 6) {
 ${""?left_pad(indent)}  HStack(spacing: 4) {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
-${""?left_pad(indent)}    Text(" | ").font(.system(size: 12)).foregroundColor(Color("border_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
+${""?left_pad(indent)}    Text(" | ").font(.system(size: 12)).foregroundColor(Color.divider)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
-${""?left_pad(indent)}    Text(" | ").font(.system(size: 12)).foregroundColor(Color("border_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
+${""?left_pad(indent)}    Text(" | ").font(.system(size: 12)).foregroundColor(Color.divider)
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.medium).foregroundColor(Color("text"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.medium).foregroundColor(Color.textPrimary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}  .padding(.bottom, 4)
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}      Text(tag)
 ${""?left_pad(indent)}        .font(.system(size: 10))
-${""?left_pad(indent)}        .foregroundColor(Color("primary"))
+${""?left_pad(indent)}        .foregroundColor(Color.primary)
 ${""?left_pad(indent)}        .padding(.horizontal, 6)
 ${""?left_pad(indent)}        .padding(.vertical, 2)
-${""?left_pad(indent)}        .background(Color("primary_bg"))
+${""?left_pad(indent)}        .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}        .cornerRadius(4)
 ${""?left_pad(indent)}        .padding(.trailing, 4)
 ${""?left_pad(indent)}    }
-${""?left_pad(indent)}  }
-${""?left_pad(indent)}  .frame(maxWidth: .infinity)
+  }
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -2404,17 +2359,17 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_horizontal_flow widget indent=0>
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 4) {
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted")).padding(.bottom, 6)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary).padding(.bottom, 6)
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color("text")).padding(.bottom, 4)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color.textPrimary).padding(.bottom, 4)
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(8)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(4)
 </#macro>
 
@@ -2432,23 +2387,23 @@ ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 6) {
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "start_time")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  .padding(.bottom, 6)
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.medium).foregroundColor(Color("text")).padding(.bottom, 6).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.medium).foregroundColor(Color.textPrimary).padding(.bottom, 6).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}      Text(tag)
 ${""?left_pad(indent)}        .font(.system(size: 10))
-${""?left_pad(indent)}        .foregroundColor(Color("primary"))
+${""?left_pad(indent)}        .foregroundColor(Color.primary)
 ${""?left_pad(indent)}        .padding(.horizontal, 6)
 ${""?left_pad(indent)}        .padding(.vertical, 2)
-${""?left_pad(indent)}        .background(Color("primary_bg"))
+${""?left_pad(indent)}        .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}        .cornerRadius(4)
 ${""?left_pad(indent)}        .padding(.trailing, 4)
 ${""?left_pad(indent)}    }
@@ -2457,7 +2412,7 @@ ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(8)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(4)
 </#macro>
 
@@ -2474,14 +2429,14 @@ ${""?left_pad(indent)}.cornerRadius(4)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 6) {
 ${""?left_pad(indent)}  HStack {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
 ${""?left_pad(indent)}    Spacer()
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  .padding(.bottom, 6)
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))})
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")})
 ${""?left_pad(indent)}    .font(.system(size: 14))
 ${""?left_pad(indent)}    .fontWeight(.medium)
 ${""?left_pad(indent)}    .multilineTextAlignment(.trailing)
@@ -2492,13 +2447,13 @@ ${""?left_pad(indent)}    .frame(maxWidth: .infinity, alignment: .trailing)
 ${""?left_pad(indent)}  HStack {
 ${""?left_pad(indent)}    Spacer()
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}        Text(tag)
 ${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("primary"))
+${""?left_pad(indent)}          .foregroundColor(Color.primary)
 ${""?left_pad(indent)}          .padding(.horizontal, 6)
 ${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary_bg"))
+${""?left_pad(indent)}          .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}          .cornerRadius(4)
 ${""?left_pad(indent)}          .padding(.leading, 4)
 ${""?left_pad(indent)}      }
@@ -2508,7 +2463,7 @@ ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(8)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(4)
 </#macro>
 
@@ -2525,30 +2480,30 @@ ${""?left_pad(indent)}.cornerRadius(4)
 <#macro print_tile_internal_chronology widget indent=0>
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 4) {
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_light")).padding(.bottom, 2).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textMuted).padding(.bottom, 2).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 4)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 4)
   </#if>
 ${""?left_pad(indent)}  Text("│")
 ${""?left_pad(indent)}    .padding(.leading, 8)
 ${""?left_pad(indent)}    .padding(.bottom, 4)
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_light")).padding(.bottom, 2).frame(maxWidth: .infinity, alignment: .leading)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textMuted).padding(.bottom, 2).frame(maxWidth: .infinity, alignment: .leading)
   </#if>
 ${""?left_pad(indent)}  HStack {
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary)
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
   </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -2564,47 +2519,47 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack(spacing: 4) {
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
-${""?left_pad(indent)}    Text(" >> ").font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
+${""?left_pad(indent)}    Text(" >> ").font(.system(size: 12)).foregroundColor(Color.textMuted)
   </#if>
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}        Text(tag)
 ${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("primary"))
+${""?left_pad(indent)}          .foregroundColor(Color.primary)
 ${""?left_pad(indent)}          .padding(.horizontal, 6)
 ${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary_bg"))
+${""?left_pad(indent)}          .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}          .cornerRadius(4)
 ${""?left_pad(indent)}          .padding(.trailing, 4)
 ${""?left_pad(indent)}      }
-${""?left_pad(indent)}    }
-${""?left_pad(indent)}    Text(" >> ").font(.system(size: 12)).foregroundColor(Color("text_light"))
+    }
+    Text(" >> ").font(.system(size: 12)).foregroundColor(Color.textMuted)
   </#if>
   <#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
   </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}  .padding(.bottom, 8)
 ${""?left_pad(indent)}  HStack(spacing: 4) {
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color("text"))
-${""?left_pad(indent)}    Text(" >> ").font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color.textPrimary)
+${""?left_pad(indent)}    Text(" >> ").font(.system(size: 12)).foregroundColor(Color.textMuted)
   </#if>
   <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
-${""?left_pad(indent)}    Text(" >> ").font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
+${""?left_pad(indent)}    Text(" >> ").font(.system(size: 12)).foregroundColor(Color.textMuted)
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
   </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -2617,30 +2572,26 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_horizontal_log widget indent=0>
 ${""?left_pad(indent)}HStack(alignment: .center, spacing: 4) {
   <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}    .resizable()
-${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}    .frame(width: 24, height: 24)
-${""?left_pad(indent)}    .cornerRadius(12)
-${""?left_pad(indent)}  Text(" | ").font(.system(size: 12)).foregroundColor(Color("border_light"))
+${""?left_pad(indent)}  Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
+${""?left_pad(indent)}  Text(" | ").font(.system(size: 12)).foregroundColor(Color.divider)
   </#if>
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
-${""?left_pad(indent)}  Text(" | ").font(.system(size: 12)).foregroundColor(Color("border_light"))
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
+${""?left_pad(indent)}  Text(" | ").font(.system(size: 12)).foregroundColor(Color.divider)
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.medium).foregroundColor(Color("text"))
-${""?left_pad(indent)}  Text(" | ").font(.system(size: 12)).foregroundColor(Color("border_light"))
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.medium).foregroundColor(Color.textPrimary)
+${""?left_pad(indent)}  Text(" | ").font(.system(size: 12)).foregroundColor(Color.divider)
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}  Spacer()
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.frame(maxWidth: .infinity)
 ${""?left_pad(indent)}.padding(.vertical, 8)
 ${""?left_pad(indent)}.padding(.horizontal, 12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(6)
 </#macro>
 
@@ -2659,48 +2610,48 @@ ${""?left_pad(indent)}.cornerRadius(6)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
   <#if guidbase.has_child_widget(widget, "tags")>
 ${""?left_pad(indent)}  HStack(spacing: 4) {
-${""?left_pad(indent)}    ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
+${""?left_pad(indent)}    ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
 ${""?left_pad(indent)}      Text(tag)
 ${""?left_pad(indent)}        .font(.system(size: 10))
-${""?left_pad(indent)}        .foregroundColor(Color("primary"))
+${""?left_pad(indent)}        .foregroundColor(Color.primary)
 ${""?left_pad(indent)}        .padding(.horizontal, 6)
 ${""?left_pad(indent)}        .padding(.vertical, 2)
-${""?left_pad(indent)}        .background(Color("primary_bg"))
+${""?left_pad(indent)}        .background(Color.primary.opacity(0.1))
 ${""?left_pad(indent)}        .cornerRadius(4)
 ${""?left_pad(indent)}        .padding(.trailing, 4)
-${""?left_pad(indent)}    }
-${""?left_pad(indent)}  }
+    }
+  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}  .padding(.bottom, 8)
   </#if>
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 4)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 4)
   </#if>
   <#if guidbase.has_child_widget(widget, "tertiary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tertiary"))}).font(.system(size: 12)).foregroundColor(Color("text_light")).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "tertiary")}).font(.system(size: 12)).foregroundColor(Color.textMuted).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
   </#if>
 ${""?left_pad(indent)}  HStack {
   <#if guidbase.has_child_widget(widget, "avatars")>
-${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
-${""?left_pad(indent)}        Image(av)
-${""?left_pad(indent)}          .resizable()
-${""?left_pad(indent)}          .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}          .frame(width: 20, height: 20)
-${""?left_pad(indent)}          .cornerRadius(10)
-${""?left_pad(indent)}          .padding(.trailing, 4)
-${""?left_pad(indent)}      }
-${""?left_pad(indent)}    }
+    HStack(spacing: 4) {
+      ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
+        Image(av)
+          .resizable()
+          .aspectRatio(contentMode: .fill)
+          .frame(width: 20, height: 20)
+          .cornerRadius(10)
+          .padding(.trailing, 4)
+      }
+    }
   </#if>
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+    Spacer()
+    Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
   </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -2716,7 +2667,7 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_timestamp_stamp widget indent=0>
 ${""?left_pad(indent)}ZStack(alignment: .bottomLeading) {
   <#if guidbase.has_child_widget(widget, "background")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "background"))})
+${""?left_pad(indent)}  Image(${guidbase4swift.format_widget_variable(widget, "background")})
 ${""?left_pad(indent)}    .resizable()
 ${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}    .frame(height: 150)
@@ -2724,23 +2675,23 @@ ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
   </#if>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 6) {
     <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))})
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "start_time")})
 ${""?left_pad(indent)}      .font(.system(size: 12))
-${""?left_pad(indent)}      .foregroundColor(Color("border_light"))
+${""?left_pad(indent)}      .foregroundColor(Color.divider)
 ${""?left_pad(indent)}      .multilineTextAlignment(.trailing)
 ${""?left_pad(indent)}      .frame(maxWidth: .infinity, alignment: .trailing)
 ${""?left_pad(indent)}      .padding(.bottom, 4)
     </#if>
     <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("bg")).padding(.bottom, 4)
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.surface).padding(.bottom, 4)
     </#if>
     <#if guidbase.has_child_widget(widget, "status")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))})
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")})
 ${""?left_pad(indent)}      .font(.system(size: 12))
-${""?left_pad(indent)}      .foregroundColor(Color("primary"))
+${""?left_pad(indent)}      .foregroundColor(Color.primary)
 ${""?left_pad(indent)}      .padding(.horizontal, 6)
 ${""?left_pad(indent)}      .padding(.vertical, 2)
-${""?left_pad(indent)}      .background(Color("bg"))
+${""?left_pad(indent)}      .background(Color.surface)
 ${""?left_pad(indent)}      .cornerRadius(4)
     </#if>
 ${""?left_pad(indent)}  }
@@ -2761,31 +2712,27 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_compact_chat widget indent=0>
 ${""?left_pad(indent)}HStack(alignment: .center, spacing: 12) {
   <#if guidbase.has_child_widget(widget, "avatar")>
-${""?left_pad(indent)}  Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatar"))})
-${""?left_pad(indent)}    .resizable()
-${""?left_pad(indent)}    .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}    .frame(width: 32, height: 32)
-${""?left_pad(indent)}    .cornerRadius(16)
+${""?left_pad(indent)}  Avatar(text: ${guidbase4swift.format_widget_variable(widget, "avatar")}, avatarSize: 48)
   </#if>
 ${""?left_pad(indent)}  VStack(alignment: .leading, spacing: 4) {
 ${""?left_pad(indent)}    HStack {
         <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 14)).fontWeight(.bold).foregroundColor(Color.textPrimary)
         </#if>
         <#if guidbase.has_child_widget(widget, "start_time")>
 ${""?left_pad(indent)}      Spacer()
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_light"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textMuted)
         </#if>
 ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}    .frame(maxWidth: .infinity)
     <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
     </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.frame(maxWidth: .infinity)
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -2803,41 +2750,41 @@ ${""?left_pad(indent)}.cornerRadius(8)
 <#macro print_tile_side_image_time_capsule widget indent=0>
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
   <#if guidbase.has_child_widget(widget, "start_time")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "start_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted")).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "start_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
   </#if>
 ${""?left_pad(indent)}  HStack(alignment: .center, spacing: 12) {
 ${""?left_pad(indent)}    VStack(alignment: .leading, spacing: 4) {
         <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary)
         </#if>
         <#if guidbase.has_child_widget(widget, "secondary")>
-${""?left_pad(indent)}      Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "secondary"))}).font(.system(size: 14)).foregroundColor(Color("text_muted"))
+${""?left_pad(indent)}      Text(${guidbase4swift.format_widget_variable(widget, "secondary")}).font(.system(size: 14)).foregroundColor(Color.textSecondary)
         </#if>
 ${""?left_pad(indent)}    }
 ${""?left_pad(indent)}    .frame(maxWidth: .infinity, alignment: .leading)
 ${""?left_pad(indent)}    Spacer()
 ${""?left_pad(indent)}    HStack {
         <#if guidbase.has_child_widget(widget, "image")>
-${""?left_pad(indent)}      Image(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "image"))})
+${""?left_pad(indent)}      Image(${guidbase4swift.format_widget_variable(widget, "image")})
 ${""?left_pad(indent)}        .resizable()
 ${""?left_pad(indent)}        .aspectRatio(contentMode: .fill)
 ${""?left_pad(indent)}        .frame(width: 60, height: 60)
 ${""?left_pad(indent)}        .cornerRadius(4)
         </#if>
 ${""?left_pad(indent)}    }
-${""?left_pad(indent)}  }
+  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  .padding(.bottom, 8)
   <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}  HStack {
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
-${""?left_pad(indent)}  }
-${""?left_pad(indent)}  .frame(maxWidth: .infinity)
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
+  }
+  .frame(maxWidth: .infinity)
   </#if>
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>
 
@@ -2854,53 +2801,50 @@ ${""?left_pad(indent)}.cornerRadius(8)
 ${""?left_pad(indent)}VStack(alignment: .leading, spacing: 8) {
 ${""?left_pad(indent)}  HStack {
   <#if guidbase.has_child_widget(widget, "tags")>
-${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "tags"))}, id: \.self) { tag in
-${""?left_pad(indent)}        Text(tag)
-${""?left_pad(indent)}          .font(.system(size: 10))
-${""?left_pad(indent)}          .foregroundColor(Color("primary"))
-${""?left_pad(indent)}          .padding(.horizontal, 6)
-${""?left_pad(indent)}          .padding(.vertical, 2)
-${""?left_pad(indent)}          .background(Color("primary_bg"))
-${""?left_pad(indent)}          .cornerRadius(4)
-${""?left_pad(indent)}          .padding(.trailing, 4)
-${""?left_pad(indent)}      }
-${""?left_pad(indent)}    }
+    HStack(spacing: 4) {
+      ForEach(${guidbase4swift.format_widget_variable(widget, "tags")}, id: \.self) { tag in
+        Text(tag)
+          .font(.system(size: 10))
+          .foregroundColor(Color.primary)
+          .padding(.horizontal, 6)
+          .padding(.vertical, 2)
+          .background(Color.primary.opacity(0.1))
+          .cornerRadius(4)
+          .padding(.trailing, 4)
+      }
+    }
   </#if>
   <#if guidbase.has_child_widget(widget, "end_time")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(
-<#if guidbase.has_child_widget(widget, "end_time")>
-${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "end_time"))}).font(.system(size: 12)).foregroundColor(Color("text_muted"))
-    </#if>
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "end_time")}).font(.system(size: 12)).foregroundColor(Color.textSecondary)
+  </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}  .padding(.bottom, 8)
   <#if guidbase.has_child_widget(widget, "primary")>
-${""?left_pad(indent)}  Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "primary"))}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color("text")).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
+${""?left_pad(indent)}  Text(${guidbase4swift.format_widget_variable(widget, "primary")}).font(.system(size: 16)).fontWeight(.bold).foregroundColor(Color.textPrimary).frame(maxWidth: .infinity, alignment: .leading).padding(.bottom, 8)
   </#if>
 ${""?left_pad(indent)}  HStack {
   <#if guidbase.has_child_widget(widget, "avatars")>
-${""?left_pad(indent)}    HStack(spacing: 4) {
-${""?left_pad(indent)}      ForEach(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "avatars"))}, id: \.self) { av in
-${""?left_pad(indent)}        Image(av)
-${""?left_pad(indent)}          .resizable()
-${""?left_pad(indent)}          .aspectRatio(contentMode: .fill)
-${""?left_pad(indent)}          .frame(width: 20, height: 20)
-${""?left_pad(indent)}          .cornerRadius(10)
-${""?left_pad(indent)}          .padding(.trailing, 4)
-${""?left_pad(indent)}      }
-${""?left_pad(indent)}    }
+    HStack(spacing: 4) {
+      ForEach(${guidbase4swift.format_widget_variable(widget, "avatars")}, id: \.self) { av in
+        Image(av)
+          .resizable()
+          .aspectRatio(contentMode: .fill)
+          .frame(width: 20, height: 20)
+          .cornerRadius(10)
+          .padding(.trailing, 4)
+      }
+    }
   </#if>
   <#if guidbase.has_child_widget(widget, "status")>
 ${""?left_pad(indent)}    Spacer()
-${""?left_pad(indent)}    Text(row.${guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, "status"))}).font(.system(size: 12)).foregroundColor(Color("primary"))
+${""?left_pad(indent)}    Text(${guidbase4swift.format_widget_variable(widget, "status")}).font(.system(size: 12)).foregroundColor(Color.primary)
   </#if>
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  .frame(maxWidth: .infinity)
 ${""?left_pad(indent)}}
 ${""?left_pad(indent)}.padding(12)
-${""?left_pad(indent)}.background(Color("bg"))
+${""?left_pad(indent)}.background(Color.surface)
 ${""?left_pad(indent)}.cornerRadius(8)
 </#macro>

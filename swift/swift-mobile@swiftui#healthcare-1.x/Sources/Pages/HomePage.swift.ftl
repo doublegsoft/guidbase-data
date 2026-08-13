@@ -1,4 +1,5 @@
 <#import "/$/guidbase.ftl" as guidbase>
+<#import "/$/tile@swiftui.ftl" as tile>
 <#import "/$/swiftui@mobile.ftl" as swiftui>
 <#if license??>
 ${swift.license(license)}

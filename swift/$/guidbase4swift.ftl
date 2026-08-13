@@ -47,3 +47,30 @@
     <#return "\"" + value + "\"">
   </#if>
 </#function>
+
+<#--
+ ###############################################################################
+ ### 格式化组件变量为 Swift 表达式 (Format Widget Variable as Swift Expression)
+ ### 
+ ### 根据指定属性获取子组件，并根据其类型（日期、时间、数值等）生成对应的 
+ ### Swift 格式化调用工具链字符串。
+ ### 
+ ### @param widget    父级组件对象 (Widget object)
+ ### @param property  子组件的属性名称 (Property name to find the child widget)
+ ### @param varname   数据源变量名称，默认为 "row" (Data source variable name, defaults to "row")
+ ### @return          格式化后的 Swift 代码表达式字符串
+ ###############################################################################
+ -->
+<#function format_widget_variable widget property varname="row">
+  <#local input = guidbase.get_child_from_tile(widget, property)>
+  <#if input.type == "date">
+    <#return "FormatUtils.Date.toYMD(row." + guidbase.name_widget_variable(input) + ")">
+  <#elseif input.type == "time">
+    <#return "FormatUtils.Date.toHM(row." + guidbase.name_widget_variable(input) + ")">
+  <#elseif input.type == "datetime">
+    <#return "FormatUtils.Date.toYMDHMS(row." + guidbase.name_widget_variable(input) + ")">
+  <#elseif input.type == "number">
+    <#return "FormatUtils.Number.toDecimal(row." + guidbase.name_widget_variable(input) + ")">
+  </#if>
+  <#return "row." + guidbase.name_widget_variable(input) + "!">
+</#function>
