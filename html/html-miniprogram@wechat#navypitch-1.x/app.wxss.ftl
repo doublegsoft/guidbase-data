@@ -1,15 +1,9 @@
-/* ═══════════════════════════════════════════════════════════════════════
-   ACADEMY PRO · 青训家长端 — WXSS Design System
-   基于 Academy Pro CSS Tokens 转换为微信小程序 WXSS
-   适配 rpx 单位 · 移除不兼容属性 · 保留完整设计语言
-   ═══════════════════════════════════════════════════════════════════════ */
-
 /* ─────────────────────────────────────────────────────────────────────
-   1.  FOUNDATIONS — CSS Custom Properties / Design Tokens
+   FOUNDATIONS — CSS Custom Properties / Design Tokens
    ───────────────────────────────────────────────────────────────────── */
 
 page {
-  /* ── 1a.  Color Palette ───────────────────── */
+  /* ── Color Palette ───────────────────── */
 
   /* Brand / Primary */
   --color-navy:       #0D1B2A;
@@ -59,7 +53,7 @@ page {
   --color-tab-text:       #95AABA;
   --color-tab-text-active:#00C9A7;
 
-  /* ── 1b.  Typography ──────────────────────── */
+  /* ── Typography ──────────────────────── */
   --font-family-base: 'PingFang SC', -apple-system, 'Helvetica Neue', sans-serif;
   --font-size-root:   28rpx;
 
@@ -86,7 +80,7 @@ page {
   --weight-bold:     700;
   --weight-extrabold:800;
 
-  /* ── 1c.  Spacing Scale (rpx) ─────────────── */
+  /* ── Spacing Scale (rpx) ─────────────── */
   --space-1:   4rpx;
   --space-2:   6rpx;
   --space-3:   8rpx;
@@ -102,7 +96,7 @@ page {
   --space-13:  48rpx;
   --space-14:  56rpx;
 
-  /* ── 1d.  Border Radius ───────────────────── */
+  /* ── Border Radius ───────────────────── */
   --radius-xs:    6rpx;
   --radius-sm:    12rpx;
   --radius-md:    16rpx;
@@ -112,18 +106,18 @@ page {
   --radius-full:  50%;
   --radius-pill:  40rpx;
 
-  /* ── 1e.  Shadows ─────────────────────────── */
+  /* ── Shadows ─────────────────────────── */
   --shadow-sm:   0 4rpx 32rpx rgba(13,27,42,0.08);
   --shadow-md:   0 8rpx 48rpx rgba(13,27,42,0.12);
 
-  /* ── 1f.  Transitions ─────────────────────── */
+  /* ── Transitions ─────────────────────── */
   --transition-fast:   0.12s ease;
   --transition-base:   0.15s ease;
   --transition-smooth: 0.18s ease;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   2.  GLOBAL RESET & BASE
+   GLOBAL RESET & BASE
    ═══════════════════════════════════════════════════════════════════════ */
 
 page {
@@ -142,7 +136,7 @@ page {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   3.  LAYOUT UTILITIES
+   LAYOUT UTILITIES
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ── Flex ───────────────────────────────────── */
@@ -199,10 +193,10 @@ page {
 .w-full { width: 100%; }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   4.  PRIMITIVES — Buttons, Tags, Avatars
+   PRIMITIVES — Buttons, Tags, Avatars
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* ── 4a.  Buttons ──────────────────────────── */
+/* ── Buttons ──────────────────────────── */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -235,7 +229,7 @@ page {
 .btn-success { background: var(--color-green); color: #fff; }
 .btn-success:active { background: var(--color-green-hover); }
 
-.btn-outline { background: transparent; color: var(--color-teal); border: 2rpx solid var(--color-teal); }
+.btn-outline { background: transparent; color: var(--color-teal); border: 2rpx solid var(--teal); border: 2rpx solid var(--color-teal); }
 .btn-outline:active { background: var(--color-teal-dim); }
 
 /* Button sizes */
@@ -261,7 +255,7 @@ page {
   transition: all var(--transition-fast);
 }
 
-/* ── 4b.  Tags / Badges ────────────────────── */
+/* ── Tags / Badges ────────────────────── */
 .tag {
   display: inline-flex;
   align-items: center;
@@ -282,7 +276,7 @@ page {
 
 .tag-sm { font-size: 20rpx; padding: 2rpx 12rpx; }
 
-/* ── 4c.  Avatars ──────────────────────────── */
+/* ── Avatars ──────────────────────────── */
 .avatar {
   width: 68rpx;
   height: 68rpx;
@@ -309,7 +303,7 @@ page {
 .avatar-navy      { background: linear-gradient(135deg, #0D1B2A, #1B4F72); }
 .avatar-steel     { background: linear-gradient(135deg, #1B4F72, #3B8BEB); }
 
-/* ── 4d.  Progress Bar ─────────────────────── */
+/* ── Progress Bar ─────────────────────── */
 .progress-bar {
   height: 12rpx;
   background: var(--color-surface);
@@ -330,19 +324,356 @@ page {
 .progress-fill.red    { background: var(--color-red);   }
 .progress-fill.purple { background: var(--color-purple);}
 
-/* ── 4e.  Stars ────────────────────────────── */
+/* ── Stars ────────────────────────────── */
 .stars { color: var(--color-amber); letter-spacing: 4rpx; font-size: var(--text-base); }
 
-/* ── 4f.  Divider ──────────────────────────── */
+/* ── Divider ──────────────────────────── */
 .divider { border: none; border-top: 2rpx solid var(--color-border); }
 
 .widget-divider { height: 16px; }
 
+/* =========================================================
+   统一导航样式文件
+   根元素：scroll-navigator / slide-navigator / list-navigator / button-navigator
+   ========================================================= */
+
+/* =========================================================
+   scroll-navigator：连续横向滚动图片
+   ========================================================= */
+.scroll-navigator {
+  width: 100%;
+  padding: 24rpx 0;
+  overflow: hidden;
+  background: #f7f8fa;
+}
+
+.scroll-navigator .scroll-view {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.scroll-navigator .scroll-track {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: max-content;
+  padding: 0 24rpx;
+}
+
+.scroll-navigator .scroll-item {
+  flex: 0 0 auto;
+  width: 280rpx;
+  height: 360rpx;
+  margin-right: 20rpx;
+  overflow: hidden;
+  border-radius: 16rpx;
+  background: #eeeeee;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.scroll-navigator .scroll-item:last-child {
+  margin-right: 0;
+}
+
+.scroll-navigator .scroll-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================================
+   slide-navigator：横向卡片导航
+   ========================================================= */
+.slide-navigator {
+  width: 100%;
+  min-height: 346rpx;
+  padding: 40rpx 0 38rpx;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #e5c2d5 0%, #f8e3e8 48%, #d9e0f0 100%);
+}
+
+.slide-navigator .slide-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.slide-navigator .slide-track {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: max-content;
+  padding: 0 28rpx;
+  box-sizing: border-box;
+}
+
+.slide-navigator .slide-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  width: 560rpx;
+  height: 420rpx;
+  margin-right: 20rpx;
+  padding: 48rpx 40rpx 36rpx;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: 34rpx;
+  box-shadow: 0 12rpx 24rpx rgba(67, 47, 63, 0.12);
+}
+
+.slide-navigator .slide-card:last-child {
+  margin-right: 0;
+}
+
+.slide-navigator .slide-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 86rpx;
+  height: 86rpx;
+  margin-bottom: auto;
+  background: linear-gradient(145deg, #f0c8d8, #f5dce5);
+  border-radius: 50%;
+}
+
+.slide-navigator .slide-icon-text {
+  color: #151326;
+  font-size: 48rpx;
+  line-height: 1;
+}
+
+.slide-navigator .slide-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.slide-navigator .slide-label {
+  margin-bottom: 6rpx;
+  color: #55515d;
+  font-size: 28rpx;
+  line-height: 1.4;
+}
+
+.slide-navigator .slide-title {
+  margin-bottom: 20rpx;
+  color: #080711;
+  font-size: 50rpx;
+  font-weight: 700;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.slide-navigator .slide-description {
+  color: #197052;
+  font-size: 28rpx;
+  line-height: 1.3;
+}
+
+/* =========================================================
+   list-navigator：带 divider 的列表导航
+   ========================================================= */
+.list-navigator {
+  width: 100%;
+  padding: 0 32rpx;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+.list-navigator .list-item {
+  width: 100%;
+  height: 92rpx;
+  color: #333333;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.list-navigator .list-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+
+.list-navigator .list-title {
+  overflow: hidden;
+  color: #333333;
+  font-size: 28rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list-navigator .list-arrow {
+  color: #999999;
+  font-size: 40rpx;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.list-navigator .divider {
+  width: 100%;
+  height: 1rpx;
+  background: #eeeeee;
+}
+
+.list-navigator .list-item-active .list-title,
+.list-navigator .list-item-active .list-arrow {
+  color: #1677ff;
+}
+
+.list-navigator .list-item-active .list-title {
+  font-weight: 600;
+}
+
+/* =========================================================
+   button-navigator：三列品牌按钮网格
+   ========================================================= */
+.button-navigator {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  background: #ffffff;
+  border-top: 1rpx solid #eeeeee;
+  border-left: 1rpx solid #eeeeee;
+  box-sizing: border-box;
+}
+
+.button-navigator .brand-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 0;
+  height: 248rpx;
+  padding: 28rpx 12rpx 20rpx;
+  border-right: 1rpx solid #eeeeee;
+  border-bottom: 1rpx solid #eeeeee;
+  box-sizing: border-box;
+  background: #ffffff;
+  transition: background 0.15s ease;
+}
+
+.button-navigator .brand-button:active {
+  background: #f7f7f7;
+}
+
+.button-navigator .no-right-border {
+  border-right: 0;
+}
+
+.button-navigator .no-bottom-border {
+  border-bottom: 0;
+}
+
+.button-navigator .brand-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76rpx;
+  height: 76rpx;
+  margin-bottom: 14rpx;
+  overflow: hidden;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.button-navigator .brand-logo-text {
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+
+.button-navigator .logo-stubhub {
+  background: linear-gradient(145deg, #7136c8, #34116e);
+}
+
+.button-navigator .logo-macys {
+  background: #ffffff;
+  border: 1rpx solid #eeeeee;
+}
+
+.button-navigator .logo-macys .brand-logo-text {
+  color: #dc1538;
+  font-size: 44rpx;
+}
+
+.button-navigator .logo-amazon {
+  background: #050505;
+}
+
+.button-navigator .logo-amazon .brand-logo-text {
+  color: #ffffff;
+  font-size: 42rpx;
+  font-family: Georgia, serif;
+}
+
+.button-navigator .logo-expedia {
+  background: #ffd500;
+}
+
+.button-navigator .logo-expedia .brand-logo-text {
+  color: #182c69;
+  font-size: 48rpx;
+}
+
+.button-navigator .logo-booking {
+  background: #09559b;
+}
+
+.button-navigator .logo-booking .brand-logo-text {
+  color: #ffffff;
+  font-size: 42rpx;
+}
+
+.button-navigator .logo-apple {
+  background: #ef98c2;
+}
+
+.button-navigator .logo-apple .brand-logo-text {
+  color: #222222;
+  font-size: 20rpx;
+}
+
+.button-navigator .brand-name {
+  width: 100%;
+  overflow: hidden;
+  color: #161616;
+  font-size: 28rpx;
+  line-height: 1.35;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.button-navigator .brand-benefit {
+  width: 100%;
+  margin-top: 8rpx;
+  overflow: hidden;
+  color: #222222;
+  font-size: 26rpx;
+  line-height: 1.3;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.button-navigator .cashback {
+  color: #177252;
+}
+
+.button-navigator .promoted {
+  color: #222222;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
-   5.  COMPONENTS
+   COMPONENTS
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* ── 5a.  Card ─────────────────────────────── */
+/* ── Card ─────────────────────────────── */
 .card {
   margin: 0 var(--space-8) var(--space-14);
   background: var(--color-card);
@@ -378,7 +709,7 @@ page {
 
 .card-body-flush { padding: 0; }
 
-/* ── 5b.  Page Header ──────────────────────── */
+/* ── Page Header ──────────────────────── */
 .page-header {
   padding: var(--space-10) var(--space-10) var(--space-6);
 }
@@ -395,7 +726,7 @@ page {
   margin-top: var(--space-2);
 }
 
-/* ── 5c.  Stat Card ────────────────────────── */
+/* ── Stat Card ────────────────────────── */
 .stat-card {
   background: var(--color-card);
   border-radius: var(--radius-xl);
@@ -436,7 +767,7 @@ page {
   margin-top: var(--space-2);
 }
 
-/* ── 5d.  Schedule Item ────────────────────── */
+/* ── Schedule Item ────────────────────── */
 .schedule-item {
   display: flex;
   gap: var(--space-8);
@@ -482,7 +813,7 @@ page {
   text-align: right;
 }
 
-/* ── 5e.  Message Item ─────────────────────── */
+/* ── Message Item ─────────────────────── */
 .msg-item {
   display: flex;
   gap: var(--space-7);
@@ -549,7 +880,7 @@ page {
   padding: 0 8rpx;
 }
 
-/* ── 5f.  Player/Child Card ────────────────── */
+/* ── Player/Child Card ────────────────── */
 .child-card {
   background: linear-gradient(135deg, var(--color-navy), var(--color-navy-mid));
   border-radius: var(--radius-xl);
@@ -617,7 +948,7 @@ page {
   margin-top: var(--space-1);
 }
 
-/* ── 5g.  Match Card ───────────────────────── */
+/* ── Match Card ───────────────────────── */
 .match-card {
   background: var(--color-card);
   border-radius: var(--radius-xl);
@@ -687,7 +1018,7 @@ page {
   flex-wrap: wrap;
 }
 
-/* ── 5h.  Announcement Card ────────────────── */
+/* ── Announcement Card ────────────────── */
 .announce-card {
   background: var(--color-card);
   border-left: 6rpx solid var(--color-teal);
@@ -720,7 +1051,7 @@ page {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   6.  FORMS
+   FORMS
    ═══════════════════════════════════════════════════════════════════════ */
 
 .form-group {
@@ -753,7 +1084,7 @@ page {
 .form-placeholder { color: var(--color-text-muted); }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   7.  TABS (Inside page)
+   TABS (Inside page)
    ═══════════════════════════════════════════════════════════════════════ */
 
 .tabs {
@@ -791,7 +1122,7 @@ page {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   8.  WEEK CALENDAR STRIP
+   WEEK CALENDAR STRIP
    ═══════════════════════════════════════════════════════════════════════ */
 
 .week-strip {
@@ -841,7 +1172,7 @@ page {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   9.  EMPTY STATE
+   EMPTY STATE
    ═══════════════════════════════════════════════════════════════════════ */
 
 .empty-state {
@@ -865,7 +1196,7 @@ page {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   10.  COLOR UTILITIES
+   COLOR UTILITIES
    ═══════════════════════════════════════════════════════════════════════ */
 
 .color-teal   { color: var(--color-teal);   }
@@ -886,11 +1217,11 @@ page {
 .text-center { text-align: center; }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   11.  DISPLAY FORM — 只读表单组件（单列行式布局）
+   DISPLAY FORM — 只读表单组件（单列行式布局）
    通用可复用：左侧标签 + 右侧值，每行一字段
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* ── 11a.  Section Dot 分组圆点 ──────────────── */
+/* ── Section Dot 分组圆点 ──────────────── */
 .section-dot {
   width: 16rpx;
   height: 16rpx;
@@ -903,7 +1234,7 @@ page {
 .section-dot-blue   { background: var(--color-blue);   }
 .section-dot-red    { background: var(--color-red);    }
 
-/* ── 11b.  Display Row 展示行 ────────────────── */
+/* ── Display Row 展示行 ────────────────── */
 .disp-row {
   display: flex;
   align-items: center;
@@ -921,7 +1252,7 @@ page {
   align-items: flex-start;
 }
 
-/* ── 11c.  Row Left — 字段标签 ───────────────── */
+/* ── Row Left — 字段标签 ───────────────── */
 .disp-row-left {
   width: 160rpx;
   flex-shrink: 0;
@@ -937,7 +1268,7 @@ page {
   font-size: var(--text-sm);
 }
 
-/* ── 11d.  Row Right — 字段值 ────────────────── */
+/* ── Row Right — 字段值 ────────────────── */
 .disp-row-right {
   flex: 1;
   min-width: 0;
@@ -967,7 +1298,7 @@ page {
   margin-left: var(--space-2);
 }
 
-/* ── 11e.  Readonly Field 只读字段标识 ────────── */
+/* ── Readonly Field 只读字段标识 ────────── */
 .disp-readonly-badge {
   display: inline-flex;
   align-items: center;
@@ -980,7 +1311,7 @@ page {
   color: var(--color-blue-text);
 }
 
-/* ── 11f.  Footer Bar 底部操作栏 ──────────────── */
+/* ── Footer Bar 底部操作栏 ──────────────── */
 .footer-bar {
   display: flex;
   gap: var(--space-6);
@@ -993,17 +1324,17 @@ page {
   flex: 1;
 }
 
-/* ── 11g.  Page Shell 页面容器 ────────────────── */
+/* ── Page Shell 页面容器 ────────────────── */
 .page-shell {
   /* padding: 0 var(--space-8) var(--space-14); */
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   12.  ENTRY FORM — 可编辑表单组件（垂直布局）
+   ENTRY FORM — 可编辑表单组件（垂直布局）
    通用可复用：标签在上 · 输入在下 · 呼吸间距
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* ── 12a.  Field 字段容器 ─────────────────────── */
+/* ── Field 字段容器 ─────────────────────── */
 .field {
   padding: var(--space-7) 0;
   border-bottom: 2rpx solid var(--color-border);
@@ -1013,7 +1344,7 @@ page {
   padding-bottom: 0;
 }
 
-/* ── 12b.  Field Label 字段标签 ───────────────── */
+/* ── Field Label 字段标签 ───────────────── */
 .field-label {
   display: block;
   font-size: var(--text-sm);
@@ -1026,7 +1357,7 @@ page {
   color: var(--color-red);
 }
 
-/* ── 12c.  Field Input 文本输入 ────────────────── */
+/* ── Field Input 文本输入 ────────────────── */
 .field-input {
   width: 100%;
   height: 80rpx;
@@ -1048,7 +1379,7 @@ page {
   border-color: rgba(59,139,235,0.10);
 }
 
-/* ── 12d.  Field Control — picker / select ─────── */
+/* ── Field Control — picker / select ─────── */
 .field-control {
   display: flex;
   align-items: center;
@@ -1075,7 +1406,7 @@ page {
   margin-left: var(--space-4);
 }
 
-/* ── 12e.  Input + 单位后缀 ───────────────────── */
+/* ── Input + 单位后缀 ───────────────────── */
 .field-with-suffix {
   display: flex;
   align-items: stretch;
@@ -1103,7 +1434,7 @@ page {
   border-color: rgba(59,139,235,0.10);
 }
 
-/* ── 12f.  Textarea ────────────────────────────── */
+/* ── Textarea ────────────────────────────── */
 .field-textarea {
   width: 100%;
   min-height: 160rpx;
@@ -1121,7 +1452,7 @@ page {
   border-color: var(--color-teal);
 }
 
-/* ── 12g.  Avatar Upload 头像上传 ───────────────── */
+/* ── Avatar Upload 头像上传 ───────────────── */
 .avatar-upload {
   display: flex;
   flex-direction: column;
@@ -1129,7 +1460,7 @@ page {
   padding: var(--space-6) 0;
 }
 
-/* ── 12h.  Option Chips 多选胶囊 ───────────────── */
+/* ── Option Chips 多选胶囊 ───────────────── */
 .option-chips {
   display: flex;
   flex-wrap: wrap;
@@ -1161,7 +1492,7 @@ page {
   font-weight: var(--weight-bold);
 }
 
-/* ── 12i.  Upload Cards 上传卡片 ────────────────── */
+/* ── Upload Cards 上传卡片 ────────────────── */
 .upload-row {
   display: flex;
   flex-wrap: wrap;
@@ -1224,7 +1555,7 @@ page {
   line-height: 1;
 }
 
-/* ── 12j.  File List 文件列表 ──────────────────── */
+/* ── File List 文件列表 ──────────────────── */
 .file-row {
   display: flex;
   align-items: center;
@@ -1274,7 +1605,7 @@ page {
   opacity: 0.7;
 }
 
-/* ── 12k.  Tag Add 标签添加 ────────────────────── */
+/* ── Tag Add 标签添加 ────────────────────── */
 .tag-add {
   border: 2rpx dashed var(--color-border);
   background: transparent;
@@ -1471,6 +1802,10 @@ page {
   background: var(--color-surface);
 }
 
+.split-col-empty {
+  width: 0rpx;
+}
+
 .split-group-item {
   padding: var(--space-6) var(--space-4);
   display: flex;
@@ -1529,6 +1864,7 @@ page {
   flex: 1;
   min-width: 0;
   padding: var(--space-5) var(--space-5);
+  background: var(--color-surface);
 }
 
 .split-tile-sec-title {
@@ -1539,6 +1875,5 @@ page {
   padding-bottom: var(--space-4);
   border-bottom: 2rpx solid var(--color-border);
 }
-
 
 <#include "/$/tile.css.ftl">

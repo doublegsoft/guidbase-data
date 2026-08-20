@@ -1,4 +1,4 @@
-<#include "tile-miniprogram.ftl">
+<#include "tile@miniprogram.ftl">
 
 <!----------------------------------------------------------------------------->
 <!--                                  INPUT                                  -->
@@ -102,10 +102,11 @@ ${""?left_pad(indent)}},
 <!----------------------------------------------------------------------------->
 <#macro print_button_methods button indent>
   <#local action = button.value("action")>
-  <#if action?starts_with("@")>
-    <#local widget = button.page.byId(action?substring(1, action?index_of(".")))>
-    <#local method = action?substring(action?index_of(".") + 1)>
-  </#if>
+  <#if action == ""><#return></#if>
+  <#local action = valuebase.action(button.value("action"))>
+  <#local method = action.method!"">
+  <#local pagepath = action.path!"">
+  <#local resource = action.resource!"">
 ${""?left_pad(indent)}
 ${""?left_pad(indent)}handle${js.nameType(button.id)}Tap: async function (event) {
   <#if method == "reset">
@@ -126,6 +127,18 @@ ${""?left_pad(indent)}  this.${guidbase.name_widget_method_load(widget)}();
   <#elseif method == "edit">
   <#elseif method == "view">
   <#elseif method == "remove">
+  <#elseif pagepath != "">
+${""?left_pad(indent)}  wx.navigateTo({
+${""?left_pad(indent)}    url: '/pages/${pagepath}',
+${""?left_pad(indent)}    events: {
+${""?left_pad(indent)}      acceptDataFromOpenedPage: function(data) {
+${""?left_pad(indent)}        console.log('Data received from detail page:', data);
+${""?left_pad(indent)}      }
+${""?left_pad(indent)}    },
+${""?left_pad(indent)}    success: function(res) {
+${""?left_pad(indent)}      res.eventChannel.emit('acceptDataFromOpenerPage', { data: 'Hello from Index' });
+${""?left_pad(indent)}    }
+${""?left_pad(indent)}  });  
   </#if>
 ${""?left_pad(indent)}},    
 </#macro>
@@ -498,7 +511,7 @@ ${""?left_pad(indent)}},
 <#macro print_page_layout page indent=0>
   <#local children = []>
   <#list page.children as child>
-<@print_layout_widget widget=child indent=indent />        
+<@print_widget_layout widget=child indent=indent />        
   </#list>
 </#macro>
 
@@ -593,28 +606,31 @@ ${""?left_pad(indent)}}
   </#list>
 </#macro>
 
-<#macro print_layout_widget widget indent=0>
+<#macro print_widget_layout widget indent=0>
   <#local isRequired = widget.value("required", "false")>
   <#local isReadonly = widget.value("readonly", "false")>
   <#local isLast = true>
   <#-- 动态构建控件根节点的辅助类 -->
   <#local stateClasses = "">
   <#if isRequired == "true"><#local stateClasses = stateClasses + " field-required"></#if>
-  <#--  <#if isLast><#local stateClasses = stateClasses + " field-last"></#if>  -->
-  <#if widget.type == "entry_form">
-<@print_layout_entry_form form=widget indent=indent />
+  <#if widget.type == "button_navigator">
+<@print_button_navigator_layout navigator=widget indent=indent />
+  <#elseif widget.type == "list_navigator">
+<@print_list_navigator_layout navigator=widget indent=indent />
+  <#elseif widget.type == "entry_form">
+<@print_entry_form_layout form=widget indent=indent />
   <#elseif widget.type == "display_form">
-<@print_layout_display_form form=widget indent=indent />
+<@print_display_form_layout form=widget indent=indent />
   <#elseif widget.type == "criteria_form">
-<@print_layout_criteria_form form=widget indent=indent />
+<@print_criteria_form_layout form=widget indent=indent />
   <#elseif widget.type == "list_view">
-<@print_layout_list_view list=widget indent=indent />
+<@print_list_view_layout list=widget indent=indent />
   <#elseif widget.type == "split_list">
-<@print_layout_split_list list=widget indent=indent />
-  <#elseif widget.type == "segment">
-<@print_layout_segment segment=widget indent=indent />
+<@print_split_list_layout list=widget indent=indent />
+  <#elseif widget.type == "segments">
+<@print_segments_layout segments=widget indent=indent />
   <#elseif widget.type == "buttons">
-<@print_layout_buttons buttons=widget indent=indent />
+<@print_buttons_layout buttons=widget indent=indent />
   <#elseif widget.type == "calendar">
     <#local url = valuebase.url(widget.value("data"))>
     <#local variable = widget.value("variable", widget.id)>

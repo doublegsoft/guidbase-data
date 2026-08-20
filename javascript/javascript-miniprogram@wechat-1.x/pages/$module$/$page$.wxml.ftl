@@ -13,6 +13,6 @@
   <#if child?index != 0>
   <view class="widget-divider" />  
   </#if>
-<@mp.print_layout_widget widget=child indent=2 />
+<@mp.print_widget_layout widget=child indent=2 />
 </#list>
 </view>
