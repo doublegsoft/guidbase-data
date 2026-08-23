@@ -386,7 +386,7 @@ page {
    ========================================================= */
 .slide-navigator {
   width: 100%;
-  min-height: 346rpx;
+  min-height: 240rpx;
   padding: 40rpx 0 38rpx;
   overflow: hidden;
   box-sizing: border-box;
@@ -412,8 +412,8 @@ page {
   display: flex;
   flex-direction: column;
   flex: 0 0 auto;
-  width: 560rpx;
-  height: 420rpx;
+  width: 420rpx;
+  height: 240rpx;
   margin-right: 20rpx;
   padding: 48rpx 40rpx 36rpx;
   overflow: hidden;
@@ -667,6 +667,30 @@ page {
 
 .button-navigator .promoted {
   color: #222222;
+}
+
+.list-item {
+  
+}
+
+/* This targets any .list-item that immediately follows another .list-item */
+.list-item + .list-item {
+  border-top: 1rpx solid #e5e5e5;
+}
+
+.load-more-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40rpx 0; /* Provides vertical breathing room at the bottom of the page */
+  min-height: 80rpx; /* Ensures a consistent height while loading or showing "no more" */
+  box-sizing: border-box;
+}
+
+.load-more-status text {
+  font-size: 26rpx;      /* Standard size for secondary/status text */
+  color: #999999;        /* Muted gray color to keep focus on the main content */
+  letter-spacing: 1rpx;  /* Slightly improves readability */
 }
 
 /* ═══════════════════════════════════════════════════════════════════════

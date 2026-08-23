@@ -9,6 +9,7 @@ const fb = require('@/utils/feedback');
 const sdk = require('@/sdk/sdk').default;
 
 Page({
+
   data: {
 <@mp.print_page_variables page=page indent=4 />
   },
@@ -38,6 +39,5 @@ Page({
     this.${guidbase.name_widget_method_load(widget)}();
 </#list>  
   },
-
 <@mp.print_page_methods page=page indent=2 />  
 });

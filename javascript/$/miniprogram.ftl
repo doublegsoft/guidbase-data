@@ -243,6 +243,26 @@ ${""?left_pad(indent)}${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_
 <#macro print_display_form_methods form indent=0>
   <#local url = valuebase.url(form.value("data"))>
 ${""?left_pad(indent)}
+${""?left_pad(indent)}onPullDownRefresh: async function () {
+${""?left_pad(indent)}  this.setData({
+${""?left_pad(indent)}    page: 1,
+${""?left_pad(indent)}    hasMore: true
+${""?left_pad(indent)}  });
+${""?left_pad(indent)}  // Await database fetch so we know when to stop the animation
+${""?left_pad(indent)}  await this.loadDemoListRows(true);
+${""?left_pad(indent)}  wx.stopPullDownRefresh();
+${""?left_pad(indent)}},
+${""?left_pad(indent)}
+${""?left_pad(indent)}onReachBottom: function () {
+${""?left_pad(indent)}  if (this.data.loading || !this.data.hasMore) {
+${""?left_pad(indent)}    return;
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  this.setData({
+${""?left_pad(indent)}    page: this.data.page + 1
+${""?left_pad(indent)}  });
+${""?left_pad(indent)}  this.loadDemoListRows(false);
+${""?left_pad(indent)}},  
+${""?left_pad(indent)}
 ${""?left_pad(indent)}/**
 ${""?left_pad(indent)} * 加载【${form.title!""}】只读表单数据的界面函数
 ${""?left_pad(indent)} */
@@ -383,8 +403,9 @@ ${""?left_pad(indent)}
 ${""?left_pad(indent)}/**
 ${""?left_pad(indent)} * 【${js.nameVariable(list.id)}】【${list.title!""}】列表视图相关变量
 ${""?left_pad(indent)} */
-${""?left_pad(indent)}${js.nameVariable(list.id)}RowsEmpty: true,
 ${""?left_pad(indent)}${js.nameVariable(list.id)}Rows: [],
+${""?left_pad(indent)}${js.nameVariable(list.id)}Total: 0,
+${""?left_pad(indent)}${js.nameVariable(list.id)}Loading: false,
 </#macro>
 
 <#macro print_list_view_methods list indent=0>
@@ -394,6 +415,9 @@ ${""?left_pad(indent)}/**
 ${""?left_pad(indent)} * 加载【${list.title!""}】列表视图数据的界面函数
 ${""?left_pad(indent)} */
 ${""?left_pad(indent)}load${js.nameType(list.id)}Rows: async function () {
+${""?left_pad(indent)}  this.setData({
+${""?left_pad(indent)}    ${js.nameVariable(list.id)}Loading: true,
+${""?left_pad(indent)}  })
 ${""?left_pad(indent)}  try {
 ${""?left_pad(indent)}    const page = await sdk.fetch${js.nameType(inflector.pluralize(url.resource))}({
   <#list url.params as urlParam>
@@ -406,17 +430,33 @@ ${""?left_pad(indent)}      ${js.nameVariable(input.id)}: this.data.${js.nameVar
 ${""?left_pad(indent)}      ${js.nameVariable(urlParam.name)}: this.data.${js.nameVariable(urlParam.value)},
     </#if>
   </#list>
+${""?left_pad(indent)}      start: this.data.${js.nameVariable(list.id)}Rows.length,
 ${""?left_pad(indent)}    });
 ${""?left_pad(indent)}    const rows = page.data;
 ${""?left_pad(indent)}    this.setData({
-${""?left_pad(indent)}      ${js.nameVariable(list.id)}Rows: rows,
-${""?left_pad(indent)}      ${js.nameVariable(list.id)}RowsEmpty: rows.length == 0,
+${""?left_pad(indent)}      ${js.nameVariable(list.id)}Rows: this.data.demoListRows.concat(rows),
+${""?left_pad(indent)}      ${js.nameVariable(list.id)}Total: page.total,
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  } catch (error) {
 ${""?left_pad(indent)}    fb.error('发生错误', error.message || String(error))
 ${""?left_pad(indent)}  } finally {
-${""?left_pad(indent)}    
+${""?left_pad(indent)}    this.setData({
+${""?left_pad(indent)}      ${js.nameVariable(list.id)}Loading: false,
+${""?left_pad(indent)}    })   
 ${""?left_pad(indent)}  }
+${""?left_pad(indent)}},
+${""?left_pad(indent)}
+${""?left_pad(indent)}onPullDownRefresh: async function () {
+${""?left_pad(indent)}  console.log('hello');  
+${""?left_pad(indent)}  this.data.${js.nameVariable(list.id)}Rows = [];
+${""?left_pad(indent)}  await this.load${js.nameType(list.id)}Rows(true);
+${""?left_pad(indent)}},
+${""?left_pad(indent)}
+${""?left_pad(indent)}onReachBottom: function () {
+${""?left_pad(indent)}  if (this.data.${js.nameVariable(list.id)}Loading || this.data.${js.nameVariable(list.id)}Rows.length == this.data.${js.nameVariable(list.id)}Total) {
+${""?left_pad(indent)}    return;
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  this.load${js.nameType(list.id)}Rows();
 ${""?left_pad(indent)}},
   <#if list.value("page") != "">
     <#assign page = list.value("page")>
@@ -613,7 +653,11 @@ ${""?left_pad(indent)}}
   <#-- 动态构建控件根节点的辅助类 -->
   <#local stateClasses = "">
   <#if isRequired == "true"><#local stateClasses = stateClasses + " field-required"></#if>
-  <#if widget.type == "button_navigator">
+  <#if widget.type == "scroll_navigator">
+<@print_scroll_navigator_layout navigator=widget indent=indent />  
+  <#elseif widget.type == "slide_navigator">
+<@print_slide_navigator_layout navigator=widget indent=indent />  
+  <#elseif widget.type == "button_navigator">
 <@print_button_navigator_layout navigator=widget indent=indent />
   <#elseif widget.type == "list_navigator">
 <@print_list_navigator_layout navigator=widget indent=indent />

@@ -1,4 +1,4 @@
-<#import "tile@miniprogram.ftl" as tile>
+<#import "/$/guidbase-tile.ftl" as guidbase4tile>
 <#include "miniprogram.ftl">
 
 <!----------------------------------------------------------------------------->
@@ -15,16 +15,18 @@ ${""?left_pad(indent)}    interval="3000"
 ${""?left_pad(indent)}    duration="3000"
 ${""?left_pad(indent)}    circular="true"
 ${""?left_pad(indent)}    bindchange="handle${js.nameType(navigator.id)}Change">
-${""?left_pad(indent)}    <swiper-item wx:for="{{imageList}}" wx:key="id">
+  <#list navigator.children as child>
+${""?left_pad(indent)}    <swiper-item>
 ${""?left_pad(indent)}      <image
 ${""?left_pad(indent)}        class="banner-image"
 ${""?left_pad(indent)}        src="{{item.url}}"
 ${""?left_pad(indent)}        mode="aspectFill"
 ${""?left_pad(indent)}        lazy-load="true"
 ${""?left_pad(indent)}        data-index="{{index}}"
-${""?left_pad(indent)}        bindtap="previewImage"
+${""?left_pad(indent)}        bindtap="handle${js.nameType(child.id)}Tap"
 ${""?left_pad(indent)}      />
 ${""?left_pad(indent)}    </swiper-item>
+  </#list>
 ${""?left_pad(indent)}  </swiper>
 ${""?left_pad(indent)}  <view class="indicator-list">
 ${""?left_pad(indent)}    <view
@@ -41,27 +43,26 @@ ${""?left_pad(indent)}</view>
 <!----------------------------------------------------------------------------->
 <#macro print_slide_navigator_layout navigator indent=0>
 ${""?left_pad(indent)}<scroll-view
-${""?left_pad(indent)}  class="slide-nav"
+${""?left_pad(indent)}  class="slide-navigator"
 ${""?left_pad(indent)}  scroll-x="true"
 ${""?left_pad(indent)}  show-scrollbar="false"
 ${""?left_pad(indent)}  enhanced="true"
 ${""?left_pad(indent)}  enable-flex="true">
-${""?left_pad(indent)}  <view class="slide-nav-track">
+${""?left_pad(indent)}  <view class="slide-track">
+  <#list navigator.children as child>
 ${""?left_pad(indent)}    <view
-${""?left_pad(indent)}      wx:for="{{cardList}}"
-${""?left_pad(indent)}      wx:key="id"
 ${""?left_pad(indent)}      class="slide-card"
-${""?left_pad(indent)}      data-index="{{index}}"
-${""?left_pad(indent)}      bindtap="onCardTap">
+${""?left_pad(indent)}      bindtap="handle${js.nameType(child.id)}Tap">
 ${""?left_pad(indent)}      <view class="card-icon">
 ${""?left_pad(indent)}        <text class="card-icon-text">{{item.icon}}</text>
 ${""?left_pad(indent)}      </view>
 ${""?left_pad(indent)}      <view class="card-content">
 ${""?left_pad(indent)}        <text class="card-label">{{item.label}}</text>
-${""?left_pad(indent)}        <text class="card-title">{{item.title}}</text>
+${""?left_pad(indent)}        <text class="card-title">${child.title}</text>
 ${""?left_pad(indent)}        <text class="card-description">{{item.description}}</text>
 ${""?left_pad(indent)}      </view>
 ${""?left_pad(indent)}    </view>
+  </#list>
 ${""?left_pad(indent)}  </view>
 ${""?left_pad(indent)}</scroll-view>
 </#macro>
@@ -73,7 +74,7 @@ ${""?left_pad(indent)}</scroll-view>
 ${""?left_pad(indent)}<view class="button-navigator">
   <#list navigator.children as child>
 ${""?left_pad(indent)}  <view class="brand-button"
-${""?left_pad(indent)}    bindtap="handle${js.nameType(navigator.type)}Tap">
+${""?left_pad(indent)}    bindtap="handle${js.nameType(child.id)}Tap">
 ${""?left_pad(indent)}    <view class="brand-logo"></view>
 ${""?left_pad(indent)}    <text class="brand-name">${child.title}</text>
 ${""?left_pad(indent)}    <text class="brand-benefit {{item.benefitType}}">{{item.benefit}}</text>
@@ -343,7 +344,7 @@ ${""?left_pad(indent)}  </scroll-view>
 ${""?left_pad(indent)}  <scroll-view class="split-col-tile" scroll-y enhanced show-scrollbar="{{ false }}">
 ${""?left_pad(indent)}    <view class="split-tile-sec-title">{{ activeDeptName }} · 共 {{ activeDoctors.length }} 位医生</view>
 ${""?left_pad(indent)}    <block wx:for="{{ ${js.nameVariable(list.id)}Rows }}" wx:key="name" wx:for-index="di">
-<@tile.print_tile_layout widget=list indent=6 />
+<@guidbase4tile.print_tile_layout widget=list indent=6 />
 ${""?left_pad(indent)}    </block>
 ${""?left_pad(indent)}    <${namespace}-empty wx:if="{{ ${js.nameVariable(list.id)}RowsEmpty }}" />
 ${""?left_pad(indent)}  </scroll-view>
@@ -355,46 +356,48 @@ ${""?left_pad(indent)}</view>
 <!----------------------------------------------------------------------------->
 <#macro print_list_view_layout list indent=0>
   <#local url = valuebase.url(list.value("data"))>
-${""?left_pad(indent)}<view class="card">
-${""?left_pad(indent)}  <view class="card-body">
-${""?left_pad(indent)}    <scroll-view wx:if="{{ !${js.nameVariable(list.id)}RowsEmpty }}" 
-${""?left_pad(indent)}                 scroll-y enhanced show-scrollbar="{{ false }}" class="card-body-flush">
-${""?left_pad(indent)}      <view wx:for="{{ ${js.nameVariable(list.id)}Rows }}"
-${""?left_pad(indent)}            wx:for-item="row" class="mt-8">
-<@tile.print_tile_layout widget=list indent=8 />
-${""?left_pad(indent)}      </view>
-${""?left_pad(indent)}    </scroll-view>
-${""?left_pad(indent)}    <${namespace}-empty wx:if="{{ ${js.nameVariable(list.id)}RowsEmpty }}" />
-${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}<view>  
+${""?left_pad(indent)}  <scroll-view wx:if="{{ ${js.nameVariable(list.id)}Rows.length != 0 }}" 
+${""?left_pad(indent)}               scroll-y enhanced show-scrollbar="{{ false }}"
+${""?left_pad(indent)}               bindscrolltolower="onReachBottom">
+${""?left_pad(indent)}    <view wx:for="{{ ${js.nameVariable(list.id)}Rows }}"
+${""?left_pad(indent)}          wx:for-item="row" class="list-item">
+<@guidbase4tile.print_tile_layout widget=list indent=8 />
+${""?left_pad(indent)}    </view>
+${""?left_pad(indent)}    <view class="load-more-status">
+${""?left_pad(indent)}      <text wx:if="{{ ${js.nameVariable(list.id)}Loading }}">正在加载更多...</text>
+${""?left_pad(indent)}      <text wx:elif="{{ ${js.nameVariable(list.id)}Rows.length == ${js.nameVariable(list.id)}Total }}">没有更多数据了</text>
+${""?left_pad(indent)}    </view>
+${""?left_pad(indent)}  </scroll-view>
+${""?left_pad(indent)}  <${namespace}-empty wx:if="{{ ${js.nameVariable(list.id)}Rows.length == 0 }}" />
 ${""?left_pad(indent)}</view>
 </#macro>
 
 <!----------------------------------------------------------------------------->
-<!--                                 SEGMENT                                 -->
+<!--                                 SEGMENTS                                 -->
 <!----------------------------------------------------------------------------->
-<#macro print_segment_layout segment indent=0>
-  <#local variable = segment.value("variable", segment.id)>
-  <#if segment.value("placement") == "top">
+<#macro print_segments_layout segments indent=0>
+  <#local variable = segments.value("variable", segments.id)>
+  <#if segments.value("placement") == "top">
 ${""?left_pad(indent)}<view class="top-fixed">
     <#local indent += 2>  
   </#if>
 ${""?left_pad(indent)}<view class="filter-bar">
 ${""?left_pad(indent)}  <view class="segments">
-${""?left_pad(indent)}    <view wx:for="{{ ${js.nameVariable(segment.id)}Options }}" wx:key="*this"
-${""?left_pad(indent)}          class="seg {{ ${js.nameVariable(variable)} === item.value ? 'seg-on' : '' }}"
-${""?left_pad(indent)}          data-value="{{ item.value }}" bindtap="handle${js.nameType(segment.id)}Tap">
-${""?left_pad(indent)}      {{ item.label }}
-${""?left_pad(indent)}    </view>
+  <#list segments.children as child>
+${""?left_pad(indent)}    <view class="seg {{ ${js.nameVariable(variable)} === item.value ? 'seg-on' : '' }}"
+${""?left_pad(indent)}          bindtap="handle${js.nameType(child.id)}Tap">${child.title}</view>
+  </#list>
 ${""?left_pad(indent)}  </view>
-  <#if segment.page.has("criteria_form")>
-    <#local form = segment.page.byType("criteria_form")[0]>
+  <#if segments.page.has("criteria_form")>
+    <#local form = segments.page.byType("criteria_form")[0]>
 ${""?left_pad(indent)}  <view class="filter-btn" bindtap="handle${js.nameType(form.id)}Show">
 ${""?left_pad(indent)}    <text class="filter-btn-arrow {{ ${js.nameVariable(form.id)}Shown ? 'filter-btn-arrow-up' : '' }}">▼</text>
 ${""?left_pad(indent)}    <text>查询</text>
 ${""?left_pad(indent)}  </view>
   </#if>
 ${""?left_pad(indent)}</view>
-  <#if segment.value("placement") == "top">
+  <#if segments.value("placement") == "top">
     <#local indent -= 2>
 ${""?left_pad(indent)}</view>
   </#if>

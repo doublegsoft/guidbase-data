@@ -14,8 +14,8 @@
   flex-direction: column;
   gap: 6px;
   padding: 12px;
-  border: 1px solid var(--tile-border, #e8e8e8);
-  border-radius: var(--tile-radius, 8px);
+  /* border: 1px solid var(--tile-border, #e8e8e8);
+  border-radius: var(--tile-radius, 8px); */
   background: var(--tile-bg, #fff);
   font-size: 13px;
   color: var(--tile-color, #333);

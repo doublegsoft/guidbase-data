@@ -1,3 +1,4 @@
+<#import "/$/tile@miniprogram.ftl" as tile>
 <#import "/$/miniprogram-wechat-navypitch.ftl" as mp>
 <#assign page = pageDef>
 <#assign children = page.children>
