@@ -314,9 +314,7 @@ ${""?left_pad(indent)}
 ${""?left_pad(indent)}/**
 ${""?left_pad(indent)} * 【${js.nameVariable(list.id)}】【${list.title!""}】【分栏列表】相关变量
 ${""?left_pad(indent)} */
-${""?left_pad(indent)}${js.nameVariable(list.id)}GroupsEmtpy: true,
 ${""?left_pad(indent)}${js.nameVariable(list.id)}Groups: [],
-${""?left_pad(indent)}${js.nameVariable(list.id)}RowsEmpty: true,
 ${""?left_pad(indent)}${js.nameVariable(list.id)}Rows: [],
 </#macro>
 
@@ -344,7 +342,6 @@ ${""?left_pad(indent)}    });
 ${""?left_pad(indent)}    const rows = page.data;
 ${""?left_pad(indent)}    this.setData({
 ${""?left_pad(indent)}      ${js.nameVariable(list.id)}Groups: rows,
-${""?left_pad(indent)}      ${js.nameVariable(list.id)}GroupsEmpty: rows.length == 0,
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  } catch (error) {
 ${""?left_pad(indent)}    fb.error('发生错误', error.message || String(error))
@@ -373,7 +370,6 @@ ${""?left_pad(indent)}    });
 ${""?left_pad(indent)}    const rows = page.data;
 ${""?left_pad(indent)}    this.setData({
 ${""?left_pad(indent)}      ${js.nameVariable(list.id)}Rows: rows,
-${""?left_pad(indent)}      ${js.nameVariable(list.id)}RowsEmpty: rows.length == 0,
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  } catch (error) {
 ${""?left_pad(indent)}    fb.error('发生错误', error.message || String(error))
@@ -434,7 +430,7 @@ ${""?left_pad(indent)}      start: this.data.${js.nameVariable(list.id)}Rows.len
 ${""?left_pad(indent)}    });
 ${""?left_pad(indent)}    const rows = page.data;
 ${""?left_pad(indent)}    this.setData({
-${""?left_pad(indent)}      ${js.nameVariable(list.id)}Rows: this.data.demoListRows.concat(rows),
+${""?left_pad(indent)}      ${js.nameVariable(list.id)}Rows: this.data.${js.nameVariable(list.id)}Rows.concat(rows),
 ${""?left_pad(indent)}      ${js.nameVariable(list.id)}Total: page.total,
 ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  } catch (error) {

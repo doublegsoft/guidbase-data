@@ -331,14 +331,15 @@ ${""?left_pad(indent)}</view>
 <!--                               SPLIT LIST                                -->
 <!----------------------------------------------------------------------------->
 <#macro print_split_list_layout list indent=0>
+  <#local groupUrl = valuebase.url(list.value("group"))>
+  <#local dataUrl = valuebase.url(list.value("data"))>
 ${""?left_pad(indent)}<view class="split">
 ${""?left_pad(indent)}  <scroll-view class="split-col-group {{ ${js.nameVariable(list.id)}Groups.length === 0 ? 'split-col-empty' : '' }}" scroll-y enhanced show-scrollbar="{{ false }}">
-${""?left_pad(indent)}    <view wx:for="{{ ${js.nameVariable(list.id)}Groups }}" wx:key="id"
+${""?left_pad(indent)}    <view wx:for="{{ ${js.nameVariable(list.id)}Groups }}" wx:key="${js.nameVariable(groupUrl.resource)}Id"
 ${""?left_pad(indent)}      class="split-group-item {{ activeDept === item.id ? 'split-group-item-active' : '' }}"
-${""?left_pad(indent)}      data-id="{{ item.id }}"
+${""?left_pad(indent)}      data-id="{{ item.${js.nameVariable(groupUrl.resource)}Id }}"
 ${""?left_pad(indent)}      bindtap="handle${js.nameType(list.id)}GroupTap">
-${""?left_pad(indent)}      <view class="split-group-badge" wx:if="{{ item.badge }}">{{ item.badge }}</view>
-${""?left_pad(indent)}      <text class="split-group-name">{{ item.name }}</text>
+${""?left_pad(indent)}      <text class="split-group-name">{{ item.${js.nameVariable(groupUrl.resource)}Name }}</text>
 ${""?left_pad(indent)}    </view>
 ${""?left_pad(indent)}  </scroll-view>
 ${""?left_pad(indent)}  <scroll-view class="split-col-tile" scroll-y enhanced show-scrollbar="{{ false }}">
@@ -346,7 +347,7 @@ ${""?left_pad(indent)}    <view class="split-tile-sec-title">{{ activeDeptName }
 ${""?left_pad(indent)}    <block wx:for="{{ ${js.nameVariable(list.id)}Rows }}" wx:key="name" wx:for-index="di">
 <@guidbase4tile.print_tile_layout widget=list indent=6 />
 ${""?left_pad(indent)}    </block>
-${""?left_pad(indent)}    <${namespace}-empty wx:if="{{ ${js.nameVariable(list.id)}RowsEmpty }}" />
+${""?left_pad(indent)}    <${namespace}-empty wx:if="{{ ${js.nameVariable(list.id)}Rows.length == 0 }}" />
 ${""?left_pad(indent)}  </scroll-view>
 ${""?left_pad(indent)}</view>
 </#macro>

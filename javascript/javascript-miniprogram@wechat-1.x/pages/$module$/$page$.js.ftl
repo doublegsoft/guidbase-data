@@ -25,6 +25,9 @@ Page({
       ${js.nameVariable(widget.id)}Options: await sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}AsOptions(),
     });
     </#if>
+  <#elseif widget.type == "split_list">
+    this.load${js.nameType(widget.id)}Groups();
+    this.load${js.nameType(widget.id)}Rows();
   </#if>
 </#list>
 <#list page.widgets as widget>
