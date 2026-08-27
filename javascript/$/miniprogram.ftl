@@ -97,6 +97,108 @@ ${""?left_pad(indent)}},
   </#if>
 </#macro>
 
+<#macro print_input_layout input indent>
+  <#if input.type == "avatar">
+${""?left_pad(indent)}<view class="avatar-upload${stateClasses}" bindtap="handle${js.nameType(input.id)}Upload">
+${""?left_pad(indent)}  <view class="avatar avatar-teal avatar-xl" wx:if="{{ !${js.nameVariable(input.id)} }}">
+${""?left_pad(indent)}    <text>👤</text>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}  <image wx:else class="avatar avatar-xl" src="{{ ${js.nameVariable(input.id)} }}" mode="aspectFill" style="object-fit:cover;" />
+${""?left_pad(indent)}  <text class="mt-6 color-teal text-sm" style="font-weight:var(--weight-semibold);">{{ avatar ? '点击更换头像' : '点击上传头像' }}</text>
+${""?left_pad(indent)}</view>
+  <#elseif input.type == "date">
+${""?left_pad(indent)}<picker class="${stateClasses?trim}" mode="date" value="{{ ${js.nameVariable(input.id)} }}" bindchange="handle${js.nameType(input.id)}Change">
+${""?left_pad(indent)}  <view class="field-control">
+${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(input.id)} ? 'field-value' : 'field-placeholder' }}">{{ ${js.nameVariable(input.id)} || '请选择日期' }}</text>
+${""?left_pad(indent)}    <text class="field-arrow">▾</text>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}</picker>
+  <#elseif input.type == "time">
+${""?left_pad(indent)}<picker class="${stateClasses?trim}" mode="time" value="{{ ${js.nameVariable(input.id)} }}" bindchange="handle${js.nameType(input.id)}Change">
+${""?left_pad(indent)}  <view class="field-control">
+${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(input.id)} ? 'field-value' : 'field-placeholder' }}">{{ ${js.nameVariable(input.id)} || '请选择时间' }}</text>
+${""?left_pad(indent)}    <text class="field-arrow">▾</text>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}</picker>
+  <#elseif input.type == "text" || input.type == "number">
+    <#local suffix = input.value("suffix", "")>
+    <#if suffix != "">
+${""?left_pad(indent)}<view class="field-with-suffix${stateClasses}">
+${""?left_pad(indent)}  <input class="field-input field-input-suffix<#if isReadonly == "true"> field-input-ro</#if>" <#if input.type == "number">type="digit"</#if> placeholder="请输入${input.title}" value="{{ ${js.nameVariable(input.id)} }}" bindinput="handle${js.nameType(input.id)}Change"<#if isReadonly == "true"> disabled="true"</#if> />
+${""?left_pad(indent)}  <text class="field-suffix<#if isReadonly == "true"> field-suffix-ro</#if>">${suffix}</text>
+${""?left_pad(indent)}</view>
+    <#else>
+${""?left_pad(indent)}<input class="field-input<#if isReadonly == "true"> field-input-ro</#if>${stateClasses}" <#if input.type == "number">type="digit"</#if> placeholder="请输入${input.title}" value="{{ ${js.nameVariable(input.id)} }}" bindinput="handle${js.nameType(input.id)}Change"<#if isReadonly == "true"> disabled="true"</#if> />
+    </#if>
+  <#elseif input.type == "select">
+${""?left_pad(indent)}<picker class="${stateClasses?trim}" range="{{ ${js.nameVariable(input.id)}Options }}" range-key="label" value="{{ ${js.nameVariable(input.id)} }}" bindchange="handle${js.nameType(input.id)}Change">
+${""?left_pad(indent)}  <view class="field-control">
+${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(input.id)} ? 'field-value' : 'field-placeholder' }}">{{ ${js.nameVariable(input.id)}Label || '请选择' }}</text>
+${""?left_pad(indent)}    <text class="field-arrow">▾</text>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}</picker>
+  <#elseif input.type == "cascade">
+${""?left_pad(indent)}<picker class="${stateClasses?trim}" mode="multiSelector" range="{{cascadeData.${js.nameVariable(input.id)}}}" value="{{formData.${js.nameVariable(input.id)}Idx}}" bindchange="handle${js.nameType(input.id)}Change" bindcolumnchange="onCascadeColumnChange">
+${""?left_pad(indent)}  <view class="field-control">
+${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(input.id)} ? 'field-value' : 'field-placeholder' }}">{{formData.${js.nameVariable(input.id)} || '请选择级联'}}</text>
+${""?left_pad(indent)}    <text class="field-arrow">▾</text>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}</picker>
+  <#elseif input.type == "multiselect">
+${""?left_pad(indent)}<view class="option-chips${stateClasses}">
+${""?left_pad(indent)}  <view class="option-chip {{ h.has(${js.nameVariable(input.id)}, item.value) ? 'option-chip-on' : '' }}" 
+${""?left_pad(indent)}        wx:for="{{ ${js.nameVariable(input.id)}Options }}" wx:key="value" 
+${""?left_pad(indent)}        bindtap="handle${js.nameType(input.id)}Tap" data-id="{{ item.value }}">
+${""?left_pad(indent)}    <text wx:if="{{ h.has(${js.nameVariable(input.id)}, item.value) }}" class="option-chip-check">✓</text>
+${""?left_pad(indent)}    <text>{{ item.label }}</text>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}</view>
+  <#elseif input.type == "tags">
+${""?left_pad(indent)}<view class="flex flex-wrap${stateClasses}" style="gap:10rpx;">
+${""?left_pad(indent)}  <view class="tag tag-teal" wx:for="{{ ${js.nameVariable(input.id)} }}" wx:key="*this" 
+${""?left_pad(indent)}        bindtap="handle${js.nameType(input.id)}Remove" data-idx="{{ index }}">
+${""?left_pad(indent)}    {{item}} <text style="font-weight:var(--weight-bold);opacity:0.5;">×</text>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}  <view class="tag tag-gray tag-add" bindtap="handle${js.nameType(input.id)}Add">+ 添加</view>
+${""?left_pad(indent)}</view>
+  <#elseif input.type == "longtext">
+${""?left_pad(indent)}<textarea class="field-textarea${stateClasses}" placeholder="请输入${input.title}内容" value="{{formData.${js.nameVariable(widget.id)}}}" bindinput="handle${js.nameType(widget.id)}Change" maxlength="${widget.value("maxlength", "300")}" />
+  <#elseif input.type == "images">
+${""?left_pad(indent)}<view class="upload-row${stateClasses}">
+${""?left_pad(indent)}  <view class="upload-card" wx:for="{{ ${js.nameVariable(input.id)} }}" wx:key="*this">
+${""?left_pad(indent)}    <image class="upload-card-img" src="{{ item.url }}" mode="aspectFill" 
+${""?left_pad(indent)}           bindtap="handle${js.nameType(input.id)}Preview" 
+${""?left_pad(indent)}           data-url="{{ item.url }}" data-id="{{ item.id }}"/>
+${""?left_pad(indent)}    <view class="upload-card-del" bindtap="handle${js.nameType(input.id)}Remove">✕</view>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}  <view class="upload-card upload-card-add" bindtap="handle${js.nameType(input.id)}Add">
+${""?left_pad(indent)}    <text class="upload-card-plus">+</text>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}</view>
+  <#elseif input.type == "videos">
+${""?left_pad(indent)}<view class="upload-row${stateClasses}">
+${""?left_pad(indent)}  <view class="upload-card upload-card-wide" wx:for="{{formData.${js.nameVariable(input.id)}}}" wx:key="*this">
+${""?left_pad(indent)}    <view class="upload-card-video">
+${""?left_pad(indent)}      <text style="font-size:48rpx;">▶</text>
+${""?left_pad(indent)}    </view>
+${""?left_pad(indent)}    <view class="upload-card-del" bindtap="handle${js.nameType(input.id)}Remove" data-idx="{{index}}">✕</view>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}  <view class="upload-card upload-card-add" bindtap="handle${js.nameType(input.id)}Add">
+${""?left_pad(indent)}    <text class="upload-card-plus">+</text>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}</view>
+  <#elseif input.type == "files">
+${""?left_pad(indent)}<view class="file-list${stateClasses}">
+${""?left_pad(indent)}  <view class="file-row" wx:for="{{formData.${js.nameVariable(input.id)}}}" wx:key="name">
+${""?left_pad(indent)}    <text class="file-row-icon">📄</text>
+${""?left_pad(indent)}    <text class="file-row-name">{{item.name}}</text>
+${""?left_pad(indent)}    <text class="file-row-del" bindtap="handle${js.nameType(input.id)}Remove" data-idx="{{index}}">✕</text>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}  <view class="file-add" bindtap="handle${js.nameType(input.id)}Add">+ 添加文件</view>
+${""?left_pad(indent)}</view>
+  </#if>
+</#macro>
+
 <!----------------------------------------------------------------------------->
 <!--                                  BUTTON                                 -->
 <!----------------------------------------------------------------------------->
@@ -314,8 +416,10 @@ ${""?left_pad(indent)}
 ${""?left_pad(indent)}/**
 ${""?left_pad(indent)} * 【${js.nameVariable(list.id)}】【${list.title!""}】【分栏列表】相关变量
 ${""?left_pad(indent)} */
+${""?left_pad(indent)}selected${js.nameType(list.id)}Group: '',
 ${""?left_pad(indent)}${js.nameVariable(list.id)}Groups: [],
 ${""?left_pad(indent)}${js.nameVariable(list.id)}Rows: [],
+${""?left_pad(indent)}${js.nameVariable(list.id)}Height: 0,
 </#macro>
 
 <#macro print_split_list_methods list indent=0>
@@ -377,15 +481,25 @@ ${""?left_pad(indent)}  } finally {
 ${""?left_pad(indent)}    
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}},
-  <#if list.value("page") != "">
-    <#assign page = list.value("page")>
+${""?left_pad(indent)}
+${""?left_pad(indent)}handle${js.nameType(list.id)}GroupTap: async function (event) {
+${""?left_pad(indent)}  this.setData({
+${""?left_pad(indent)}    selected${js.nameType(list.id)}Group: event.currentTarget.dataset.id,
+${""?left_pad(indent)}    ${js.nameVariable(list.id)}Rows: [],
+${""?left_pad(indent)}  });
+${""?left_pad(indent)}  this.load${js.nameType(list.id)}Rows();
+${""?left_pad(indent)}},  
+  <#if list.value("next") != "">
+    <#local nextAction = valuebase.action(list.value("next"))>
 ${""?left_pad(indent)}
 ${""?left_pad(indent)}handle${js.nameType(list.id)}RowTap: async function (event) {
-    <#if page?starts_with("$")>
-${""?left_pad(indent)}  wx.navigateTo({
-${""?left_pad(indent)}    url: '/pages/${page?substring(1)}?',
+${""?left_pad(indent)}  let row = event.currentTarget.dataset.row;
+    <#list nextAction.params as param>
+${""?left_pad(indent)}  let ${js.nameVariable(param.name)} = row.${js.nameVariable(param.name)}; 
+    </#list>
+${""?left_pad(indent)}  safeNavigateTo({
+${""?left_pad(indent)}    url: "/pages/${nextAction.path?replace("_","-")}",
 ${""?left_pad(indent)}  });
-    </#if>
 ${""?left_pad(indent)}},  
   </#if>
 </#macro>
@@ -442,8 +556,7 @@ ${""?left_pad(indent)}    })
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}},
 ${""?left_pad(indent)}
-${""?left_pad(indent)}onPullDownRefresh: async function () {
-${""?left_pad(indent)}  console.log('hello');  
+${""?left_pad(indent)}onPullDownRefresh: async function () { 
 ${""?left_pad(indent)}  this.data.${js.nameVariable(list.id)}Rows = [];
 ${""?left_pad(indent)}  await this.load${js.nameType(list.id)}Rows(true);
 ${""?left_pad(indent)}},
@@ -454,37 +567,117 @@ ${""?left_pad(indent)}    return;
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}  this.load${js.nameType(list.id)}Rows();
 ${""?left_pad(indent)}},
-  <#if list.value("page") != "">
-    <#assign page = list.value("page")>
+  <#if list.value("next") != "">
+    <#local nextAction = valuebase.action(list.value("next"))>
 ${""?left_pad(indent)}
 ${""?left_pad(indent)}handle${js.nameType(list.id)}RowTap: async function (event) {
-    <#if page?starts_with("$")>
-${""?left_pad(indent)}  wx.navigateTo({
-${""?left_pad(indent)}    url: '/pages/${page?substring(1)}?',
+${""?left_pad(indent)}  let row = event.currentTarget.dataset.row;
+    <#list nextAction.params as param>
+${""?left_pad(indent)}  let ${js.nameVariable(param.name)} = row.${js.nameVariable(param.name)}; 
+    </#list>
+${""?left_pad(indent)}  safeNavigateTo({
+${""?left_pad(indent)}    url: "/pages/${nextAction.path?replace("_","-")}",
 ${""?left_pad(indent)}  });
+${""?left_pad(indent)}},  
+  </#if> 
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                GRID VIEW                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_grid_view_variables grid indent=0>
+  <#local url = valuebase.url(grid.value("data"))>
+${""?left_pad(indent)}
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * 【${js.nameVariable(grid.id)}】【${grid.title!""}】瀑布视图相关变量
+${""?left_pad(indent)} */
+${""?left_pad(indent)}${js.nameVariable(grid.id)}Rows: [],
+${""?left_pad(indent)}${js.nameVariable(grid.id)}Total: 0,
+${""?left_pad(indent)}${js.nameVariable(grid.id)}Loading: false,
+</#macro>
+
+<#macro print_grid_view_methods grid indent=0>
+  <#local url = valuebase.url(grid.value("data"))>
+${""?left_pad(indent)}
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * 加载【${grid.title!""}】列表视图数据的界面函数
+${""?left_pad(indent)} */
+${""?left_pad(indent)}load${js.nameType(grid.id)}Rows: async function () {
+${""?left_pad(indent)}  this.setData({
+${""?left_pad(indent)}    ${js.nameVariable(grid.id)}Loading: true,
+${""?left_pad(indent)}  })
+${""?left_pad(indent)}  try {
+${""?left_pad(indent)}    const page = await sdk.fetch${js.nameType(inflector.pluralize(url.resource))}({
+  <#list url.params as urlParam>
+    <#if urlParam.type?string == "OBJECT">
+      <#local form = grid.page.byVar("{" + urlParam.name + "}")>
+      <#list form.inputs as input>
+${""?left_pad(indent)}      ${js.nameVariable(input.id)}: this.data.${js.nameVariable(input.id)},
+      </#list>
+    <#else>
+${""?left_pad(indent)}      ${js.nameVariable(urlParam.name)}: this.data.${js.nameVariable(urlParam.value)},
     </#if>
+  </#list>
+${""?left_pad(indent)}      start: this.data.${js.nameVariable(grid.id)}Rows.length,
+${""?left_pad(indent)}    });
+${""?left_pad(indent)}    const rows = page.data;
+${""?left_pad(indent)}    this.setData({
+${""?left_pad(indent)}      ${js.nameVariable(grid.id)}Rows: this.data.${js.nameVariable(grid.id)}Rows.concat(rows),
+${""?left_pad(indent)}      ${js.nameVariable(grid.id)}Total: page.total,
+${""?left_pad(indent)}    })
+${""?left_pad(indent)}  } catch (error) {
+${""?left_pad(indent)}    fb.error('发生错误', error.message || String(error))
+${""?left_pad(indent)}  } finally {
+${""?left_pad(indent)}    this.setData({
+${""?left_pad(indent)}      ${js.nameVariable(grid.id)}Loading: false,
+${""?left_pad(indent)}    })   
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}},
+${""?left_pad(indent)}
+${""?left_pad(indent)}onPullDownRefresh: async function () {
+${""?left_pad(indent)}  this.data.${js.nameVariable(grid.id)}Rows = [];
+${""?left_pad(indent)}  await this.load${js.nameType(grid.id)}Rows(true);
+${""?left_pad(indent)}},
+${""?left_pad(indent)}
+${""?left_pad(indent)}onReachBottom: function () {
+${""?left_pad(indent)}  if (this.data.${js.nameVariable(grid.id)}Loading || this.data.${js.nameVariable(grid.id)}Rows.length == this.data.${js.nameVariable(grid.id)}Total) {
+${""?left_pad(indent)}    return;
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  this.load${js.nameType(grid.id)}Rows();
+${""?left_pad(indent)}},
+  <#if grid.value("next") != "">
+    <#local nextAction = valuebase.action(grid.value("next"))>
+${""?left_pad(indent)}
+${""?left_pad(indent)}handle${js.nameType(grid.id)}RowTap: async function (event) {
+${""?left_pad(indent)}  let row = event.currentTarget.dataset.row;
+    <#list nextAction.params as param>
+${""?left_pad(indent)}  let ${js.nameVariable(param.name)} = row.${js.nameVariable(param.name)}; 
+    </#list>
+${""?left_pad(indent)}  safeNavigateTo({
+${""?left_pad(indent)}    url: "/pages/${nextAction.path?replace("_","-")}",
+${""?left_pad(indent)}  });
 ${""?left_pad(indent)}},  
   </#if>
 </#macro>
 
 <!----------------------------------------------------------------------------->
-<!--                                  SEGMENT                                -->
+<!--                                  SEGMENTS                               -->
 <!----------------------------------------------------------------------------->
-<#macro print_segment_variables segment indent=0>
-  <#local variable = segment.value("variable", segment.id)>
+<#macro print_segments_variables segments indent=0>
+  <#local variable = segments.value("variable", segments.id)>
 ${""?left_pad(indent)}
 ${""?left_pad(indent)}/**
-${""?left_pad(indent)} * ${js.nameVariable(segment.id)} 【${segment.title!""}】日历视图相关变量
+${""?left_pad(indent)} * ${js.nameVariable(segments.id)} 【${segments.title!""}】日历视图相关变量
 ${""?left_pad(indent)} */
-${""?left_pad(indent)}${js.nameVariable(segment.id)}Options: sdk.${js.nameVariable(segment.id)}Options,
-${""?left_pad(indent)}${js.nameVariable(variable)}: sdk.${js.nameVariable(segment.id)}Options[0].value,
+${""?left_pad(indent)}${js.nameVariable(segments.id)}Options: sdk.${js.nameVariable(segments.id)}Options,
+${""?left_pad(indent)}${js.nameVariable(variable)}: sdk.${js.nameVariable(segments.id)}Options[0].value,
 </#macro>
 
-<#macro print_segment_methods segment indent=0>
-  <#local variable = segment.value("variable", segment.id)>
-  <#local reactiveWidgets = guidbase.get_reactive_widgets(variable, segment.page)>
+<#macro print_segments_methods segments indent=0>
+  <#local variable = segments.value("variable", segments.id)>
+  <#local reactiveWidgets = guidbase.get_reactive_widgets(variable, segments.page)>
 ${""?left_pad(indent)}
-${""?left_pad(indent)}handle${js.nameType(segment.id)}Tap: async function (event) {
+${""?left_pad(indent)}handle${js.nameType(segments.id)}Tap: async function (event) {
 ${""?left_pad(indent)}  this.setData({
 ${""?left_pad(indent)}    ${js.nameVariable(variable)}: event.currentTarget.dataset.value,
 ${""?left_pad(indent)}  });
@@ -492,6 +685,28 @@ ${""?left_pad(indent)}  });
 ${""?left_pad(indent)}  this.${guidbase.name_widget_method_load(reactiveWidget)}();
   </#list>
 ${""?left_pad(indent)}},
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                   TABS                                  -->
+<!----------------------------------------------------------------------------->
+<#macro print_tabs_variables tabs indent=0>
+${""?left_pad(indent)}
+${""?left_pad(indent)}/**
+${""?left_pad(indent)} * ${js.nameVariable(tabs.id)} 【${tabs.title!""}】分页标签相关变量
+${""?left_pad(indent)} */
+${""?left_pad(indent)}selected${js.nameType(tabs.id)}Tab: 0,
+</#macro>
+
+<#macro print_tabs_methods tabs indent=0>
+  <#list tabs.children as tab>
+${""?left_pad(indent)}
+${""?left_pad(indent)}handle${js.nameType(tab.id)}Tap: async function (event) {
+${""?left_pad(indent)}  this.setData({
+${""?left_pad(indent)}    selected${js.nameType(tabs.id)}Tab: ${tab?index},
+${""?left_pad(indent)}  });
+${""?left_pad(indent)}},
+  </#list>
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -542,6 +757,23 @@ ${""?left_pad(indent)}},
 </#macro>
 
 <!----------------------------------------------------------------------------->
+<!--                              MEDIA CAROUSEL                             -->
+<!----------------------------------------------------------------------------->
+
+<!----------------------------------------------------------------------------->
+<!--                              LIST SELECTOR                              -->
+<!----------------------------------------------------------------------------->
+
+<!----------------------------------------------------------------------------->
+<!--                              SELECTOR TILE                              -->
+<!----------------------------------------------------------------------------->
+
+<!----------------------------------------------------------------------------->
+<!--                                   CARD                                  -->
+<!----------------------------------------------------------------------------->
+
+
+<!----------------------------------------------------------------------------->
 <!--                                   PAGE                                  -->
 <!----------------------------------------------------------------------------->
 <#macro print_page_layout page indent=0>
@@ -579,10 +811,12 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(fals
 <@print_time_grid_variables grid=widget indent=indent />
     <#elseif widget.type == 'list_view'>
 <@print_list_view_variables list=widget indent=indent />
+    <#elseif widget.type == 'grid_view'>
+<@print_grid_view_variables grid=widget indent=indent />
     <#elseif widget.type == 'split_list'>
 <@print_split_list_variables list=widget indent=indent />
-    <#elseif widget.type == 'segment'>
-<@print_segment_variables segment=widget indent=indent />
+    <#elseif widget.type == 'segments'>
+<@print_segments_variables segments=widget indent=indent />
     <#elseif widget.type == 'calendar'>
 <@print_calendar_variables calendar=widget indent=indent />    
     <#elseif widget.type == "chart">
@@ -613,10 +847,12 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(fals
 <@print_time_grid_methods grid=widget indent=indent />
     <#elseif widget.type == 'list_view'>
 <@print_list_view_methods list=widget indent=indent />
+    <#elseif widget.type == 'grid_view'>
+<@print_grid_view_methods grid=widget indent=indent />
     <#elseif widget.type == 'split_list'>
 <@print_split_list_methods list=widget indent=indent />
-    <#elseif widget.type == 'segment'>
-<@print_segment_methods segment=widget indent=indent />
+    <#elseif widget.type == 'segments'>
+<@print_segments_methods segments=widget indent=indent />
     <#elseif widget.type == 'calendar'>
 <@print_calendar_methods calendar=widget indent=indent />    
     <#elseif widget.type == "chart">
@@ -639,7 +875,7 @@ ${""?left_pad(indent)}}
   </#list>
   <#list page.inputs as input>
 <@print_input_methods input=input indent=indent />  
-  </#list>
+  </#list>   
 </#macro>
 
 <#macro print_widget_layout widget indent=0>
@@ -665,10 +901,14 @@ ${""?left_pad(indent)}}
 <@print_criteria_form_layout form=widget indent=indent />
   <#elseif widget.type == "list_view">
 <@print_list_view_layout list=widget indent=indent />
+  <#elseif widget.type == "grid_view">
+<@print_grid_view_layout grid=widget indent=indent />
   <#elseif widget.type == "split_list">
 <@print_split_list_layout list=widget indent=indent />
   <#elseif widget.type == "segments">
 <@print_segments_layout segments=widget indent=indent />
+  <#elseif widget.type == "tabs">
+<@print_tabs_layout tabs=widget indent=indent />
   <#elseif widget.type == "buttons">
 <@print_buttons_layout buttons=widget indent=indent />
   <#elseif widget.type == "calendar">
@@ -682,105 +922,17 @@ ${""?left_pad(indent)}    value="{{ ${js.nameVariable(variable)} }}"
 ${""?left_pad(indent)}    bind:dayclick="handle${js.nameType(variable)}Change"
 ${""?left_pad(indent)}    bind:viewchange="handleViewChange" />
 ${""?left_pad(indent)}</view>
-  <#elseif widget.type == "avatar">
-${""?left_pad(indent)}<view class="avatar-upload${stateClasses}" bindtap="handle${js.nameType(widget.id)}Upload">
-${""?left_pad(indent)}  <view class="avatar avatar-teal avatar-xl" wx:if="{{ !${js.nameVariable(widget.id)} }}">
-${""?left_pad(indent)}    <text>👤</text>
-${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}  <image wx:else class="avatar avatar-xl" src="{{ ${js.nameVariable(widget.id)} }}" mode="aspectFill" style="object-fit:cover;" />
-${""?left_pad(indent)}  <text class="mt-6 color-teal text-sm" style="font-weight:var(--weight-semibold);">{{ avatar ? '点击更换头像' : '点击上传头像' }}</text>
-${""?left_pad(indent)}</view>
-  <#elseif widget.type == "date">
-${""?left_pad(indent)}<picker class="${stateClasses?trim}" mode="date" value="{{ ${js.nameVariable(widget.id)} }}" bindchange="handle${js.nameType(widget.id)}Change">
-${""?left_pad(indent)}  <view class="field-control">
-${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(widget.id)} ? 'field-value' : 'field-placeholder' }}">{{ ${js.nameVariable(widget.id)} || '请选择日期' }}</text>
-${""?left_pad(indent)}    <text class="field-arrow">▾</text>
-${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}</picker>
-  <#elseif widget.type == "time">
-${""?left_pad(indent)}<picker class="${stateClasses?trim}" mode="time" value="{{ ${js.nameVariable(widget.id)} }}" bindchange="handle${js.nameType(widget.id)}Change">
-${""?left_pad(indent)}  <view class="field-control">
-${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(widget.id)} ? 'field-value' : 'field-placeholder' }}">{{ ${js.nameVariable(widget.id)} || '请选择时间' }}</text>
-${""?left_pad(indent)}    <text class="field-arrow">▾</text>
-${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}</picker>
-  <#elseif widget.type == "text" || widget.type == "number">
-    <#local suffix = widget.value("suffix", "")>
-    <#if suffix != "">
-${""?left_pad(indent)}<view class="field-with-suffix${stateClasses}">
-${""?left_pad(indent)}  <input class="field-input field-input-suffix<#if isReadonly == "true"> field-input-ro</#if>" <#if widget.type == "number">type="digit"</#if> placeholder="请输入${widget.title}" value="{{ ${js.nameVariable(widget.id)} }}" bindinput="handle${js.nameType(widget.id)}Change"<#if isReadonly == "true"> disabled="true"</#if> />
-${""?left_pad(indent)}  <text class="field-suffix<#if isReadonly == "true"> field-suffix-ro</#if>">${suffix}</text>
-${""?left_pad(indent)}</view>
-    <#else>
-${""?left_pad(indent)}<input class="field-input<#if isReadonly == "true"> field-input-ro</#if>${stateClasses}" <#if widget.type == "number">type="digit"</#if> placeholder="请输入${widget.title}" value="{{ ${js.nameVariable(widget.id)} }}" bindinput="handle${js.nameType(widget.id)}Change"<#if isReadonly == "true"> disabled="true"</#if> />
-    </#if>
-  <#elseif widget.type == "select">
-${""?left_pad(indent)}<picker class="${stateClasses?trim}" range="{{ ${js.nameVariable(widget.id)}Options }}" range-key="label" value="{{ ${js.nameVariable(widget.id)} }}" bindchange="handle${js.nameType(widget.id)}Change">
-${""?left_pad(indent)}  <view class="field-control">
-${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(widget.id)} ? 'field-value' : 'field-placeholder' }}">{{ ${js.nameVariable(widget.id)}Label || '请选择' }}</text>
-${""?left_pad(indent)}    <text class="field-arrow">▾</text>
-${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}</picker>
-  <#elseif widget.type == "cascade">
-${""?left_pad(indent)}<picker class="${stateClasses?trim}" mode="multiSelector" range="{{cascadeData.${js.nameVariable(widget.id)}}}" value="{{formData.${js.nameVariable(widget.id)}Idx}}" bindchange="handle${js.nameType(widget.id)}Change" bindcolumnchange="onCascadeColumnChange">
-${""?left_pad(indent)}  <view class="field-control">
-${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(widget.id)} ? 'field-value' : 'field-placeholder' }}">{{formData.${js.nameVariable(widget.id)} || '请选择级联'}}</text>
-${""?left_pad(indent)}    <text class="field-arrow">▾</text>
-${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}</picker>
-  <#elseif widget.type == "multiselect">
-${""?left_pad(indent)}<view class="option-chips${stateClasses}">
-${""?left_pad(indent)}  <view class="option-chip {{ h.has(${js.nameVariable(widget.id)}, item.value) ? 'option-chip-on' : '' }}" 
-${""?left_pad(indent)}        wx:for="{{ ${js.nameVariable(widget.id)}Options }}" wx:key="value" 
-${""?left_pad(indent)}        bindtap="handle${js.nameType(widget.id)}Tap" data-id="{{ item.value }}">
-${""?left_pad(indent)}    <text wx:if="{{ h.has(${js.nameVariable(widget.id)}, item.value) }}" class="option-chip-check">✓</text>
-${""?left_pad(indent)}    <text>{{ item.label }}</text>
-${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}</view>
-  <#elseif widget.type == "tags">
-${""?left_pad(indent)}<view class="flex flex-wrap${stateClasses}" style="gap:10rpx;">
-${""?left_pad(indent)}  <view class="tag tag-teal" wx:for="{{ ${js.nameVariable(widget.id)} }}" wx:key="*this" 
-${""?left_pad(indent)}        bindtap="handle${js.nameType(widget.id)}Remove" data-idx="{{ index }}">
-${""?left_pad(indent)}    {{item}} <text style="font-weight:var(--weight-bold);opacity:0.5;">×</text>
-${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}  <view class="tag tag-gray tag-add" bindtap="handle${js.nameType(widget.id)}Add">+ 添加</view>
-${""?left_pad(indent)}</view>
-  <#elseif widget.type == "longtext">
-${""?left_pad(indent)}<textarea class="field-textarea${stateClasses}" placeholder="请输入${widget.title}内容" value="{{formData.${js.nameVariable(widget.id)}}}" bindinput="handle${js.nameType(widget.id)}Change" maxlength="${widget.value("maxlength", "300")}" />
-  <#elseif widget.type == "images">
-${""?left_pad(indent)}<view class="upload-row${stateClasses}">
-${""?left_pad(indent)}  <view class="upload-card" wx:for="{{ ${js.nameVariable(widget.id)} }}" wx:key="*this">
-${""?left_pad(indent)}    <image class="upload-card-img" src="{{ item.url }}" mode="aspectFill" 
-${""?left_pad(indent)}           bindtap="handle${js.nameType(widget.id)}Preview" 
-${""?left_pad(indent)}           data-url="{{ item.url }}" data-id="{{ item.id }}"/>
-${""?left_pad(indent)}    <view class="upload-card-del" bindtap="handle${js.nameType(widget.id)}Remove">✕</view>
-${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}  <view class="upload-card upload-card-add" bindtap="handle${js.nameType(widget.id)}Add">
-${""?left_pad(indent)}    <text class="upload-card-plus">+</text>
-${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}</view>
-  <#elseif widget.type == "videos">
-${""?left_pad(indent)}<view class="upload-row${stateClasses}">
-${""?left_pad(indent)}  <view class="upload-card upload-card-wide" wx:for="{{formData.${js.nameVariable(widget.id)}}}" wx:key="*this">
-${""?left_pad(indent)}    <view class="upload-card-video">
-${""?left_pad(indent)}      <text style="font-size:48rpx;">▶</text>
-${""?left_pad(indent)}    </view>
-${""?left_pad(indent)}    <view class="upload-card-del" bindtap="handle${js.nameType(widget.id)}Remove" data-idx="{{index}}">✕</view>
-${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}  <view class="upload-card upload-card-add" bindtap="handle${js.nameType(widget.id)}Add">
-${""?left_pad(indent)}    <text class="upload-card-plus">+</text>
-${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}</view>
-  <#elseif widget.type == "files">
-${""?left_pad(indent)}<view class="file-list${stateClasses}">
-${""?left_pad(indent)}  <view class="file-row" wx:for="{{formData.${js.nameVariable(widget.id)}}}" wx:key="name">
-${""?left_pad(indent)}    <text class="file-row-icon">📄</text>
-${""?left_pad(indent)}    <text class="file-row-name">{{item.name}}</text>
-${""?left_pad(indent)}    <text class="file-row-del" bindtap="handle${js.nameType(widget.id)}Remove" data-idx="{{index}}">✕</text>
-${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}  <view class="file-add" bindtap="handle${js.nameType(widget.id)}Add">+ 添加文件</view>
-${""?left_pad(indent)}</view>
+  <#elseif widget.type == "media_carousel">
+<@print_media_carousel_layout carousel=widget indent=indent />    
+  <#elseif widget.type == "list_selector">
+<@print_list_selector_layout selector=widget indent=indent />    
+  <#elseif widget.type == "selector_tile">
+<@print_selector_tile_layout selector=widget indent=indent />   
+  <#elseif widget.type == "card">
+<@print_card_layout card=widget indent=indent />   
   <#else>
-<#--  <@print_layout_custom widget=widget indent=indent />    -->
+    <#if widget.container.type == "entry_form" || widget.container.type == "criteria_form">
+<@print_input_layout input=widget indent=indent />      
+    </#if>
   </#if>
 </#macro>

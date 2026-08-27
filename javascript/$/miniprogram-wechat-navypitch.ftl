@@ -334,19 +334,23 @@ ${""?left_pad(indent)}</view>
   <#local groupUrl = valuebase.url(list.value("group"))>
   <#local dataUrl = valuebase.url(list.value("data"))>
 ${""?left_pad(indent)}<view class="split">
-${""?left_pad(indent)}  <scroll-view class="split-col-group {{ ${js.nameVariable(list.id)}Groups.length === 0 ? 'split-col-empty' : '' }}" scroll-y enhanced show-scrollbar="{{ false }}">
+${""?left_pad(indent)}  <scroll-view class="split-col-group {{ ${js.nameVariable(list.id)}Groups.length === 0 ? 'split-col-empty' : '' }}" 
+${""?left_pad(indent)}               scroll-y enhanced show-scrollbar="{{ false }}" 
+${""?left_pad(indent)}               style="height: {{ ${js.nameVariable(list.id)}Height }}rpx">
 ${""?left_pad(indent)}    <view wx:for="{{ ${js.nameVariable(list.id)}Groups }}" wx:key="${js.nameVariable(groupUrl.resource)}Id"
-${""?left_pad(indent)}      class="split-group-item {{ activeDept === item.id ? 'split-group-item-active' : '' }}"
+${""?left_pad(indent)}      class="split-group-item {{ selected${js.nameType(list.id)}Group === item.${js.nameVariable(groupUrl.resource)}Id ? 'split-group-item-active' : '' }}"
 ${""?left_pad(indent)}      data-id="{{ item.${js.nameVariable(groupUrl.resource)}Id }}"
 ${""?left_pad(indent)}      bindtap="handle${js.nameType(list.id)}GroupTap">
 ${""?left_pad(indent)}      <text class="split-group-name">{{ item.${js.nameVariable(groupUrl.resource)}Name }}</text>
 ${""?left_pad(indent)}    </view>
 ${""?left_pad(indent)}  </scroll-view>
-${""?left_pad(indent)}  <scroll-view class="split-col-tile" scroll-y enhanced show-scrollbar="{{ false }}">
+${""?left_pad(indent)}  <scroll-view class="split-col-tile" scroll-y enhanced show-scrollbar="{{ false }}"
+${""?left_pad(indent)}               style="height: {{ ${js.nameVariable(list.id)}Height }}rpx">
 ${""?left_pad(indent)}    <view class="split-tile-sec-title">{{ activeDeptName }} · 共 {{ activeDoctors.length }} 位医生</view>
-${""?left_pad(indent)}    <block wx:for="{{ ${js.nameVariable(list.id)}Rows }}" wx:key="name" wx:for-index="di">
+${""?left_pad(indent)}    <view class="list-item" wx:for="{{ ${js.nameVariable(list.id)}Rows }}" wx:for-item="row" data-row="{{ row }}"
+${""?left_pad(indent)}          bindtap="handle${js.nameType(list.id)}RowTap">
 <@guidbase4tile.print_tile_layout widget=list indent=6 />
-${""?left_pad(indent)}    </block>
+${""?left_pad(indent)}    </view>
 ${""?left_pad(indent)}    <${namespace}-empty wx:if="{{ ${js.nameVariable(list.id)}Rows.length == 0 }}" />
 ${""?left_pad(indent)}  </scroll-view>
 ${""?left_pad(indent)}</view>
@@ -362,7 +366,8 @@ ${""?left_pad(indent)}  <scroll-view wx:if="{{ ${js.nameVariable(list.id)}Rows.l
 ${""?left_pad(indent)}               scroll-y enhanced show-scrollbar="{{ false }}"
 ${""?left_pad(indent)}               bindscrolltolower="onReachBottom">
 ${""?left_pad(indent)}    <view wx:for="{{ ${js.nameVariable(list.id)}Rows }}"
-${""?left_pad(indent)}          wx:for-item="row" class="list-item">
+${""?left_pad(indent)}          wx:for-item="row" class="list-item" data-row = "{{ row }}"
+${""?left_pad(indent)}          bindtap="handle${js.nameType(list.id)}RowTap">
 <@guidbase4tile.print_tile_layout widget=list indent=8 />
 ${""?left_pad(indent)}    </view>
 ${""?left_pad(indent)}    <view class="load-more-status">
@@ -375,7 +380,39 @@ ${""?left_pad(indent)}</view>
 </#macro>
 
 <!----------------------------------------------------------------------------->
-<!--                                 SEGMENTS                                 -->
+<!--                                GRID VIEW                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_grid_view_layout grid indent=0>
+  <#local url = valuebase.url(grid.value("data"))>
+${""?left_pad(indent)}<view>  
+${""?left_pad(indent)}  <scroll-view wx:if="{{ ${js.nameVariable(grid.id)}Rows.length != 0 }}" 
+${""?left_pad(indent)}               scroll-y enhanced show-scrollbar="{{ false }}"
+${""?left_pad(indent)}               bindscrolltolower="onReachBottom">
+${""?left_pad(indent)}    <view class="waterfall-container">
+${""?left_pad(indent)}      <view class="waterfall-column">
+${""?left_pad(indent)}        <view wx:for="{{ ${js.nameVariable(grid.id)}Rows }}" wx:for-index="index" wx:for-item="row">
+${""?left_pad(indent)}          <view class="waterfall-card" wx:if="{{ index % 2 === 0 }}" data-row = "{{ row }}"
+${""?left_pad(indent)}                bindtap="handle${js.nameType(grid.id)}RowTap">
+<@guidbase4tile.print_tile_layout widget=grid  vertical=true indent=8 />
+${""?left_pad(indent)}          </view>
+${""?left_pad(indent)}        </view>
+${""?left_pad(indent)}      </view>
+${""?left_pad(indent)}      <view class="waterfall-column">
+${""?left_pad(indent)}        <view wx:for="{{ ${js.nameVariable(grid.id)}Rows }}" wx:for-index="index" wx:for-item="row">
+${""?left_pad(indent)}          <view class="waterfall-card" wx:if="{{ index % 2 === 1 }}" data-row = "{{ row }}"
+${""?left_pad(indent)}                bindtap="handle${js.nameType(grid.id)}RowTap">
+<@guidbase4tile.print_tile_layout widget=grid vertical=true indent=8 />
+${""?left_pad(indent)}          </view>
+${""?left_pad(indent)}        </view>
+${""?left_pad(indent)}      </view>
+${""?left_pad(indent)}    </view>
+${""?left_pad(indent)}  </scroll-view>
+${""?left_pad(indent)}  <${namespace}-empty wx:if="{{ ${js.nameVariable(grid.id)}Rows.length == 0 }}" />
+${""?left_pad(indent)}</view>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                 SEGMENTS                                -->
 <!----------------------------------------------------------------------------->
 <#macro print_segments_layout segments indent=0>
   <#local variable = segments.value("variable", segments.id)>
@@ -402,4 +439,116 @@ ${""?left_pad(indent)}</view>
     <#local indent -= 2>
 ${""?left_pad(indent)}</view>
   </#if>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                   TABS                                  -->
+<!----------------------------------------------------------------------------->
+<#macro print_tabs_layout tabs indent=0>
+${""?left_pad(indent)}<view class="tabs">
+  <#list tabs.children as tab>
+${""?left_pad(indent)}  <view 
+${""?left_pad(indent)}    class="tab-item {{ selected${js.nameType(tabs.id)}Tab === ${tab?index} ? 'active' : '' }}" 
+${""?left_pad(indent)}    bindtap="handle${js.nameType(tab.id)}Tap" data-index="{{ ${tab?index} }}">
+${""?left_pad(indent)}    <text class="tab-text">${tab.title}</text>
+${""?left_pad(indent)}    <view class="tab-underline" wx:if="{{selected${js.nameType(tabs.id)}Tab === index}}"></view>
+${""?left_pad(indent)}  </view>
+  </#list>
+${""?left_pad(indent)}</view>
+<#list tabs.children as tab>
+${""?left_pad(indent)}<view wx:if="{{ selected${js.nameType(tabs.id)}Tab === ${tab?index} }}">
+<@print_widget_layout widget=tab.children[0] indent=indent+2 />
+${""?left_pad(indent)}</view>  
+  </#list>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                              MEDIA CAROUSEL                             -->
+<!----------------------------------------------------------------------------->
+<#macro print_media_carousel_layout carousel indent=0>
+  <#local url = valuebase.url(carousel.value("data"))>
+${""?left_pad(indent)}<view class="scroll-navigator">
+${""?left_pad(indent)}  <swiper
+${""?left_pad(indent)}    indicator-dots="true"
+${""?left_pad(indent)}    circular="true">
+${""?left_pad(indent)}    <swiper-item>
+${""?left_pad(indent)}      <image
+${""?left_pad(indent)}        class="banner-image"
+${""?left_pad(indent)}        src="https://raw.githubusercontent.com/doublegsoft/tatabase-image/main/1024x768/0028.jpg"
+${""?left_pad(indent)}        mode="aspectFill"
+${""?left_pad(indent)}        lazy-load="true"/>
+${""?left_pad(indent)}    </swiper-item>
+${""?left_pad(indent)}    <swiper-item>
+${""?left_pad(indent)}      <image
+${""?left_pad(indent)}        class="banner-image"
+${""?left_pad(indent)}        src="https://raw.githubusercontent.com/doublegsoft/tatabase-image/main/1024x768/0027.jpg"
+${""?left_pad(indent)}        mode="aspectFill"
+${""?left_pad(indent)}        lazy-load="true"/>
+${""?left_pad(indent)}    </swiper-item>
+${""?left_pad(indent)}    <swiper-item>
+${""?left_pad(indent)}      <image
+${""?left_pad(indent)}        class="banner-image"
+${""?left_pad(indent)}        src="https://raw.githubusercontent.com/doublegsoft/tatabase-image/main/1024x768/0026.jpg"
+${""?left_pad(indent)}        mode="aspectFill"
+${""?left_pad(indent)}        lazy-load="true"/>
+${""?left_pad(indent)}    </swiper-item>
+${""?left_pad(indent)}    <swiper-item>
+${""?left_pad(indent)}      <image
+${""?left_pad(indent)}        class="banner-image"
+${""?left_pad(indent)}        src="https://raw.githubusercontent.com/doublegsoft/tatabase-image/main/1024x768/0025.jpg"
+${""?left_pad(indent)}        mode="aspectFill"
+${""?left_pad(indent)}        lazy-load="true"/>
+${""?left_pad(indent)}    </swiper-item>
+<#--  ${""?left_pad(indent)}    <swiper-item wx:for="{{ ${js.nameVariable(url.resource)}.${js.nameVariable(carousel.id)} }}" wx:item="{{ row }}">
+${""?left_pad(indent)}      <image
+${""?left_pad(indent)}        class="banner-image"
+${""?left_pad(indent)}        src="{{ row.url }}"
+${""?left_pad(indent)}        mode="aspectFill"
+${""?left_pad(indent)}        lazy-load="true"
+${""?left_pad(indent)}        data-index="{{index}}"
+${""?left_pad(indent)}      />
+${""?left_pad(indent)}    </swiper-item>  -->
+${""?left_pad(indent)}  </swiper>
+<#--  ${""?left_pad(indent)}  <view class="indicator-list">
+${""?left_pad(indent)}    <view
+${""?left_pad(indent)}      wx:for="{{imageList}}"
+${""?left_pad(indent)}      wx:key="id"
+${""?left_pad(indent)}      class="indicator {{index === currentIndex ? 'indicator-active' : ''}}"
+${""?left_pad(indent)}    ></view>
+${""?left_pad(indent)}  </view>  -->
+${""?left_pad(indent)}</view>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                              LIST SELECTOR                              -->
+<!----------------------------------------------------------------------------->
+<#macro print_list_selector_layout selector indent=0>
+  <#local dataExpr = selector.value("data")>
+  <#if dataExpr?starts_with("enum")>
+  <#else>
+  </#if>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                              SELECTOR TILE                              -->
+<!----------------------------------------------------------------------------->
+<#macro print_selector_tile_layout selector indent=0>
+  <#local dataExpr = selector.value("data")>
+  <#if dataExpr?starts_with("enum")>
+    <#local url = valuebase.url(dataExpr)>
+  <#else>
+    <#local opts = typebase.enumtype(dataExpr)>
+  </#if>
+  <#if url??>
+  </#if>
+  <#if opts??>
+  </#if>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                   CARD                                  -->
+<!----------------------------------------------------------------------------->
+<#macro print_card_layout card indent=0>
+  <#local url = valuebase.url(card.value("data"))>
+<@guidbase4tile.print_tile_layout widget=card varname=js.nameVariable(url.resource) vertical=false indent=indent />
 </#macro>

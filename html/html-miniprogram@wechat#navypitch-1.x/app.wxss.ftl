@@ -342,7 +342,7 @@ page {
    ========================================================= */
 .scroll-navigator {
   width: 100%;
-  padding: 24rpx 0;
+  padding: 0 0;
   overflow: hidden;
   background: #f7f8fa;
 }
@@ -376,6 +376,12 @@ page {
 }
 
 .scroll-navigator .scroll-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.banner-image {
   display: block;
   width: 100%;
   height: 100%;
@@ -691,6 +697,31 @@ page {
   font-size: 26rpx;      /* Standard size for secondary/status text */
   color: #999999;        /* Muted gray color to keep focus on the main content */
   letter-spacing: 1rpx;  /* Slightly improves readability */
+}
+
+.waterfall-container {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%; 
+  background-color: #f7f8fa; 
+  
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24rpx; /* 页面外边距 */
+}
+
+.waterfall-column {
+  /* 核心：两列平分宽度 */
+  flex: 1;
+  width: 0; 
+  display: flex;
+  flex-direction: column;
+}
+
+.waterfall-column:first-child {
+  margin-right: 20rpx; 
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1816,6 +1847,7 @@ page {
   display: flex;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
   background: var(--color-card);
 }
 
