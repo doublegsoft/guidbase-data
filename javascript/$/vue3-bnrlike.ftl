@@ -3,7 +3,7 @@
 <!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_tabs tabs indent=0>
+<#macro print_tabs_layout tabs indent=0>
 ${""?left_pad(indent)}<div class="${namespace}-tabs">
 ${""?left_pad(indent)}  <div v-for="tab in tabs${js.nameType(tabs.id)}" :key="tab.key"
 ${""?left_pad(indent)}       class="${namespace}-tab"
@@ -16,7 +16,7 @@ ${""?left_pad(indent)}  </div>
     <#local buttons = tabs.byType("buttons")[0]>
 ${""?left_pad(indent)}  <div class="${namespace}-tabs-right" v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(buttons.container.id)}'">
     <#list buttons.children as button>
-<@print_layout_widget widget=button indent=indent+4 />
+<@print_widget_layout widget=button indent=indent+4 />
     </#list>
 ${""?left_pad(indent)}  </div>
   </#if>
@@ -28,7 +28,7 @@ ${""?left_pad(indent)}  <div v-show="activeTab${js.nameType(tabs.id)} === '${js.
 ${""?left_pad(indent)}    ${tab.title}
     <#else>
       <#list tab.children as child>
-<@print_layout_widget widget=child indent=indent+4 />
+<@print_widget_layout widget=child indent=indent+4 />
       </#list>
     </#if>
 ${""?left_pad(indent)}  </div>
@@ -39,7 +39,7 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                                ENTRY FORM                               -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_entry_form form indent=0>
+<#macro print_entry_form_layout form indent=0>
   <#local cols = form.value("cols","3")>
   <#local groups = form.groups()>
 ${""?left_pad(indent)}<div id="entry${js.nameType(form.id)}">
@@ -55,7 +55,7 @@ ${""?left_pad(indent)}    <div class="${namespace}-form ${namespace}-form--${col
       <#list row as child>
 ${""?left_pad(indent)}      <div class="${namespace}-field<#if child.value("span")??> ${namespace}-field--span${child.value("span")}</#if>">
 ${""?left_pad(indent)}        <label class="${namespace}-field-label<#if (child.value("required")!"") == "true"> ${namespace}-field-label--required</#if>">${child.title}</label>
-<@print_layout_widget widget=child indent=indent+8 />
+<@print_widget_layout widget=child indent=indent+8 />
 ${""?left_pad(indent)}      </div>
       </#list>
     </#list>
@@ -68,7 +68,7 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                              OFFICIAL FORM                              -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_official_form form indent>
+<#macro print_official_form_layout form indent>
   <#local cols = form.value("cols","3")>
   <#local groups = form.groups()>
 ${""?left_pad(indent)}<div class="${namespace}-of">
@@ -131,10 +131,10 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                              CRITERIA FORM                              -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_criteria_form form indent=0>
+<#macro print_criteria_form_layout form indent=0>
 ${""?left_pad(indent)}<div id="criteria${js.nameType(form.id)}" class="${namespace}-toolbar">
   <#list form.children as widget>
-<@print_layout_widget widget=widget indent=indent+2 />
+<@print_widget_layout widget=widget indent=indent+2 />
   </#list>
 ${""?left_pad(indent)}</div>
 </#macro>
@@ -142,7 +142,7 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                               DISPLAY FORM                              -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_display_form form indent=0>
+<#macro print_display_form_layout form indent=0>
   <#local cols = form.value("cols", "3")>
 ${""?left_pad(indent)}<div id="${js.nameVariable(form.id)}">  
   <#list form.groups() as group>
@@ -171,26 +171,26 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                                 TIME GRID                               -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_week_grid grid indent=0>
+<#macro print_week_grid_layout grid indent=0>
 </#macro>
 
 <!----------------------------------------------------------------------------->
 <!--                                LIST VIEW                                -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_list_view list indent=0>
+<#macro print_list_view_layout list indent=0>
 </#macro>
 
 <!----------------------------------------------------------------------------->
 <!--                                  BUTTON                                 -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_buttons buttons indent=0>
+<#macro print_buttons_layout buttons indent=0>
   <#if buttons.ancestor("tabs")??>
     <#return>
   </#if>
 ${""?left_pad(indent)}<div class="${namespace}-form-footer">
 ${""?left_pad(indent)}  <div style="margin-left: auto;">
   <#list buttons.children as child>
-<@print_layout_widget widget=child indent=indent+4 />
+<@print_widget_layout widget=child indent=indent+4 />
   </#list>    
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -199,16 +199,16 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                                   PAGE                                  -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_container widget indent>
-<@print_layout_widget widget=widget indent=indent />
+<#macro print_container_layout widget indent>
+<@print_widget_layout widget=widget indent=indent />
 </#macro>
 
-<#macro print_layout_custom widget indent>
+<#macro print_custom_layout widget indent>
   <#if widget.type == "card">
 ${""?left_pad(indent)}<div class="${namespace}-panel">
 ${""?left_pad(indent)}  <div class="${namespace}-panel-head">${widget.title!"这里是标题"}</div>
     <#list widget.children as child>
-<@print_layout_widget widget=child indent=indent+2 />
+<@print_widget_layout widget=child indent=indent+2 />
     </#list>
 ${""?left_pad(indent)}</div>  
   <#elseif widget.type == "button">

@@ -1,10 +1,10 @@
 <#import "/$/guidbase.ftl" as guidbase>
-<#include "tile-html.ftl">
+<#include "tile@vue3.ftl">
 <#include "vue3.ftl">
 <!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_tabs tabs indent=0>
+<#macro print_tabs_layout tabs indent=0>
 ${""?left_pad(indent)}<div class="card">
 ${""?left_pad(indent)}  <div class="card-body">
 ${""?left_pad(indent)}    <div class="tabs">
@@ -21,7 +21,7 @@ ${""?left_pad(indent)}      </div>
 ${""?left_pad(indent)}      <div class="tabs-actions" v-show="activeTab${js.nameType(tabs.id)} === '${js.nameVariable(tab.id)}'">
     <#list tab.children as button>
       <#if button.type != "button"><#continue></#if>
-<@print_layout_widget widget=button indent=indent+8 />
+<@print_widget_layout widget=button indent=indent+8 />
     </#list>
 ${""?left_pad(indent)}      </div>
   </#list>
@@ -34,7 +34,7 @@ ${""?left_pad(indent)}    ${tab.title}
     <#else>
       <#list tab.children as child>
         <#if child.type == "button"><#continue></#if>
-<@print_layout_widget widget=child indent=indent+8 />
+<@print_widget_layout widget=child indent=indent+8 />
       </#list>
     </#if>
 ${""?left_pad(indent)}      </div>
@@ -47,7 +47,7 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                                ENTRY FORM                               -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_entry_form form indent=0>
+<#macro print_entry_form_layout form indent=0>
   <#local cols = form.value("cols","2")>
   <#local groups = form.groups()>
   <#list groups as group>
@@ -62,7 +62,7 @@ ${""?left_pad(indent)}      <div class="form-group form-col-span-${span}">
 ${""?left_pad(indent)}        <label class="form-label">${child.title}
 ${""?left_pad(indent)}          <span style="color: var(--color-red);">*</span>
 ${""?left_pad(indent)}        </label>
-<@print_layout_widget widget=child indent=indent+8 />
+<@print_widget_layout widget=child indent=indent+8 />
 ${""?left_pad(indent)}      </div>
       </#list>
     </#list>
@@ -78,7 +78,7 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
     <#if group?index != groups?size - 1>
-<@print_layout_divider indent=indent />  
+<@print_divider_layout indent=indent />  
     </#if>
   </#list>
 </#macro>
@@ -86,7 +86,7 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                              OFFICIAL FORM                              -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_official_form form indent>
+<#macro print_official_form_layout form indent>
   <#local cols = form.value("cols")!"3">
   <#local groups = form.groups()>
 ${""?left_pad(indent)}<div class="${namespace}-of">
@@ -149,14 +149,14 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                              CRITERIA FORM                              -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_criteria_form form indent=0>
+<#macro print_criteria_form_layout form indent=0>
   <#local cols = form.value("cols","3")>
 ${""?left_pad(indent)}<div id="criteria${js.nameType(form.id)}" class="form-row form-row-${cols}">
   <#list form.children as widget>
     <#if widget.type == "button">
       <#continue>
     </#if>
-<@print_layout_widget widget=widget indent=indent+2 />
+<@print_widget_layout widget=widget indent=indent+2 />
   </#list>
 ${""?left_pad(indent)}</div>
 ${""?left_pad(indent)}<div class="btn-group">
@@ -164,7 +164,7 @@ ${""?left_pad(indent)}<div class="btn-group">
     <#if widget.type != "button">
       <#continue>
     </#if>
-<@print_layout_widget widget=widget indent=indent+2 />
+<@print_widget_layout widget=widget indent=indent+2 />
   </#list>
 ${""?left_pad(indent)}</div>
 </#macro>
@@ -172,7 +172,7 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                               DISPLAY FORM                              -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_display_form form indent=0>
+<#macro print_display_form_layout form indent=0>
   <#local cols = form.value("cols", "3")>
   <#list form.groups() as group>
 ${""?left_pad(indent)}<div class="card">
@@ -200,7 +200,7 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                                 TIME GRID                               -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_week_grid grid indent=0>
+<#macro print_week_grid_layout grid indent=0>
 ${""?left_pad(indent)}<${namespace}-weekgrid
 ${""?left_pad(indent)}  v-model="calendarDate"
 ${""?left_pad(indent)}  :events="${js.nameVariable(grid.id)}Rows"
@@ -215,7 +215,7 @@ ${""?left_pad(indent)}/>
 <!----------------------------------------------------------------------------->
 <!--                                LIST VIEW                                -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_list_view list indent=0>
+<#macro print_list_view_layout list indent=0>
 ${""?left_pad(indent)}<div class="card">
 ${""?left_pad(indent)}  <div class="card-header">
 ${""?left_pad(indent)}    <div class="card-title">${list.title}</div>
@@ -231,13 +231,13 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                                  BUTTON                                 -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_buttons buttons indent=0>
+<#macro print_buttons_layout buttons indent=0>
   <#if buttons.ancestor("tabs")??>
     <#return>
   </#if>
 ${""?left_pad(indent)}<div class="form-footer form-footer--right">
   <#list buttons.children as child>
-<@print_layout_widget widget=child indent=indent+4 />
+<@print_widget_layout widget=child indent=indent+4 />
   </#list>    
 ${""?left_pad(indent)}</div>
 </#macro>
@@ -245,15 +245,15 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <!--                                   PAGE                                  -->
 <!----------------------------------------------------------------------------->
-<#macro print_layout_container widget indent>
+<#macro print_container_layout widget indent>
 ${""?left_pad(indent)}<div class="card">
 ${""?left_pad(indent)}  <div class="card-body">
-<@print_layout_widget widget=widget indent=indent />
+<@print_widget_layout widget=widget indent=indent />
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
 </#macro>
 
-<#macro print_layout_custom widget indent>
+<#macro print_custom_layout widget indent>
   <#if widget.type == "card">
 ${""?left_pad(indent)}<div class="card">
 ${""?left_pad(indent)}  <div class="card-header">
@@ -264,7 +264,7 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}  <div class="card-body">
   <#list widget.children as child>
-<@print_layout_widget widget=child indent=indent+2 />
+<@print_widget_layout widget=child indent=indent+2 />
   </#list>
 ${""?left_pad(indent)}  </div>  
 ${""?left_pad(indent)}</div>  
@@ -278,11 +278,11 @@ ${""?left_pad(indent)}<button class="btn btn-${guidbase.get_button_role(widget)}
     </#if>
   <#elseif widget.type == "longtext">
 ${""?left_pad(indent)}<textarea class="form-input resize-v" data-test="${js.nameVariable(widget.id)}" 
-${""?left_pad(indent)}          v-model="${get_input_model_name(widget)}" placeholder="${widget.value("placeholder",("请输入" + widget.title))}"></textarea>  
+${""?left_pad(indent)}          v-model="${js.nameVariable(widget.id)}" placeholder="${widget.value("placeholder",("请输入" + widget.title))}"></textarea>  
   <#elseif widget.type == "text">
 ${""?left_pad(indent)}<div class="input-with-unit">
 ${""?left_pad(indent)}  <input class="form-input" data-test="${js.nameVariable(widget.id)}" 
-${""?left_pad(indent)}         v-model="${get_input_model_name(widget)}" 
+${""?left_pad(indent)}         v-model="${js.nameVariable(widget.id)}" 
     <#if (widget.value("readonly")!"") == "true">
 ${""?left_pad(indent)}         :disabled="true">
     <#else>
@@ -295,7 +295,7 @@ ${""?left_pad(indent)}</div>
   <#elseif widget.type == "number">
 ${""?left_pad(indent)}<div class="input-with-unit">  
 ${""?left_pad(indent)}  <input class="form-input" data-test="${js.nameVariable(widget.id)}" 
-${""?left_pad(indent)}         v-model="${get_input_model_name(widget)}" 
+${""?left_pad(indent)}         v-model="${js.nameVariable(widget.id)}" 
     <#if (widget.value("readonly")!"") == "true">
 ${""?left_pad(indent)}         :disabled="true">
     <#else>
@@ -308,6 +308,6 @@ ${""?left_pad(indent)}</div>
   </#if>
 </#macro>
 
-<#macro print_layout_divider indent=0>
+<#macro print_divider_layout indent=0>
 ${""?left_pad(indent)}<div style="height:16px;"></div>
 </#macro>

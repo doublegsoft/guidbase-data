@@ -1,5 +1,5 @@
 <#import "/$/guidbase.ftl" as guidbase>
-<#include "tile-vue3.ftl">
+<#include "tile@vue3.ftl">
 <!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
 <!----------------------------------------------------------------------------->
@@ -224,7 +224,7 @@ const load${js.nameType(form.id)}Rows = async () => {
 }
 </#macro>
 
-<#macro print_layout_excel_form form indent=0>
+<#macro print_excel_form_layout form indent=0>
 ${""?left_pad(indent)}<${namespace}-excelform style="flex:1;"
 ${""?left_pad(indent)}  :columns="${js.nameVariable(form.id)}Cols"
 ${""?left_pad(indent)}  :fetch-data="load${js.nameType(form.id)}Rows"
@@ -259,7 +259,7 @@ ${""?left_pad(indent)}  align: 'center',
 ${""?left_pad(indent)}  render: (v, row) => {                                       
 ${""?left_pad(indent)}    return `
       <#list column.children as button>
-<@print_layout_widget widget=button indent=indent+6 />      
+<@print_widget_layout widget=button indent=indent+6 />      
       </#list>
 ${""?left_pad(indent)}    `   
 ${""?left_pad(indent)}  },    
@@ -289,7 +289,7 @@ const load${js.nameType(table.id)}Rows = async (params, pageNumber, pageSize) =>
 }
 </#macro>
 
-<#macro print_layout_paged_table table indent=0>
+<#macro print_paged_table_layout table indent=0>
 ${""?left_pad(indent)}<${namespace}-pagedtable
 ${""?left_pad(indent)}  ref="${js.nameVariable(table.id)}Ref"
 ${""?left_pad(indent)}  style="flex:1"
@@ -333,7 +333,7 @@ ${""?left_pad(indent)}  align: 'center',
 ${""?left_pad(indent)}  render: (v, row) => {                                       
 ${""?left_pad(indent)}    return `
       <#list column.children as button>
-<@print_layout_widget widget=button indent=indent+6 />      
+<@print_widget_layout widget=button indent=indent+6 />      
       </#list>
 ${""?left_pad(indent)}    `   
 ${""?left_pad(indent)}  },    
@@ -363,7 +363,7 @@ const load${js.nameType(table.id)}Rows = async (params, pageNumber, pageSize) =>
 }
 </#macro>
 
-<#macro print_layout_fixed_table table indent=0>
+<#macro print_fixed_table_layout table indent=0>
 ${""?left_pad(indent)}<${namespace}-fixedtable
 ${""?left_pad(indent)}  ref="${js.nameVariable(table.id)}Ref"
 ${""?left_pad(indent)}  style="flex:1"
@@ -405,7 +405,7 @@ const load${js.nameType(grid.id)}Rows = async (params, pageNumber, pageSize) => 
 }
 </#macro>
 
-<#macro print_layout_paged_grid grid indent=0>
+<#macro print_paged_grid_layout grid indent=0>
 ${""?left_pad(indent)}<${namespace}-pagedgrid
 ${""?left_pad(indent)}  ref="${js.nameVariable(grid.id)}Ref"
 ${""?left_pad(indent)}  style="flex:1"
@@ -569,7 +569,7 @@ const load${js.nameType(chart.id)}Rows = async (params, pageNumber, pageSize) =>
 }
 </#macro>
 
-<#macro print_layout_chart chart indent=0>
+<#macro print_chart_layout chart indent=0>
 ${""?left_pad(indent)}<${namespace}-chart :option="${js.nameVariable(chart.id)}Conf" height="280px" />
 </#macro>
 
@@ -639,7 +639,7 @@ const ${guidbase.name_button_method(button)} = async () => {
 <#--
  ### 页面中固定在底部，tabs出现在右侧
  -->
-<#macro print_layout_buttons buttons indent=0>
+<#macro print_buttons_layout buttons indent=0>
   <#-- bnrlike 模式下，按钮在tab页的右侧 -->
   <#if buttons.ancestor("tabs")??>
     <#return>
@@ -647,7 +647,7 @@ const ${guidbase.name_button_method(button)} = async () => {
 ${""?left_pad(indent)}<div class="${namespace}-form-footer">
 ${""?left_pad(indent)}  <div style="margin-left: auto;">
   <#list buttons.children as child>
-<@print_layout_widget widget=child indent=indent+4 />
+<@print_widget_layout widget=child indent=indent+4 />
   </#list>    
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
@@ -812,25 +812,25 @@ ${""?left_pad(indent)}}
     <#if child.type != "dialog" && child.type != "drawer" && 
          child.type != "buttons" && child.type != "entry_form" && 
          page.value("viewport") == "" >
-<@print_layout_container widget=child indent=indent />       
+<@print_container_layout widget=child indent=indent />       
     <#else>
-<@print_layout_widget widget=child indent=indent />        
+<@print_widget_layout widget=child indent=indent />        
     </#if>
     <#if child?index != children?size - 1>
-<@print_layout_divider indent=indent />    
+<@print_divider_layout indent=indent />    
     </#if>
   </#list>
   <#-- 把带有viewport的显示在最后 -->
   <#list page.children as child>
     <#if child.value("viewport","") != "">
-<@print_layout_widget widget=child indent=indent />          
+<@print_widget_layout widget=child indent=indent />          
     </#if>
   </#list>
 </#macro>
 
-<#macro print_layout_divider indent=0></#macro>
+<#macro print_divider_layout indent=0></#macro>
 
-<#macro print_layout_widget widget indent=0>
+<#macro print_widget_layout widget indent=0>
   <#if widget.type == "drawer">
 ${""?left_pad(indent)}<${namespace}-drawer v-model="${js.nameVariable(widget.id)}Open" title="${widget.title}">
     <#if widget.value("page","") != "">
@@ -838,7 +838,7 @@ ${""?left_pad(indent)}<${namespace}-drawer v-model="${js.nameVariable(widget.id)
 ${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
     <#else>
       <#list widget.children as child>
-<@print_layout_widget widget=child indent=indent />    
+<@print_widget_layout widget=child indent=indent />    
       </#list>
     </#if>
 ${""?left_pad(indent)}</${namespace}-drawer>
@@ -849,34 +849,34 @@ ${""?left_pad(indent)}<${namespace}-dialog v-model="${js.nameVariable(widget.id)
 ${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
     <#else>
       <#list widget.children as child>
-<@print_layout_widget widget=child indent=indent />    
+<@print_widget_layout widget=child indent=indent />    
       </#list>
     </#if>
 ${""?left_pad(indent)}</${namespace}-dialog>
   <#elseif widget.type == "tabs">
-<@print_layout_tabs tabs=widget indent=indent />
+<@print_tabs_layout tabs=widget indent=indent />
   <#elseif widget.type == "entry_form">
-<@print_layout_entry_form form=widget indent=indent />    
+<@print_entry_form_layout form=widget indent=indent />    
   <#elseif widget.type == "official_form">
-<@print_layout_official_form form=widget indent=indent />   
+<@print_official_form_layout form=widget indent=indent />   
   <#elseif widget.type == "excel_form">
-<@print_layout_excel_form form=widget indent=indent />      
+<@print_excel_form_layout form=widget indent=indent />      
   <#elseif widget.type == "paged_table">
-<@print_layout_paged_table table=widget indent=indent />
+<@print_paged_table_layout table=widget indent=indent />
   <#elseif widget.type == "fixed_table">
-<@print_layout_fixed_table table=widget indent=indent />
+<@print_fixed_table_layout table=widget indent=indent />
   <#elseif widget.type == "criteria_form">
-<@print_layout_criteria_form form=widget indent=indent />
+<@print_criteria_form_layout form=widget indent=indent />
   <#elseif widget.type == "display_form">
-<@print_layout_display_form form=widget indent=indent />
+<@print_display_form_layout form=widget indent=indent />
   <#elseif widget.type == "paged_grid">
-<@print_layout_paged_grid grid=widget indent=indent />
+<@print_paged_grid_layout grid=widget indent=indent />
   <#elseif widget.type == "list_view">
-<@print_layout_list_view list=widget indent=indent />
+<@print_list_view_layout list=widget indent=indent />
   <#elseif widget.type == "chart">
-<@print_layout_chart chart=widget indent=indent />
+<@print_chart_layout chart=widget indent=indent />
   <#elseif widget.type == "buttons">
-<@print_layout_buttons buttons=widget indent=indent />
+<@print_buttons_layout buttons=widget indent=indent />
   <#elseif widget.type == "select">
     <#if (widget.value("data")!"")?starts_with("enum[")>
 ${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="sdk.${js.nameVariable(widget.id)}Options" :clearable="true" v-model="${guidbase.name_input_variable(widget)}" />    
@@ -902,6 +902,6 @@ ${""?left_pad(indent)}<${namespace}-videoupload data-test="${js.nameVariable(wid
 <#elseif widget.type == "files">
 ${""?left_pad(indent)}<${namespace}-fileupload data-test="${js.nameVariable(widget.id)}" v-model="${guidbase.name_input_variable(widget)}" />
   <#else><#-- 各个Design System的个性化风格 -->
-<@print_layout_custom widget=widget indent=indent />  
+<@print_custom_layout widget=widget indent=indent />  
   </#if>
 </#macro>
