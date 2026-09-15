@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>如期 - 治愈系萌宠目标追踪</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入萌系圆润字体 + FontAwesome 图标 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+  <!-- 礼花特效库 (还原 00:24 爆彩屑效果) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* 萌系软糯字体 */
+    body {
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", sans-serif;
+      background: #eef6f2;
+      background-image: 
+        radial-gradient(#cde9dc 1.5px, transparent 1.5px), 
+        radial-gradient(#cde9dc 1.5px, #eef6f2 1.5px);
+      background-size: 30px 30px;
+      background-position: 0 0, 15px 15px;
+      color: #334e44;
+    }
+
+    /* 3D 软萌果冻按键效果 (带下压手感) */
+    .btn-jelly-green {
+      background: linear-gradient(180deg, #34d399 0%, #059669 100%);
+      box-shadow: 0 5px 0 #047857, 0 10px 15px rgba(5, 150, 105, 0.25);
+      transition: all 0.1s ease-in-out;
+    }
+    .btn-jelly-green:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #047857, 0 4px 8px rgba(5, 150, 105, 0.2);
+    }
+
+    .btn-jelly-white {
+      background: #ffffff;
+      box-shadow: 0 4px 0 #d1e3d9, 0 6px 12px rgba(0, 0, 0, 0.04);
+      transition: all 0.1s ease-in-out;
+    }
+    .btn-jelly-white:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #d1e3d9;
+    }
+
+    /* 奶油贴纸卡片样式 */
+    .cute-card {
+      background: rgba(255, 255, 255, 0.95);
+      border: 3px solid #e1efe7;
+      border-radius: 28px;
+      box-shadow: 0 12px 25px -4px rgba(100, 140, 120, 0.08);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .cute-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      border-color: #a7f3d0;
+      box-shadow: 0 18px 30px -4px rgba(16, 185, 129, 0.15);
+    }
+
+    /* 彩色波浪进度槽 */
+    .cute-progress-bar {
+      background: #e4f2eb;
+      border-radius: 999px;
+      padding: 3px;
+      border: 2px solid #d4ebe0;
+    }
+    .cute-progress-fill {
+      background: linear-gradient(90deg, #6ee7b7, #10b981, #059669);
+      border-radius: 999px;
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6);
+      height: 100%;
+      position: relative;
+    }
+    .cute-progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 6px;
+      right: 6px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 999px;
+    }
+
+    /* 治愈小动物摆动动画 (柴犬/猫咪头) */
+    @keyframes cuteWiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-8deg) scale(1.05); }
+      75% { transform: rotate(8deg) scale(1.05); }
+    }
+    .animate-wiggle {
+      animation: cuteWiggle 3.5s ease-in-out infinite;
+      transform-origin: bottom center;
+    }
+
+    @keyframes floatBubble {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .animate-float {
+      animation: floatBubble 2.5s ease-in-out infinite;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-200">
+
+  <!-- 顶部萌系软糖 Header -->
+  <header class="h-20 bg-white/90 backdrop-blur-md border-b-4 border-[#e2efe8] px-8 flex items-center justify-between sticky top-0 z-40">
+    <div class="flex items-center space-x-4">
+      <!-- 软萌 Logo 果冻方块 -->
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-emerald-200 transform -rotate-3 hover:rotate-6 transition">
+        🌱
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="text-2xl font-black tracking-wide text-emerald-950">如期</span>
+          <span class="text-xs bg-emerald-100 border-2 border-emerald-300 text-emerald-800 px-2.5 py-0.5 rounded-full font-black">v2.8 萌力版</span>
+        </div>
+        <p class="text-[11px] text-emerald-700/60 font-bold -mt-0.5">今天也是元气满满推进目标的一天！✨</p>
+      </div>
+
+      <!-- 视频同款 Hermes 胶囊 -->
+      <div class="hidden md:flex items-center space-x-2 ml-6 px-3.5 py-1.5 rounded-full bg-emerald-50 border-2 border-emerald-200 text-emerald-800 text-xs font-black shadow-xs">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+        <span>Hermes 智能助手已连接 🪄</span>
+      </div>
+    </div>
+
+    <!-- 右侧：中英药丸切换 + 贴纸风账户 -->
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center bg-[#e4f0ea] p-1.5 rounded-full border-2 border-[#d0e5dc] text-xs font-black">
+        <button id="langZh" onclick="switchLang('zh')" class="px-3 py-1 rounded-full bg-white shadow text-emerald-900 transition">中文</button>
+        <button id="langEn" onclick="switchLang('en')" class="px-3 py-1 rounded-full text-emerald-700/70 hover:text-emerald-900 transition">EN</button>
+      </div>
+      
+      <div class="flex items-center space-x-2 px-3.5 py-1.5 bg-white border-2 border-[#e0efe7] rounded-2xl cursor-pointer hover:border-emerald-300 transition text-xs font-extrabold text-emerald-900 shadow-sm">
+        <span>💌</span>
+        <span>creator@orderly.app</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容三栏 -->
+  <div class="flex flex-1 max-w-[1700px] w-full mx-auto p-5 gap-5">
+
+    <!-- 1. 左侧胖嘟嘟侧边栏 -->
+    <aside class="w-64 flex-shrink-0 flex flex-col justify-between hidden md:flex">
+      <div class="space-y-2.5">
+        <button class="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-extrabold text-emerald-900 bg-white/70 border-2 border-[#d9ece2] hover:bg-white transition">
+          <div class="flex items-center space-x-3">
+            <span class="text-xl">📅</span>
+            <span class="lang" data-zh="今天任务" data-en="Today">今天任务</span>
+          </div>
+          <span class="text-xs bg-emerald-100 border border-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full font-black">0</span>
+        </button>
+
+        <!-- 激活项：果冻高光薄荷绿 -->
+        <button class="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-black text-white bg-gradient-to-r from-emerald-500 to-teal-500 border-2 border-emerald-400 shadow-md shadow-emerald-500/20 transform scale-102 transition">
+          <div class="flex items-center space-x-3">
+            <span class="text-xl">📋</span>
+            <span class="lang" data-zh="短期项目" data-en="Short-term">短期项目</span>
+          </div>
+          <span class="text-xs bg-white text-emerald-700 px-2 py-0.5 rounded-full font-black shadow-inner">3</span>
+        </button>
+
+        <button class="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-extrabold text-emerald-900 bg-white/70 border-2 border-[#d9ece2] hover:bg-white transition">
+          <div class="flex items-center space-x-3">
+            <span class="text-xl">🏔️</span>
+            <span class="lang" data-zh="长期项目" data-en="Long-term">长期项目</span>
+          </div>
+          <span class="text-xs bg-emerald-100 border border-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full font-black">1</span>
+        </button>
+
+        <!-- 黄色奶酪里程碑 -->
+        <button class="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-extrabold text-amber-950 bg-amber-50 border-2 border-amber-200 hover:bg-amber-100/70 transition">
+          <div class="flex items-center space-x-3">
+            <span class="text-xl">🏆</span>
+            <span class="lang" data-zh="里程碑勋章" data-en="Milestones">里程碑勋章</span>
+          </div>
+          <span class="text-xs bg-amber-400 text-white font-black px-2 py-0.5 rounded-full shadow-xs">2/24</span>
+        </button>
+
+        <button class="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-extrabold text-emerald-900 bg-white/70 border-2 border-[#d9ece2] hover:bg-white transition">
+          <div class="flex items-center space-x-3">
+            <span class="text-xl">🔮</span>
+            <span class="lang" data-zh="Hermes 连通" data-en="Hermes Hub">Hermes 连通</span>
+          </div>
+          <span class="text-[10px] bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded font-black">MCP</span>
+        </button>
+
+        <button class="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-extrabold text-emerald-900 bg-white/70 border-2 border-[#d9ece2] hover:bg-white transition">
+          <div class="flex items-center space-x-3">
+            <span class="text-xl">🎉</span>
+            <span class="lang" data-zh="已达成目标" data-en="Finished">已达成目标</span>
+          </div>
+          <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-black">3</span>
+        </button>
+      </div>
+
+      <!-- 侧边栏贴纸风小卡片 -->
+      <div class="space-y-3 pt-3">
+        <div class="p-3.5 bg-white/80 rounded-2xl border-2 border-[#d9ece2] text-xs font-black flex items-center justify-between">
+          <span class="flex items-center gap-2">⏰ 每天 09:00 叫我</span>
+          <span class="text-emerald-500 font-black">开启</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. 中间主要舞台 (Main Stage) -->
+    <main class="flex-1 flex flex-col space-y-5 overflow-y-auto pr-1">
+
+      <!-- 萌萌的 SMART 目标输入栏卡片 -->
+      <section class="cute-card p-6 bg-white/95 relative overflow-hidden">
+        <!-- 装饰背景小爪印 -->
+        <span class="absolute -right-4 -bottom-4 text-8xl text-emerald-50 opacity-40 font-black select-none">🐾</span>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end relative z-10">
+          <div class="md:col-span-5">
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="text-xs font-black text-emerald-950 flex items-center gap-1.5">
+                <span>🎯 当前要拆解的大目标</span>
+              </label>
+              <span class="text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-extrabold border border-emerald-200">
+                ✨ SMART 魔法拆解
+              </span>
+            </div>
+            <input type="text" value="岗位: AWS架构师准备 / 景观方案深化 / 雅思口语7分" class="w-full bg-[#f4f9f6] border-2 border-[#d1e8dc] focus:bg-white focus:border-emerald-500 rounded-2xl px-4 py-2.5 text-xs font-black text-emerald-950 outline-none transition shadow-inner">
+          </div>
+
+          <div class="md:col-span-3">
+            <label class="text-xs font-black text-emerald-950 block mb-1.5">🏁 约定截止日期</label>
+            <input type="date" value="2026-09-19" class="w-full bg-[#f4f9f6] border-2 border-[#d1e8dc] focus:bg-white focus:border-emerald-500 rounded-2xl px-4 py-2.5 text-xs font-black text-emerald-950 outline-none transition shadow-inner">
+          </div>
+
+          <div class="md:col-span-4 flex items-center space-x-2">
+            <button onclick="fireConfetti(event)" class="flex-1 btn-jelly-green text-white text-xs font-black py-3 px-5 rounded-2xl flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>添加大愿望</span>
+            </button>
+            <button onclick="fireConfetti(event)" class="btn-jelly-white border-2 border-emerald-300 text-emerald-700 text-xs font-black py-3 px-4 rounded-2xl">
+              ⚡ 5分钟微启动
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-3.5 pt-3 border-t-2 border-dashed border-[#e6f2ec] flex items-center text-xs font-bold text-emerald-700/80">
+          <span class="mr-1.5">💡 小贴士：</span>
+          <span>不用有心理压力，只需填一个目标，系统会自动帮你切成一口一口能吃下的小泡芙！</span>
+        </div>
+      </section>
+
+      <!-- 动态推进胶囊条 (带光效) -->
+      <div class="bg-gradient-to-r from-emerald-100 via-teal-50 to-emerald-100 border-2 border-emerald-300 rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
+        <div class="flex items-center space-x-3">
+          <span class="text-2xl animate-bounce">👉</span>
+          <div>
+            <div class="text-[11px] font-black text-emerald-600 uppercase tracking-wider">今日推荐推进</div>
+            <div class="text-xs font-black text-emerald-950">「某三期项目景观施工图」 (58% · 接下来是：施工图绘制)</div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="fireConfetti(event)" class="btn-jelly-white border-2 border-emerald-300 text-emerald-800 text-xs font-black px-3.5 py-1.5 rounded-xl">
+            🚀 5分钟启动
+          </button>
+          <button onclick="fireConfetti(event)" class="btn-jelly-green text-white text-xs font-black px-4 py-1.5 rounded-xl">
+            打卡记录进度
+          </button>
+        </div>
+      </div>
+
+      <!-- 四张胖乎乎的项目卡片网格 -->
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- 卡片 1 -->
+        <div class="cute-card p-5 relative">
+          <div class="flex items-center justify-between">
+            <h3 class="font-black text-sm text-emerald-950 flex items-center gap-2">
+              <span>🏡</span> 某三期工程施工图
+            </h3>
+            <span class="text-xs font-black text-emerald-700 bg-emerald-100 border-2 border-emerald-300 px-2.5 py-0.5 rounded-full">58%</span>
+          </div>
+          <div class="text-[11px] font-extrabold text-emerald-600/70 mt-1 mb-3">📅 最终截止: 2026-08-23</div>
+          
+          <div class="cute-progress-bar h-3.5 w-full mb-3.5">
+            <div class="cute-progress-fill" style="width: 58%"></div>
+          </div>
+
+          <div class="flex items-center justify-between bg-[#f4f9f6] p-2.5 rounded-2xl border-2 border-[#e0efe7] mb-3">
+            <div class="text-xs font-black text-emerald-950">下一步：<span class="text-emerald-700 font-black">施工图绘制 📐</span></div>
+            <button onclick="fireConfetti(event)" class="btn-jelly-white text-[11px] font-black text-emerald-700 px-2.5 py-1 rounded-xl border border-emerald-200">▶ 5分钟开始</button>
+          </div>
+
+          <div class="flex items-center justify-between pt-2 border-t-2 border-[#f0f6f3] text-xs font-black text-emerald-800">
+            <span class="text-emerald-600/80">🐣 子任务节点 <b class="text-emerald-700 font-black">1/1</b></span>
+            <button onclick="fireConfetti(event)" class="hover:text-emerald-600 transition flex items-center gap-1">
+              <span>✍️ 记一笔进度</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 卡片 2 (橙色系点缀) -->
+        <div class="cute-card p-5 relative">
+          <div class="flex items-center justify-between">
+            <h3 class="font-black text-sm text-emerald-950 flex items-center gap-2">
+              <span>🛍️</span> 某商业金街效果图深化
+            </h3>
+            <span class="text-xs font-black text-amber-800 bg-amber-100 border-2 border-amber-300 px-2.5 py-0.5 rounded-full">25%</span>
+          </div>
+          <div class="text-[11px] font-extrabold text-emerald-600/70 mt-1 mb-3">📅 最终截止: 2026-08-23</div>
+          
+          <div class="cute-progress-bar h-3.5 w-full mb-3.5">
+            <div class="cute-progress-fill !bg-gradient-to-r !from-amber-300 !to-amber-500" style="width: 25%"></div>
+          </div>
+
+          <div class="flex items-center justify-between bg-[#f4f9f6] p-2.5 rounded-2xl border-2 border-[#e0efe7] mb-3">
+            <div class="text-xs font-black text-emerald-950">下一步：<span class="text-amber-800 font-black">效果图主材匹配 🎨</span></div>
+            <button onclick="fireConfetti(event)" class="btn-jelly-white text-[11px] font-black text-emerald-700 px-2.5 py-1 rounded-xl border border-emerald-200">▶ 5分钟开始</button>
+          </div>
+
+          <div class="flex items-center justify-between pt-2 border-t-2 border-[#f0f6f3] text-xs font-black text-emerald-800">
+            <span class="text-emerald-600/80">🐣 子任务节点 <b class="text-emerald-700 font-black">1/1</b></span>
+            <button onclick="fireConfetti(event)" class="hover:text-emerald-600 transition flex items-center gap-1">
+              <span>✍️ 记一笔进度</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 卡片 3 -->
+        <div class="cute-card p-5 relative">
+          <div class="flex items-center justify-between">
+            <h3 class="font-black text-sm text-emerald-950 flex items-center gap-2">
+              <span>🌿</span> 某产业园区方案汇报
+            </h3>
+            <span class="text-xs font-black text-emerald-700 bg-emerald-100 border-2 border-emerald-300 px-2.5 py-0.5 rounded-full">58%</span>
+          </div>
+          <div class="text-[11px] font-extrabold text-emerald-600/70 mt-1 mb-3">📅 最终截止: 2026-08-23</div>
+          
+          <div class="cute-progress-bar h-3.5 w-full mb-3.5">
+            <div class="cute-progress-fill" style="width: 58%"></div>
+          </div>
+
+          <div class="flex items-center justify-between bg-[#f4f9f6] p-2.5 rounded-2xl border-2 border-[#e0efe7] mb-3">
+            <div class="text-xs font-black text-emerald-950">下一步：<span class="text-emerald-700 font-black">商务造价清单审核 📊</span></div>
+            <button onclick="fireConfetti(event)" class="btn-jelly-white text-[11px] font-black text-emerald-700 px-2.5 py-1 rounded-xl border border-emerald-200">▶ 5分钟开始</button>
+          </div>
+
+          <div class="flex items-center justify-between pt-2 border-t-2 border-[#f0f6f3] text-xs font-black text-emerald-800">
+            <span class="text-emerald-600/80">🐣 子任务节点 <b class="text-emerald-700 font-black">1/1</b></span>
+            <button onclick="fireConfetti(event)" class="hover:text-emerald-600 transition flex items-center gap-1">
+              <span>✍️ 记一笔进度</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 卡片 4 -->
+        <div class="cute-card p-5 relative">
+          <div class="flex items-center justify-between">
+            <h3 class="font-black text-sm text-emerald-950 flex items-center gap-2">
+              <span>🍁</span> 某秋季新品品牌策划
+            </h3>
+            <span class="text-xs font-black text-teal-800 bg-teal-100 border-2 border-teal-300 px-2.5 py-0.5 rounded-full">67%</span>
+          </div>
+          <div class="text-[11px] font-extrabold text-emerald-600/70 mt-1 mb-3">📅 最终截止: 2026-12-08</div>
+          
+          <div class="cute-progress-bar h-3.5 w-full mb-3.5">
+            <div class="cute-progress-fill !bg-gradient-to-r !from-teal-300 !to-emerald-500" style="width: 67%"></div>
+          </div>
+
+          <div class="flex items-center justify-between bg-[#f4f9f6] p-2.5 rounded-2xl border-2 border-[#e0efe7] mb-3">
+            <div class="text-xs font-black text-emerald-950">下一步：<span class="text-teal-800 font-black">与甲方沟通主KV 🎨</span></div>
+            <button onclick="fireConfetti(event)" class="btn-jelly-white text-[11px] font-black text-emerald-700 px-2.5 py-1 rounded-xl border border-emerald-200">▶ 5分钟开始</button>
+          </div>
+
+          <div class="flex items-center justify-between pt-2 border-t-2 border-[#f0f6f3] text-xs font-black text-emerald-800">
+            <span class="text-emerald-600/80">🐣 子任务节点 <b class="text-emerald-700 font-black">1/1</b></span>
+            <button onclick="fireConfetti(event)" class="hover:text-emerald-600 transition flex items-center gap-1">
+              <span>✍️ 记一笔进度</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 底部彩蛋按钮：打开复盘大弹窗 -->
+      <div class="text-center py-2">
+        <button onclick="openCuteModal(); fireConfetti(event);" class="btn-jelly-white border-2 border-emerald-400 text-emerald-800 font-black text-xs px-6 py-3 rounded-2xl">
+          🌟 点我看超萌的月度成长战报 (00:26 同款)
+        </button>
+      </div>
+
+    </main>
+
+    <!-- 3. 右侧栏（附带视频灵魂：右下角小宠物） -->
+    <aside class="w-80 flex-shrink-0 space-y-4 hidden lg:flex flex-col justify-between">
+      
+      <div class="space-y-4">
+        <!-- 侧栏微卡片 1 -->
+        <div class="cute-card p-5">
+          <div class="flex justify-between items-center mb-3">
+            <span class="text-xs font-black text-emerald-950">📌 短期任务速览</span>
+            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-black">3</span>
+          </div>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs font-extrabold mb-1">
+                <span>某三期施工图</span>
+                <span class="text-emerald-600 font-black">58%</span>
+              </div>
+              <div class="cute-progress-bar h-2 w-full"><div class="cute-progress-fill" style="width: 58%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-extrabold mb-1">
+                <span>商业街效果图</span>
+                <span class="text-amber-600 font-black">25%</span>
+              </div>
+              <div class="cute-progress-bar h-2 w-full"><div class="cute-progress-fill !bg-amber-400" style="width: 25%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 侧栏微卡片 2 -->
+        <div class="cute-card p-5">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-black text-emerald-950">🏆 长期愿景</span>
+            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-black">1</span>
+          </div>
+          <div class="flex justify-between text-xs font-extrabold mb-1">
+            <span>秋季品牌活动策划</span>
+            <span class="text-teal-600 font-black">67%</span>
+          </div>
+          <div class="cute-progress-bar h-2 w-full"><div class="cute-progress-fill" style="width: 67%"></div></div>
+        </div>
+      </div>
+
+      <!-- ⭐ 视频 00:25 右下角那只摇摆的可爱桌宠！⭐ -->
+      <div class="relative bg-gradient-to-b from-[#fffbf0] to-[#fff3d6] border-3 border-[#fed7aa] rounded-3xl p-4 text-center shadow-lg cursor-pointer transform hover:scale-105 transition" onclick="petCompanion(event)">
+        <!-- 对话气泡 (摇晃悬浮) -->
+        <div id="petBubble" class="animate-float absolute -top-10 left-1/2 -translate-x-1/2 bg-white border-2 border-amber-300 text-amber-900 text-[11px] font-black px-3 py-1 rounded-full shadow-md whitespace-nowrap">
+          汪！点我给你加油打气！✨
+        </div>
+
+        <!-- 治愈摇摆小狗头像 -->
+        <div class="text-6xl animate-wiggle inline-block filter drop-shadow-md select-none mt-2">
+          🐶
+        </div>
+
+        <div class="mt-2">
+          <div class="flex items-center justify-center gap-1.5">
+            <span class="font-black text-xs text-amber-950">如期陪伴小柴</span>
+            <span class="bg-amber-300 text-amber-950 text-[10px] font-black px-2 py-0.2 rounded-full">Lv.3 饱腹</span>
+          </div>
+          <p class="text-[11px] font-bold text-amber-800/80 mt-1 leading-relaxed">
+            “注意：保持小步向前，持续推进小任务就是对目标最好的支持！不要有压力哦~”
+          </p>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- 视频 00:26 同款月度战报复盘超级可爱弹窗 -->
+  <div id="cuteReviewModal" class="fixed inset-0 bg-emerald-950/40 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="cute-card !bg-white max-w-xl w-full p-7 relative border-4 border-emerald-300 shadow-2xl">
+      
+      <!-- 右上角果冻关闭圆钮 -->
+      <button onclick="closeCuteModal()" class="btn-jelly-white absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center font-black text-emerald-900 border-2 border-emerald-200">
+        ✕
+      </button>
+
+      <!-- 弹窗头 -->
+      <div class="flex items-center space-x-4 border-b-2 border-[#e6f3ec] pb-4 mb-5">
+        <div class="w-14 h-14 rounded-2xl bg-amber-100 border-2 border-amber-300 flex items-center justify-center text-3xl shadow-inner">
+          🐣
+        </div>
+        <div>
+          <h3 class="font-black text-lg text-emerald-950 flex items-center gap-2">
+            <span>月度成长战略复盘</span>
+            <span class="text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-full">Monthly</span>
+          </h3>
+          <p class="text-xs font-bold text-emerald-700/60">在过去的 30 天里，你把大目标拆成了超棒的小奇迹！</p>
+        </div>
+      </div>
+
+      <!-- 4 宫格萌系数字胶囊 (如视频 00:27) -->
+      <div class="grid grid-cols-4 gap-2.5 mb-5 text-center">
+        <div class="bg-[#f4f9f6] border-2 border-[#e0efe7] p-3 rounded-2xl">
+          <div class="text-[10px] font-black text-emerald-600">延期项目</div>
+          <div class="text-xl font-black text-emerald-950 mt-0.5">0</div>
+        </div>
+        <div class="bg-[#f4f9f6] border-2 border-[#e0efe7] p-3 rounded-2xl">
+          <div class="text-[10px] font-black text-emerald-600">长期目标完成</div>
+          <div class="text-xl font-black text-emerald-950 mt-0.5">0</div>
+        </div>
+        <div class="bg-[#f4f9f6] border-2 border-[#e0efe7] p-3 rounded-2xl">
+          <div class="text-[10px] font-black text-emerald-600">累计打卡</div>
+          <div class="text-xl font-black text-emerald-600 mt-0.5">3 <span class="text-xs">次</span></div>
+        </div>
+        <div class="bg-emerald-100 border-2 border-emerald-300 p-3 rounded-2xl">
+          <div class="text-[10px] font-black text-emerald-800">完成率</div>
+          <div class="text-xl font-black text-emerald-700 mt-0.5">98%</div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-emerald-50 rounded-2xl border-2 border-emerald-200 text-xs font-extrabold text-emerald-900 leading-relaxed mb-5">
+        🎉 <b>太棒啦，从容推进的感觉真好：</b><br>
+        即使面对繁忙的排期，你依然坚持记录并完成了每一件 5 分钟微启动任务！小柴为你颁发一枚「自律小海星」勋章 ⭐！
+      </div>
+
+      <!-- 底部萌萌按钮 -->
+      <div class="flex items-center justify-between">
+        <button class="btn-jelly-white text-xs font-black text-emerald-900 px-4 py-2.5 rounded-xl border border-emerald-200 flex items-center gap-1.5">
+          📷 拍一张卡片留念
+        </button>
+        <button onclick="closeCuteModal(); fireConfetti(event);" class="btn-jelly-green text-xs font-black text-white px-6 py-2.5 rounded-xl">
+          收下鼓励，继续冲鸭 🚀
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 互动逻辑脚本 -->
+  <script>
+    // 1. 还原视频 00:24 爆彩带彩屑粒子特效 (Canvas Confetti)
+    function fireConfetti(event) {
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.75 },
+        colors: ['#34d399', '#10b981', '#fbbf24', '#f472b6', '#60a5fa']
+      });
+    }
+
+    // 2. 摸摸右下角小桌宠彩蛋
+    const petQuotes = [
+      "汪呜~ 主人今天也超级棒！💖",
+      "哪怕只做 5 分钟也很厉害啦！🐾",
+      "喝口水，伸个懒腰吧！🍵",
+      "今天的小柴也是你的头号粉丝！⭐",
+      "嗷呜！目标正在一点点被攻克！🦴"
+    ];
+    function petCompanion(e) {
+      fireConfetti(e);
+      const bubble = document.getElementById('petBubble');
+      const randomQuote = petQuotes[Math.floor(Math.random() * petQuotes.length)];
+      bubble.textContent = randomQuote;
+      bubble.classList.remove('animate-float');
+      void bubble.offsetWidth; // 触发重绘
+      bubble.classList.add('animate-float');
+    }
+
+    // 3. 弹窗控制
+    function openCuteModal() {
+      document.getElementById('cuteReviewModal').classList.remove('hidden');
+    }
+    function closeCuteModal() {
+      document.getElementById('cuteReviewModal').classList.add('hidden');
+    }
+
+    // 4. 语言切换
+    function switchLang(lang) {
+      const zhBtn = document.getElementById('langZh');
+      const enBtn = document.getElementById('langEn');
+      const items = document.querySelectorAll('.lang');
+
+      if (lang === 'zh') {
+        zhBtn.className = "px-3 py-1 rounded-full bg-white shadow text-emerald-900 transition font-black";
+        enBtn.className = "px-3 py-1 rounded-full text-emerald-700/70 hover:text-emerald-900 transition font-bold";
+        items.forEach(el => el.textContent = el.getAttribute('data-zh'));
+      } else {
+        enBtn.className = "px-3 py-1 rounded-full bg-white shadow text-emerald-900 transition font-black";
+        zhBtn.className = "px-3 py-1 rounded-full text-emerald-700/70 hover:text-emerald-900 transition font-bold";
+        items.forEach(el => el.textContent = el.getAttribute('data-en'));
+      }
+    }
+  </script>
+</body>
+</html>

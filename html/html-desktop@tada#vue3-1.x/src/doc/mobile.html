@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>步步爪 (Stepaw) - 治愈系微目标App</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome 图标库 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- 萌系字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <!-- 礼花彩屑特效库 -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e1ede6;
+      color: #284236;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 手机外壳容器质感 */
+    .mobile-shell {
+      max-width: 414px;
+      height: 896px;
+      background: #edf5f1;
+      background-image: 
+        radial-gradient(#d1e9dc 1.5px, transparent 1.5px), 
+        radial-gradient(#d1e9dc 1.5px, #edf5f1 1.5px);
+      background-size: 24px 24px;
+      box-shadow: 0 25px 60px -15px rgba(26, 54, 41, 0.25), 0 0 0 10px #ffffff;
+      border-radius: 48px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* 隐藏滚动条但保留平滑滚动 */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* 3D 软萌微凸卡片 */
+    .app-card {
+      background: #ffffff;
+      border: 2.5px solid #e1efe7;
+      border-radius: 24px;
+      box-shadow: 0 6px 14px -2px rgba(40, 66, 54, 0.05);
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .app-card:active {
+      transform: scale(0.98);
+    }
+
+    /* 3D 果冻按钮微动效 */
+    .btn-jelly-green {
+      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 4px 0 #047857, 0 6px 10px rgba(5, 150, 105, 0.25);
+      transition: all 0.1s ease;
+    }
+    .btn-jelly-green:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #047857;
+    }
+
+    .btn-jelly-add {
+      background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+      box-shadow: 0 6px 0 #047857, 0 10px 18px rgba(5, 150, 105, 0.35);
+      transition: all 0.1s ease;
+    }
+    .btn-jelly-add:active {
+      transform: translateY(4px) scale(0.96);
+      box-shadow: 0 2px 0 #047857;
+    }
+
+    /* 进度条样式 */
+    .cute-progress-bar {
+      background: #e6f3ec;
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+      border: 1.5px solid #d7ebe0;
+    }
+    .cute-progress-fill {
+      background: linear-gradient(90deg, #6ee7b7, #10b981);
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    /* 底部抽屉动画 (Bottom Sheet) */
+    .sheet-transition {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* 小柴晃动动画 */
+    @keyframes dogWiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-8deg) scale(1.06); }
+      75% { transform: rotate(8deg) scale(1.06); }
+    }
+    .animate-wiggle {
+      animation: dogWiggle 3.5s ease-in-out infinite;
+      transform-origin: bottom center;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-0 md:p-6 select-none">
+
+  <!-- 手机实体外壳 (模拟 iPhone / 现代圆角全面屏) -->
+  <div class="mobile-shell w-full">
+
+    <!-- 1. 手机状态栏 + 灵动岛 (Dynamic Island) -->
+    <div class="h-12 w-full pt-3 px-7 flex justify-between items-center z-30 shrink-0">
+      <span class="text-xs font-black text-slate-800 tracking-tight">09:41</span>
+      <!-- 灵动岛药丸 -->
+      <div class="w-24 h-5 bg-black rounded-full flex items-center justify-center space-x-1 px-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-[9px] text-white font-bold tracking-wider">Stepaw</span>
+      </div>
+      <div class="flex items-center space-x-1.5 text-xs text-slate-800">
+        <i class="fa-solid fa-signal text-[10px]"></i>
+        <i class="fa-solid fa-wifi text-[10px]"></i>
+        <i class="fa-solid fa-battery-three-quarters text-xs"></i>
+      </div>
+    </div>
+
+    <!-- 2. 顶部 App Header (陪伴小桌宠胶囊) -->
+    <div class="px-5 pt-2 pb-3 flex items-center justify-between z-20 shrink-0">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white text-lg font-black shadow-md shadow-emerald-200">
+          🐾
+        </div>
+        <div>
+          <div class="flex items-center space-x-1.5">
+            <span class="text-lg font-black text-emerald-950">步步爪</span>
+            <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.2 rounded-full font-black border border-emerald-200">
+              今日打卡 3/4
+            </span>
+          </div>
+          <p class="text-[10px] font-bold text-emerald-700/60">小步慢跑，大目标如期实现 ✨</p>
+        </div>
+      </div>
+
+      <!-- 右上角摇摆小柴犬桌宠 (点击有互动) -->
+      <div onclick="petCompanion(event)" class="flex items-center bg-amber-50 border-2 border-amber-200 rounded-2xl px-2.5 py-1.5 cursor-pointer active:scale-95 transition shadow-xs">
+        <span class="text-2xl animate-wiggle inline-block mr-1">🐶</span>
+        <div class="text-left">
+          <div class="text-[9px] font-black text-amber-900 leading-none">如期小柴</div>
+          <div class="text-[8px] font-extrabold text-amber-600 mt-0.5">Lv.3 饱腹</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 中间可滚动区域 (App 内容流) -->
+    <div class="flex-1 overflow-y-auto no-scrollbar px-5 pb-28 space-y-4">
+      
+      <!-- 萌系今日核心推进卡片 (Hero Card) -->
+      <div class="app-card p-4 bg-gradient-to-br from-emerald-50 via-white to-teal-50/40 border-2 border-emerald-300 relative overflow-hidden">
+        <span class="absolute -right-2 -bottom-2 text-6xl text-emerald-100/50 font-black select-none">🎯</span>
+        
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] font-black text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-300">
+            ⚡ 今日焦点推进
+          </span>
+          <span class="text-[11px] font-black text-emerald-600">58% 已就绪</span>
+        </div>
+
+        <h2 class="text-sm font-black text-slate-800">某三期工程景观施工图</h2>
+        <p class="text-[11px] font-bold text-slate-400 mt-0.5 mb-3">截止日: 2026-08-23 · 仅差 1 个微节点</p>
+
+        <!-- 进度条 -->
+        <div class="cute-progress-bar w-full mb-3">
+          <div class="cute-progress-fill" style="width: 58%"></div>
+        </div>
+
+        <div class="flex items-center justify-between bg-white/90 p-2.5 rounded-2xl border border-emerald-200">
+          <div class="text-xs font-black text-slate-700">
+            下一步: <span class="text-emerald-700">施工图绘制 📐</span>
+          </div>
+          <button onclick="triggerConfetti(event)" class="btn-jelly-green text-white text-[11px] font-black px-3.5 py-1 rounded-xl">
+            5min 启动
+          </button>
+        </div>
+      </div>
+
+      <!-- 分类标签过滤器胶囊 -->
+      <div class="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1">
+        <button class="shrink-0 px-3.5 py-1.5 rounded-full text-xs font-black bg-emerald-600 text-white shadow-sm">
+          全部任务 (5)
+        </button>
+        <button class="shrink-0 px-3.5 py-1.5 rounded-full text-xs font-black bg-white text-slate-600 border border-slate-200">
+          ⚡ 短期项目
+        </button>
+        <button class="shrink-0 px-3.5 py-1.5 rounded-full text-xs font-black bg-white text-slate-600 border border-slate-200">
+          🏔️ 长期愿景
+        </button>
+        <button class="shrink-0 px-3.5 py-1.5 rounded-full text-xs font-black bg-white text-slate-600 border border-slate-200">
+          🌱 习惯萌芽
+        </button>
+      </div>
+
+      <!-- 任务列表流 (Mobile List Cards) -->
+      <div id="mobileTaskList" class="space-y-3">
+        
+        <!-- 任务卡片 1 -->
+        <div class="app-card p-3.5 flex flex-col justify-between">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span class="text-xs font-black text-slate-800">商业金街效果图深化</span>
+            </div>
+            <span class="text-[10px] font-black text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">25%</span>
+          </div>
+          
+          <div class="cute-progress-bar w-full my-2.5">
+            <div class="cute-progress-fill !bg-amber-400" style="width: 25%"></div>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] pt-1">
+            <span class="text-slate-400 font-bold">主材打样效果图 🎨</span>
+            <button onclick="triggerConfetti(event)" class="text-emerald-700 font-black flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+              <i class="fa-solid fa-check"></i>
+              <span>打卡记录</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 任务卡片 2 -->
+        <div class="app-card p-3.5 flex flex-col justify-between">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full bg-teal-500"></span>
+              <span class="text-xs font-black text-slate-800">产业园区方案汇报</span>
+            </div>
+            <span class="text-[10px] font-black text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">58%</span>
+          </div>
+          
+          <div class="cute-progress-bar w-full my-2.5">
+            <div class="cute-progress-fill" style="width: 58%"></div>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] pt-1">
+            <span class="text-slate-400 font-bold">造价清单与商务条款 📊</span>
+            <button onclick="triggerConfetti(event)" class="text-emerald-700 font-black flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+              <i class="fa-solid fa-check"></i>
+              <span>打卡记录</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 任务卡片 3 -->
+        <div class="app-card p-3.5 flex flex-col justify-between">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+              <span class="text-xs font-black text-slate-800">秋季品牌活动全案策划</span>
+            </div>
+            <span class="text-[10px] font-black text-teal-800 bg-teal-100 px-2 py-0.5 rounded-full">67%</span>
+          </div>
+          
+          <div class="cute-progress-bar w-full my-2.5">
+            <div class="cute-progress-fill !bg-teal-500" style="width: 67%"></div>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] pt-1">
+            <span class="text-slate-400 font-bold">与甲方沟通初审方案 💡</span>
+            <button onclick="triggerConfetti(event)" class="text-emerald-700 font-black flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+              <i class="fa-solid fa-check"></i>
+              <span>打卡记录</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 4. 悬浮果冻底部导航栏 (Bottom Tab Bar with Big Add Button) -->
+    <div class="absolute bottom-4 inset-x-5 h-16 bg-white/95 backdrop-blur-md rounded-3xl border-2 border-[#d9ece2] shadow-lg shadow-emerald-900/10 flex items-center justify-between px-6 z-30">
+      
+      <!-- Tab 1: 今天 -->
+      <button class="flex flex-col items-center space-y-0.5 text-emerald-600">
+        <i class="fa-solid fa-calendar-check text-base"></i>
+        <span class="text-[10px] font-black">今天</span>
+      </button>
+
+      <!-- Tab 2: 项目 -->
+      <button class="flex flex-col items-center space-y-0.5 text-slate-400 hover:text-slate-600">
+        <i class="fa-solid fa-list-check text-base"></i>
+        <span class="text-[10px] font-black">项目</span>
+      </button>
+
+      <!-- 中间凸起的萌系果冻大加号 (新建入口) -->
+      <div class="-mt-8">
+        <button onclick="openBottomSheet()" class="w-13 h-13 w-12 h-12 rounded-2xl btn-jelly-add flex items-center justify-center text-white text-xl font-black shadow-lg">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+
+      <!-- Tab 3: 勋章图鉴 -->
+      <button onclick="triggerConfetti(event)" class="flex flex-col items-center space-y-0.5 text-slate-400 hover:text-slate-600">
+        <i class="fa-solid fa-trophy text-base text-amber-500"></i>
+        <span class="text-[10px] font-black">勋章</span>
+      </button>
+
+      <!-- Tab 4: 我的 -->
+      <button class="flex flex-col items-center space-y-0.5 text-slate-400 hover:text-slate-600">
+        <i class="fa-solid fa-user-ninja text-base"></i>
+        <span class="text-[10px] font-black">小窝</span>
+      </button>
+
+    </div>
+
+    <!-- 5. 手机端专属：底部滑出抽屉表单 (Action / Bottom Sheet) -->
+    <div id="bottomSheetModal" class="absolute inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex flex-col justify-end hidden">
+      <!-- 遮罩点击关闭 -->
+      <div class="flex-1" onclick="closeBottomSheet()"></div>
+      
+      <!-- 抽屉卡片面板 -->
+      <div id="sheetPanel" class="bg-white rounded-t-[36px] border-t-3 border-x-3 border-emerald-300 p-5 space-y-3.5 transform translate-y-full sheet-transition shadow-2xl">
+        
+        <!-- 顶部拖拽把手与关闭条 -->
+        <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-1"></div>
+        
+        <div class="flex items-center justify-between pb-2 border-b-2 border-dashed border-[#e6f2ec]">
+          <div class="flex items-center space-x-2">
+            <span class="text-xl">🌱</span>
+            <span class="font-black text-sm text-slate-800">新建 5 分钟微目标</span>
+          </div>
+          <button onclick="closeBottomSheet()" class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-xs font-black text-slate-500">✕</button>
+        </div>
+
+        <!-- 移动端微表单 -->
+        <form id="mobileForm" onsubmit="handleMobileSubmit(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="block font-black text-slate-700 mb-1">目标愿望名称 *</label>
+            <input type="text" id="mTitle" required placeholder="如：备考雅思听力 / 练习水彩" class="w-full bg-[#f6faf8] border-2 border-[#d9ece2] focus:border-emerald-500 rounded-2xl px-3.5 py-2 font-black outline-none transition">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block font-black text-slate-700 mb-1">归属类型</label>
+              <select id="mCategory" class="w-full bg-[#f6faf8] border-2 border-[#d9ece2] rounded-2xl px-3 py-2 font-black outline-none">
+                <option value="短期项目">⚡ 短期项目</option>
+                <option value="长期愿景">🏔️ 长期愿景</option>
+                <option value="日常习惯">☕ 日常习惯</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-black text-slate-700 mb-1">约定截止</label>
+              <input type="date" id="mDeadline" required class="w-full bg-[#f6faf8] border-2 border-[#d9ece2] rounded-2xl px-2.5 py-1.5 font-black outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-black text-slate-700 mb-1">第 1 个 5 分钟微动作 *</label>
+            <input type="text" id="mNextTask" required placeholder="如：打开听力音频并听完第一段 🎧" class="w-full bg-[#f6faf8] border-2 border-[#d9ece2] focus:border-emerald-500 rounded-2xl px-3.5 py-2 font-black outline-none transition">
+          </div>
+
+          <!-- 提交按钮 -->
+          <div class="pt-2">
+            <button type="submit" class="w-full btn-jelly-green py-3 rounded-2xl text-xs font-black text-white shadow-md">
+              开启小步起航 🚀
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // 默认给表单截止日期填入下周
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    document.getElementById('mDeadline').value = nextWeek.toISOString().split('T')[0];
+
+    // 1. 抽屉式对话框开关
+    function openBottomSheet() {
+      const modal = document.getElementById('bottomSheetModal');
+      const panel = document.getElementById('sheetPanel');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        panel.classList.remove('translate-y-full');
+      }, 10);
+    }
+
+    function closeBottomSheet() {
+      const modal = document.getElementById('bottomSheetModal');
+      const panel = document.getElementById('sheetPanel');
+      panel.classList.add('translate-y-full');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 250);
+    }
+
+    // 2. 表单提交插入到移动端列表中
+    function handleMobileSubmit(e) {
+      e.preventDefault();
+
+      const title = document.getElementById('mTitle').value.trim();
+      const category = document.getElementById('mCategory').value;
+      const nextTask = document.getElementById('mNextTask').value.trim();
+
+      const card = document.createElement('div');
+      card.className = "app-card p-3.5 flex flex-col justify-between animate-in fade-in zoom-in duration-200 border-2 border-emerald-300";
+      card.innerHTML = `
+        <div class="flex items-start justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span class="text-xs font-black text-slate-800">${title}</span>
+          </div>
+          <span class="text-[10px] font-black text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">新启动</span>
+        </div>
+        <div class="cute-progress-bar w-full my-2.5">
+          <div class="cute-progress-fill" style="width: 10%"></div>
+        </div>
+        <div class="flex items-center justify-between text-[11px] pt-1">
+          <span class="text-slate-400 font-bold">${nextTask}</span>
+          <button onclick="triggerConfetti(event)" class="text-emerald-700 font-black flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+            <i class="fa-solid fa-check"></i>
+            <span>打卡记录</span>
+          </button>
+        </div>
+      `;
+
+      // 插入到列表首项
+      const list = document.getElementById('mobileTaskList');
+      list.prepend(card);
+
+      closeBottomSheet();
+      triggerConfetti(e);
+      document.getElementById('mobileForm').reset();
+      document.getElementById('mDeadline').value = nextWeek.toISOString().split('T')[0];
+    }
+
+    // 3. 小狗互动对话与彩屑
+    function petCompanion(e) {
+      triggerConfetti(e);
+      alert("汪呜~ (小柴说：今天也做得非常棒！喝口水休息一下吧 🍵)");
+    }
+
+    // 4. 00:24 同款彩屑礼花
+    function triggerConfetti(e) {
+      confetti({
+        particleCount: 45,
+        spread: 60,
+        origin: { y: 0.65 },
+        colors: ['#34d399', '#10b981', '#fbbf24', '#f472b6', '#60a5fa']
+      });
+    }
+  </script>
+
+</body>
+</html>

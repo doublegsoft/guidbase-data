@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>如期 - 模态弹窗录入与分页表格 (Modal Form & Table)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome 图标库 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- 萌系英文字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <!-- 彩带彩屑特效库 (00:24 同款) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #edf5f1;
+      background-image: 
+        radial-gradient(#cce7da 1.5px, transparent 1.5px), 
+        radial-gradient(#cce7da 1.5px, #edf5f1 1.5px);
+      background-size: 28px 28px;
+      color: #2d4a3e;
+    }
+
+    /* 容器奶油微凸边框 */
+    .cute-container {
+      background: #ffffff;
+      border: 3px solid #e1efe7;
+      border-radius: 28px;
+      box-shadow: 0 10px 25px -4px rgba(45, 74, 62, 0.06);
+    }
+
+    /* 迷你行内进度条 */
+    .table-progress-bg {
+      background: #e6f3ec;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #d4ebe0;
+      height: 7px;
+    }
+    .table-progress-fill {
+      background: linear-gradient(90deg, #6ee7b7, #10b981);
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    /* 3D 果冻按钮 */
+    .btn-jelly-green {
+      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 4px 0 #047857, 0 6px 12px rgba(5, 150, 105, 0.25);
+      transition: all 0.1s ease;
+    }
+    .btn-jelly-green:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #047857;
+    }
+
+    .btn-pill-action {
+      background: #ffffff;
+      border: 1.5px solid #d2e7dc;
+      box-shadow: 0 2px 0 #c2dbcf;
+      transition: all 0.1s ease;
+    }
+    .btn-pill-action:hover {
+      border-color: #10b981;
+      color: #059669;
+    }
+    .btn-pill-action:active {
+      transform: translateY(2px);
+      box-shadow: none;
+    }
+
+    /* 分页按钮小圆钮 */
+    .page-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      transition: all 0.15s ease;
+    }
+    .page-btn.active {
+      background: #059669;
+      color: #ffffff;
+      box-shadow: 0 3px 8px rgba(5, 150, 105, 0.3);
+      border: 2px solid #047857;
+    }
+    .page-btn:not(.active) {
+      background: #f4f8f6;
+      color: #475569;
+      border: 2px solid #e2ece7;
+    }
+    .page-btn:not(.active):hover {
+      background: #e6f4ed;
+      border-color: #a7f3d0;
+      color: #059669;
+    }
+
+    /* 萌系表单输入控件 */
+    .cute-input {
+      background-color: #f7faf8;
+      border: 2px solid #d9ece2;
+      border-radius: 16px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #1e293b;
+      outline: none;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+    .cute-input:focus {
+      background-color: #ffffff;
+      border-color: #10b981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+    }
+
+    /* 新建行微闪动画 */
+    @keyframes highlightRow {
+      0% { background-color: #a7f3d0; }
+      100% { background-color: transparent; }
+    }
+    .row-highlight {
+      animation: highlightRow 2s ease-out;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen p-6 flex flex-col items-center">
+
+  <div class="w-full max-w-6xl space-y-4">
+    
+    <!-- 顶部状态栏 -->
+    <div class="flex flex-wrap items-center justify-between gap-4 px-2">
+      <div class="flex items-center space-x-3">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white text-2xl font-black shadow-md shadow-emerald-200">
+          🌱
+        </div>
+        <div>
+          <h1 class="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+            <span>如期 · 任务目标管理大厅</span>
+            <span class="text-xs bg-emerald-100 text-emerald-800 font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-200">
+              共 <span id="totalBadgeCount">5</span> 项
+            </span>
+          </h1>
+          <p class="text-xs font-bold text-slate-400">大目标轻轻拆，小日子从容过 🐾</p>
+        </div>
+      </div>
+
+      <!-- 右侧：弹出表单大按钮 -->
+      <div class="flex items-center space-x-2">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+          <input type="text" id="searchInput" oninput="handleSearch()" placeholder="搜索项目、任务或标签..." class="bg-white border-2 border-[#d9ece2] focus:border-emerald-500 rounded-2xl pl-9 pr-4 py-2 text-xs font-black text-slate-700 outline-none w-56 transition shadow-xs">
+        </div>
+
+        <!-- 弹出 Modal 的果冻按键 -->
+        <button onclick="openGoalModal()" class="btn-jelly-green px-4 py-2.5 rounded-2xl text-xs font-black text-white flex items-center gap-2">
+          <i class="fa-solid fa-plus-circle"></i>
+          <span>新建目标愿望 ✨</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 核心表格容器 -->
+    <div class="cute-container overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-[#f7faf8] border-b-2 border-[#e2efe8] text-[11px] font-black text-slate-400 uppercase tracking-wider">
+              <th class="py-3.5 px-5">状态 / 项目名称</th>
+              <th class="py-3.5 px-4">类别</th>
+              <th class="py-3.5 px-4 w-48">总体完成进度</th>
+              <th class="py-3.5 px-4">下一步微启动任务</th>
+              <th class="py-3.5 px-4">子节点</th>
+              <th class="py-3.5 px-4">截止日期</th>
+              <th class="py-3.5 px-5 text-right">推进操作</th>
+            </tr>
+          </thead>
+
+          <tbody id="tableBody" class="divide-y-2 divide-[#f2f8f4] text-xs font-extrabold text-slate-700">
+            <!-- JS 动态填入 -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 分页底栏 -->
+      <div class="bg-[#fbfdfc] border-t-2 border-[#e6f1eb] px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center space-x-3 text-xs font-extrabold text-slate-400">
+          <span>显示第 <b id="rangeText" class="text-slate-700">1 - 4</b> 条</span>
+          <span>·</span>
+          <div class="flex items-center space-x-1.5">
+            <span>每页</span>
+            <select id="pageSizeSelect" onchange="changePageSize(this.value)" class="bg-white border-2 border-[#d9ece2] rounded-xl px-2 py-1 text-xs font-black text-slate-700 outline-none cursor-pointer">
+              <option value="4" selected>4 条</option>
+              <option value="6">6 条</option>
+              <option value="10">10 条</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button id="prevBtn" onclick="prevPage()" class="btn-pill-action px-3 py-1.5 rounded-xl text-xs font-black text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1">
+            <i class="fa-solid fa-chevron-left text-[10px]"></i>
+            <span>上一页</span>
+          </button>
+
+          <div id="paginationNumbers" class="flex items-center space-x-1.5"></div>
+
+          <button id="nextBtn" onclick="nextPage()" class="btn-pill-action px-3 py-1.5 rounded-xl text-xs font-black text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1">
+            <span>下一页</span>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ⭐ 对话框模式弹出录入表单 (Modal Dialog) ⭐ -->
+  <div id="goalModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+    <!-- 模态框主体卡片 -->
+    <div class="cute-container !bg-white max-w-xl w-full p-6 relative border-4 border-emerald-300 shadow-2xl animate-in fade-in zoom-in duration-150">
+      
+      <!-- 右上角果冻关闭圆钮 -->
+      <button onclick="closeGoalModal()" class="btn-pill-action absolute top-5 right-5 w-8 h-8 rounded-full flex items-center justify-center font-black text-slate-500 hover:text-slate-800">
+        ✕
+      </button>
+
+      <!-- 弹窗标题 -->
+      <div class="flex items-center space-x-3 border-b-2 border-dashed border-[#e6f2ec] pb-3.5 mb-4">
+        <div class="w-10 h-10 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-xl shadow-inner">
+          ✨
+        </div>
+        <div>
+          <h3 class="font-black text-base text-slate-800 flex items-center gap-2">
+            <span>新建目标计划</span>
+            <span class="text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.2 rounded-full">SMART 拆解</span>
+          </h3>
+          <p class="text-xs font-bold text-slate-400">把大目标放进来，系统帮你一步步拆解拿下！</p>
+        </div>
+      </div>
+
+      <!-- 弹出表单内容 -->
+      <form id="modalGoalForm" onsubmit="handleModalSubmit(event)" class="space-y-3.5">
+        
+        <!-- 名称 + 标签 -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+          <div class="md:col-span-8">
+            <label class="block text-xs font-black text-slate-700 mb-1">
+              目标 / 项目名称 <span class="text-emerald-500">*</span>
+            </label>
+            <input type="text" id="modalTitle" required placeholder="如：景观施工图方案 / 雅思口语 7 分" class="cute-input">
+          </div>
+
+          <div class="md:col-span-4">
+            <label class="block text-xs font-black text-slate-700 mb-1">
+              任务阶段 / 标签 <span class="text-emerald-500">*</span>
+            </label>
+            <input type="text" id="modalTag" required placeholder="如：施工图阶段" class="cute-input">
+          </div>
+        </div>
+
+        <!-- 分类 + 下一步微任务 -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+          <div class="md:col-span-5">
+            <label class="block text-xs font-black text-slate-700 mb-1">
+              归属周期分类
+            </label>
+            <select id="modalCategory" class="cute-input cursor-pointer">
+              <option value="短期项目">⚡ 短期项目 (1-30天)</option>
+              <option value="长期项目">🏔️ 长期项目 (季度/年)</option>
+              <option value="个人成长">🌱 个人成长 / 考证</option>
+              <option value="日常习惯">☕ 日常微习惯</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-7">
+            <label class="block text-xs font-black text-slate-700 mb-1">
+              下一步 5 分钟微启动任务 <span class="text-emerald-500">*</span>
+            </label>
+            <input type="text" id="modalNextTask" required placeholder="如：打开 CAD 绘制第 1 张图纸 📐" class="cute-input">
+          </div>
+        </div>
+
+        <!-- 截止日期 + 初始进度 -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+          <div class="md:col-span-5">
+            <label class="block text-xs font-black text-slate-700 mb-1">
+              约定截止日期 <span class="text-emerald-500">*</span>
+            </label>
+            <input type="date" id="modalDeadline" required class="cute-input">
+          </div>
+
+          <div class="md:col-span-7 bg-[#f7faf8] border-2 border-[#e4ede7] p-2.5 rounded-2xl">
+            <div class="flex justify-between text-xs font-black mb-1">
+              <span class="text-slate-600">当前初始进度</span>
+              <span id="modalProgressText" class="text-emerald-600 font-black">15%</span>
+            </div>
+            <input type="range" id="modalProgress" min="0" max="100" value="15" oninput="document.getElementById('modalProgressText').textContent = this.value + '%'" class="w-full accent-emerald-500 cursor-pointer">
+          </div>
+        </div>
+
+        <!-- 弹窗底部操作按钮 -->
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t-2 border-[#f0f6f3]">
+          <button type="button" onclick="closeGoalModal()" class="btn-pill-action px-4 py-2 rounded-xl text-xs font-black text-slate-600">
+            取消
+          </button>
+          <button type="submit" class="btn-jelly-green px-5 py-2 rounded-xl text-xs font-black text-white flex items-center gap-1.5">
+            <i class="fa-solid fa-sparkles"></i>
+            <span>存入清单并起航 🚀</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // 数据源
+    let dataSource = [
+      {
+        id: 1,
+        title: "某三期工程景观施工图",
+        tag: "施工图阶段",
+        category: "短期项目",
+        catBg: "bg-emerald-100 text-emerald-800 border-emerald-200",
+        progress: 58,
+        nextTask: "施工图绘制深化 📐",
+        subTasks: "1/1",
+        deadline: "2026-08-23"
+      },
+      {
+        id: 2,
+        title: "某商业金街效果图深化 (包括主材)",
+        tag: "方案评审",
+        category: "短期项目",
+        catBg: "bg-emerald-100 text-emerald-800 border-emerald-200",
+        progress: 25,
+        nextTask: "主材打样效果图 🎨",
+        subTasks: "1/2",
+        deadline: "2026-08-23"
+      },
+      {
+        id: 3,
+        title: "某产业园区方案深化汇报",
+        tag: "造价清单",
+        category: "短期项目",
+        catBg: "bg-emerald-100 text-emerald-800 border-emerald-200",
+        progress: 58,
+        nextTask: "报价与商务清单确认 📊",
+        subTasks: "1/1",
+        deadline: "2026-08-23"
+      },
+      {
+        id: 4,
+        title: "某秋季新品品牌活动全案策划",
+        tag: "主KV审核",
+        category: "长期项目",
+        catBg: "bg-teal-100 text-teal-800 border-teal-200",
+        progress: 67,
+        nextTask: "与甲方沟通初审方案 💡",
+        subTasks: "1/1",
+        deadline: "2026-12-08"
+      },
+      {
+        id: 5,
+        title: "AWS Certified 架构师考试复习",
+        tag: "每日刷题",
+        category: "个人成长",
+        catBg: "bg-indigo-100 text-indigo-800 border-indigo-200",
+        progress: 82,
+        nextTask: "高可用架构模拟考题 🧠",
+        subTasks: "3/4",
+        deadline: "2026-09-19"
+      }
+    ];
+
+    let currentPage = 1;
+    let pageSize = 4;
+    let filteredData = [...dataSource];
+    let newlyAddedId = null;
+
+    // 默认给对话框截止日期设为 7 天后
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() + 7);
+    document.getElementById('modalDeadline').value = defaultDate.toISOString().split('T')[0];
+
+    // 打开对话框
+    function openGoalModal() {
+      document.getElementById('goalModal').classList.remove('hidden');
+      document.getElementById('modalTitle').focus();
+    }
+
+    // 关闭对话框
+    function closeGoalModal() {
+      document.getElementById('goalModal').classList.add('hidden');
+      document.getElementById('modalGoalForm').reset();
+      document.getElementById('modalProgressText').textContent = '15%';
+      document.getElementById('modalDeadline').value = defaultDate.toISOString().split('T')[0];
+    }
+
+    // 支持 ESC 键退出对话框
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeGoalModal();
+    });
+
+    // 弹窗表单提交处理
+    function handleModalSubmit(e) {
+      e.preventDefault();
+
+      const title = document.getElementById('modalTitle').value.trim();
+      const tag = document.getElementById('modalTag').value.trim();
+      const category = document.getElementById('modalCategory').value;
+      const nextTask = document.getElementById('modalNextTask').value.trim();
+      const deadline = document.getElementById('modalDeadline').value;
+      const progress = parseInt(document.getElementById('modalProgress').value, 10);
+
+      // 分类配色匹配
+      let catBg = "bg-emerald-100 text-emerald-800 border-emerald-200";
+      if (category === "长期项目") catBg = "bg-teal-100 text-teal-800 border-teal-200";
+      if (category === "个人成长") catBg = "bg-indigo-100 text-indigo-800 border-indigo-200";
+      if (category === "日常习惯") catBg = "bg-amber-100 text-amber-900 border-amber-200";
+
+      const newItem = {
+        id: Date.now(),
+        title,
+        tag,
+        category,
+        catBg,
+        progress,
+        nextTask,
+        subTasks: "1/1",
+        deadline
+      };
+
+      newlyAddedId = newItem.id;
+      dataSource.unshift(newItem);
+      filteredData = [...dataSource];
+
+      // 关闭对话框
+      closeGoalModal();
+
+      // 重回第 1 页并渲染
+      currentPage = 1;
+      renderTable();
+
+      // 00:24 同款礼花爆炸庆祝
+      triggerConfetti();
+    }
+
+    // 渲染表格
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, filteredData.length);
+      const pageRows = filteredData.slice(startIndex, endIndex);
+
+      if (pageRows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-slate-400 font-bold">空空如也，点击右上角加一个目标吧 (•ㅅ•)</td></tr>`;
+        updatePaginationInfo(0, 0, 0);
+        return;
+      }
+
+      pageRows.forEach(item => {
+        const tr = document.createElement('tr');
+        const isHighlight = item.id === newlyAddedId ? 'row-highlight' : '';
+        tr.className = `hover:bg-[#f5faf7] transition duration-150 ${isHighlight}`;
+        tr.innerHTML = `
+          <td class="py-4 px-5">
+            <div class="flex items-center space-x-2.5">
+              <span class="w-2.5 h-2.5 rounded-full ${item.progress === 100 ? 'bg-emerald-400' : 'bg-emerald-500 animate-pulse'}"></span>
+              <div>
+                <div class="font-black text-slate-800 hover:text-emerald-700 transition cursor-pointer">${item.title}</div>
+                <div class="text-[10px] text-slate-400 mt-0.5 font-bold">#${item.tag}</div>
+              </div>
+            </div>
+          </td>
+          <td class="py-4 px-4">
+            <span class="text-[11px] font-black px-2.5 py-0.5 rounded-full border ${item.catBg}">${item.category}</span>
+          </td>
+          <td class="py-4 px-4">
+            <div class="space-y-1">
+              <div class="flex justify-between text-[11px] font-black">
+                <span class="text-slate-400">完成度</span>
+                <span class="${item.progress > 50 ? 'text-emerald-600' : 'text-slate-600'}">${item.progress}%</span>
+              </div>
+              <div class="table-progress-bg w-full">
+                <div class="table-progress-fill" style="width: ${item.progress}%"></div>
+              </div>
+            </div>
+          </td>
+          <td class="py-4 px-4">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-[#d6ebe0] rounded-xl text-[11px] font-black text-slate-700 shadow-2xs">
+              ${item.nextTask}
+            </span>
+          </td>
+          <td class="py-4 px-4">
+            <span class="text-xs font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
+              ${item.subTasks}
+            </span>
+          </td>
+          <td class="py-4 px-4 text-xs font-bold text-slate-500">
+            ${item.deadline}
+          </td>
+          <td class="py-4 px-5 text-right">
+            <div class="inline-flex items-center space-x-1.5">
+              <button onclick="triggerConfetti()" class="btn-pill-action text-[11px] font-black px-2.5 py-1 rounded-xl text-emerald-800 flex items-center gap-1">
+                <span>▶ 5min</span>
+              </button>
+              <button onclick="triggerConfetti()" class="px-2.5 py-1 rounded-xl text-[11px] font-black bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition">
+                记录
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      updatePaginationInfo(startIndex + 1, endIndex, filteredData.length);
+      renderPaginationButtons();
+    }
+
+    // 分页文字
+    function updatePaginationInfo(start, end, total) {
+      document.getElementById('totalBadgeCount').textContent = total;
+      document.getElementById('rangeText').textContent = total === 0 ? '0' : `${start} - ${end} of ${total}`;
+      
+      const totalPages = Math.ceil(total / pageSize) || 1;
+      document.getElementById('prevBtn').disabled = currentPage <= 1;
+      document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+    }
+
+    // 分页数字按钮
+    function renderPaginationButtons() {
+      const container = document.getElementById('paginationNumbers');
+      container.innerHTML = '';
+      const totalPages = Math.ceil(filteredData.length / pageSize) || 1;
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+        btn.textContent = i;
+        btn.onclick = () => {
+          currentPage = i;
+          renderTable();
+        };
+        container.appendChild(btn);
+      }
+    }
+
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+      }
+    }
+
+    function nextPage() {
+      const totalPages = Math.ceil(filteredData.length / pageSize);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderTable();
+      }
+    }
+
+    function changePageSize(val) {
+      pageSize = parseInt(val, 10);
+      currentPage = 1;
+      renderTable();
+    }
+
+    // 搜索
+    function handleSearch() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      filteredData = dataSource.filter(item => 
+        item.title.toLowerCase().includes(q) || 
+        item.category.toLowerCase().includes(q) ||
+        item.nextTask.toLowerCase().includes(q) ||
+        item.tag.toLowerCase().includes(q)
+      );
+      currentPage = 1;
+      renderTable();
+    }
+
+    // 彩带粒子
+    function triggerConfetti() {
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.7 },
+        colors: ['#34d399', '#10b981', '#fbbf24', '#60a5fa', '#f472b6']
+      });
+    }
+
+    // 启动
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTable();
+    });
+  </script>
+</body>
+</html>

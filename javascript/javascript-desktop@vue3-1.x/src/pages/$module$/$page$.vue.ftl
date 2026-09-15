@@ -7,6 +7,7 @@
 </#if>
 <#import "/$/guidbase4js.ftl" as guidbase4js>
 <#assign page = pageDef>
+<#global pageVars = {}>
 <template>
   <div class="${namespace}-page-body">
 <@vue3.print_page_layout page=pageDef indent=4 />

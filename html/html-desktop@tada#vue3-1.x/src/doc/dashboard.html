@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>步步爪 (Stepaw) - 里程碑成就大厅</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 图标库与圆润字体 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <!-- 爆彩屑特效库 (还原 00:24 达成特效) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #edf5f1;
+      background-image: 
+        radial-gradient(#cce7da 1.5px, transparent 1.5px), 
+        radial-gradient(#cce7da 1.5px, #edf5f1 1.5px);
+      background-size: 28px 28px;
+      background-position: 0 0, 14px 14px;
+      color: #2d4a3e;
+    }
+
+    /* 3D 软萌微凸卡片 (Claymorphism) */
+    .badge-card {
+      background: #ffffff;
+      border: 3px solid #e2f0e8;
+      border-radius: 24px;
+      box-shadow: 0 8px 16px -2px rgba(45, 74, 62, 0.05);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .badge-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      border-color: #a7f3d0;
+      box-shadow: 0 16px 25px -4px rgba(16, 185, 129, 0.15);
+    }
+
+    /* 已解锁金光卡片 */
+    .badge-card-unlocked {
+      border-color: #fde68a !important;
+      background: linear-gradient(180deg, #fffdfa 0%, #fffbf0 100%);
+    }
+    .badge-card-unlocked:hover {
+      border-color: #f59e0b !important;
+      box-shadow: 0 16px 25px -4px rgba(245, 158, 11, 0.2);
+    }
+
+    /* 未解锁锁定卡片 (迷雾状态) */
+    .badge-card-locked {
+      background: #f8faf9;
+      border-color: #e5ece8;
+      opacity: 0.75;
+    }
+    .badge-card-locked:hover {
+      opacity: 0.95;
+      border-color: #cbd5e1;
+    }
+
+    /* 果冻按钮微动效 */
+    .btn-jelly {
+      box-shadow: 0 4px 0 #059669;
+      transition: all 0.1s ease;
+    }
+    .btn-jelly:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #059669;
+    }
+
+    .pill-filter {
+      transition: all 0.15s ease;
+      border: 2px solid transparent;
+    }
+    .pill-filter.active {
+      background-color: #059669;
+      color: #ffffff;
+      border-color: #047857;
+      box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);
+    }
+    .pill-filter:not(.active) {
+      background-color: #ffffff;
+      color: #475569;
+      border-color: #e2e8e5;
+    }
+    .pill-filter:not(.active):hover {
+      border-color: #10b981;
+      color: #059669;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col antialiased">
+
+  <!-- 顶部 Header 导航 -->
+  <header class="h-20 bg-white/90 backdrop-blur-md border-b-4 border-[#e2efe8] px-8 flex items-center justify-between sticky top-0 z-40">
+    <div class="flex items-center space-x-4">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-emerald-200">
+        🐾
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="text-2xl font-black tracking-wide text-emerald-950">步步爪 · 里程碑图鉴</span>
+          <span class="text-xs bg-amber-100 border-2 border-amber-300 text-amber-900 px-2.5 py-0.5 rounded-full font-black">
+            🏆 成就集邮馆
+          </span>
+        </div>
+        <p class="text-[11px] text-emerald-700/70 font-bold">每一次小小的坚持，都会化为一枚闪亮的勋章！</p>
+      </div>
+    </div>
+
+    <!-- 右侧操作与灵敏返回 -->
+    <div class="flex items-center space-x-3">
+      <button class="px-4 py-2 bg-white border-2 border-slate-200 hover:border-emerald-400 rounded-2xl text-xs font-black text-slate-700 transition flex items-center gap-2">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>返回今日清单</span>
+      </button>
+      <div class="flex items-center space-x-2 px-3.5 py-2 bg-emerald-50 border-2 border-emerald-200 rounded-2xl text-xs font-black text-emerald-900">
+        <span>⭐ 成就点数: <b>380</b></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主体集合展示区 -->
+  <main class="flex-1 max-w-[1450px] w-full mx-auto p-6 space-y-6">
+
+    <!-- 1. 顶部总览大卡片 (视频 00:19 同款统计卡) -->
+    <section class="bg-white border-3 border-[#e0ede6] rounded-3xl p-6 shadow-sm relative overflow-hidden">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        
+        <!-- 左侧标题描述 -->
+        <div class="md:col-span-4">
+          <div class="flex items-center space-x-2 mb-1">
+            <span class="text-2xl">🎖️</span>
+            <h2 class="text-xl font-black text-slate-800">全域里程碑成就</h2>
+          </div>
+          <p class="text-xs font-bold text-slate-400 leading-relaxed">
+            每一次认真推进都是通往伟大目标的小脚印。不仅记录时间，更记录专注与坚持的痕迹。
+          </p>
+          <div class="mt-4 flex gap-2">
+            <button onclick="triggerHallFireworks()" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl text-xs font-black btn-jelly flex items-center gap-1.5">
+              <span>🎊 庆祝我的成就</span>
+            </button>
+            <button class="px-3.5 py-2 bg-amber-50 border-2 border-amber-200 text-amber-900 rounded-xl text-xs font-black hover:bg-amber-100 transition">
+              <span>📜 勋章荣誉证书</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 右侧三大核心指标胶囊 -->
+        <div class="md:col-span-8 grid grid-cols-3 gap-3.5">
+          
+          <div class="bg-[#f7faf8] border-2 border-[#e4ede7] p-4 rounded-2xl flex items-center space-x-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-2xl">
+              🔓
+            </div>
+            <div>
+              <div class="text-[11px] font-black text-slate-400">已解锁勋章</div>
+              <div class="text-2xl font-black text-emerald-600">2 <span class="text-xs text-slate-400 font-bold">/ 24</span></div>
+            </div>
+          </div>
+
+          <div class="bg-[#f7faf8] border-2 border-[#e4ede7] p-4 rounded-2xl flex items-center space-x-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-teal-100 border border-teal-300 flex items-center justify-center text-2xl">
+              ⏳
+            </div>
+            <div>
+              <div class="text-[11px] font-black text-slate-400">正在孵化推进</div>
+              <div class="text-2xl font-black text-teal-700">3 <span class="text-xs text-slate-400 font-bold">个</span></div>
+            </div>
+          </div>
+
+          <div class="bg-[#f7faf8] border-2 border-[#e4ede7] p-4 rounded-2xl flex items-center space-x-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-2xl">
+              🔥
+            </div>
+            <div>
+              <div class="text-[11px] font-black text-slate-400">累计专注天数</div>
+              <div class="text-2xl font-black text-amber-500">1 <span class="text-xs text-slate-400 font-bold">天</span></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2. 分类过滤标签栏 (视频 00:20 同款) -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2 overflow-x-auto py-1">
+        <button onclick="filterBadges(this, 'all')" class="pill-filter active px-4 py-2 rounded-2xl text-xs font-black">
+          全部勋章 (24)
+        </button>
+        <button onclick="filterBadges(this, 'time')" class="pill-filter px-4 py-2 rounded-2xl text-xs font-black">
+          ⏳ 时间里程碑
+        </button>
+        <button onclick="filterBadges(this, 'progress')" class="pill-filter px-4 py-2 rounded-2xl text-xs font-black">
+          📈 进度破局
+        </button>
+        <button onclick="filterBadges(this, 'habit')" class="pill-filter px-4 py-2 rounded-2xl text-xs font-black">
+          🌱 习惯萌芽
+        </button>
+        <button onclick="filterBadges(this, 'epic')" class="pill-filter px-4 py-2 rounded-2xl text-xs font-black">
+          👑 传奇远征
+        </button>
+      </div>
+
+      <div class="text-xs font-black text-slate-400">
+        提示：点击任意徽章卡片查看详细成就履历 ✨
+      </div>
+    </div>
+
+    <!-- 3. 里程碑成就集合列表 (网格 4 列布局) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+      <!-- 卡片 1: 已解锁 (黄金7天) -->
+      <div onclick="unlockModal('黄金初启 · 7天', '连续打卡推进 7 天，完成首周工作习惯破冰', '🏆 2026-04-12 达成', 'gold')" class="badge-card badge-card-unlocked p-5 cursor-pointer flex flex-col justify-between">
+        <!-- 角落已达成小标签 -->
+        <span class="absolute top-3 right-3 bg-amber-400 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-xs">
+          已达成 ✨
+        </span>
+
+        <div>
+          <!-- 勋章大图标 -->
+          <div class="w-16 h-16 mx-auto rounded-3xl bg-amber-100 border-2 border-amber-300 flex items-center justify-center text-3xl shadow-inner mt-2 mb-3">
+            🥇
+          </div>
+          <h3 class="text-sm font-black text-slate-800 text-center">黄金初启 · 7天</h3>
+          <p class="text-[11px] font-bold text-amber-700/80 text-center mt-1">
+            首个习惯周期达成，完成工作破冰
+          </p>
+        </div>
+
+        <div class="mt-4 pt-3 border-t-2 border-amber-200/50">
+          <div class="flex justify-between text-[11px] font-black text-amber-900 mb-1">
+            <span>推进达成度</span>
+            <span>7 / 7 天</span>
+          </div>
+          <div class="w-full h-2.5 bg-amber-200/60 rounded-full overflow-hidden p-0.5">
+            <div class="h-full bg-amber-500 rounded-full w-full"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 2: 正在进行中 (满月之约 · 30天) -->
+      <div onclick="unlockModal('满月之约 · 1个月', '累计专注推进 30 天打卡，让自律成为自然而然的呼吸', '正在冲刺中，已完成 1 天！', 'active')" class="badge-card p-5 cursor-pointer flex flex-col justify-between border-emerald-300">
+        <span class="absolute top-3 right-3 bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-black px-2 py-0.5 rounded-full">
+          冲刺中 🏃
+        </span>
+
+        <div>
+          <div class="w-16 h-16 mx-auto rounded-3xl bg-emerald-100 border-2 border-emerald-300 flex items-center justify-center text-3xl shadow-inner mt-2 mb-3">
+            🌕
+          </div>
+          <h3 class="text-sm font-black text-slate-800 text-center">满月之约 · 1个月 (30天)</h3>
+          <p class="text-[11px] font-bold text-emerald-700/80 text-center mt-1">
+            累计专注 30 天打卡，让自律成为呼吸
+          </p>
+        </div>
+
+        <div class="mt-4 pt-3 border-t-2 border-emerald-100">
+          <div class="flex justify-between text-[11px] font-black text-emerald-800 mb-1">
+            <span>当前进度</span>
+            <span class="font-black text-emerald-600">1 / 30 天 (3%)</span>
+          </div>
+          <div class="w-full h-2.5 bg-emerald-100 rounded-full overflow-hidden p-0.5 border border-emerald-200">
+            <div class="h-full bg-emerald-500 rounded-full" style="width: 3%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 3: 锁定状态 (双月深耕 · 60天) -->
+      <div onclick="unlockModal('双月深耕 · 2个月 (60天)', '累计专注 60 天打卡，深度技能已具雏形', '未解锁（先达成30天即可激活）', 'locked')" class="badge-card badge-card-locked p-5 cursor-pointer flex flex-col justify-between">
+        <span class="absolute top-3 right-3 text-slate-400 text-xs">
+          🔒 待解锁
+        </span>
+
+        <div>
+          <div class="w-16 h-16 mx-auto rounded-3xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center text-3xl filter grayscale mt-2 mb-3">
+            🌱
+          </div>
+          <h3 class="text-sm font-black text-slate-600 text-center">双月深耕 · 2个月 (60天)</h3>
+          <p class="text-[11px] font-bold text-slate-400 text-center mt-1">
+            深度技能已具雏形，突破心理舒适区
+          </p>
+        </div>
+
+        <div class="mt-4 pt-3 border-t-2 border-slate-200">
+          <div class="flex justify-between text-[11px] font-black text-slate-400 mb-1">
+            <span>当前进度</span>
+            <span>1 / 60 天</span>
+          </div>
+          <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+            <div class="h-full bg-slate-400 rounded-full" style="width: 2%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 4: 锁定状态 (季度成峰 · 90天) -->
+      <div onclick="unlockModal('季度成峰 · 1季度 (90天)', '累计专注 90 天，完成至少一个中大型项目里程碑交付', '未解锁', 'locked')" class="badge-card badge-card-locked p-5 cursor-pointer flex flex-col justify-between">
+        <span class="absolute top-3 right-3 text-slate-400 text-xs">
+          🔒 待解锁
+        </span>
+
+        <div>
+          <div class="w-16 h-16 mx-auto rounded-3xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center text-3xl filter grayscale mt-2 mb-3">
+            ⛰️
+          </div>
+          <h3 class="text-sm font-black text-slate-600 text-center">季度成峰 · 1季度 (90天)</h3>
+          <p class="text-[11px] font-bold text-slate-400 text-center mt-1">
+            累计专注 90 天，完成第一个中大项目交付
+          </p>
+        </div>
+
+        <div class="mt-4 pt-3 border-t-2 border-slate-200">
+          <div class="flex justify-between text-[11px] font-black text-slate-400 mb-1">
+            <span>当前进度</span>
+            <span>1 / 90 天</span>
+          </div>
+          <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+            <div class="h-full bg-slate-400 rounded-full" style="width: 1%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 5: 半载积力 (180天) -->
+      <div onclick="unlockModal('半载积力 · 半年 (180天)', '累计专注 180 天，已超越 95% 的同行者', '未解锁', 'locked')" class="badge-card badge-card-locked p-5 cursor-pointer flex flex-col justify-between">
+        <span class="absolute top-3 right-3 text-slate-400 text-xs">
+          🔒 待解锁
+        </span>
+        <div>
+          <div class="w-16 h-16 mx-auto rounded-3xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center text-3xl filter grayscale mt-2 mb-3">
+            🌳
+          </div>
+          <h3 class="text-sm font-black text-slate-600 text-center">半载积力 · 半年 (180天)</h3>
+          <p class="text-[11px] font-bold text-slate-400 text-center mt-1">
+            超越 95% 的同行者，质变即将发生
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t-2 border-slate-200">
+          <div class="flex justify-between text-[11px] font-black text-slate-400 mb-1">
+            <span>当前进度</span>
+            <span>1 / 180 天</span>
+          </div>
+          <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+            <div class="h-full bg-slate-400 rounded-full" style="width: 0.5%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 6: 年度大成 (365天) -->
+      <div onclick="unlockModal('年度大成 · 1年 (365天)', '一整年的坚持！足以重新定义一项专业能力', '未解锁', 'locked')" class="badge-card badge-card-locked p-5 cursor-pointer flex flex-col justify-between">
+        <span class="absolute top-3 right-3 text-slate-400 text-xs">
+          🔒 待解锁
+        </span>
+        <div>
+          <div class="w-16 h-16 mx-auto rounded-3xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center text-3xl filter grayscale mt-2 mb-3">
+            🏰
+          </div>
+          <h3 class="text-sm font-black text-slate-600 text-center">年度大成 · 1年 (365天)</h3>
+          <p class="text-[11px] font-bold text-slate-400 text-center mt-1">
+            整整一年的沉淀，重塑你的专业内核
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t-2 border-slate-200">
+          <div class="flex justify-between text-[11px] font-black text-slate-400 mb-1">
+            <span>当前进度</span>
+            <span>1 / 365 天</span>
+          </div>
+          <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+            <div class="h-full bg-slate-400 rounded-full" style="width: 0.3%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 7: 两载深耕 (730天) -->
+      <div onclick="unlockModal('两载深耕 · 2年 (730天)', '静水流深，两年时间已经形成强大的技术护城河', '未解锁', 'locked')" class="badge-card badge-card-locked p-5 cursor-pointer flex flex-col justify-between">
+        <span class="absolute top-3 right-3 text-slate-400 text-xs">
+          🔒 待解锁
+        </span>
+        <div>
+          <div class="w-16 h-16 mx-auto rounded-3xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center text-3xl filter grayscale mt-2 mb-3">
+            💎
+          </div>
+          <h3 class="text-sm font-black text-slate-600 text-center">两载深耕 · 2年 (730天)</h3>
+          <p class="text-[11px] font-bold text-slate-400 text-center mt-1">
+            静水流深，打造出属于自己的硬核壁垒
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t-2 border-slate-200">
+          <div class="flex justify-between text-[11px] font-black text-slate-400 mb-1">
+            <span>当前进度</span>
+            <span>1 / 730 天</span>
+          </div>
+          <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+            <div class="h-full bg-slate-400 rounded-full" style="width: 0.1%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 8: 三载如一日 (1095天 / 千日远征) -->
+      <div onclick="unlockModal('千日成圣 · 3年 (1095天)', '1000天的匠人精神，你已经是该领域的绝对专家', '传奇勋章', 'locked')" class="badge-card badge-card-locked p-5 cursor-pointer flex flex-col justify-between border-dashed">
+        <span class="absolute top-3 right-3 text-amber-500 font-black text-xs">
+          👑 传奇
+        </span>
+        <div>
+          <div class="w-16 h-16 mx-auto rounded-3xl bg-amber-50 border-2 border-amber-200 flex items-center justify-center text-3xl filter grayscale mt-2 mb-3">
+            🌟
+          </div>
+          <h3 class="text-sm font-black text-slate-600 text-center">千日成圣 · 3年 (1095天)</h3>
+          <p class="text-[11px] font-bold text-slate-400 text-center mt-1">
+            一千天的匠心打磨，向大师级人物致敬
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t-2 border-slate-200">
+          <div class="flex justify-between text-[11px] font-black text-slate-400 mb-1">
+            <span>当前进度</span>
+            <span>1 / 1095 天</span>
+          </div>
+          <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+            <div class="h-full bg-slate-400 rounded-full" style="width: 0.08%"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- 点击徽章后的治愈系详情弹窗 (带彩带礼花) -->
+  <div id="badgeModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white border-4 border-emerald-300 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl relative animate-in zoom-in duration-150">
+      
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 transition font-black">
+        ✕
+      </button>
+
+      <div id="modalIcon" class="w-20 h-20 mx-auto rounded-3xl bg-amber-100 border-2 border-amber-300 flex items-center justify-center text-4xl shadow-inner mt-2 mb-4">
+        🎖️
+      </div>
+
+      <h3 id="modalTitle" class="text-lg font-black text-slate-800">勋章详情</h3>
+      <p id="modalDesc" class="text-xs font-bold text-slate-500 mt-2 px-4 leading-relaxed">成就描述说明</p>
+
+      <div id="modalStatus" class="my-4 py-2 px-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs font-black text-emerald-800 inline-block">
+        状态信息
+      </div>
+
+      <div class="pt-3 border-t-2 border-slate-100 flex gap-2">
+        <button onclick="closeModal()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition shadow-sm">
+          收到，继续前行！🐾
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1. 全屏爆彩屑彩带礼花 (视频 00:24 同款)
+    function triggerHallFireworks() {
+      confetti({
+        particleCount: 80,
+        spread: 100,
+        origin: { y: 0.6 },
+        colors: ['#34d399', '#10b981', '#fbbf24', '#f59e0b', '#ec4899', '#60a5fa']
+      });
+    }
+
+    // 2. 点击分类按钮切换高亮
+    function filterBadges(button, category) {
+      const parent = button.parentElement;
+      parent.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+    }
+
+    // 3. 打开勋章详情模态弹窗
+    function unlockModal(title, desc, status, type) {
+      const modal = document.getElementById('badgeModal');
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalDesc').textContent = desc;
+      document.getElementById('modalStatus').textContent = status;
+
+      const iconBox = document.getElementById('modalIcon');
+      if (type === 'gold' || type === 'active') {
+        iconBox.className = "w-20 h-20 mx-auto rounded-3xl bg-amber-100 border-2 border-amber-300 flex items-center justify-center text-4xl shadow-inner mt-2 mb-4 animate-bounce";
+        iconBox.innerHTML = "🏆";
+        triggerHallFireworks(); // 解锁类直接弹彩花
+      } else {
+        iconBox.className = "w-20 h-20 mx-auto rounded-3xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center text-4xl shadow-inner mt-2 mb-4 filter grayscale";
+        iconBox.innerHTML = "🔒";
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('badgeModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

@@ -44,10 +44,13 @@ ${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitiv
   </#list>
 ${""?left_pad(indent)}});
   <#list form.inputs as input>
+    <#if pageVars[input.id]??><#continue></#if>
     <#if (input.type == "select" || input.type == "multiselect") && !(input.value("data")!"")?starts_with("enum[")>
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
+      <#global pageVars += {input.id:input.id}>
     <#elseif input.type == "select">
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
+      <#global pageVars += {input.id:input.id}>
     </#if>
   </#list>
 ${""?left_pad(indent)}// 表单错误相关
@@ -121,10 +124,13 @@ ${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitiv
   </#list>
 ${""?left_pad(indent)}});
   <#list form.inputs as input>
+    <#if pageVars[input.id]??><#continue></#if>
     <#if (input.type == "select" || input.type == "multiselect") && !(input.value("data")!"")?starts_with("enum[")>
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
+      <#global pageVars += {input.id:input.id}>
     <#elseif input.type == "select">
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
+      <#global pageVars += {input.id:input.id}>
     </#if>
   </#list>
 const ${js.nameVariable(form.id)}ErrorShow = ref(false)
@@ -143,9 +149,11 @@ ${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitiv
   </#list>
 ${""?left_pad(indent)}});
   <#list form.inputs as input>
+    <#if pageVars[input.id]??><#continue></#if>
     <#if (input.type == "select" || input.type == "multiselect")>
       <#if !(input.value("data")!"")?starts_with("enum[")>    
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
+        <#global pageVars += {input.id:input.id}>
       </#if>
     </#if>
   </#list>
