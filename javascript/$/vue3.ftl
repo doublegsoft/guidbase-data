@@ -765,6 +765,7 @@ import ${js.nameType(namespace + "_" + action.resource)} from '@/pages/${js.name
 <@print_button_variables button=widget indent=indent />
     </#if>
   </#list>
+  <#-- 集中处理action定义 -->
   <#list page.widgets as widget>
     <#if widget.value("action") == ""><#continue></#if>
     <#local action = valuebase.action(widget.value("action"))>
@@ -819,24 +820,32 @@ ${""?left_pad(indent)}}
   <#list page.children as child>
     <#if child.type != "dialog" && child.type != "drawer" && 
          child.type != "buttons" && child.type != "entry_form" && 
-         page.value("viewport") == "" >
+         child.value("viewport") == "" >
 <@print_container_layout widget=child indent=indent />       
-    <#else>
+    <#elseif child.value("viewport") == "">
 <@print_widget_layout widget=child indent=indent />        
     </#if>
-    <#if child?index != children?size - 1>
+    <#if child?index != page.children?size - 1>
 <@print_divider_layout indent=indent />    
     </#if>
   </#list>
-  <#-- 把带有viewport的显示在最后 -->
-  <#list page.children as child>
-    <#if child.value("viewport","") != "">
-<@print_widget_layout widget=child indent=indent />          
+  <#-- 集中处理action定义 -->
+  <#list page.widgets as widget>
+    <#if widget.value("action") == ""><#continue></#if>
+    <#local action = valuebase.action(widget.value("action"))>
+    <#if action.type.name() == "DRAWER">
+
+    <#elseif action.type.name() == "DIALOG">
+${""?left_pad(indent)}<${namespace}-dialog v-model="${js.nameVariable(action.resource)}Open" title="" size="lg">  
+${""?left_pad(indent)}  <${namespace}-${action.resource?replace("_","-")} />
+${""?left_pad(indent)}</${namespace}-dialog>
     </#if>
   </#list>
 </#macro>
 
-<#macro print_divider_layout indent=0></#macro>
+<#macro print_divider_layout indent=0>
+${""?left_pad(indent)}<div class="${namespace}-divider"></div>    
+</#macro>
 
 <#macro print_widget_layout widget indent=0>
   <#if widget.type == "drawer">
@@ -846,7 +855,7 @@ ${""?left_pad(indent)}<${namespace}-drawer v-model="${js.nameVariable(widget.id)
 ${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
     <#else>
       <#list widget.children as child>
-<@print_widget_layout widget=child indent=indent />    
+<@print_widget_layout widget=child indent=indent+2 />    
       </#list>
     </#if>
 ${""?left_pad(indent)}</${namespace}-drawer>
@@ -857,7 +866,7 @@ ${""?left_pad(indent)}<${namespace}-dialog v-model="${js.nameVariable(widget.id)
 ${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
     <#else>
       <#list widget.children as child>
-<@print_widget_layout widget=child indent=indent />    
+<@print_widget_layout widget=child indent=indent+2 />    
       </#list>
     </#if>
 ${""?left_pad(indent)}</${namespace}-dialog>

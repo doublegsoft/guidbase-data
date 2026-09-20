@@ -800,6 +800,14 @@ html, body {
 /* ══════════════════════════════════════════════
    11. Buttons
    ══════════════════════════════════════════════ */
+
+.${namespace}-btns {
+  width: 100%; 
+  display: flex; 
+  justify-content: 
+  flex-end; gap: 8px;
+}
+
 .${namespace}-btn {
   height: 24px;
   padding: 0 9px;

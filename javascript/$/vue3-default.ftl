@@ -1,5 +1,4 @@
 <#import "/$/guidbase.ftl" as guidbase>
-<#include "vue3-default.ftl">
 <#include "vue3.ftl">
 <!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
@@ -140,6 +139,16 @@ ${""?left_pad(indent)}<div id="criteria${js.nameType(form.id)}" class="${namespa
     </#if>
   </#list>
 ${""?left_pad(indent)}</div>
+  <#list form.children as widget>
+    <#if widget.type == "buttons">
+<@print_divider_layout indent=indent />
+${""?left_pad(indent)}<div style="width: 100%; display: flex; justify-content: flex-end; gap: 8px;">
+      <#list widget.children as button>
+${""?left_pad(indent)}  <button @click="${guidbase.name_button_method(button)}" class="${namespace}-btn ${namespace}-btn--default">${button.title}</button>
+      </#list>
+${""?left_pad(indent)}</div>
+    </#if>
+  </#list>
 </#macro>
 
 <!----------------------------------------------------------------------------->

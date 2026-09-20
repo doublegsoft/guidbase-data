@@ -1,36 +1,31 @@
 <template>
-  <Transition name="dialog">
-    <div v-if="modelValue" class="dialog-root">
-      <!-- Overlay -->
-      <div class="dialog-overlay" @click="closeOnOverlay && close()"></div>
+  <Transition name="tada-dialog">
+    <div v-if="modelValue" class="${namespace}-dialog-root">
+      <div class="${namespace}-dialog-overlay" @click="closeOnOverlay && close()"></div>
 
-      <!-- Dialog box -->
       <div
-        class="dialog-box"
+        class="${namespace}-dialog-box"
         :class="{
-          'dialog-box--sm': size === 'sm',
-          'dialog-box--lg': size === 'lg',
+          '${namespace}-dialog-box--sm': size === 'sm',
+          '${namespace}-dialog-box--lg': size === 'lg',
         }"
         role="dialog"
         aria-modal="true"
         @keydown.escape="close()"
       >
-        <!-- Header -->
-        <div class="dialog-header">
-          <div class="dialog-header__text">
-            <h3 class="dialog-title">{{ title }}</h3>
-            <p v-if="subtitle" class="dialog-subtitle">{{ subtitle }}</p>
+        <div class="${namespace}-dialog-header">
+          <div class="${namespace}-dialog-header__text">
+            <h3 class="${namespace}-dialog-title">{{ title }}</h3>
+            <p v-if="subtitle" class="${namespace}-dialog-subtitle">{{ subtitle }}</p>
           </div>
-          <button class="dialog-close" @click="close()" title="关闭">✕</button>
+          <button class="${namespace}-dialog-close" @click="close()" title="关闭">✕</button>
         </div>
 
-        <!-- Body -->
-        <div class="dialog-body">
+        <div class="${namespace}-dialog-body">
           <slot />
         </div>
 
-        <!-- Footer -->
-        <div v-if="$slots.footer" class="dialog-footer">
+        <div v-if="$slots.footer" class="${namespace}-dialog-footer">
           <slot name="footer" />
         </div>
       </div>
@@ -43,7 +38,7 @@ defineProps({
   modelValue:    { type: Boolean, default: false },
   title:         { type: String, default: '' },
   subtitle:      { type: String, default: '' },
-  size:          { type: String, default: 'md' },   // 'sm' | 'md' | 'lg'
+  size:          { type: String, default: 'md' },
   closeOnOverlay:{ type: Boolean, default: true },
 })
 
@@ -52,140 +47,164 @@ function close() { emit('update:modelValue', false) }
 </script>
 
 <style scoped>
-/* ═══════════════════════════════════════════════════════════════════════════
-   DIALOG — Academy Pro · Centered Modal for Edit / Confirm
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.dialog-root {
+.${namespace}-dialog-root {
   position: fixed;
   inset: 0;
-  z-index: 500;
+  z-index: 999;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-13);
+  padding: 20px;
 }
 
-/* ── Overlay ──────────────────────────────────── */
-
-.dialog-overlay {
+.${namespace}-dialog-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(13, 27, 42, 0.5);
-  backdrop-filter: blur(2px);
+  background: rgba(30, 41, 59, 0.35);
+  backdrop-filter: blur(5px);
 }
 
-/* ── Box ──────────────────────────────────────── */
-
-.dialog-box {
+.${namespace}-dialog-box {
   position: relative;
-  width: 540px;
+  width: 520px;
   max-width: 100%;
-  max-height: 85vh;
-  background: var(--color-card);
-  border-radius: var(--radius-2xl);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  max-height: 88vh;
+  background: var(--${namespace}-bg, #FFFFFF);
+  border: 3px solid var(--${namespace}-border, #E2EFE8);
+  border-radius: var(--${namespace}-radius-lg, 24px);
+  box-shadow: 0 12px 32px -4px rgba(16, 185, 129, 0.18), 0 6px 12px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  font-family: var(--${namespace}-font);
 }
 
-.dialog-box--sm { width: 400px; }
-.dialog-box--lg { width: 720px; }
+.${namespace}-dialog-box--sm { width: 380px; }
+.${namespace}-dialog-box--lg { width: 720px; }
 
-/* ── Header ───────────────────────────────────── */
-
-.dialog-header {
-  padding: var(--space-11) var(--space-13) var(--space-9);
-  border-bottom: 1px solid var(--color-border);
+.${namespace}-dialog-header {
+  padding: 16px 20px;
+  background: #FFFFFF;
+  border-bottom: 2px solid var(--${namespace}-border-light, #EEF5F1);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--space-7);
+  gap: 12px;
   flex-shrink: 0;
+  position: relative;
 }
 
-.dialog-header__text { min-width: 0; }
-
-.dialog-title {
-  font-size: var(--text-2xl);
-  font-weight: var(--weight-bold);
-  color: var(--color-text-main);
+.${namespace}-dialog-header::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 18px;
+  background: var(--${namespace}-primary, #10B981);
+  border-radius: var(--${namespace}-radius-pill, 9999px);
 }
 
-.dialog-subtitle {
-  font-size: var(--text-md);
-  color: var(--color-text-sub);
-  margin-top: var(--space-1);
+.${namespace}-dialog-header__text {
+  min-width: 0;
+  padding-left: 14px;
 }
 
-.dialog-close {
-  width: 32px; height: 32px;
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+.${namespace}-dialog-title {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--${namespace}-text, #1E293B);
+  letter-spacing: 0.02em;
+}
+
+.${namespace}-dialog-subtitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--${namespace}-text-light, #94A3B8);
+  margin-top: 2px;
+}
+
+.${namespace}-dialog-close {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--${namespace}-radius-pill, 9999px);
+  background: #F8FCFA;
+  border: 2px solid var(--${namespace}-border, #E2EFE8);
+  box-shadow: 0 2px 0 #D1E3D9;
   cursor: pointer;
-  font-size: var(--text-lg);
+  font-size: 13px;
+  font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-sub);
-  transition: all var(--transition-base);
+  color: var(--${namespace}-text-muted, #475569);
+  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
   flex-shrink: 0;
-  font-family: inherit;
 }
 
-.dialog-close:hover {
-  background: var(--color-red-dim);
-  border-color: var(--color-red);
-  color: var(--color-red);
+.${namespace}-dialog-close:hover {
+  background: var(--${namespace}-danger-bg, #FFF1F2);
+  border-color: var(--${namespace}-danger-border, #FECDD3);
+  color: var(--${namespace}-danger, #F43F5E);
+  transform: rotate(90deg) scale(1.08);
 }
 
-/* ── Body ─────────────────────────────────────── */
+.${namespace}-dialog-close:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
 
-.dialog-body {
+.${namespace}-dialog-body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-11) var(--space-13);
+  padding: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--${namespace}-text, #1E293B);
+  background: #FFFFFF;
 }
 
-/* ── Footer ───────────────────────────────────── */
-
-.dialog-footer {
-  padding: var(--space-9) var(--space-13);
-  border-top: 1px solid var(--color-border);
+.${namespace}-dialog-footer {
+  padding: 14px 20px;
+  background: #F8FCFA;
+  border-top: 2px solid var(--${namespace}-border-light, #EEF5F1);
   display: flex;
   justify-content: flex-end;
-  gap: var(--space-6);
+  gap: 10px;
   flex-shrink: 0;
 }
 
-/* ── Transitions ──────────────────────────────── */
-
-.dialog-enter-active { transition: opacity var(--transition-smooth); }
-
-.dialog-enter-active .dialog-box {
-  transition: transform var(--transition-smooth), opacity var(--transition-smooth);
+.tada-dialog-enter-active {
+  transition: opacity 0.25s ease;
 }
 
-.dialog-leave-active {
-  transition: opacity 0.12s ease;
+.tada-dialog-enter-active .${namespace}-dialog-box {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
 }
 
-.dialog-leave-active .dialog-box {
-  transition: transform 0.12s ease, opacity 0.12s ease;
+.tada-dialog-leave-active {
+  transition: opacity 0.15s ease;
 }
 
-.dialog-enter-from { opacity: 0; }
+.tada-dialog-leave-active .${namespace}-dialog-box {
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
 
-.dialog-enter-from .dialog-box {
-  transform: scale(0.95);
+.tada-dialog-enter-from {
   opacity: 0;
 }
 
-.dialog-leave-to { opacity: 0; }
+.tada-dialog-enter-from .${namespace}-dialog-box {
+  transform: scale(0.9) translateY(12px);
+  opacity: 0;
+}
 
-.dialog-leave-to .dialog-box {
+.tada-dialog-leave-to {
+  opacity: 0;
+}
+
+.tada-dialog-leave-to .${namespace}-dialog-box {
   transform: scale(0.95);
   opacity: 0;
 }

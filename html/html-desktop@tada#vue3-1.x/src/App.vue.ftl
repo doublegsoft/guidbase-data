@@ -1,19 +1,14 @@
 <template>
-  <!-- 如果是登录页面，直接全屏渲染，不加载 mainframe 外壳 -->
   <router-view v-if="isLoginPage" />
 
-  <!-- 标准 TADA Mainframe 外壳 -->
   <div v-else class="${namespace}-shell">
 
-    <!-- 1. 顶部固定 Topbar -->
     <header class="${namespace}-topbar">
-      <!-- 品牌 Logo 区域 -->
       <div class="${namespace}-logo">
         <div class="${namespace}-logo-badge">🌱</div>
         <span>如期<em>v2.8</em></span>
       </div>
 
-      <!-- 顶部模块切换 Tab (tnav) -->
       <div 
         v-for="m in modules" 
         :key="m.key"
@@ -23,9 +18,7 @@
         {{ m.label }}
       </div>
 
-      <!-- 顶部右侧槽位：小柴桌宠互动 + 时钟 + 用户信息 -->
       <div class="${namespace}-topbar-right">
-        <!-- 桌面小宠交互胶囊 -->
         <div class="${namespace}-pet-capsule" @click="petCompanion">
           <span class="${namespace}-pet-avatar">🐶</span>
           <span style="font-size: 11px; font-weight: 900; color: var(--${namespace}-gold-dark);">
@@ -33,63 +26,70 @@
           </span>
         </div>
 
-        <!-- 系统时钟 -->
         <span style="font-family: var(--${namespace}-mono); font-weight: 700; color: var(--${namespace}-text-muted);">
           {{ clock }}
         </span>
 
-        <!-- 登录用户及退出 -->
         <span class="${namespace}-tag ${namespace}-tag--primary" style="padding: 4px 10px; cursor: pointer;" @click="logout">
           <i class="fa-solid fa-user-ninja" style="margin-right: 4px;"></i>{{ username }} [退出]
         </span>
       </div>
     </header>
 
-    <!-- 2. 主工作区布局 (Sidebar + Content) -->
     <div class="${namespace}-main">
 
-      <!-- 左侧：定宽、自身独立滚动 Sidebar -->
       <aside class="${namespace}-sidebar">
-        <div>
-          <!-- 动态渲染菜单分区 -->
+        <div class="${namespace}-nav-card-list">
           <template v-for="(sec, sIdx) in currentSections" :key="sIdx">
-            <div class="${namespace}-nav-section">{{ sec.title || '任务与目标' }}</div>
+            <div v-if="sec.title" class="${namespace}-nav-section-label">
+              {{ sec.title }}
+            </div>
+
             <div 
               v-for="item in sec.items" 
               :key="item.id"
-              class="${namespace}-nav-item"
-              :class="{ '${namespace}-active': activeId === item.id }"
-              @click="selectItem(item)">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <i :class="item.icon || 'fa-regular fa-folder'"></i>
-                <span>{{ item.label }}</span>
+              class="${namespace}-nav-card"
+              :class="[
+                { '${namespace}-nav-card--active': activeId === item.id },
+                item.theme ? ('${namespace}-nav-card--' + item.theme) : ''
+              ]"
+              @click="selectItem(item)"
+            >
+              <div class="${namespace}-nav-card__icon">
+                <template v-if="item.emoji">{{ item.emoji }}</template>
+                <i v-else-if="item.icon" :class="item.icon"></i>
+                <span v-else>📌</span>
               </div>
-              <span v-if="item.badge" class="${namespace}-tag ${namespace}-tag--neutral">
+
+              <span class="${namespace}-nav-card__title">{{ item.label }}</span>
+
+              <span 
+                v-if="item.badge !== undefined && item.badge !== null" 
+                class="${namespace}-nav-card__badge"
+                :class="item.badgeType ? ('${namespace}-nav-card__badge--' + item.badgeType) : ''"
+              >
                 {{ item.badge }}
               </span>
             </div>
           </template>
         </div>
 
-        <!-- 侧边栏底部常驻状态 -->
-        <div style="padding: 10px 14px; border-top: 2px solid var(--${namespace}-border-light);">
-          <div class="${namespace}-alert" style="padding: 8px 10px; font-size: 11px; justify-content: center;">
-            <i class="fa-regular fa-bell"></i> 每天 09:00 晨间提醒
+        <div class="${namespace}-sidebar-footer">
+          <div class="${namespace}-pet-hint-bubble">
+            <span class="pet-paw">🐾</span>
+            <span>今天也要元气满满哦！</span>
           </div>
         </div>
       </aside>
 
-      <!-- 右侧：Content 展示区 -->
       <section class="${namespace}-content">
         
-        <!-- 面包屑与记录导航栏 -->
         <div class="${namespace}-breadcrumb">
           <span>当前位置：</span>
           <a href="javascript:void(0)">{{ currentModuleLabel }}</a>
           <span>&gt;</span>
           <span>{{ breadPage }}</span>
 
-          <!-- 经典微翻页组件 -->
           <div class="${namespace}-record-nav" v-if="showPrevNext">
             <button class="${namespace}-rn-btn" @click="prevRecord">
               <i class="fa-solid fa-chevron-left" style="font-size: 10px; margin-right: 2px;"></i>上一个
@@ -101,16 +101,12 @@
           </div>
         </div>
 
-        <!-- 页面自滚动主区 -->
         <main class="${namespace}-page">
           
-          <!-- 路由出口 (业务子页面优先挂载到这里) -->
           <router-view />
 
-          <!-- 如果业务子页面为空，默认渲染的“今日推进总览”面板 (使用 100% 规范 class) -->
           <div v-if="route.path === '/' || route.path === '/home'" style="display: flex; flex-direction: column; gap: 14px;">
             
-            <!-- SMART 快速输入面板 -->
             <div class="${namespace}-panel">
               <div class="${namespace}-panel-head">
                 <span>🎯 今日核心目标快速拆解 (SMART 策略)</span>
@@ -143,7 +139,6 @@
               </div>
             </div>
 
-            <!-- 今日推荐推进伴随提示条 (Alert) -->
             <div class="${namespace}-alert">
               <i class="fa-solid fa-bell animate-wiggle"></i>
               <span style="font-weight: 900;">🎯 推进提示：</span>
@@ -158,7 +153,6 @@
               </div>
             </div>
 
-            <!-- 目标卡片多维网格 (利用 24 栅格体系) -->
             <div class="${namespace}-row">
               <div 
                 v-for="card in projectCards" 
@@ -177,7 +171,6 @@
                     截止时间: {{ card.deadline }} · 子任务 {{ card.subNodes }}
                   </div>
 
-                  <!-- 细致进度条 -->
                   <div class="${namespace}-progress-bar" style="margin-bottom: 12px;">
                     <div class="${namespace}-progress-fill" :style="{ width: card.progress + '%' }"></div>
                   </div>
@@ -198,7 +191,6 @@
 
         </main>
 
-        <!-- 底部状态指示栏 (Status Bar) -->
         <footer class="${namespace}-statusbar">
           <div style="display: flex; align-items: center; gap: 8px;">
             <span class="${namespace}-tag ${namespace}-tag--warning" style="border: none;">🐾 陪伴小柴在线</span>
@@ -211,7 +203,6 @@
 
     </div>
 
-    <!-- 全局反馈弹窗组件 -->
     <${js.nameType(namespace)}Feedback />
 
   </div>
@@ -231,26 +222,44 @@ const { dialog, success, warning, error, info, confirm, close } = provideFeedbac
 const route = useRoute()
 const { showPrevNext, show, hide, toggle } = useNavControl()
 
-// 判断是否为登录页
 const isLoginPage = computed(() => route.path === '/login')
 
 const modules = MODULE_LIST
 const activeModule = ref(modules[0].key)
-const activeId     = ref(MENUS[modules[0].key].sections[0].items[0].id)
-const activePath   = ref(MENUS[modules[0].key].sections[0].items[0].path)
-const breadPage    = ref(MENUS[modules[0].key].sections[0].items[0].label)
+
+const fallbackSections = [
+  {
+    title: '',
+    items: [
+      { id: 'today',     label: '今天任务',   emoji: '📅', badge: 0, path: '/today' },
+      { id: 'short',     label: '短期项目',   emoji: '📋', badge: 3, path: '/short' },
+      { id: 'long',      label: '长期项目',   emoji: '🏔️', badge: 1, path: '/long' },
+      { id: 'milestone', label: '里程碑勋章', emoji: '🏆', badge: '2/24', theme: 'gold', path: '/milestones' },
+      { id: 'hermes',    label: 'Hermes 连通', emoji: '🔮', badge: 'MCP', badgeType: 'text', path: '/hermes' },
+      { id: 'done',      label: '已达成目标', emoji: '🎉', badge: 3, path: '/done' }
+    ]
+  }
+]
+
+const currentSections = computed(() => {
+  const mod = MENUS[activeModule.value]
+  return (mod && mod.sections && mod.sections.length > 0) ? mod.sections : fallbackSections
+})
+
+const activeId     = ref('short')
+const activePath   = ref('/short')
+const breadPage    = ref('短期项目')
 const clock        = ref('')
 const username     = ref(localStorage.getItem('username') || '旅行者')
 
-const currentSections    = computed(() => MODULE_LIST.flatMap(m => MENUS[m.key].sections))
-const currentModuleLabel = computed(() => MENUS[activeModule.value].label)
+const currentModuleLabel = computed(() => MENUS[activeModule.value]?.label || '自律空间')
 
 function switchModule(key) {
   activeModule.value = key
-  const first = MENUS[key].sections[0].items[0]
-  activeId.value   = first.id
-  activePath.value = first.path || ''
-  breadPage.value  = first.label.replace(/^└\s*/, '')
+  const sec = currentSections.value[0]
+  if (sec && sec.items && sec.items[0]) {
+    selectItem(sec.items[0])
+  }
 }
 
 function selectItem(item) {
@@ -258,26 +267,26 @@ function selectItem(item) {
   activeId.value   = item.id
   activePath.value = item.path || ''
   breadPage.value  = item.label.replace(/^└\s*/, '')
-  router.push(item.path || '/')
+  if (item.path) {
+    router.push(item.path)
+  }
 }
 
 let timer
 function tick() {
   const now = new Date()
   const p = n => String(n).padStart(2, '0')
-  clock.value = ${r"`${now.getFullYear()}-${p(now.getMonth()+1)}-${p(now.getDate())} ${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`"}
+  clock.value = now.getFullYear() + '-' + p(now.getMonth() + 1) + '-' + p(now.getDate()) + ' ' + p(now.getHours()) + ':' + p(now.getMinutes()) + ':' + p(now.getSeconds())
 }
 onMounted(() => { tick(); timer = setInterval(tick, 1000) })
 onBeforeUnmount(() => clearInterval(timer))
 
-// 退出登录
 function logout() {
   localStorage.removeItem('isLoggedIn')
   localStorage.removeItem('username')
   router.push('/login')
 }
 
-// 示例数据模型
 const goalInput = ref('岗位: AWS架构师准备 / 景观方案深化 / 雅思口语7分')
 const goalDeadline = ref('2026-09-19')
 
@@ -288,12 +297,11 @@ const projectCards = ref([
   { id: 4, icon: '🍁', title: '某秋季新品品牌策划', progress: 67, deadline: '2026-12-08', nextTask: '与甲方沟通初审方案 💡', subNodes: '1/1' },
 ])
 
-// 小柴互动台词
 const petQuotes = [
-  "汪！摸摸头，今天也超级棒！✨",
-  "哪怕只前进一步也很厉害啦！🐾",
-  "喝口水，稍微活动下肩膀吧 🍵",
-  "今天的小柴也是你的头号粉丝！⭐"
+  '汪！摸摸头，今天也超级棒！✨',
+  '哪怕只前进一步也很厉害啦！🐾',
+  '喝口水，稍微活动下肩膀吧 🍵',
+  '今天的小柴也是你的头号粉丝！⭐'
 ]
 const currentPetQuote = ref(petQuotes[0])
 
@@ -303,7 +311,6 @@ function petCompanion() {
   currentPetQuote.value = petQuotes[randomIdx]
 }
 
-// 彩屑粒子特效
 function fireConfetti() {
   if (typeof window !== 'undefined' && window.confetti) {
     window.confetti({
@@ -315,3 +322,153 @@ function fireConfetti() {
   }
 }
 </script>
+
+<style scoped>
+.${namespace}-sidebar {
+  width: 260px;
+  background: var(--${namespace}-bg-page, #EDF5F1);
+  background-image: 
+    radial-gradient(var(--${namespace}-dot-color, #CCE7DA) 1.5px, transparent 1.5px), 
+    radial-gradient(var(--${namespace}-dot-color, #CCE7DA) 1.5px, var(--${namespace}-bg-page, #EDF5F1) 1.5px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+  border-right: 3px solid var(--${namespace}-border, #E2EFE8);
+  overflow-y: auto;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 14px;
+  gap: 12px;
+}
+
+.${namespace}-nav-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.${namespace}-nav-section-label {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--${namespace}-text-light, #94A3B8);
+  padding: 2px 10px;
+  letter-spacing: 0.05em;
+}
+
+.${namespace}-nav-card {
+  min-height: 58px;
+  background: var(--${namespace}-bg, #FFFFFF);
+  border: 2.5px solid var(--${namespace}-border, #E2EFE8);
+  border-radius: var(--${namespace}-radius-lg, 24px);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  box-shadow: 0 4px 0 #D2E7DC, 0 6px 12px rgba(45, 74, 62, 0.03);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.${namespace}-nav-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--${namespace}-primary-border, #A7F3D0);
+  box-shadow: 0 6px 0 #D2E7DC, 0 10px 16px rgba(16, 185, 129, 0.08);
+}
+
+.${namespace}-nav-card:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #D2E7DC;
+}
+
+.${namespace}-nav-card__icon {
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.08));
+}
+
+.${namespace}-nav-card__title {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--${namespace}-text, #1E293B);
+  flex: 1;
+  letter-spacing: 0.02em;
+}
+
+.${namespace}-nav-card__badge {
+  min-width: 32px;
+  height: 28px;
+  padding: 0 10px;
+  background: #DCFCE7;
+  color: #047857;
+  border-radius: var(--${namespace}-radius-pill, 9999px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.${namespace}-nav-card.${namespace}-nav-card--active {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  border-color: #047857;
+  box-shadow: 0 4px 0 #047857, 0 10px 20px rgba(5, 150, 105, 0.3);
+}
+.${namespace}-nav-card.${namespace}-nav-card--active .${namespace}-nav-card__title {
+  color: #FFFFFF;
+}
+.${namespace}-nav-card.${namespace}-nav-card--active .${namespace}-nav-card__badge {
+  background: #FFFFFF;
+  color: #047857;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.${namespace}-nav-card--gold {
+  background: #FFFDF0;
+  border-color: #FDE68A;
+  box-shadow: 0 4px 0 #FCD34D, 0 6px 12px rgba(217, 119, 6, 0.06);
+}
+.${namespace}-nav-card--gold .${namespace}-nav-card__title {
+  color: #78350F;
+}
+.${namespace}-nav-card--gold .${namespace}-nav-card__badge {
+  background: #FBBF24;
+  color: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
+}
+
+.${namespace}-nav-card__badge--text {
+  background: #A7F3D0;
+  color: #065F46;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 0 8px;
+}
+
+.${namespace}-sidebar-footer {
+  padding-top: 8px;
+}
+.${namespace}-pet-hint-bubble {
+  background: #FFFFFF;
+  border: 2px solid var(--${namespace}-border, #E2EFE8);
+  border-radius: var(--${namespace}-radius-md, 16px);
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--${namespace}-text-muted, #475569);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 0 #D2E7DC;
+}
+.${namespace}-pet-hint-bubble .pet-paw {
+  font-size: 16px;
+}
+</style>

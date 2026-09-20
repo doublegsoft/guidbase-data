@@ -2,7 +2,6 @@
   <div class="login-page">
     <div class="login-container">
       <div class="login-top-line"></div>
-
       <header class="login-header">
         <div class="logo-area">
           <span class="logo-icon">⚡</span>

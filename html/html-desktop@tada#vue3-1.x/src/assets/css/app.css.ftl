@@ -172,6 +172,9 @@ html, body {
   padding: 12px 18px;
   background: var(--${namespace}-bg);
   border-bottom: 2px solid var(--${namespace}-border);
+  border: 3px solid var(--${namespace}-border);
+  border-radius: var(--${namespace}-radius-lg);
+  box-shadow: var(--${namespace}-shadow-sm);
 }
 
 .${namespace}-nav-section {
@@ -543,11 +546,33 @@ html, body {
   background: var(--${namespace}-border-light);
   border-top: 1px solid var(--${namespace}-border-light);
 }
+
+.${namespace}-fview--1 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+.${namespace}-fview--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.${namespace}-fview--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.${namespace}-fview--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
 .${namespace}-fv {
   display: flex;
   background: var(--${namespace}-bg);
   min-height: 40px;
 }
+
+.${namespace}-fv--span2 { grid-column: span 2; }
+.${namespace}-fv--span3 { grid-column: span 3; }
+.${namespace}-fv--span4 { grid-column: span 4; }
+
 .${namespace}-fv-label {
   width: 100px;
   background: #F9FCFA;
@@ -577,6 +602,10 @@ html, body {
   gap: 12px 16px;
   padding: 18px 20px;
 }
+
+.${namespace}-form--2 { grid-template-columns: repeat(2, 1fr); }
+.${namespace}-form--3 { grid-template-columns: repeat(3, 1fr); }
+
 .${namespace}-field {
   display: flex;
   flex-direction: column;
@@ -629,6 +658,14 @@ html, body {
 /* ══════════════════════════════════════════════
    12. Buttons (3D 果冻物理按键)
    ══════════════════════════════════════════════ */
+   
+.${namespace}-btns {
+  width: 100%; 
+  display: flex; 
+  justify-content: 
+  flex-end; gap: 8px;
+}
+
 .${namespace}-btn {
   height: 36px;
   padding: 0 16px;
@@ -656,6 +693,54 @@ html, body {
 .${namespace}-btn--primary:active {
   transform: translateY(3px);
   box-shadow: 0 1px 0 var(--${namespace}-primary-deep);
+}
+
+/* 果冻元气绿 (Success) */
+.${namespace}-btn--success {
+  background: linear-gradient(180deg, #34D399 0%, var(--${namespace}-success-dark) 100%);
+  color: #FFFFFF;
+  border-color: #065F46;
+  box-shadow: 0 4px 0 #065F46, 0 8px 14px rgba(16, 185, 129, 0.25);
+}
+.${namespace}-btn--success:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #065F46;
+}
+
+/* 果冻暖橙日落 (Warning) */
+.${namespace}-btn--warning {
+  background: linear-gradient(180deg, #FB923C 0%, var(--${namespace}-warning) 100%);
+  color: #FFFFFF;
+  border-color: #C2410C;
+  box-shadow: 0 4px 0 #C2410C, 0 8px 14px rgba(249, 115, 22, 0.28);
+}
+.${namespace}-btn--warning:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #C2410C;
+}
+
+/* 果冻蜜桃柔红 (Danger) */
+.${namespace}-btn--danger {
+  background: linear-gradient(180deg, #FB7185 0%, var(--${namespace}-danger-dark) 100%);
+  color: #FFFFFF;
+  border-color: #9F1239;
+  box-shadow: 0 4px 0 #9F1239, 0 8px 14px rgba(244, 63, 94, 0.28);
+}
+.${namespace}-btn--danger:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #9F1239;
+}
+
+/* 果冻灵感紫 (Purple) */
+.${namespace}-btn--purple {
+  background: linear-gradient(180deg, #A78BFA 0%, var(--${namespace}-purple) 100%);
+  color: #FFFFFF;
+  border-color: #5B21B6;
+  box-shadow: 0 4px 0 #5B21B6, 0 8px 14px rgba(139, 92, 246, 0.28);
+}
+.${namespace}-btn--purple:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #5B21B6;
 }
 
 /* 贴纸白按键 */
@@ -897,6 +982,10 @@ html, body {
   text-align: center;
   width: 15%;
   color: var(--${namespace}-primary-dark);
+}
+
+.${namespace}-divider {
+  height: 12px;
 }
 
 /* ══════════════════════════════════════════════

@@ -2,8 +2,10 @@
 <#import "/$/vue3-bnrlike.ftl" as vue3>
 <#elseif (designSystem!"") == "navypitch">
 <#import "/$/vue3-navypitch.ftl" as vue3>
+<#elseif (designSystem!"") == "tada">
+<#import "/$/vue3-tada.ftl" as vue3>
 <#else>
-<#import "/$/vue3-bnrlike.ftl" as vue3>
+<#import "/$/vue3-default.ftl" as vue3>
 </#if>
 <#import "/$/guidbase4js.ftl" as guidbase4js>
 <#assign page = pageDef>
@@ -16,11 +18,11 @@
 <#list page.widgets as button>
   <#if button.type != "button"><#continue></#if>
   <#assign action = valuebase.action(button.value("action"))>
-  <#if action.type.name() == "DRAWER">
+  <#if action.type.name() == "drawer">
   <${namespace}-drawer v-model="${js.nameVariable(action.resource)}Open">
     <${namespace}-${js.nameFile(action.resource)} />
   </${namespace}-drawer>
-    <#elseif action.type.name() == "DIALOG">
+    <#elseif action.type.name() == "dialog">
   <${namespace}-dialog v-model="${js.nameVariable(action.resource)}Open" size="lg">
     <${namespace}-${js.nameFile(action.resource)} />
   </${namespace}-dialog>
@@ -28,7 +30,7 @@
 </#list>
 </template>
 <script setup>
-import { ref, reactive, computed, inject, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, inject, provide, onMounted, onUnmounted } from 'vue'
 <@vue3.print_page_imports page=pageDef />
 import sdk from '@/sdk/sdk.js'
 import { useFeedback } from '@/composables/useFeedback.js'
@@ -45,6 +47,16 @@ const props = defineProps({
 </#if>
 })
 <@vue3.print_page_variables page=pageDef />
+<#list page.widgets as button>
+  <#if button.value("action") == ""><#continue></#if>
+  <#assign action = valuebase.action(button.value("action"))>
+  <#if action.type.name() == "DIALOG" || action.type.name() == "DRAWER">
+
+provide('dialogClose', () => {
+  ${java.nameVariable(action.resource)}Open.value = false;
+});
+  </#if>
+</#list>
 <@vue3.print_page_methods page=pageDef />
 
 onMounted(async () => {

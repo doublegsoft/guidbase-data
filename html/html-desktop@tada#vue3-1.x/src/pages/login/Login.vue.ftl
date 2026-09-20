@@ -1,161 +1,167 @@
 <template>
-  <div class="login-wrapper min-h-screen w-screen flex items-center justify-center p-4 selection:bg-emerald-200 select-none">
+  <div class="${namespace}-login-wrapper">
     
-    <!-- 登录居中卡片 -->
-    <div class="tada-card max-w-md w-full p-8 md:p-10 relative overflow-visible">
+    <!-- 登录居中卡片 (基于系统 panel 微凸面板规范) -->
+    <div class="${namespace}-panel ${namespace}-login-card">
 
       <!-- 顶部挂载桌宠头像与动态问候气泡 -->
-      <div class="absolute -top-16 left-1/2 -translate-x-1/2 flex flex-col items-center">
-        <!-- 气泡文字 -->
-        <div class="animate-float mb-2 bg-white border-2 border-amber-300 text-amber-900 text-xs font-black px-4 py-1.5 rounded-full shadow-md whitespace-nowrap">
+      <div class="${namespace}-pet-float-group">
+        <!-- 动态浮动气泡 -->
+        <div class="${namespace}-bubble-tip">
           {{ petBubble }}
         </div>
 
-        <!-- 交互桌宠 (输入密码自动蒙眼 🙈) -->
+        <!-- 交互桌宠 (输入密码自动蒙眼 🙈，使用系统 tadaPetWiggle 动画) -->
         <div 
-          @click="petBark"
-          class="w-20 h-20 rounded-3xl bg-amber-100 border-3 border-amber-300 flex items-center justify-center text-4xl shadow-lg shadow-amber-900/10 cursor-pointer animate-wiggle select-none transform hover:scale-105 active:scale-95 transition">
+          class="${namespace}-pet-badge" 
+          @click="petBark" 
+          title="戳我有惊喜哦！"
+        >
           {{ petAvatar }}
         </div>
       </div>
 
       <!-- 标题与副标题 -->
-      <div class="text-center mt-8 mb-6">
-        <div class="inline-flex items-center gap-2 mb-1">
-          <h1 class="text-2xl font-black text-slate-800 tracking-tight">步步爪</h1>
-          <span class="text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-0.5 rounded-full font-black">
-            v2.8
-          </span>
+      <div class="${namespace}-login-header">
+        <div class="${namespace}-login-title-row">
+          <h1 class="${namespace}-login-title">步步爪</h1>
+          <span class="${namespace}-tag ${namespace}-tag--primary">v2.8</span>
         </div>
-        <p class="text-xs font-bold text-slate-400">大目标轻轻拆，从容推进今天的小确幸 🐾</p>
+        <p class="${namespace}-login-subtitle">大目标轻轻拆，从容推进今天的小确幸 🐾</p>
       </div>
 
-      <!-- 登录模式切换 Tab -->
-      <div class="flex p-1.5 bg-[#eaf4ee] border-2 border-[#d6ebe0] rounded-2xl mb-6 text-xs font-black">
-        <button 
-          type="button" 
-          @click="loginType = 'pwd'" 
-          :class="loginType === 'pwd' ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
-          class="flex-1 py-2 rounded-xl transition">
+      <!-- 登录模式切换 Tab (系统原生 ${namespace}-tabs) -->
+      <div class="${namespace}-tabs ${namespace}-login-tabs">
+        <div 
+          class="${namespace}-tab" 
+          :class="{ '${namespace}-active': loginType === 'pwd' }"
+          @click="loginType = 'pwd'"
+        >
           账号密码登录
-        </button>
-        <button 
-          type="button" 
-          @click="loginType = 'otp'" 
-          :class="loginType === 'otp' ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
-          class="flex-1 py-2 rounded-xl transition">
+        </div>
+        <div 
+          class="${namespace}-tab" 
+          :class="{ '${namespace}-active': loginType === 'otp' }"
+          @click="loginType = 'otp'"
+        >
           免密验证码
-        </button>
+        </div>
       </div>
 
       <!-- 登录表单 -->
-      <form @submit.prevent="handleLogin" class="space-y-4">
+      <form @submit.prevent="handleLogin" class="${namespace}-login-form">
         
         <!-- 账号输入 -->
-        <div>
-          <label class="block text-xs font-black text-slate-700 mb-1.5">电子邮箱 / 手机号</label>
-          <div class="relative">
-            <i class="fa-regular fa-envelope absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+        <div class="${namespace}-field">
+          <label class="${namespace}-field-label">电子邮箱 / 手机号</label>
+          <div class="${namespace}-input-wrap">
+            <i class="${namespace}-regular ${namespace}-envelope ${namespace}-input-icon"></i>
             <input 
               type="text" 
               v-model="form.account" 
               required 
               placeholder="creator@orderly.app" 
-              class="tada-input" 
+              class="${namespace}-input" 
               @focus="onAccountFocus" 
-              @blur="onInputBlur" />
+              @blur="onInputBlur" 
+            />
           </div>
         </div>
 
         <!-- 密码登录区 -->
-        <div v-if="loginType === 'pwd'">
-          <div class="flex items-center justify-between mb-1.5">
-            <label class="text-xs font-black text-slate-700">账户密码</label>
-            <a href="javascript:void(0)" class="text-xs font-black text-emerald-600 hover:underline">忘记密码？</a>
+        <div v-if="loginType === 'pwd'" class="${namespace}-field">
+          <div class="${namespace}-field-header">
+            <label class="${namespace}-field-label">账户密码</label>
+            <a href="javascript:void(0)" class="${namespace}-login-link">忘记密码？</a>
           </div>
-          <div class="relative">
-            <i class="fa-solid fa-lock absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+          <div class="${namespace}-input-wrap">
+            <i class="${namespace}-solid ${namespace}-lock ${namespace}-input-icon"></i>
             <input 
               type="password" 
               v-model="form.password" 
               required
               placeholder="输入密码 (小柴会自动捂眼哦)" 
-              class="tada-input" 
+              class="${namespace}-input" 
               @focus="onPasswordFocus" 
-              @blur="onInputBlur" />
+              @blur="onInputBlur" 
+            />
           </div>
         </div>
 
         <!-- 短信验证码登录区 -->
-        <div v-else>
-          <label class="block text-xs font-black text-slate-700 mb-1.5">短信验证码</label>
-          <div class="flex gap-2">
-            <div class="relative flex-1">
-              <i class="fa-solid fa-shield-halved absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+        <div v-else class="${namespace}-field">
+          <label class="${namespace}-field-label">短信验证码</label>
+          <div class="${namespace}-otp-row">
+            <div class="${namespace}-input-wrap ${namespace}-otp-input">
+              <i class="${namespace}-solid ${namespace}-shield-halved ${namespace}-input-icon"></i>
               <input 
                 type="text" 
                 v-model="form.otp" 
                 required
                 placeholder="6 位验证码" 
-                class="tada-input" 
+                class="${namespace}-input" 
                 @focus="onAccountFocus" 
-                @blur="onInputBlur" />
+                @blur="onInputBlur" 
+              />
             </div>
             <button 
               type="button" 
               @click="sendOtp"
-              class="px-4 bg-emerald-50 border-2 border-emerald-200 text-emerald-800 rounded-2xl text-xs font-black hover:bg-emerald-100 transition whitespace-nowrap">
+              class="${namespace}-btn ${namespace}-btn--default ${namespace}-btn-otp"
+            >
               获取验证码
             </button>
           </div>
         </div>
 
         <!-- 免登录勾选 -->
-        <div class="flex items-center justify-between pt-1">
-          <label class="flex items-center space-x-2 cursor-pointer text-xs font-extrabold text-slate-500">
-            <input type="checkbox" v-model="form.remember" class="w-4 h-4 rounded-lg accent-emerald-500 cursor-pointer">
-            <span>7天内免登录 (保持小柴常驻)</span>
+        <div class="${namespace}-field">
+          <label class="${namespace}-checkbox-wrap">
+            <input type="checkbox" v-model="form.remember" class="${namespace}-checkbox" />
+            <span>7 天内免登录 (保持小柴常驻)</span>
           </label>
         </div>
 
-        <!-- 3D 果冻大登录按键 -->
-        <div class="pt-2">
-          <button 
-            type="submit" 
-            class="w-full btn-jelly-primary text-white text-sm font-black py-3.5 rounded-2xl flex items-center justify-center space-x-2">
-            <span>开始今天的微启动之旅</span>
-            <i class="fa-solid fa-arrow-right text-xs"></i>
-          </button>
-        </div>
+        <!-- 3D 果冻主按键 (系统原生 ${namespace}-btn--primary) -->
+        <button 
+          type="submit" 
+          class="${namespace}-btn ${namespace}-btn--primary ${namespace}-btn-submit"
+        >
+          <span>开始今天的微启动之旅</span>
+          <i class="${namespace}-solid ${namespace}-arrow-right"></i>
+        </button>
 
       </form>
 
-      <!-- 虚线分隔条 -->
-      <div class="relative my-6">
-        <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t-2 border-dashed border-[#e6f1eb]"></div>
-        </div>
-        <div class="relative flex justify-center text-xs font-black">
-          <span class="bg-white px-3 text-slate-400">快捷开启</span>
-        </div>
+      <!-- 虚线中间文字分隔条 -->
+      <div class="${namespace}-separator">
+        <span>快捷开启</span>
       </div>
 
-      <!-- 第三方快速登录 -->
-      <div class="grid grid-cols-3 gap-3">
-        <button type="button" @click="socialLogin('微信')" class="btn-social py-2.5 rounded-2xl flex items-center justify-center text-emerald-600 text-base">
-          <i class="fa-brands fa-weixin"></i>
-        </button>
-        <button type="button" @click="socialLogin('Apple')" class="btn-social py-2.5 rounded-2xl flex items-center justify-center text-slate-800 text-base">
-          <i class="fa-brands fa-apple"></i>
-        </button>
-        <button type="button" @click="socialLogin('GitHub')" class="btn-social py-2.5 rounded-2xl flex items-center justify-center text-slate-700 text-base">
-          <i class="fa-brands fa-github"></i>
-        </button>
+      <!-- 第三方快速登录 (系统原生 24 栅格 ${namespace}-row / ${namespace}-col-8 + ${namespace}-btn--default) -->
+      <div class="${namespace}-row ${namespace}-social-row">
+        <div class="${namespace}-col-8">
+          <button type="button" @click="socialLogin('微信')" class="${namespace}-btn ${namespace}-btn--default ${namespace}-btn-social">
+            <i class="${namespace}-brands ${namespace}-weixin ${namespace}-icon-wechat"></i>
+          </button>
+        </div>
+        <div class="${namespace}-col-8">
+          <button type="button" @click="socialLogin('Apple')" class="${namespace}-btn ${namespace}-btn--default ${namespace}-btn-social">
+            <i class="${namespace}-brands ${namespace}-apple"></i>
+          </button>
+        </div>
+        <div class="${namespace}-col-8">
+          <button type="button" @click="socialLogin('GitHub')" class="${namespace}-btn ${namespace}-btn--default ${namespace}-btn-social">
+            <i class="${namespace}-brands ${namespace}-github"></i>
+          </button>
+        </div>
       </div>
 
       <!-- 底部协议说明 -->
-      <p class="text-center text-[11px] font-bold text-slate-400 mt-6">
-        登录即代表同意 <a href="javascript:void(0)" class="text-emerald-700 underline font-black">《如期服务条款》</a> 与 <a href="javascript:void(0)" class="text-emerald-700 underline font-black">《自律成长公约》</a>
+      <p class="${namespace}-login-agreement">
+        登录即代表同意 
+        <a href="javascript:void(0)">《如期服务条款》</a> 与 
+        <a href="javascript:void(0)">《自律成长公约》</a>
       </p>
 
     </div>
@@ -165,9 +171,6 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-// 如果你的项目已配置 vue-router，可解开下行引入：
-// import { useRouter } from 'vue-router'
-// const router = useRouter()
 
 // 1. 登录表单与模式状态
 const loginType = ref('pwd') // 'pwd' | 'otp'
@@ -187,7 +190,7 @@ const onAccountFocus = () => {
   petBubble.value = '在看你输入账号哦~ 🐾'
 }
 
-// ⭐ 密码框聚焦时，触发蒙眼交互 (Peek-a-boo)
+// 密码框聚焦时，触发蒙眼交互 (Peek-a-boo)
 const onPasswordFocus = () => {
   petAvatar.value = '🙈'
   petBubble.value = '保密时间！小柴不看你的密码 🤫'
@@ -207,12 +210,9 @@ const petBark = () => {
 const handleLogin = () => {
   petAvatar.value = '🎉'
   petBubble.value = '验证通过！如期系统正在开启... 🚀'
-  
   triggerConfetti()
 
   setTimeout(() => {
-    // 页面跳转示例：
-    // router.push('/home')
     alert('登录成功！正在跳转至工作台总览...')
   }, 700)
 }
@@ -241,87 +241,252 @@ const triggerConfetti = () => {
 </script>
 
 <style scoped>
-/* 治愈系背景网点 */
-.login-wrapper {
-  background: #edf5f1;
-  background-image: 
-    radial-gradient(#cce7da 1.5px, transparent 1.5px), 
-    radial-gradient(#cce7da 1.5px, #edf5f1 1.5px);
-  background-size: 28px 28px;
+/* 居中背景 */
+.${namespace}-login-wrapper {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--${namespace}-sp-lg, 20px);
+  user-select: none;
 }
 
-/* TADA 3D 软萌微凸卡片 */
-.tada-card {
-  background: #ffffff;
-  border: 3.5px solid #e1efe7;
-  border-radius: 36px;
-  box-shadow: 0 16px 35px -6px rgba(45, 74, 62, 0.08);
-}
-
-/* 3D 果冻物理按键 */
-.btn-jelly-primary {
-  background: linear-gradient(180deg, #34d399 0%, #059669 100%);
-  box-shadow: 0 5px 0 #047857, 0 10px 18px rgba(5, 150, 105, 0.3);
-  transition: all 0.1s ease;
-}
-.btn-jelly-primary:active {
-  transform: translateY(4px);
-  box-shadow: 0 1px 0 #047857, 0 4px 8px rgba(5, 150, 105, 0.2);
-}
-
-/* 快捷第三方登录小圆钮 */
-.btn-social {
-  background: #f8fcfa;
-  border: 2px solid #d9ece2;
-  box-shadow: 0 3px 0 #cde5d8;
-  transition: all 0.15s ease;
-}
-.btn-social:hover {
-  background: #ffffff;
-  border-color: #10b981;
-  transform: translateY(-2px);
-}
-.btn-social:active {
-  transform: translateY(2px);
-  box-shadow: none;
-}
-
-/* 软萌输入框控件 */
-.tada-input {
-  background-color: #f7faf8;
-  border: 2.5px solid #d9ece2;
-  border-radius: 20px;
-  padding: 12px 16px 12px 44px;
-  font-size: 13px;
-  font-weight: 800;
-  color: #1e293b;
-  outline: none;
-  transition: all 0.2s ease;
+/* 核心卡片 (继承 panel 并配置定位上下文) */
+.${namespace}-login-card {
   width: 100%;
-}
-.tada-input:focus {
-  background-color: #ffffff;
-  border-color: #10b981;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+  max-width: 420px;
+  position: relative;
+  overflow: visible;
+  padding: 38px 32px 28px;
+  box-shadow: var(--${namespace}-shadow-md);
 }
 
-/* 柴犬晃晃动效 */
-@keyframes petWiggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-8deg) scale(1.04); }
-  75% { transform: rotate(8deg) scale(1.04); }
-}
-.animate-wiggle {
-  animation: petWiggle 3.5s ease-in-out infinite;
-  transform-origin: bottom center;
+/* 顶部桌宠悬挂锚点 */
+.${namespace}-pet-float-group {
+  position: absolute;
+  top: -64px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* 浮动气泡 */
-@keyframes floatSlow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+.${namespace}-bubble-tip {
+  margin-bottom: 8px;
+  background: var(--${namespace}-bg, #FFFFFF);
+  border: 2px solid var(--${namespace}-gold-border);
+  color: var(--${namespace}-gold-dark);
+  font-size: 11px;
+  font-weight: 900;
+  padding: 4px 14px;
+  border-radius: var(--${namespace}-radius-pill);
+  box-shadow: 0 4px 10px rgba(217, 119, 6, 0.12);
+  white-space: nowrap;
+  animation: faBubbleFloat 2.5s ease-in-out infinite;
 }
-.animate-float {
-  animation: floatSlow 2.5s ease-in-out infinite;
+
+@keyframes faBubbleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* 桌宠本体大徽章 (复用系统 tadaPetWiggle 动效) */
+.${namespace}-pet-badge {
+  width: 76px;
+  height: 76px;
+  border-radius: var(--${namespace}-radius-lg);
+  background: var(--${namespace}-gold-bg);
+  border: 3px solid var(--${namespace}-gold-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--${namespace}-gold-border), 0 8px 16px rgba(217, 119, 6, 0.15);
+  animation: tadaPetWiggle 3.5s ease-in-out infinite;
+  transform-origin: bottom center;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.${namespace}-pet-badge:hover {
+  transform: scale(1.08);
+}
+.${namespace}-pet-badge:active {
+  transform: scale(0.95);
+}
+
+/* 标题区 */
+.${namespace}-login-header {
+  text-align: center;
+  margin-top: 16px;
+  margin-bottom: 20px;
+}
+.${namespace}-login-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.${namespace}-login-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--${namespace}-text);
+  margin: 0;
+}
+.${namespace}-login-subtitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--${namespace}-text-light);
+  margin: 0;
+}
+
+/* Tab 适配全宽 */
+.${namespace}-login-tabs {
+  width: 100%;
+  margin-bottom: 18px;
+  display: flex;
+}
+.${namespace}-login-tabs .${namespace}-tab {
+  flex: 1;
+  text-align: center;
+}
+
+/* 表单主体 */
+.${namespace}-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.${namespace}-field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.${namespace}-login-link {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--${namespace}-primary-dark);
+  text-decoration: none;
+}
+.${namespace}-login-link:hover {
+  text-decoration: underline;
+}
+
+/* 输入框内嵌图标 */
+.${namespace}-input-wrap {
+  position: relative;
+  width: 100%;
+}
+.${namespace}-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--${namespace}-text-light);
+  font-size: 14px;
+}
+.${namespace}-input-wrap .${namespace}-input {
+  width: 100%;
+  padding-left: 40px;
+}
+
+/* 短信验证码行 */
+.${namespace}-otp-row {
+  display: flex;
+  gap: 8px;
+}
+.${namespace}-otp-input {
+  flex: 1;
+}
+.${namespace}-btn-otp {
+  white-space: nowrap;
+  font-size: 12px;
+  padding: 0 12px;
+}
+
+/* 勾选框 */
+.${namespace}-checkbox-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--${namespace}-text-muted);
+  cursor: pointer;
+}
+.${namespace}-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--${namespace}-primary);
+  cursor: pointer;
+}
+
+/* 登录大按钮 */
+.${namespace}-btn-submit {
+  width: 100%;
+  height: 44px;
+  font-size: 14px;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* 虚线分割带 */
+.${namespace}-separator {
+  position: relative;
+  text-align: center;
+  margin: 22px 0 16px;
+}
+.${namespace}-separator::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  border-top: 2px dashed var(--${namespace}-border);
+  z-index: 0;
+}
+.${namespace}-separator span {
+  position: relative;
+  z-index: 1;
+  background: var(--${namespace}-bg, #FFFFFF);
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--${namespace}-text-light);
+}
+
+/* 第三方登录 */
+.${namespace}-social-row {
+  margin-left: -4px;
+  margin-right: -4px;
+}
+.${namespace}-social-row > [class*="${namespace}-col-"] {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+.${namespace}-btn-social {
+  width: 100%;
+  font-size: 16px;
+  height: 38px;
+}
+.${namespace}-icon-wechat {
+  color: #07C160;
+}
+
+/* 协议页脚 */
+.${namespace}-login-agreement {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--${namespace}-text-light);
+  margin-top: 20px;
+}
+.${namespace}-login-agreement a {
+  color: var(--${namespace}-primary-dark);
+  font-weight: 900;
+  text-decoration: underline;
 }
 </style>

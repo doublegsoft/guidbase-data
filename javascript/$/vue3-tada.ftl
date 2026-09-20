@@ -1,109 +1,108 @@
 <#import "/$/guidbase.ftl" as guidbase>
-<#include "tile-html.ftl">
+<#include "vue3-default.ftl">
 <#include "vue3.ftl">
 <!----------------------------------------------------------------------------->
 <!--                                ENTRY FORM                               -->
 <!----------------------------------------------------------------------------->
-<#macro print_entry_form_layout form indent=0>
-</#macro>
+<#--  <#macro print_entry_form_layout form indent=0>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                              OFFICIAL FORM                              -->
 <!----------------------------------------------------------------------------->
-<#macro print_official_form_layout form indent>
-</#macro>
+<#--  <#macro print_official_form_layout form indent>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                              CRITERIA FORM                              -->
 <!----------------------------------------------------------------------------->
-<#macro print_criteria_form_layout form indent=0>
-</#macro>
+<#--  <#macro print_criteria_form_layout form indent=0>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                               DISPLAY FORM                              -->
 <!----------------------------------------------------------------------------->
-<#macro print_display_form_layout form indent=0>
-</#macro>
+<#--  <#macro print_display_form_layout form indent=0>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                                EXCEL FORM                               -->
 <!----------------------------------------------------------------------------->
-<#macro print_excel_form_layout form indent=0>
-</#macro>
+<#--  <#macro print_excel_form_layout form indent=0>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                               PAGED TABLE                               -->
 <!----------------------------------------------------------------------------->
-<#macro print_paged_table_layout table indent=0>
-</#macro>
+<#--  <#macro print_paged_table_layout table indent=0>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                               PAGED GRID                                -->
 <!----------------------------------------------------------------------------->
-<#macro print_paged_grid_layout grid indent=0>
-</#macro>
+<#--  <#macro print_paged_grid_layout grid indent=0>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                                TIME GRID                                -->
 <!----------------------------------------------------------------------------->
-<#macro print_time_grid_layout grid indent=0>
-</#macro>
+<#--  <#macro print_time_grid_layout grid indent=0>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                                GRID VIEW                                -->
 <!----------------------------------------------------------------------------->
-<#macro print_grid_view_layout grid indent=0>
-</#macro>
+<#--  <#macro print_grid_view_layout grid indent=0>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                                LIST VIEW                                -->
 <!----------------------------------------------------------------------------->
-<#macro print_list_view_layout list indent=0>
-</#macro>
+<#--  <#macro print_list_view_layout list indent=0>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
 <!----------------------------------------------------------------------------->
-<#macro print_tabs_layout tabs indent=0>
-</#macro>
+<#--  <#macro print_tabs_layout tabs indent=0>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                                 SEGMENTS                                -->
 <!----------------------------------------------------------------------------->
-<#macro print_segments_layout segments indent=0>
-</#macro>
+<#--  <#macro print_segments_layout segments indent=0>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                                  BUTTONS                                -->
 <!----------------------------------------------------------------------------->
 <#macro print_buttons_layout buttons indent=0>
-</#macro>
-
-<!----------------------------------------------------------------------------->
-<!--                                  BUTTON                                 -->
-<!----------------------------------------------------------------------------->
-<#macro print_button_layout button indent=0>
+${""?left_pad(indent)}<div class="${namespace}-btns">
+  <#list buttons.children as button>
+${""?left_pad(indent)}  <button @click="${guidbase.name_button_method(button)}" class="${namespace}-btn ${namespace}-btn--${guidbase.get_button_variant(button)}">${button.title}</button>
+  </#list>
+${""?left_pad(indent)}</div>
 </#macro>
 
 <!----------------------------------------------------------------------------->
 <!--                                  INPUT                                  -->
 <!----------------------------------------------------------------------------->
-<#macro print_input_layout input indent=0>
-</#macro>
+<#--  <#macro print_input_layout input indent=0>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                                   TILE                                  -->
 <!----------------------------------------------------------------------------->
-<#macro print_tile_layout tile indent=0>
-</#macro>
+<#--  <#macro print_tile_layout tile indent=0>
+</#macro>  -->
 
 <!----------------------------------------------------------------------------->
 <!--                                   PAGE                                  -->
 <!----------------------------------------------------------------------------->
-<#macro print_container_layout widget indent>
+<#--  <#macro print_container_layout widget indent>
 ${""?left_pad(indent)}<div class="card">
 ${""?left_pad(indent)}  <div class="card-body">
-<@print_layout_widget widget=widget indent=indent />
+<@print_widget_layout widget=widget indent=indent />
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
 </#macro>
@@ -165,4 +164,4 @@ ${""?left_pad(indent)}</div>
 
 <#macro print_divider_layout indent=0>
 ${""?left_pad(indent)}<div style="height:16px;"></div>
-</#macro>
+</#macro>  -->
