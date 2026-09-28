@@ -27,15 +27,16 @@ Page({
     this.data.${js.nameVariable(param.name)} = options.${js.nameVariable(param.name)};
   </#list>
     this.load${js.nameType(url.resource)}();
-</#if>    
+</#if>
 <#assign visited_widgets = {}>      
 <#list page.widgets as widget>
   <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
-  <#if (widget.type == "select" || widget.type == "multiselect") && 
-       !(widget.value("data")!"")?starts_with("enum[")>
+  <#if (widget.type == "select" || widget.type == "multiselect" || widget.type == "cascade") && 
+       guidbase.get_widget_enum_ref(widget)??>
     <#if widget.ancestor("entry_form")?? || widget.ancestor("criteria_form")??>
+      <#assign opt = guidbase.get_widget_enum_ref(widget)>
     this.setData({
-      ${js.nameVariable(widget.id)}Options: await sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}AsOptions(),
+      ${js.nameVariable(widget.id)}Options: await sdk.fetch${js.nameType(inflector.pluralize(opt.name))}AsOptions(),
     });
     </#if>
   <#elseif widget.type == "split_list">
@@ -47,6 +48,8 @@ Page({
     this.load${js.nameType(widget.id)}Rows();
   <#elseif widget.type == "list_view" || widget.type == "grid_view">
     this.load${js.nameType(widget.id)}Rows();
+  <#elseif widget.type == "display_form" || widget.type == "entry_form">
+    this.load${js.nameType(widget.id)}Data();
   </#if>
 </#list>
 <#--  <#list page.widgets as widget>

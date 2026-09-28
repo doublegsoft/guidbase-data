@@ -7,7 +7,7 @@ if (typeof sdk === 'undefined') {
   <#list page.widgets as widget>
     <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
     <#-- select, multiselect, segment支持枚举类型 -->
-    <#if widget.type != "select" && widget.type != "multiselect" && widget.type != "segment"><#continue></#if>
+    <#if widget.type != "select" && widget.type != "multiselect" && widget.type != "segments"><#continue></#if>
     <#assign visited_widgets += {widget.id: widget}>
     <#if widget.value("data")?starts_with("enum[")>
       <#assign opts = typebase.enumtype(widget.value("data"))>
@@ -28,12 +28,30 @@ sdk.get${js.nameType(widget.id)}OptionLabel = function (value) {
   }
   return null;
 };
+
+sdk.get${js.nameType(widget.id)}OptionValue = function (label) {
+  for (let i = 0; i < sdk.${js.nameVariable(widget.id)}Options.length; i++) {
+    if (sdk.${js.nameVariable(widget.id)}Options[i].label == label) {
+      return sdk.${js.nameVariable(widget.id)}Options[i].value;
+    }
+  }
+  return null;
+};
     <#else>
 
 sdk.get${js.nameType(widget.id)}OptionLabel = function (value, options) {
   for (let i = 0; i < options.length; i++) {
     if (options[i].value == value) {
       return options[i].label;
+    }
+  }
+  return null;
+};
+
+sdk.get${js.nameType(widget.id)}OptionValue = function (label, options) {
+  for (let i = 0; i < options.length; i++) {
+    if (options[i].label == label) {
+      return options[i].value;
     }
   }
   return null;

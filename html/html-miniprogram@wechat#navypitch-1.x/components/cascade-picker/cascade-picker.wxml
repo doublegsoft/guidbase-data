@@ -1,0 +1,51 @@
+<view class="cascade-trigger-wrapper" bindtap="handleOpen">
+  <slot></slot>
+</view>
+
+<view 
+  class="cascade-mask {{ innerVisible ? 'cascade-mask--visible' : '' }}" 
+  catchtouchmove="preventTouchMove" 
+  bindtap="handleClose">
+</view>
+<view 
+  class="cascade-sheet {{ innerVisible ? 'cascade-sheet--visible' : '' }}" 
+  catchtouchmove="preventTouchMove">
+  <view class="cascade-sheet__header">
+    <text class="cascade-sheet__title">{{ title }}</text>
+    <view class="cascade-sheet__close" hover-class="btn-hover" bindtap="handleClose">✕</view>
+  </view>
+  <scroll-view class="cascade-tabs" scroll-x enable-flex scroll-into-view="{{ 'tab-' + activeTab }}" scroll-with-animation>
+    <view 
+      id="{{ 'tab-' + index }}"
+      class="cascade-tab-item {{ activeTab === index ? 'cascade-tab-item--active' : '' }}" 
+      wx:for="{{ tabs }}" 
+      wx:key="index" 
+      bindtap="handleTabTap" 
+      data-index="{{ index }}">
+      <text class="cascade-tab-text">{{ item.name }}</text>
+      <view class="cascade-tab-line" wx:if="{{ activeTab === index }}"></view>
+    </view>
+  </scroll-view>
+  <scroll-view 
+    scroll-y 
+    class="cascade-list" 
+    catchtouchmove="stopBubble"
+    enhanced="{{true}}"
+    show-scrollbar="{{false}}">
+    <view 
+      class="cascade-cell {{ currentSelectedId === item[fieldValue] ? 'cascade-cell--active' : '' }}" 
+      wx:for="{{ currentOptions }}" 
+      wx:key="index" 
+      hover-class="cascade-cell--hover" 
+      bindtap="handleOptionTap" 
+      data-item="{{ item }}">
+      <text class="cascade-cell__title">{{ item[fieldText] }}</text>
+      <text class="cascade-cell__check" wx:if="{{ currentSelectedId === item[fieldValue] }}">✓</text>
+    </view>
+    <view class="cascade-state" wx:if="{{ loading }}">
+      <view class="cascade-spinner"></view>
+      <text class="cascade-state__text">正在加载选项...</text>
+    </view>
+  </scroll-view>
+  <view class="safe-area-bottom"></view>
+</view>

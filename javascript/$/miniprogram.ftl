@@ -85,11 +85,21 @@ ${""?left_pad(indent)}},
   <#else>
 ${""?left_pad(indent)}    
 ${""?left_pad(indent)}handle${js.nameType(input.id)}Change: function (event) {
+    <#if input.type == "select">
+${""?left_pad(indent)}  const index = parseInt(event.detail.value);
+    </#if>
 ${""?left_pad(indent)}  this.setData({
-    <#if input.type == "select">   
-${""?left_pad(indent)}    ${js.nameVariable(input.id)}: this.data.${js.nameVariable(input.id)}Options[parseInt(event.detail.value)].value,
-${""?left_pad(indent)}    ${js.nameVariable(input.id)}Label: this.data.${js.nameVariable(input.id)}Options[parseInt(event.detail.value)].label,
+    <#if input.type == "select">
+      <#if guidbase.get_widget_enum_ref(input)??>
+        <#assign opt = guidbase.get_widget_enum_ref(input)>
+${""?left_pad(indent)}    ${js.nameVariable(input.id)}: this.data.${js.nameVariable(opt.name)}Options[index].${js.nameVariable(opt.code)},
+${""?left_pad(indent)}    ${js.nameVariable(input.id)}Label: this.data.${js.nameVariable(opt.name)}Options[index].${js.nameVariable(opt.text)},
       <#else>
+${""?left_pad(indent)}    ${js.nameVariable(input.id)}: this.data.${js.nameVariable(input.id)}Options[index].value,
+${""?left_pad(indent)}    ${js.nameVariable(input.id)}Label: this.data.${js.nameVariable(input.id)}Options[index].label,
+      </#if>
+${""?left_pad(indent)}    ${js.nameVariable(input.id)}Index: index,
+    <#else>
 ${""?left_pad(indent)}    ${js.nameVariable(input.id)}: event.detail.value,
     </#if>   
 ${""?left_pad(indent)}  });
@@ -138,9 +148,9 @@ ${""?left_pad(indent)}    <text class="field-arrow">▾</text>
 ${""?left_pad(indent)}  </view>
 ${""?left_pad(indent)}</picker>
   <#elseif input.type == "cascade">
-${""?left_pad(indent)}<picker class="${stateClasses?trim}" mode="multiSelector" range="{{cascadeData.${js.nameVariable(input.id)}}}" value="{{formData.${js.nameVariable(input.id)}Idx}}" bindchange="handle${js.nameType(input.id)}Change" bindcolumnchange="onCascadeColumnChange">
+${""?left_pad(indent)}<picker class="${stateClasses?trim}" mode="multiSelector" range="{{ ${js.nameVariable(input.id)}}Options " value="{{formData.${js.nameVariable(input.id)}Idx}}" bindchange="handle${js.nameType(input.id)}Change" bindcolumnchange="handle${js.nameType(input.id)}ColumnChange">
 ${""?left_pad(indent)}  <view class="field-control">
-${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(input.id)} ? 'field-value' : 'field-placeholder' }}">{{formData.${js.nameVariable(input.id)} || '请选择级联'}}</text>
+${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(input.id)} ? 'field-value' : 'field-placeholder' }}">{{ ${js.nameVariable(input.id)} || '请选择级联'}}</text>
 ${""?left_pad(indent)}    <text class="field-arrow">▾</text>
 ${""?left_pad(indent)}  </view>
 ${""?left_pad(indent)}</picker>
@@ -209,16 +219,23 @@ ${""?left_pad(indent)}</view>
   <#local method = action.method!"">
   <#local pagepath = action.path!"">
   <#local resource = action.resource!"">
+  <#if resource != "" && page.byId(resource)??>
+    <#local widget = page.byId(resource)>
+  </#if>
 ${""?left_pad(indent)}
 ${""?left_pad(indent)}handle${js.nameType(button.id)}Tap: async function (event) {
   <#if method == "reset">
-    <#if widget.type != "criteria_form">
+    <#if widget?? && widget.type != "criteria_form">
 ${""?left_pad(indent)}  const ok = await fb.confirm('确认重置', '确定要重置所有表单数据吗？此操作不可恢复。');
 ${""?left_pad(indent)}  if (!ok) return;
     </#if>
 ${""?left_pad(indent)}  this.setData({
     <#list button.container.inputs as input>
 ${""?left_pad(indent)}    ${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
+      <#if input.type == "select">
+${""?left_pad(indent)}    ${js.nameVariable(input.id)}Index: null,
+${""?left_pad(indent)}    ${js.nameVariable(input.id)}Label: null,
+      </#if>
     </#list>
 ${""?left_pad(indent)}  });     
   <#elseif method == "search">
@@ -228,7 +245,8 @@ ${""?left_pad(indent)}  this.${guidbase.name_widget_method_load(widget)}();
   <#elseif method == "save">
   <#elseif method == "edit">
   <#elseif method == "view">
-  <#elseif method == "remove">
+  <#elseif method == "close">
+${""?left_pad(indent)}  wx.navigateBack({ delta: 1 });
   <#elseif pagepath != "">
 ${""?left_pad(indent)}  wx.navigateTo({
 ${""?left_pad(indent)}    url: '/pages/${pagepath}',
@@ -252,22 +270,8 @@ ${""?left_pad(indent)}
 ${""?left_pad(indent)}/**
 ${""?left_pad(indent)} * ${js.nameVariable(form.id)} 【${form.title!""}】编辑表单相关变量
 ${""?left_pad(indent)} */
-${""?left_pad(indent)}// 表单数据载体
   <#list form.inputs as input>
-${""?left_pad(indent)}${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
-  </#list>
-${""?left_pad(indent)}// 表单选项数据  
-  <#list form.inputs as input>
-    <#if input.type == "select">
-${""?left_pad(indent)}${js.nameVariable(input.id)}Label: null,    
-    </#if>
-    <#if (input.type == "select" || input.type == "multiselect")>
-      <#if input.value("data")?starts_with("enum[")>
-${""?left_pad(indent)}${js.nameVariable(input.id)}Options: sdk.${js.nameVariable(input.id)}Options,
-      <#else>
-${""?left_pad(indent)}${js.nameVariable(input.id)}Options: [],    
-      </#if>
-    </#if>
+<@print_input_variables input=input indent=indent />
   </#list>
 </#macro>
 
@@ -395,7 +399,7 @@ ${""?left_pad(indent)} * ${js.nameVariable(form.id)} 【${form.title!""}】查�
 ${""?left_pad(indent)} */
 ${""?left_pad(indent)}${js.nameVariable(form.id)}Shown: false,
   <#list form.inputs as input>
-${""?left_pad(indent)}${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
+<@print_input_variables input=input indent=indent />
   </#list>
 </#macro>
 
@@ -669,8 +673,12 @@ ${""?left_pad(indent)}
 ${""?left_pad(indent)}/**
 ${""?left_pad(indent)} * ${js.nameVariable(segments.id)} 【${segments.title!""}】日历视图相关变量
 ${""?left_pad(indent)} */
+  <#if segments.value("data") != "">
 ${""?left_pad(indent)}${js.nameVariable(segments.id)}Options: sdk.${js.nameVariable(segments.id)}Options,
 ${""?left_pad(indent)}${js.nameVariable(variable)}: sdk.${js.nameVariable(segments.id)}Options[0].value,
+  <#else>
+${""?left_pad(indent)}${js.nameVariable(variable)}: '${segments.children[0].title}',
+  </#if>
 </#macro>
 
 <#macro print_segments_methods segments indent=0>

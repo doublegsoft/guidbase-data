@@ -105,7 +105,27 @@ ${""?left_pad(indent)}</view>
 <!----------------------------------------------------------------------------->
 <!--                                  INPUT                                  -->
 <!----------------------------------------------------------------------------->
+<#macro print_input_variables input indent=0>
+${""?left_pad(indent)}${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
+  <#if input.type == "select">
+${""?left_pad(indent)}${js.nameVariable(input.id)}Index: null,
+${""?left_pad(indent)}${js.nameVariable(input.id)}Label: null,
+  <#elseif input.type == "multiselect">
+${""?left_pad(indent)}${js.nameVariable(input.id)}Indexes: [],
+${""?left_pad(indent)}${js.nameVariable(input.id)}Labels: [],  
+  <#elseif input.type == "cascade">
+${""?left_pad(indent)}${js.nameVariable(input.id)}Indexes: [],
+${""?left_pad(indent)}${js.nameVariable(input.id)}Labels: [],
+  </#if>
+  <#if guidbase.get_widget_enum_ref(input)??>
+${""?left_pad(indent)}${js.nameVariable(input.id)}Options: [],
+  <#elseif guidbase.get_widget_enum_vals(input)?size != 0>
+${""?left_pad(indent)}${js.nameVariable(input.id)}Options: sdk.${js.nameVariable(input.id)}Options,
+  </#if>
+</#macro>
+
 <#macro print_input_layout input indent=0>
+  <#local isReadonly = input.value("readonly")>
   <#if input.type == "avatar">
 ${""?left_pad(indent)}<view class="avatar-upload" bindtap="handle${js.nameType(input.id)}Upload">
 ${""?left_pad(indent)}  <view class="avatar avatar-teal avatar-xl" wx:if="{{ !${js.nameVariable(input.id)} }}">
@@ -137,22 +157,53 @@ ${""?left_pad(indent)}  <input class="field-input field-input-suffix<#if isReado
 ${""?left_pad(indent)}  <text class="field-suffix<#if isReadonly == "true"> field-suffix-ro</#if>">${suffix}</text>
 ${""?left_pad(indent)}</view>
     <#else>
-${""?left_pad(indent)}<input class="field-input<#if isReadonly == "true"> field-input-ro</#if>${stateClasses}" <#if input.type == "number">type="digit"</#if> placeholder="请输入${input.title}" value="{{ ${js.nameVariable(input.id)} }}" bindinput="handle${js.nameType(input.id)}Change"<#if isReadonly == "true"> disabled="true"</#if> />
+${""?left_pad(indent)}<input class="field-input<#if isReadonly == "true"> field-input-ro</#if>" <#if input.type == "number">type="digit"</#if> placeholder="请输入${input.title}" value="{{ ${js.nameVariable(input.id)} }}" bindinput="handle${js.nameType(input.id)}Change"<#if isReadonly == "true"> disabled="true"</#if> />
     </#if>
   <#elseif input.type == "select">
-${""?left_pad(indent)}<picker range="{{ ${js.nameVariable(input.id)}Options }}" range-key="value" value="{{ ${js.nameVariable(input.id)} }}" bindchange="handle${js.nameType(input.id)}Change">
+    <#if guidbase.get_widget_enum_ref(input)??>
+      <#assign opt = guidbase.get_widget_enum_ref(input)>
+${""?left_pad(indent)}<picker range="{{ ${js.nameVariable(input.id)}Options }}" range-key="${js.nameVariable(opt.text)}" 
+${""?left_pad(indent)}        value="{{ ${js.nameVariable(input.id)}Index }}" 
+${""?left_pad(indent)}        bindchange="handle${js.nameType(input.id)}Change">
 ${""?left_pad(indent)}  <view class="field-control">
 ${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(input.id)} ? 'field-value' : 'field-placeholder' }}">{{ ${js.nameVariable(input.id)}Label || '请选择' }}</text>
 ${""?left_pad(indent)}    <text class="field-arrow">▾</text>
 ${""?left_pad(indent)}  </view>
 ${""?left_pad(indent)}</picker>
-  <#elseif input.type == "cascade">
-${""?left_pad(indent)}<picker mode="multiSelector" range="{{cascadeData.${js.nameVariable(input.id)}}}" value="{{formData.${js.nameVariable(input.id)}Idx}}" bindchange="handle${js.nameType(input.id)}Change" bindcolumnchange="onCascadeColumnChange">
+    <#else>
+${""?left_pad(indent)}<picker range="{{ ${js.nameVariable(input.id)}Options }}" range-key="label" 
+${""?left_pad(indent)}        value="{{ ${js.nameVariable(input.id)}Index }}" 
+${""?left_pad(indent)}        bindchange="handle${js.nameType(input.id)}Change">
 ${""?left_pad(indent)}  <view class="field-control">
-${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(input.id)} ? 'field-value' : 'field-placeholder' }}">{{formData.${js.nameVariable(input.id)} || '请选择级联'}}</text>
+${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(input.id)} ? 'field-value' : 'field-placeholder' }}">{{ ${js.nameVariable(input.id)}Label || '请选择' }}</text>
 ${""?left_pad(indent)}    <text class="field-arrow">▾</text>
 ${""?left_pad(indent)}  </view>
 ${""?left_pad(indent)}</picker>
+    </#if>
+  <#elseif input.type == "cascade">
+    <#assign opt = guidbase.get_widget_enum_ref(input)>
+<#--  ${""?left_pad(indent)}<picker range="{{ ${js.nameVariable(input.id)}Options }}" 
+${""?left_pad(indent)}        range-key="${js.nameVariable(opt.text)}" 
+${""?left_pad(indent)}        value="{{ ${js.nameVariable(input.id)}Index }}" 
+${""?left_pad(indent)}        bindchange="handle${js.nameType(input.id)}Change" 
+${""?left_pad(indent)}        bindcolumnchange="handle${js.nameType(input.id)}ColumnChange">
+${""?left_pad(indent)}  <view class="field-control">
+${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(input.id)} ? 'field-value' : 'field-placeholder' }}">{{ ${js.nameVariable(input.id)} || '请选择级联'}}</text>
+${""?left_pad(indent)}    <text class="field-arrow">▾</text>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}</picker>  -->
+${""?left_pad(indent)}<${namespace}-cascade-picker
+${""?left_pad(indent)}  title="请选择${input.label!'地区'}"
+${""?left_pad(indent)}  fieldText="${js.nameVariable(opt.text)}"
+${""?left_pad(indent)}  fieldValue="${js.nameVariable(opt.code)}"
+${""?left_pad(indent)}  valueText="{{ ${js.nameVariable(input.id)}Label }}"
+${""?left_pad(indent)}  bind:load="handle${js.nameType(input.id)}Load"
+${""?left_pad(indent)}  bind:change="handle${js.nameType(input.id)}Change">
+${""?left_pad(indent)}  <view slot="true" class="field-control">
+${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(input.id)} ? 'field-value' : 'field-placeholder' }}">{{ ${js.nameVariable(input.id)} || '请选择级联'}}</text>
+${""?left_pad(indent)}    <text class="field-arrow">▾</text>
+${""?left_pad(indent)}  </view>
+${""?left_pad(indent)}</${namespace}-cascade-picker>
   <#elseif input.type == "multiselect">
 ${""?left_pad(indent)}<view class="option-chips">
 ${""?left_pad(indent)}  <view class="option-chip {{ h.has(${js.nameVariable(input.id)}, item.value) ? 'option-chip-on' : '' }}" 
@@ -243,7 +294,7 @@ ${""?left_pad(indent)}  <view id="entry${js.nameType(form.id)}" class="card-body
       <#list row as input>
 ${""?left_pad(indent)}    <view class="field<#if input.value("required") == "true"> field-required</#if>">
 ${""?left_pad(indent)}      <text class="field-label">${input.title}</text>
-<@print_widget_layout widget=input indent=indent+8 />
+<@print_widget_layout widget=input indent=indent+6 />
 ${""?left_pad(indent)}    </view>
       </#list>
     </#list>
@@ -316,7 +367,7 @@ ${""?left_pad(indent)}        style="top: 80rpx;">
   <#list form.inputs as input>
 ${""?left_pad(indent)}  <view class="filter-row">
 ${""?left_pad(indent)}    <text class="filter-label">${input.title}</text>
-<@print_input_layout input=input indent=indent+6 />
+<@print_input_layout input=input indent=indent+4 />
 ${""?left_pad(indent)}  </view>
   </#list>
 ${""?left_pad(indent)}  <view class="btn-actions">
@@ -423,8 +474,8 @@ ${""?left_pad(indent)}<view class="top-fixed">
 ${""?left_pad(indent)}<view class="filter-bar">
 ${""?left_pad(indent)}  <view class="segments">
   <#list segments.children as child>
-${""?left_pad(indent)}    <view class="seg {{ ${js.nameVariable(variable)} === item.value ? 'seg-on' : '' }}"
-${""?left_pad(indent)}          bindtap="handle${js.nameType(child.id)}Tap">${child.title}</view>
+${""?left_pad(indent)}    <view class="seg {{ ${js.nameVariable(variable)} === '${child.title}' ? 'seg-on' : '' }}" data-value="${child.title}"
+${""?left_pad(indent)}          bindtap="handle${js.nameType(segments.id)}Tap">${child.title}</view>
   </#list>
 ${""?left_pad(indent)}  </view>
   <#if segments.page.has("criteria_form")>

@@ -138,6 +138,9 @@
  ###############################################################################
  -->
 <#function get_button_variant button>
+  <#if button.container.children?size == 1>
+    <#return "primary">
+  </#if>
   <#local action = valuebase.action(button.value("action"))>
   <#if action.method??>
     <#local method = action.method>
@@ -343,6 +346,50 @@
       <#return page>
     </#if>
   </#list>
+</#function>
+
+<#--
+ ###############################################################################
+ ### 获取组件绑定的枚举引用 (Get Widget Enum Reference)
+ ### 
+ ### 检查指定组件绑定的数据源是否属于枚举类型（即以 "enum[" 开头）。
+ ### 若为枚举类型，则通过系统类型库解析其对应的枚举选项列表；
+ ### 当解析结果存在且仅包含唯一一个枚举项时，提取并返回该枚举项的引用。
+ ### 
+ ### @param widget  目标组件对象 (Widget Object)
+ ### @return        单一枚举项引用；若非枚举或选项数不为 1 则返回空 (Single Enum Option Reference, or null/undefined)
+ ###############################################################################
+ -->
+<#function get_widget_enum_ref widget>
+  <#if widget.value("data")?starts_with("enum[")>
+    <#local opts = typebase.enumtype(widget.value("data"))>
+    <#if opts?size == 1>
+      <#return opts?first>
+    </#if>
+  </#if>
+</#function>
+
+<#--
+ ###############################################################################
+ ### 获取组件绑定的枚举选项列表 (Get Widget Enum Option List)
+ ### 
+ ### 检查指定组件绑定的数据源是否属于枚举类型（即以 "enum[" 开头）。
+ ### 若为枚举类型，则通过系统类型库解析其对应的全部枚举选项列表；
+ ### 当选项数量不为 1 时（即多候选值场景，如下拉框、单选/多选组），返回完整的枚举选项序列；
+ ### 若非枚举类型或仅包含单一项，则默认返回空序列 []。
+ ### 
+ ### @param widget  目标组件对象 (Widget Object)
+ ### @return        枚举选项序列；若非多选项枚举则返回空序列 (Sequence of Enum Options, or empty sequence [])
+ ###############################################################################
+ -->
+<#function get_widget_enum_vals widget>
+  <#if widget.value("data")?starts_with("enum[")>
+    <#local opts = typebase.enumtype(widget.value("data"))>
+    <#if opts?size != 1>
+      <#return opts>
+    </#if>
+  </#if>
+  <#return []>
 </#function>
 
 <#--

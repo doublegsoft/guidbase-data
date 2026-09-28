@@ -32,9 +32,7 @@ Component({
 Page({
 </#if>
   data: {    
-    /*!
-    ** 当前登录用户。
-    */
+    // 当前登录用户。
     user: app.user,
 <#list pagedef.pageWidgets as widget>    
   <#if !widget.type??><#continue></#if>
@@ -97,6 +95,7 @@ Page({
   },
 
   onLoad: async function (options) {
+    //
 <#if pagedef.options["object"]??>
   <#assign objname = pagedef.options["object"]>
     this.data.${js.nameVariable(guidbase.get_widget_id_attribute(pagedef))} = options.${js.nameVariable(guidbase.get_widget_id_attribute(pagedef))};

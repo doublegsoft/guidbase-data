@@ -1375,6 +1375,16 @@ page {
   border-top: 2rpx solid var(--color-border);
   margin-top: var(--space-4);
 }
+
+.footer-bar-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .footer-bar .btn {
   flex: 1;
 }
