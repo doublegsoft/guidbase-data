@@ -182,16 +182,6 @@ ${""?left_pad(indent)}</picker>
     </#if>
   <#elseif input.type == "cascade">
     <#assign opt = guidbase.get_widget_enum_ref(input)>
-<#--  ${""?left_pad(indent)}<picker range="{{ ${js.nameVariable(input.id)}Options }}" 
-${""?left_pad(indent)}        range-key="${js.nameVariable(opt.text)}" 
-${""?left_pad(indent)}        value="{{ ${js.nameVariable(input.id)}Index }}" 
-${""?left_pad(indent)}        bindchange="handle${js.nameType(input.id)}Change" 
-${""?left_pad(indent)}        bindcolumnchange="handle${js.nameType(input.id)}ColumnChange">
-${""?left_pad(indent)}  <view class="field-control">
-${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(input.id)} ? 'field-value' : 'field-placeholder' }}">{{ ${js.nameVariable(input.id)} || '请选择级联'}}</text>
-${""?left_pad(indent)}    <text class="field-arrow">▾</text>
-${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}</picker>  -->
 ${""?left_pad(indent)}<${namespace}-cascade-picker
 ${""?left_pad(indent)}  title="请选择${input.label!'地区'}"
 ${""?left_pad(indent)}  fieldText="${js.nameVariable(opt.text)}"
@@ -199,7 +189,7 @@ ${""?left_pad(indent)}  fieldValue="${js.nameVariable(opt.code)}"
 ${""?left_pad(indent)}  valueText="{{ ${js.nameVariable(input.id)}Label }}"
 ${""?left_pad(indent)}  bind:load="handle${js.nameType(input.id)}Load"
 ${""?left_pad(indent)}  bind:change="handle${js.nameType(input.id)}Change">
-${""?left_pad(indent)}  <view slot="true" class="field-control">
+${""?left_pad(indent)}  <view class="field-control">
 ${""?left_pad(indent)}    <text class="{{ ${js.nameVariable(input.id)} ? 'field-value' : 'field-placeholder' }}">{{ ${js.nameVariable(input.id)} || '请选择级联'}}</text>
 ${""?left_pad(indent)}    <text class="field-arrow">▾</text>
 ${""?left_pad(indent)}  </view>

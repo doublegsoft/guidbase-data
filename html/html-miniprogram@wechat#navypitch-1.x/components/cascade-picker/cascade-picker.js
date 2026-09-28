@@ -9,7 +9,6 @@ Component({
     // 数据字段映射
     fieldText: { type: String, value: 'name' },
     fieldValue: { type: String, value: 'id' },
-    // 外部回显值 (支持双向或受控)
     value: {
       type: Array,
       value: []
@@ -20,7 +19,7 @@ Component({
       observer(val) {
         this.setData({ displayPath: val });
       }
-    }
+    },
   },
 
   data: {
@@ -30,20 +29,25 @@ Component({
     activeTab: 0,
     currentOptions: [],
     currentSelectedId: null,
-    loading: false
+    loading: false,
+
+    cacheData: {},
   },
 
-  cacheData: {},
-
   methods: {
+
     preventTouchMove() {},
+
     stopBubble(e) {
       e.stopPropagation && e.stopPropagation();
     },
 
     handleOpen() {
       if (this.data.disabled) return;
-      this.setData({ innerVisible: true });
+
+      this.setData({ 
+        innerVisible: true, 
+      });
       this.triggerEvent('open');
 
       if (this.data.currentOptions.length === 0) {
@@ -56,25 +60,16 @@ Component({
       this.triggerEvent('close');
     },
 
-    fetchLevelData(parentId, tabIndex) {
+    async fetchLevelData(parentId, tabIndex) {
       this.setData({ loading: true });
-      const cacheKey = parentId || 'root';
-
-      if (this.cacheData[cacheKey]) {
-        this.setData({
-          currentOptions: this.cacheData[cacheKey],
-          activeTab: tabIndex,
-          loading: false
-        });
-        return;
-      }
+      const cacheKey = parentId || '';
 
       this.triggerEvent('load', {
         parentId,
         tabIndex,
         resolve: (list) => {
           const options = list || [];
-          this.cacheData[cacheKey] = options;
+          this.data.cacheData[cacheKey] = options;
           this.setData({
             currentOptions: options,
             activeTab: tabIndex,
@@ -107,7 +102,7 @@ Component({
           this.setData({ loading: false });
 
           if (children && children.length > 0) {
-            this.cacheData[item[fieldValue]] = children;
+            this.data.cacheData[item[fieldValue]] = children;
             newTabs.push({ name: '请选择', value: null });
 
             this.setData({

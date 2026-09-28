@@ -19,6 +19,15 @@ ${""?left_pad(indent)}  this.setData({
 ${""?left_pad(indent)}    ${js.nameVariable(input.id)}: values,
 ${""?left_pad(indent)}  });
 ${""?left_pad(indent)}}, 
+  <#elseif input.type == "cascade">
+    <#assign opt = guidbase.get_widget_enum_ref(input)>
+${""?left_pad(indent)}    
+${""?left_pad(indent)}handle${js.nameType(input.id)}Load: function (event) {
+${""?left_pad(indent)}  const { parentId, resolve } = event.detail;
+${""?left_pad(indent)}  sdk.fetch${js.nameType(inflector.pluralize(opt.name))}AsOptions().then(data => {
+${""?left_pad(indent)}    resolve(data);
+${""?left_pad(indent)}  });
+${""?left_pad(indent)}}, 
   <#elseif input.type == "avatar">
 ${""?left_pad(indent)}    
 ${""?left_pad(indent)}handle${js.nameType(input.id)}Upload: function () {
