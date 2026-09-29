@@ -1,74 +1,68 @@
-/*
+/* 
 ** ═══════════════════════════════════════════════════════════════════════
-**  DESIGN SYSTEM: NAVY PITCH (深蓝绿茵 / 绿茵先锋)
-**  Architecture: Foundations — CSS Custom Properties / Design Tokens
+**  DESIGN SYSTEM: SLATEPULSE (磐石电光) — SEMANTIC TOKEN EDITION
 **  Platform: WeChat Mini Program (100% Native RPX)
-** ═══════════════════════════════════════════════════════════════════════
+**  Architecture: Semantic Palette ➔ Primitives ➔ Components ➔ Business
+** ═══════════════════════════════════════════════════════════════════════ 
 */
 
+/* 
+** ─────────────────────────────────────────────────────────────────────
+**  FOUNDATION: DESIGN TOKENS (系统设计变量令牌)
+** ───────────────────────────────────────────────────────────────────── 
+*/
 page {
-  /* ── 1. 语义色彩系统 (Semantic Color Tokens) ── */
+  /* ── 语义色彩系统 ── */
+  --color-primary:         #0284C7;
+  --color-primary-light:   #0EA5E9;
+  --color-primary-hover:   #0369A1;
+  --color-primary-dim:     rgba(14, 165, 233, 0.08);
+  --color-primary-text:    #0284C7;
 
-  /* Primary: 活力薄荷青 (原 --color-teal) */
-  --color-primary:         #00C9A7;
-  --color-primary-light:   #34D399;
-  --color-primary-hover:   #00B599;
-  --color-primary-dim:     rgba(0, 201, 167, 0.12);
-  --color-primary-text:    #00A085;
+  --color-secondary:       #0F172A;
+  --color-secondary-light: #1E293B;
+  --color-secondary-hover: #334155;
+  --color-secondary-dim:   rgba(15, 23, 42, 0.06);
+  --color-secondary-text:  #1E293B;
 
-  /* Secondary: 深邃海军蓝 (原 --color-navy / steel) */
-  --color-secondary:       #0D1B2A;
-  --color-secondary-light: #1D3448;
-  --color-secondary-hover: #152636;
-  --color-secondary-dim:   rgba(13, 27, 42, 0.08);
-  --color-secondary-text:  #1B4F72;
+  --color-warning:         #D97706;
+  --color-warning-light:   #F59E0B;
+  --color-warning-hover:   #B45309;
+  --color-warning-dim:     rgba(217, 119, 6, 0.08);
+  --color-warning-text:    #B45309;
 
-  /* Warning: 阳光琥珀橙 (原 --color-amber) */
-  --color-warning:         #F5A623;
-  --color-warning-light:   #FBBF24;
-  --color-warning-hover:   #E8981A;
-  --color-warning-dim:     rgba(245, 166, 35, 0.12);
-  --color-warning-text:    #C8830A;
+  --color-danger:          #E11D48;
+  --color-danger-light:    #FB7185;
+  --color-danger-hover:    #BE123C;
+  --color-danger-dim:      rgba(225, 29, 72, 0.08);
+  --color-danger-text:     #BE123C;
 
-  /* Danger: 警示珊瑚红 (原 --color-red) */
-  --color-danger:          #E74C6F;
-  --color-danger-light:    #F87171;
-  --color-danger-hover:    #C0294F;
-  --color-danger-dim:      rgba(231, 76, 111, 0.12);
-  --color-danger-text:     #C0294F;
+  --color-success:         #059669;
+  --color-success-light:   #10B981;
+  --color-success-hover:   #047857;
+  --color-success-dim:     rgba(5, 150, 105, 0.08);
+  --color-success-text:    #047857;
 
-  /* Success: 森林活力绿 (原 --color-green) */
-  --color-success:         #27AE60;
-  --color-success-light:   #4ADE80;
-  --color-success-hover:   #219A52;
-  --color-success-dim:     rgba(39, 174, 96, 0.12);
-  --color-success-text:    #1E8449;
+  --color-info:            #6366F1;
+  --color-info-light:      #818CF8;
+  --color-info-hover:      #4F46E5;
+  --color-info-dim:        rgba(99, 102, 241, 0.08);
+  --color-info-text:       #4F46E5;
 
-  /* Info: 智慧信息蓝/紫 (原 --color-blue / purple) */
-  --color-info:            #3B8BEB;
-  --color-info-light:      #60A5FA;
-  --color-info-hover:      #2A6DC7;
-  --color-info-dim:        rgba(59, 139, 235, 0.12);
-  --color-info-text:       #2A6DC7;
+  /* ── 纸张表面与边框排版 ── */
+  --color-bg:              #F8FAFC; /* 冷白护眼晨光底色 */
+  --color-card:            #FFFFFF; /* 纯白卡片 */
+  --color-surface:         #F1F5F9; /* 次级表面衬底 */
+  --color-surface-hover:   #E2E8F0;
+  --color-surface-active:  #CBD5E1;
 
-  /* ── 2. 纸张表面与边框排版 ── */
-  --color-bg:              #F5F7FA; /* 护眼晨光冷灰底色 */
-  --color-card:            #FFFFFF; /* 纯白卡片容器 */
-  --color-surface:         #F0F4F8; /* 浅灰次级表面 */
-  --color-surface-hover:   #E4EBF2;
-  --color-surface-active:  #D5DFEA;
+  --color-text-main:       #0F172A; /* 一级深板岩主文字 */
+  --color-text-sub:        #475569; /* 二级次要说明 */
+  --color-text-muted:      #94A3B8; /* 三级占位与停用说明 */
+  --color-border:          #E2E8F0; /* 一级硬结构分割线 */
+  --color-border-subtle:   #EDF2F7; /* 二级微弱行分割线 */
 
-  --color-text-main:       #1A2B3C; /* 一级深板岩主文字 */
-  --color-text-sub:        #5A7080; /* 二级次要正文 */
-  --color-text-muted:      #95AABA; /* 三级占位与停用文字 */
-  --color-border:          #E2EAF0; /* 一级硬结构分割线 */
-  --color-border-subtle:   #EDF3F7; /* 二级弱边框线 */
-
-  /* TabBar 选项卡适配映射 */
-  --color-tab-text:        var(--color-text-muted);
-  --color-tab-text-active: var(--color-primary);
-
-  /* ── 3. 字体大小标尺 (Type Scale in rpx) ── */
+  /* ── 字体大小标尺 ── */
   --text-2xs:  20rpx;
   --text-xs:   22rpx;
   --text-sm:   24rpx;
@@ -84,7 +78,7 @@ page {
   --text-6xl:  56rpx;
   --text-7xl:  64rpx;
 
-  /* ── 4. 字重阶梯 ── */
+  /* ── 字重阶梯 ── */
   --weight-light:     300;
   --weight-normal:    400;
   --weight-medium:    500;
@@ -92,9 +86,9 @@ page {
   --weight-bold:      700;
   --weight-extrabold: 800;
 
-  /* ── 5. 间距体系 (标准 8-Point 网格) ── */
-  --space-1:   4rpx;
-  --space-2:   8rpx;
+  /* ── 间距体系 ── */
+  --space-1:    4rpx;
+  --space-2:    8rpx;
   --space-3:   12rpx;
   --space-4:   16rpx;
   --space-5:   20rpx;
@@ -108,7 +102,7 @@ page {
   --space-13:  56rpx;
   --space-14:  64rpx;
 
-  /* ── 6. 弹性圆角系统 ── */
+  /* ── 圆角系统 ── */
   --radius-xs:    6rpx;
   --radius-sm:   10rpx;
   --radius-md:   16rpx;
@@ -118,21 +112,21 @@ page {
   --radius-pill: 9999rpx;
   --radius-full: 50%;
 
-  /* ── 7. 双层高透光物理阴影 ── */
-  --shadow-sm:   0 4rpx 16rpx rgba(13, 27, 42, 0.05);
-  --shadow-md:   0 8rpx 32rpx rgba(13, 27, 42, 0.08), 0 2rpx 8rpx rgba(13, 27, 42, 0.03);
-  --shadow-lg:   0 16rpx 48rpx rgba(13, 27, 42, 0.12);
+  /* ── 阴影与微光 ── */
+  --shadow-sm:   0 2rpx 6rpx rgba(15, 23, 42, 0.03), 0 6rpx 16rpx -2rpx rgba(15, 23, 42, 0.04);
+  --shadow-md:   0 8rpx 24rpx -4rpx rgba(15, 23, 42, 0.06), 0 2rpx 8rpx rgba(15, 23, 42, 0.02);
+  --shadow-lg:   0 16rpx 36rpx -6rpx rgba(15, 23, 42, 0.08), 0 4rpx 12rpx rgba(15, 23, 42, 0.03);
 
-  /* ── 8. 动效转场速度 ── */
+  /* ── 动效转场 ── */
   --anim-fast:   0.12s cubic-bezier(0.4, 0, 0.2, 1);
   --anim-base:   0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --anim-smooth: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/*
+/* 
 ** ─────────────────────────────────────────────────────────────────────
 **  GLOBAL BASE & RESETS (全局重置与页面基底)
-** ─────────────────────────────────────────────────────────────────────
+** ───────────────────────────────────────────────────────────────────── 
 */
 page {
   background: var(--color-bg);
@@ -210,10 +204,10 @@ page {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/*
+/* 
 ** ─────────────────────────────────────────────────────────────────────
 **  LAYOUT & UTILITIES (盒模型、排版与原子工具类)
-** ─────────────────────────────────────────────────────────────────────
+** ───────────────────────────────────────────────────────────────────── 
 */
 
 /* ── Flex 布局 ── */
@@ -340,26 +334,28 @@ page {
 .color-success   { color: var(--color-success); }
 .color-info      { color: var(--color-info); }
 
-/*
+/* 
 ** ─────────────────────────────────────────────────────────────────────
 **  COMPONENT: BUTTON (按键组件体系)
-** ─────────────────────────────────────────────────────────────────────
+** ───────────────────────────────────────────────────────────────────── 
 */
 
-/* ── Buttons ──────────────────────────── */
+/* ── 按钮基类 ── */
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-4);
-  padding: var(--space-5) var(--space-10);
+  gap: var(--space-3);
+  padding: 22rpx 36rpx;
   border-radius: var(--radius-md);
   font-size: var(--text-md);
   font-weight: var(--weight-semibold);
   border: none;
-  transition: all var(--transition-base);
+  line-height: 1.35;
+  box-sizing: border-box;
   white-space: nowrap;
-  line-height: 1.4;
+  transition: all var(--anim-fast);
 }
 .btn::after { border: none; }
 
@@ -437,10 +433,10 @@ page {
   box-sizing: border-box;
 }
 
-/*
+/* 
 ** ─────────────────────────────────────────────────────────────────────
 **  COMPONENT: CARD (卡片容器系统)
-** ─────────────────────────────────────────────────────────────────────
+** ───────────────────────────────────────────────────────────────────── 
 */
 
 /* ── 基础标准卡片 (Base Card) ── */
@@ -524,10 +520,10 @@ page {
   line-height: 1.4;
 }
 
-/*
+/* 
 ** ─────────────────────────────────────────────────────────────────────
 **  COMPONENT: AVATAR (头像与用户标识系统)
-** ─────────────────────────────────────────────────────────────────────
+** ───────────────────────────────────────────────────────────────────── 
 */
 
 /* ── 头像基类 (默认中号 md: 72rpx，微圆角矩形形态) ── */
@@ -704,10 +700,10 @@ page {
   line-height: 1.4;
 }
 
-/*
+/* 
 ** ─────────────────────────────────────────────────────────────────────
 **  COMPONENT: TAGS & TAG (标签容器与多维语义标签体系)
-** ─────────────────────────────────────────────────────────────────────
+** ───────────────────────────────────────────────────────────────────── 
 */
 
 /* ── 标签容器 (Tags Wrapper: 支持自适应流动与自动换行) ── */
@@ -809,10 +805,10 @@ page {
   opacity: 0.85;
 }
 
-/*
+/* 
 ** ─────────────────────────────────────────────────────────────────────
 **  COMPONENT: FORM (表单容器、字段、标签与输入控制)
-** ─────────────────────────────────────────────────────────────────────
+** ───────────────────────────────────────────────────────────────────── 
 */
 
 /* ── 字段容器 (Field Container) ── */
@@ -1220,6 +1216,92 @@ page {
 
 /* 
 ** ─────────────────────────────────────────────────────────────────────
+**  COMPONENT: LOAD MORE (页面触底加载状态与指示器系统)
+** ───────────────────────────────────────────────────────────────────── 
+*/
+
+/* ── 加载状态主容器 (为页面底部提供充足呼吸空间) ── */
+.load-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 88rpx;
+  padding: var(--space-6) 0;
+  box-sizing: border-box;
+}
+
+/* ── 纯 CSS 轻量旋转环 (Loading Spinner) ── */
+.load-spinner {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: var(--radius-full);
+  border: 3.5rpx solid var(--color-surface-hover);
+  border-top-color: var(--color-primary);
+  animation: load-spin 0.8s linear infinite;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+@keyframes load-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ── 状态说明文字 ── */
+.load-text {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.5rpx;
+  line-height: 1;
+}
+
+/* ── 数据全部加载完毕状态 (Finished / End: 带左右两翼淡雅分割线) ── */
+.load-finished,
+.load-end {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--space-6) var(--space-8);
+  box-sizing: border-box;
+}
+
+.load-finished::before,
+.load-finished::after,
+.load-end::before,
+.load-end::after {
+  content: '';
+  flex: 1;
+  height: 1.5rpx;
+  background: var(--color-border);
+}
+
+.load-finished .load-text,
+.load-end .load-text {
+  padding: 0 var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* ── 加载失败 / 点击重试状态 (Error / Retry) ── */
+.load-error {
+  cursor: pointer;
+}
+
+.load-error .load-text {
+  color: var(--color-primary-text);
+}
+
+.load-error:active {
+  opacity: 0.7;
+}
+
+/* 
+** ─────────────────────────────────────────────────────────────────────
 **  COMPONENT: BTN-GRID (按键组件 -> 网格矩阵)
 ** ───────────────────────────────────────────────────────────────────── 
 */
@@ -1281,7 +1363,6 @@ page {
 **  COMPONENT: LIST VIEW (列表视图与单元格条目系统)
 ** ───────────────────────────────────────────────────────────────────── 
 */
-
 /* ── 列表外层容器 (默认卡片式微悬浮形态) ── */
 .list-view {
   background: var(--color-card);
@@ -1406,94 +1487,8 @@ page {
 
 /* 
 ** ─────────────────────────────────────────────────────────────────────
-**  COMPONENT: LOAD MORE (页面触底加载状态与指示器系统)
-** ───────────────────────────────────────────────────────────────────── 
-*/
-
-/* ── 加载状态主容器 (为页面底部提供充足呼吸空间) ── */
-.load-more {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: 88rpx;
-  padding: var(--space-6) 0;
-  box-sizing: border-box;
-}
-
-/* ── 纯 CSS 轻量旋转环 (Loading Spinner) ── */
-.load-spinner {
-  width: 32rpx;
-  height: 32rpx;
-  border-radius: var(--radius-full);
-  border: 3.5rpx solid var(--color-surface-hover);
-  border-top-color: var(--color-primary);
-  animation: load-spin 0.8s linear infinite;
-  box-sizing: border-box;
-  flex-shrink: 0;
-}
-
-@keyframes load-spin {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* ── 状态说明文字 ── */
-.load-text {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  font-weight: var(--weight-medium);
-  letter-spacing: 0.5rpx;
-  line-height: 1;
-}
-
-/* ── 数据全部加载完毕状态 (Finished / End: 带左右两翼淡雅分割线) ── */
-.load-finished,
-.load-end {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: var(--space-6) var(--space-8);
-  box-sizing: border-box;
-}
-
-.load-finished::before,
-.load-finished::after,
-.load-end::before,
-.load-end::after {
-  content: '';
-  flex: 1;
-  height: 1.5rpx;
-  background: var(--color-border);
-}
-
-.load-finished .load-text,
-.load-end .load-text {
-  padding: 0 var(--space-4);
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-}
-
-/* ── 加载失败 / 点击重试状态 (Error / Retry) ── */
-.load-error {
-  cursor: pointer;
-}
-
-.load-error .load-text {
-  color: var(--color-primary-text);
-}
-
-.load-error:active {
-  opacity: 0.7;
-}
-
-/*
-** ─────────────────────────────────────────────────────────────────────
 **  COMPONENT: EMPTY STATE (空状态提示与引导系统)
-** ─────────────────────────────────────────────────────────────────────
+** ───────────────────────────────────────────────────────────────────── 
 */
 /* ── 空状态主容器 (默认整页/主区域居中) ── */
 .empty-state {

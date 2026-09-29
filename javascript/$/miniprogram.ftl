@@ -101,8 +101,8 @@ ${""?left_pad(indent)}  this.setData({
     <#if input.type == "select">
       <#if guidbase.get_widget_enum_ref(input)??>
         <#assign opt = guidbase.get_widget_enum_ref(input)>
-${""?left_pad(indent)}    ${js.nameVariable(input.id)}: this.data.${js.nameVariable(opt.name)}Options[index].${js.nameVariable(opt.code)},
-${""?left_pad(indent)}    ${js.nameVariable(input.id)}Label: this.data.${js.nameVariable(opt.name)}Options[index].${js.nameVariable(opt.text)},
+${""?left_pad(indent)}    ${js.nameVariable(input.id)}: this.data.${js.nameVariable(input.id)}Options[index].${js.nameVariable(opt.code)},
+${""?left_pad(indent)}    ${js.nameVariable(input.id)}Label: this.data.${js.nameVariable(input.id)}Options[index].${js.nameVariable(opt.text)},
       <#else>
 ${""?left_pad(indent)}    ${js.nameVariable(input.id)}: this.data.${js.nameVariable(input.id)}Options[index].value,
 ${""?left_pad(indent)}    ${js.nameVariable(input.id)}Label: this.data.${js.nameVariable(input.id)}Options[index].label,
@@ -239,7 +239,7 @@ ${""?left_pad(indent)}  const ok = await fb.confirm('确认重置', '确定要�
 ${""?left_pad(indent)}  if (!ok) return;
     </#if>
 ${""?left_pad(indent)}  this.setData({
-    <#list button.container.inputs as input>
+    <#list page.byId(action.resource).inputs as input>
 ${""?left_pad(indent)}    ${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
       <#if input.type == "select">
 ${""?left_pad(indent)}    ${js.nameVariable(input.id)}Index: null,
@@ -252,6 +252,12 @@ ${""?left_pad(indent)}  });
 ${""?left_pad(indent)}  this.${guidbase.name_widget_method_load(widget)}();
     </#if>
   <#elseif method == "save">
+${""?left_pad(indent)}  const params = {
+    <#list page.byId(action.resource).inputs as input>
+${""?left_pad(indent)}    ${js.nameVariable(input.id)}: this.data.${js.nameVariable(input.id)},
+    </#list>  
+${""?left_pad(indent)}  };  
+${""?left_pad(indent)}  console.log(params);
   <#elseif method == "edit">
   <#elseif method == "view">
   <#elseif method == "close">
@@ -301,10 +307,10 @@ ${""?left_pad(indent)}      ${js.nameVariable(input.id)}: data.${js.nameVariable
   </#list>
   <#list form.inputs as input>
     <#if input.type == "select">
-      <#if input.value("data")?starts_with("enum[")>
-${""?left_pad(indent)}      ${js.nameVariable(input.id)}Label: sdk.get${js.nameType(input.id)}OptionLabel(data.${js.nameVariable(input.id)}),       
+      <#if guidbase.get_widget_enum_ref(input)??>
+${""?left_pad(indent)}      ${js.nameVariable(input.id)}Label: sdk.get${js.nameType(input.id)}OptionLabel(data.${js.nameVariable(input.id)}, this.data.${js.nameVariable(input.id)}Options),      
       <#else>
-${""?left_pad(indent)}      ${js.nameVariable(input.id)}Label: sdk.get${js.nameType(input.id)}OptionLabel(data.${js.nameVariable(input.id)}, this.data.${js.nameVariable(input.id)}Options),  
+${""?left_pad(indent)}      ${js.nameVariable(input.id)}Label: sdk.get${js.nameType(input.id)}OptionLabel(data.${js.nameVariable(input.id)}),   
       </#if>
     </#if>
   </#list>
@@ -878,6 +884,7 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(fals
 <@print_button_methods button=widget indent=indent />
     </#if>
   </#list>
+  <#-- 特殊处理paged_table -->
   <#list page.widgets as widget>
     <#if widget.type != "paged_table"><#continue></#if>
 ${""?left_pad(indent)}const ${js.nameVariable(widget.id)}RowActionHandlers = { 
@@ -892,7 +899,11 @@ ${""?left_pad(indent)}}
   </#list>
   <#list page.inputs as input>
 <@print_input_methods input=input indent=indent />  
-  </#list>   
+  </#list>
+  <#-- 如果PAGE有相关数据定义，需要处理 -->
+  <#if page.value("data") != "">
+    <#local url = valuebase.url(page.value("data"))>
+  </#if>
 </#macro>
 
 <#macro print_widget_layout widget indent=0>

@@ -1,5 +1,5 @@
 <#import "/$/tile@miniprogram.ftl" as tile>
-<#import "/$/miniprogram-wechat-navypitch.ftl" as mp>
+<#import "/$/miniprogram-wechat.ftl" as mp>
 <#assign page = pageDef>
 <#assign children = page.children>
 <wxs module="h" src="../helper.wxs"></wxs>

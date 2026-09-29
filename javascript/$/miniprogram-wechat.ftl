@@ -71,13 +71,13 @@ ${""?left_pad(indent)}</scroll-view>
 <!--                            BUTTON NAVIGATOR                             -->
 <!----------------------------------------------------------------------------->
 <#macro print_button_navigator_layout navigator indent=0>
-${""?left_pad(indent)}<view class="button-navigator">
+${""?left_pad(indent)}<view class="btn-grid">
   <#list navigator.children as child>
-${""?left_pad(indent)}  <view class="brand-button"
+${""?left_pad(indent)}  <view class="btn-grid-item"
 ${""?left_pad(indent)}    bindtap="handle${js.nameType(child.id)}Tap">
-${""?left_pad(indent)}    <view class="brand-logo"></view>
-${""?left_pad(indent)}    <text class="brand-name">${child.title}</text>
-${""?left_pad(indent)}    <text class="brand-benefit {{item.benefitType}}">{{item.benefit}}</text>
+${""?left_pad(indent)}    <view class="btn-grid-icon"></view>
+${""?left_pad(indent)}    <text class="btn-grid-label">${child.title}</text>
+${""?left_pad(indent)}    <text class="btn-grid-sub {{item.benefitType}}">{{item.benefit}}</text>
 ${""?left_pad(indent)}  </view>
   </#list>
 ${""?left_pad(indent)}</view>
@@ -87,7 +87,7 @@ ${""?left_pad(indent)}</view>
 <!--                             LIST NAVIGATOR                              -->
 <!----------------------------------------------------------------------------->
 <#macro print_list_navigator_layout navigator indent=0>
-${""?left_pad(indent)}<view class="list-navigator">
+${""?left_pad(indent)}<view class="list-view">
   <#list navigator.children as child>
 ${""?left_pad(indent)}  <view class="list-item">
 ${""?left_pad(indent)}    <view class="list-content" bindtap="handle${js.nameType(child.id)}Tap">
