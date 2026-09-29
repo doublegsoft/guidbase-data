@@ -9,6 +9,7 @@ if (typeof sdk === 'undefined') {
     <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
     <#-- select, multiselect, segment支持枚举类型 -->
     <#if widget.type != "select" && widget.type != "multiselect" && widget.type != "segments"><#continue></#if>
+    <#if widget.value("data") == ""><#continue></#if>
     <#assign visited_widgets += {widget.id: widget}>
     <#if guidbase.get_widget_enum_ref(widget)??>
 

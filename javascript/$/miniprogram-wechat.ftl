@@ -89,15 +89,12 @@ ${""?left_pad(indent)}</view>
 <#macro print_list_navigator_layout navigator indent=0>
 ${""?left_pad(indent)}<view class="list-view">
   <#list navigator.children as child>
-${""?left_pad(indent)}  <view class="list-item">
-${""?left_pad(indent)}    <view class="list-content" bindtap="handle${js.nameType(child.id)}Tap">
+${""?left_pad(indent)}  <view class="list-item" bindtap="handle${js.nameType(child.id)}Tap">
+${""?left_pad(indent)}    <view class="list-content">
 ${""?left_pad(indent)}      <text class="list-title">${child.title}</text>
-${""?left_pad(indent)}      <text class="list-arrow">›</text>
 ${""?left_pad(indent)}    </view>
+${""?left_pad(indent)}    <text class="list-arrow">›</text>
 ${""?left_pad(indent)}  </view>
-    <#if child?index != navigator.children?size - 1>
-${""?left_pad(indent)}  <view wx:if="{{index < imageList.length - 1}}" class="navigator-divider"></view>
-    </#if>
   </#list>
 ${""?left_pad(indent)}</view>
 </#macro>
@@ -301,40 +298,51 @@ ${""?left_pad(indent)}</view>
   <#list form.groups() as group>
 ${""?left_pad(indent)}<view class="card">
 ${""?left_pad(indent)}  <view class="card-header">
-${""?left_pad(indent)}    <view class="flex items-center gap-8">
-${""?left_pad(indent)}      <view class="section-dot"></view>
+${""?left_pad(indent)}    <view class="flex items-center gap-2">
+${""?left_pad(indent)}      <view class="cell-group-dot"></view>
 ${""?left_pad(indent)}      <text class="card-title"><#if group == "">${form.title}<#else>${group}</#if></text>
 ${""?left_pad(indent)}    </view>
 ${""?left_pad(indent)}  </view>
-${""?left_pad(indent)}  <view class="card-body  card-body-flush">
+${""?left_pad(indent)}  <view class="card-body card-body-flush">
     <#local rows = form.rows(group, cols?number)>
     <#list rows as row>
       <#list row as input>
-${""?left_pad(indent)}    <view class="disp-row">
-${""?left_pad(indent)}      <view class="disp-row-left">
-${""?left_pad(indent)}        <text class="disp-label">${input.title}</text>
-${""?left_pad(indent)}      </view>
-${""?left_pad(indent)}      <view class="disp-row-right">
-        <#if input.type == "select">
-${""?left_pad(indent)}        <view class="tag tag-blue">{{ ${js.nameVariable(input.id)} || '' }}</view>    
+${""?left_pad(indent)}    <view class="cell<#if input.type == 'longtext' || input.type == 'images'> cell-multiline</#if>">
+${""?left_pad(indent)}      <text class="cell-label">${input.title}</text>
+${""?left_pad(indent)}      <view class="cell-value">
+        <#if input.type == "avatar">
+${""?left_pad(indent)}        <view class="avatar avatar-md avatar-round avatar-primary" bindtap="handle${js.nameType(input.id)}Preview" data-url="{{ ${js.nameVariable(input.id)} }}">
+${""?left_pad(indent)}          <image wx:if="{{ ${js.nameVariable(input.id)} }}" class="avatar-img" src="{{ ${js.nameVariable(input.id)} }}" mode="aspectFill" />
+${""?left_pad(indent)}          <text wx:else class="avatar-text">头</text>
+${""?left_pad(indent)}        </view>
+        <#elseif input.type == "image">
+${""?left_pad(indent)}        <image class="cell-img-cover" src="{{ ${js.nameVariable(input.id)} }}" mode="aspectFill"
+${""?left_pad(indent)}               bindtap="handle${js.nameType(input.id)}Preview" data-url="{{ ${js.nameVariable(input.id)} }}" />
+        <#elseif input.type == "images">
+${""?left_pad(indent)}        <view class="cell-images">
+${""?left_pad(indent)}          <image class="cell-img-thumb" wx:for="{{ ${js.nameVariable(input.id)} }}" wx:key="*this"
+${""?left_pad(indent)}                 src="{{ item.url || item }}" mode="aspectFill"
+${""?left_pad(indent)}                 bindtap="handle${js.nameType(input.id)}Preview" data-url="{{ item.url || item }}" />
+${""?left_pad(indent)}        </view>
+        <#elseif input.type == "select">
+${""?left_pad(indent)}        <view class="tag tag-primary">{{ ${js.nameVariable(input.id)} || '' }}</view>    
         <#elseif input.type == "multiselect">
-${""?left_pad(indent)}        <view class="flex flex-wrap" style="gap:10rpx;">
-${""?left_pad(indent)}          <view class="tag tag-blue" wx:for="{{ ${js.nameVariable(input.id)} }}" wx:key="*this">{{ item.label }}</view>
+${""?left_pad(indent)}        <view class="cell-tags">
+${""?left_pad(indent)}          <view class="tag tag-primary tag-sm" wx:for="{{ ${js.nameVariable(input.id)} }}" wx:key="*this">{{ item.label }}</view>
 ${""?left_pad(indent)}        </view>  
         <#elseif input.type == "tags">
-${""?left_pad(indent)}        <view class="flex flex-wrap" style="gap:10rpx;">
-${""?left_pad(indent)}          <view class="tag tag-teal" wx:for="{{ ${js.nameVariable(input.id)} }}" wx:key="*this">{{ item }}</view>
+${""?left_pad(indent)}        <view class="cell-tags">
+${""?left_pad(indent)}          <view class="tag tag-success tag-sm" wx:for="{{ ${js.nameVariable(input.id)} }}" wx:key="*this">{{ item }}</view>
 ${""?left_pad(indent)}        </view>        
-        <#elseif input.type == "images">
         <#elseif input.type == "videos">
         <#elseif input.type == "files">
         <#elseif input.type == "longtext">
-${""?left_pad(indent)}        <text class="disp-value disp-value-longtext">{{ ${js.nameVariable(input.id)} || '' }}</text>        
+${""?left_pad(indent)}        <text>{{ ${js.nameVariable(input.id)} || '' }}</text>        
         <#else>
-${""?left_pad(indent)}        <text class="disp-value">{{ ${js.nameVariable(input.id)} || '' }}</text>
+${""?left_pad(indent)}        <text>{{ ${js.nameVariable(input.id)} || '' }}</text>
         </#if>
         <#if input.value("unit") != "">
-${""?left_pad(indent)}        <text class="disp-unit"> ${input.value("unit")}</text>        
+${""?left_pad(indent)}        <text class="cell-unit">${input.value("unit")}</text>        
         </#if>
 ${""?left_pad(indent)}      </view>
 ${""?left_pad(indent)}    </view>
@@ -349,11 +357,10 @@ ${""?left_pad(indent)}</view>
 <!--                              CRITERIA FORM                              -->
 <!----------------------------------------------------------------------------->
 <#macro print_criteria_form_layout form indent=0>
-${""?left_pad(indent)}<view class="filter-drawer {{ ${js.nameVariable(form.id)}Shown ? 'filter-drawer-open' : '' }}"
-${""?left_pad(indent)}        style="top: 80rpx;">
+${""?left_pad(indent)}<view class="drawer drawer-top px-8 {{ ${js.nameVariable(form.id)}Shown ? 'open' : '' }}" style="top:122rpx;">
   <#list form.inputs as input>
-${""?left_pad(indent)}  <view class="filter-row">
-${""?left_pad(indent)}    <text class="filter-label">${input.title}</text>
+${""?left_pad(indent)}  <view class="field">
+${""?left_pad(indent)}    <text class="field-label">${input.title}</text>
 <@print_input_layout input=input indent=indent+4 />
 ${""?left_pad(indent)}  </view>
   </#list>
@@ -455,20 +462,27 @@ ${""?left_pad(indent)}</view>
 <#macro print_segments_layout segments indent=0>
   <#local variable = segments.value("variable", segments.id)>
   <#if segments.value("placement") == "top">
-${""?left_pad(indent)}<view class="top-fixed">
+${""?left_pad(indent)}<view class="page-toolbar">
     <#local indent += 2>  
   </#if>
-${""?left_pad(indent)}<view class="filter-bar">
+${""?left_pad(indent)}<view class="segments-bar">
 ${""?left_pad(indent)}  <view class="segments">
   <#list segments.children as child>
 ${""?left_pad(indent)}    <view class="seg {{ ${js.nameVariable(variable)} === '${child.title}' ? 'seg-on' : '' }}" data-value="${child.title}"
 ${""?left_pad(indent)}          bindtap="handle${js.nameType(segments.id)}Tap">${child.title}</view>
   </#list>
+  <#if segments.value("data") != "">
+    <#local opts = typebase.enumtype(segments.value("data"))>
+    <#list opts as opt>
+${""?left_pad(indent)}    <view class="seg {{ ${js.nameVariable(variable)} === '${opt.text}' ? 'seg-on' : '' }}" data-value="${opt.text}"
+${""?left_pad(indent)}          bindtap="handle${js.nameType(segments.id)}Tap">${opt.text}</view>
+    </#list>
+  </#if>
 ${""?left_pad(indent)}  </view>
   <#if segments.page.has("criteria_form")>
     <#local form = segments.page.byType("criteria_form")[0]>
-${""?left_pad(indent)}  <view class="filter-btn" bindtap="handle${js.nameType(form.id)}Show">
-${""?left_pad(indent)}    <text class="filter-btn-arrow {{ ${js.nameVariable(form.id)}Shown ? 'filter-btn-arrow-up' : '' }}">▼</text>
+${""?left_pad(indent)}  <view class="segments-btn" bindtap="handle${js.nameType(form.id)}Show">
+${""?left_pad(indent)}    <text class="segments-btn-arrow {{ ${js.nameVariable(form.id)}Shown ? 'segments-btn-arrow-up' : '' }}">▼</text>
 ${""?left_pad(indent)}    <text>查询</text>
 ${""?left_pad(indent)}  </view>
   </#if>

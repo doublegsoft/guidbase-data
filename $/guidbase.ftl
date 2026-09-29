@@ -159,13 +159,13 @@
     <#elseif method == "close" || method == "cancel">
       <#return "warning">      
     </#if>
-  <#elseif action.type.name() == "DRAWER">
+  <#elseif action.type?? && action.type.name() == "DRAWER">
     <#return "success">
-  <#elseif action.type.name() == "DIALOG">
+  <#elseif action.type?? && action.type.name() == "DIALOG">
     <#return "primary">
-  <#elseif action.type.name() == "OVERLAY">
+  <#elseif action.type?? && action.type.name() == "SHEET">
     <#return "primary">    
-  <#elseif action.type.name() == "GOTO">
+  <#elseif action.type?? && action.type.name() == "GOTO">
     <#return "default">  
   </#if>
   <#return "default">  

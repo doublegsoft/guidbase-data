@@ -150,7 +150,7 @@ page {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 90;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1220,6 +1220,128 @@ page {
 
 /* 
 ** ─────────────────────────────────────────────────────────────────────
+**  COMPONENT: CELL (只读详情展示单元格 / 键值对系统)
+** ───────────────────────────────────────────────────────────────────── 
+*/
+
+/* ── 1. 分组与标题容器 ── */
+.cell-group {
+  margin-bottom: var(--space-4);
+}
+
+.cell-group-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 24rpx 28rpx 16rpx;
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-main);
+  border-bottom: 1.5rpx solid var(--color-border-subtle);
+}
+
+/* 分组标题左侧装饰指示圆点 */
+.cell-group-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+}
+
+/* ── 2. 单行展示单元格 (核心 Flex 左右排版) ── */
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 88rpx;
+  padding: 20rpx 28rpx;
+  border-bottom: 1.5rpx solid var(--color-border-subtle);
+  box-sizing: border-box;
+  background: var(--color-card);
+  transition: background var(--anim-fast);
+}
+
+/* 点击反馈 */
+.cell:active {
+  background: var(--color-surface);
+}
+
+/* 最后一项自动去除底部分割线 */
+.cell:last-child,
+.cell-last {
+  border-bottom: none;
+}
+
+/* ── 3. 左侧标签区 (定宽防换行被挤压) ── */
+.cell-label {
+  width: 180rpx;
+  flex-shrink: 0;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-sub);
+  line-height: 1.4;
+}
+
+/* ── 4. 右侧内容值区 (默认右对齐) ── */
+.cell-value {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: right;
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-main);
+  line-height: 1.5;
+  word-break: break-all;
+}
+
+/* 数值后面的单位 (如 米/秒, %/天) */
+.cell-unit {
+  margin-left: 6rpx;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--weight-normal);
+}
+
+/* ── 5. 多行长文本场景 (顶端对齐、内容靠左) ── */
+.cell-multiline,
+.cell-vertical {
+  align-items: flex-start;
+  padding: 24rpx 28rpx;
+}
+
+.cell-multiline .cell-value,
+.cell-vertical .cell-value {
+  justify-content: flex-start;
+  text-align: left;
+  line-height: 1.6;
+}
+
+/* ── 6. 标签展示场景 (向右靠拢流动排列) ── */
+.cell-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* ── 7. 只读状态高亮胶囊 ── */
+.cell-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 14rpx;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-dim);
+  border: 1rpx solid rgba(0, 201, 167, 0.2);
+  color: var(--color-primary-text);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+/* 
+** ─────────────────────────────────────────────────────────────────────
 **  COMPONENT: BTN-GRID (按键组件 -> 网格矩阵)
 ** ───────────────────────────────────────────────────────────────────── 
 */
@@ -1313,7 +1435,7 @@ page {
 /* ── 基础列表条目 (List Item) ── */
 .list-item {
   position: relative;
-  display: flex;
+  /* display: flex; */
   align-items: center;
   justify-content: space-between;
   min-height: 104rpx;
@@ -1402,6 +1524,459 @@ page {
   color: var(--color-text-muted);
   line-height: 1;
   opacity: 0.7;
+}
+
+/* 
+** ─────────────────────────────────────────────────────────────────────
+**  COMPONENT: SEGMENTS (分段选择器与筛选工具条系统)
+** ───────────────────────────────────────────────────────────────────── 
+*/
+
+/* ── 1. 配套筛选工具栏容器 (常置于页面顶部或吸顶悬浮) ── */
+.segments-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx var(--space-6);
+  background: var(--color-card);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* ── 2. 分段器滑轨基座 (支持横向滚动，不换行) ── */
+.segments {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 6rpx;
+  background: var(--color-surface);
+  border-radius: var(--radius-pill);
+  box-sizing: border-box;
+  overflow-x: auto;
+  white-space: nowrap;
+  /* 隐藏小程序原生滚动条 */
+  scrollbar-width: none;
+}
+
+.segments::-webkit-scrollbar {
+  display: none;
+}
+
+/* 均分宽度变体 (用于2~4个选项的固定标签页) */
+.segments-fluid {
+  display: flex;
+  width: 100%;
+}
+
+.segments-fluid .seg {
+  flex: 1;
+  text-align: center;
+  justify-content: center;
+}
+
+/* ── 3. 单个分段滑块选项 ── */
+.seg {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 60rpx;
+  padding: 0 28rpx;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-sub);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  box-sizing: border-box;
+  white-space: nowrap;
+  transition: all var(--anim-fast);
+}
+
+/* 未选状态的按压微触感 */
+.seg:active {
+  background: var(--color-surface-hover);
+}
+
+/* ── 4. 激活选中态 (Active: 默认极夜深墨纯净悬浮态) ── */
+.seg-on,
+.seg.active {
+  background: var(--color-secondary);
+  color: #FFFFFF;
+  font-weight: var(--weight-bold);
+  box-shadow: 0 4rpx 14rpx rgba(13, 27, 42, 0.16);
+}
+
+/* 激活选中态变体：薄荷青主色模式 (适用于高频强调交互) */
+.seg-primary.seg-on,
+.seg-primary.active {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  box-shadow: 0 4rpx 14rpx rgba(0, 201, 167, 0.28);
+}
+
+/* ── 5. 分段器内数字计数徽章 (Badge) ── */
+.seg-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28rpx;
+  height: 28rpx;
+  margin-left: 8rpx;
+  padding: 0 8rpx;
+  font-size: 18rpx;
+  font-weight: var(--weight-bold);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-hover);
+  color: var(--color-text-sub);
+  line-height: 1;
+}
+
+/* 选中项内部的徽章配色倒置 */
+.seg-on .seg-badge,
+.seg.active .seg-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+}
+
+.segments-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  height: 60rpx;
+  padding: 0 22rpx;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary-text);
+  border: 1.5rpx solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  flex-shrink: 0;
+  margin-left: var(--space-4);
+  transition: all var(--anim-fast);
+}
+
+.segments-btn:active {
+  background: var(--color-primary-dim);
+}
+
+.segments-btn-arrow {
+  font-size: 16rpx;
+  transition: transform var(--anim-base);
+}
+.segments-btn-arrow-up {
+  transform: rotate(180deg);
+}
+
+/* 
+** ─────────────────────────────────────────────────────────────────────
+**  COMPONENT: TABS (页面级选项卡与游标指示系统)
+** ───────────────────────────────────────────────────────────────────── 
+*/
+
+/* ── 1. 选项卡顶层容器 (默认纯白卡片底，贴合底部分割线) ── */
+.tabs {
+  position: relative;
+  width: 100%;
+  background: var(--color-card);
+  border-bottom: 1.5rpx solid var(--color-border);
+  box-sizing: border-box;
+}
+
+/* 吸顶定位变体 (常置于 page-header 或顶部导航下方) */
+.tabs-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+}
+
+/* ── 2. 横向滚动滑轨 (多于4个选项时长条自适应横滑) ── */
+.tabs-scroll {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  white-space: nowrap;
+  box-sizing: border-box;
+  padding: 0 var(--space-4);
+  /* 隐藏小程序与各端滚动条 */
+  scrollbar-width: none;
+}
+.tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── 3. 单个选项卡单元 (Tab Item) ── */
+.tab-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 96rpx;
+  padding: 0 var(--space-6);
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-sub);
+  box-sizing: border-box;
+  white-space: nowrap;
+  transition: color var(--anim-fast);
+}
+
+/* 点击反馈 */
+.tab-item:active {
+  color: var(--color-text-main);
+}
+
+/* ── 4. 激活选中状态 (Active / Tab-on) ── */
+.tab-item.active,
+.tab-item.tab-on {
+  color: var(--color-primary-text);
+  font-weight: var(--weight-bold);
+}
+
+/* 底部中央游标下划线 (薄荷青圆角高亮短条) */
+.tab-item.active::after,
+.tab-item.tab-on::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44rpx;
+  height: 6rpx;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  box-shadow: 0 2rpx 8rpx rgba(0, 201, 167, 0.4);
+}
+
+/* ── 5. 等宽平铺变体 (Fluid: 用于2~4个选项均分屏幕宽度) ── */
+.tabs-fluid .tabs-scroll {
+  padding: 0;
+}
+
+.tabs-fluid .tab-item {
+  flex: 1;
+  padding: 0;
+  justify-content: center;
+}
+
+/* ── 6. 胶囊风格变体 (Pill Tabs: 无下划线，改用内嵌浅底) ── */
+.tabs-pill {
+  border-bottom: none;
+  background: transparent;
+  padding: var(--space-2) var(--space-4);
+}
+
+.tabs-pill .tab-item {
+  height: 68rpx;
+  padding: 0 28rpx;
+  border-radius: var(--radius-pill);
+  margin-right: var(--space-2);
+}
+
+.tabs-pill .tab-item.active {
+  background: var(--color-primary-dim);
+  color: var(--color-primary-text);
+}
+
+.tabs-pill .tab-item.active::after {
+  display: none; /* 隐藏下划线 */
+}
+
+/* ── 7. 选项卡角标与红点 ── */
+/* 统计数字徽章 */
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28rpx;
+  height: 28rpx;
+  margin-left: 8rpx;
+  padding: 0 6rpx;
+  font-size: 18rpx;
+  font-weight: var(--weight-bold);
+  border-radius: var(--radius-pill);
+  background: var(--color-danger);
+  color: #FFFFFF;
+  line-height: 1;
+  transform: translateY(-8rpx);
+}
+
+/* 纯红点状态 */
+.tab-dot {
+  width: 14rpx;
+  height: 14rpx;
+  margin-left: 6rpx;
+  border-radius: var(--radius-full);
+  background: var(--color-danger);
+  transform: translateY(-10rpx);
+}
+
+/* ── 8. 禁用状态 ── */
+.tab-item.disabled {
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+/* 
+** ─────────────────────────────────────────────────────────────────────
+**  COMPONENT: DRAWER (滑出式抽屉控制面板)
+** ───────────────────────────────────────────────────────────────────── 
+*/
+
+/* ── 1. 全局遮罩层 (Backdrop) ── */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 98;
+  background: rgba(13, 27, 42, 0.45);
+  backdrop-filter: blur(8rpx);
+  -webkit-backdrop-filter: blur(8rpx);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--anim-base);
+}
+
+/* 遮罩激活显示态 */
+.drawer-backdrop.show,
+.drawer-backdrop-show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── 2. 抽屉主容器 (默认顶部滑出模式) ── */
+.drawer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: var(--color-card);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  transition: transform var(--anim-smooth);
+}
+
+/* 顶部滑出变体 (替代原 .filter-drawer) */
+.drawer-top {
+  top: 0;
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  transform: translateY(-100%);
+}
+
+.drawer-top.open,
+.drawer-top.show {
+  transform: translateY(0);
+}
+
+/* 底部滑出变体 (常见弹窗模式，支持 iPhone 安全区) */
+.drawer-bottom {
+  bottom: 0;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  transform: translateY(100%);
+  padding-bottom: calc(20rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+}
+
+.drawer-bottom.open,
+.drawer-bottom.show {
+  transform: translateY(0);
+}
+
+/* ── 3. 抽屉内部结构插槽 ── */
+/* 头部标题区 (可选) */
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx var(--space-6);
+  border-bottom: 1.5rpx solid var(--color-border-subtle);
+}
+
+.drawer-title {
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-main);
+}
+
+.drawer-close {
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+  padding: 4rpx;
+  line-height: 1;
+}
+
+/* 主体滚动表单内容区 */
+.drawer-body {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0 var(--space-6);
+}
+
+/* 单行键值对/筛选行 (替代原 .filter-row) */
+.drawer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  border-bottom: 1.5rpx solid var(--color-border-subtle);
+}
+
+.drawer-row:last-child {
+  border-bottom: none;
+}
+
+.drawer-label {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-sub);
+  width: 160rpx;
+  flex-shrink: 0;
+}
+
+.drawer-value {
+  flex: 1;
+  text-align: right;
+  font-size: var(--text-md);
+  color: var(--color-text-main);
+}
+
+.drawer-placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ── 4. 底部双按键操作栏 (重置 + 确认) ── */
+.drawer-footer {
+  display: flex;
+  gap: var(--space-4);
+  padding: 20rpx var(--space-6);
+  background: var(--color-card);
+  border-top: 1.5rpx solid var(--color-border-subtle);
+}
+
+.drawer-btn {
+  flex: 1;
+}
+
+.drawer-mask {
+  position: fixed;
+  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 98;
+  background: rgba(13, 27, 42, 0.45); /* 深海军蓝半透明遮罩 */
+  backdrop-filter: blur(6rpx);        /* 高斯模糊增强层级感 */
+  -webkit-backdrop-filter: blur(6rpx);
+  opacity: 0;
+  pointer-events: none;               /* 隐藏时不阻挡下方点击 */
+  transition: opacity var(--anim-base);
+}
+
+/* 遮罩显示激活态 */
+.drawer-mask.show {
+  opacity: 1;
+  pointer-events: auto;               /* 显示时捕获点击事件以触发关闭 */
 }
 
 /* 
