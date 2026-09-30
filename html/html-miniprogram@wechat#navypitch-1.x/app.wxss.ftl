@@ -1528,6 +1528,281 @@ page {
 
 /* 
 ** ─────────────────────────────────────────────────────────────────────
+**  COMPONENT: 瀑布流布局核心 (Waterfall Layout)
+** ───────────────────────────────────────────────────────────────────── 
+*/
+
+.waterfall-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* 关键：防止两列被拉伸等高 */
+  padding: 16rpx 20rpx;
+  box-sizing: border-box;
+}
+
+.waterfall-column {
+  width: calc(50% - 10rpx); /* 两列均分，保留中间 20rpx 间距 */
+  display: flex;
+  flex-direction: column;
+}
+
+.waterfall-card {
+  margin-bottom: 20rpx; /* 卡片之间的上下间距 */
+  width: 100%;
+}
+
+
+/* 
+** ─────────────────────────────────────────────────────────────────────
+**  COMPONENT: TIMELINE COMMENT (时间轴批注、审批意见与沟通记录)
+** ─────────────────────────────────────────────────────────────────────
+*/
+
+/* ── 1. 时间轴主容器 (包裹整条流水线) ── */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) var(--space-6);
+  box-sizing: border-box;
+}
+
+/* 嵌入卡片内的紧凑模式 (去外边距，自然融入 Card) */
+.timeline-card {
+  padding: var(--space-2) 0;
+}
+
+/* ── 2. 单个时间轴条目 (Timeline Item) ── */
+.timeline-item {
+  position: relative;
+  display: flex;
+  padding-bottom: var(--space-8);
+  box-sizing: border-box;
+}
+
+/* 最后一项隐藏主轴连接线并缩小底部留白 */
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+/* ── 3. 轴线轨道系统 (The Vertical Track) ── */
+/* 核心贯穿竖线：由左侧图标槽绝对定位居中延伸 */
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  top: 36rpx;                   /* 从节点图标中央下方开始 */
+  left: 27rpx;                  /* 锚定节点水平中轴线 (56rpx 宽度的中心约 27rpx) */
+  bottom: 0;
+  width: 2rpx;
+  background: var(--color-border);
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.timeline-item:last-child::before {
+  display: none;                /* 尾节点切断向下延伸的轴线 */
+}
+
+/* 轨道线风格变体：虚线轨道 (常用于“待进行”或“预估步骤”) */
+.timeline-item-dashed::before {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--color-border) 0,
+    var(--color-border) 8rpx,
+    transparent 8rpx,
+    transparent 16rpx
+  );
+}
+
+/* ── 4. 节点指示器容器 (Node Indicator Slot) ── */
+.timeline-node {
+  position: relative;
+  z-index: 2;                   /* 遮盖贯穿竖线 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56rpx;
+  height: 56rpx;
+  margin-right: var(--space-4);
+  flex-shrink: 0;
+  background: var(--color-bg);  /* 底色与页面背景一致，形成天然隔断遮罩 */
+}
+
+/* 卡片内部嵌套时背景自动变纯白 */
+.card .timeline-node {
+  background: var(--color-card);
+}
+
+/* ── 4.1 节点形态变体 1：极简小圆点 (Dot Mode) ── */
+.timeline-dot {
+  width: 18rpx;
+  height: 18rpx;
+  border-radius: var(--radius-full);
+  background: var(--color-text-muted);
+  box-shadow: 0 0 0 6rpx var(--color-bg); /* 外圈光晕扩散 */
+  transition: all var(--anim-base);
+}
+.card .timeline-dot {
+  box-shadow: 0 0 0 6rpx var(--color-card);
+}
+
+/* ── 4.2 节点形态变体 2：微拟物立体徽标/图标台 (Icon Mode) ── */
+.timeline-icon-box {
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-sub);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+  border: 1.5rpx solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--anim-base);
+}
+
+/* ── 5. 节点语义状态系统 (Semantic Statuses) ── */
+
+/* ① Active / Current: 当前进行中 (薄荷青主色 + 呼吸光晕) */
+.timeline-item-primary .timeline-dot,
+.timeline-item-active .timeline-dot {
+  background: var(--color-primary);
+  box-shadow: 0 0 0 8rpx var(--color-primary-dim);
+}
+
+.timeline-item-primary .timeline-icon-box,
+.timeline-item-active .timeline-icon-box {
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary));
+  color: #FFFFFF;
+  border-color: transparent;
+  box-shadow: 0 4rpx 14rpx rgba(0, 201, 167, 0.35);
+}
+
+/* ② Success: 已完成 / 成功 (森林绿) */
+.timeline-item-success .timeline-dot {
+  background: var(--color-success);
+  box-shadow: 0 0 0 8rpx var(--color-success-dim);
+}
+.timeline-item-success .timeline-icon-box {
+  background: var(--color-success);
+  color: #FFFFFF;
+  border-color: transparent;
+  box-shadow: 0 4rpx 12rpx rgba(39, 174, 96, 0.25);
+}
+
+/* ③ Warning: 挂起 / 风险预警 (琥珀橙) */
+.timeline-item-warning .timeline-dot {
+  background: var(--color-warning);
+  box-shadow: 0 0 0 8rpx var(--color-warning-dim);
+}
+.timeline-item-warning .timeline-icon-box {
+  background: var(--color-warning);
+  color: #FFFFFF;
+  border-color: transparent;
+  box-shadow: 0 4rpx 12rpx rgba(245, 166, 35, 0.25);
+}
+
+/* ④ Danger: 异常中断 / 驳回 (警示红) */
+.timeline-item-danger .timeline-dot {
+  background: var(--color-danger);
+  box-shadow: 0 0 0 8rpx var(--color-danger-dim);
+}
+.timeline-item-danger .timeline-icon-box {
+  background: var(--color-danger);
+  color: #FFFFFF;
+  border-color: transparent;
+  box-shadow: 0 4rpx 12rpx rgba(231, 76, 111, 0.25);
+}
+
+/* ⑤ Pending / Secondary: 沉稳深海军蓝 */
+.timeline-item-secondary .timeline-icon-box {
+  background: var(--color-secondary);
+  color: #FFFFFF;
+  border-color: transparent;
+}
+
+/* ── 6. 右侧时间轴内容区 (Content Layout) ── */
+.timeline-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: 6rpx;            /* 对齐左侧指示器上边缘 */
+}
+
+/* 头部两端对齐栏：标题与右侧时间戳 */
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.timeline-title {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-main);
+  line-height: 1.35;
+}
+
+/* 当前进行中的标题高亮强化 */
+.timeline-item-active .timeline-title {
+  color: var(--color-primary-text);
+  font-weight: var(--weight-bold);
+}
+
+/* 发生时间标签 */
+.timeline-time {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--weight-normal);
+  white-space: nowrap;
+}
+
+/* 描述详情段落 */
+.timeline-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-sub);
+  line-height: 1.5;
+  margin-top: 6rpx;
+}
+
+/* ── 7. 内容区下属附属插槽 ── */
+
+/* 7.1 嵌入式微卡片插槽 (常用于审批意见留言、操作凭证) */
+.timeline-card-box {
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  border: 1.5rpx solid var(--color-border-subtle);
+  box-sizing: border-box;
+}
+
+/* 7.2 底部标签/信息组插槽 */
+.timeline-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+/* ── 8. 扩展：左右交替对称时间轴 (Centered Alternate Mode) ── */
+.timeline-alternate .timeline-item:nth-child(even) {
+  flex-direction: row-reverse;
+}
+.timeline-alternate .timeline-item:nth-child(even) .timeline-content {
+  text-align: right;
+  padding-right: var(--space-4);
+  padding-left: 0;
+}
+.timeline-alternate .timeline-item:nth-child(even) .timeline-header {
+  flex-direction: row-reverse;
+}
+
+/* 
+** ─────────────────────────────────────────────────────────────────────
 **  COMPONENT: SEGMENTS (分段选择器与筛选工具条系统)
 ** ───────────────────────────────────────────────────────────────────── 
 */
@@ -2063,97 +2338,6 @@ page {
 
 .load-error:active {
   opacity: 0.7;
-}
-
-/*
-** ─────────────────────────────────────────────────────────────────────
-**  COMPONENT: EMPTY STATE (空状态提示与引导系统)
-** ─────────────────────────────────────────────────────────────────────
-*/
-/* ── 空状态主容器 (默认整页/主区域居中) ── */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80rpx var(--space-8);
-  box-sizing: border-box;
-  text-align: center;
-}
-
-/* ── 空状态图标/插画载体 ── */
-.empty-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 140rpx;
-  height: 140rpx;
-  margin-bottom: var(--space-6);
-  border-radius: var(--radius-2xl);
-  background: var(--color-surface);
-  color: var(--color-text-muted);
-  font-size: 64rpx;
-  line-height: 1;
-  box-shadow: var(--shadow-sm);
-}
-
-/* 嵌入矢量图片/占位插画时 */
-.empty-img {
-  width: 240rpx;
-  height: 240rpx;
-  margin-bottom: var(--space-6);
-  object-fit: contain;
-}
-
-/* ── 空状态文本排版 ── */
-.empty-title {
-  font-size: var(--text-lg);
-  font-weight: var(--weight-bold);
-  color: var(--color-text-main);
-  line-height: 1.35;
-}
-
-.empty-desc {
-  max-width: 480rpx;
-  margin-top: var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  line-height: 1.6;
-}
-
-/* ── 底部引导动作区 (Action Slot) ── */
-.empty-action {
-  margin-top: var(--space-8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-}
-
-/* ── 局部/卡片内微型空状态 (Compact Inline Variant) ── */
-.empty-sm {
-  padding: 40rpx var(--space-4);
-}
-
-.empty-sm .empty-icon {
-  width: 88rpx;
-  height: 88rpx;
-  font-size: 40rpx;
-  margin-bottom: var(--space-3);
-  border-radius: var(--radius-lg);
-}
-
-.empty-sm .empty-title {
-  font-size: var(--text-md);
-}
-
-.empty-sm .empty-desc {
-  font-size: var(--text-xs);
-  margin-top: 4rpx;
-}
-
-.empty-sm .empty-action {
-  margin-top: var(--space-4);
 }
 
 <#include "/$/tile.css.ftl">

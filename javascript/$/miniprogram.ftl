@@ -958,6 +958,8 @@ ${""?left_pad(indent)}</view>
 <@print_selector_tile_layout selector=widget indent=indent />   
   <#elseif widget.type == "card">
 <@print_card_layout card=widget indent=indent />   
+  <#elseif widget.type == "object_header">
+<@print_object_header_layout header=widget indent=indent />   
   <#else>
     <#if widget.container.type == "entry_form" || widget.container.type == "criteria_form">
 <@print_input_layout input=widget indent=indent />      

@@ -1,5 +1,32 @@
 <#import "/$/guidbase-tile.ftl" as guidbase4tile>
 <#include "miniprogram.ftl">
+<#--
+ ###############################################################################
+ ### 计算组件顶部偏移距离 (Calculate Widget Top Position)
+ ### 
+ ### 遍历当前组件所在容器内的所有兄弟节点（同级组件），
+ ### 判断是否存在置于顶部的特定组件，从而动态计算当前组件的 top 偏移量。
+ ### 
+ ### 计算与匹配规则：
+ ### - 忽略自身（跳过与当前组件 ID 相同的子节点）
+ ### - 检查兄弟组件的位置（placement）是否为 "top"
+ ### - 当存在置顶组件且其类型为 "segments" 时，固定返回顶部偏移量 122
+ ### - 若无满足条件的兄弟组件，则不返回任何值（默认无额外偏移）
+ ### 
+ ### @param widget  当前目标组件对象 (Object)
+ ### @return       顶部偏移量像素值 (Number)
+ ###############################################################################
+ -->
+<#function calc_widget_top widget>
+  <#list widget.container.children as child>
+    <#if child.id == widget.id><#continue></#if>
+    <#if child.value("placement") == "top">
+      <#if child.type == "segments">
+        <#return 122>
+      </#if>
+    </#if>
+  </#list>
+</#function>
 
 <!----------------------------------------------------------------------------->
 <!--                            SCROLL NAVIGATOR                             -->
@@ -406,7 +433,7 @@ ${""?left_pad(indent)}</view>
 <!----------------------------------------------------------------------------->
 <#macro print_list_view_layout list indent=0>
   <#local url = valuebase.url(list.value("data"))>
-${""?left_pad(indent)}<view>  
+${""?left_pad(indent)}<view<#if calc_widget_top(list)??> style="position:relative;top:${calc_widget_top(list)}rpx;"</#if>>  
 ${""?left_pad(indent)}  <scroll-view wx:if="{{ ${js.nameVariable(list.id)}Rows.length != 0 }}" 
 ${""?left_pad(indent)}               scroll-y enhanced show-scrollbar="{{ false }}"
 ${""?left_pad(indent)}               bindscrolltolower="onReachBottom">
@@ -415,9 +442,9 @@ ${""?left_pad(indent)}          wx:for-item="row" class="list-item" data-row = "
 ${""?left_pad(indent)}          bindtap="handle${js.nameType(list.id)}RowTap">
 <@guidbase4tile.print_tile_layout widget=list indent=8 />
 ${""?left_pad(indent)}    </view>
-${""?left_pad(indent)}    <view class="load-more-status">
-${""?left_pad(indent)}      <text wx:if="{{ ${js.nameVariable(list.id)}Loading }}">正在加载更多...</text>
-${""?left_pad(indent)}      <text wx:elif="{{ ${js.nameVariable(list.id)}Rows.length == ${js.nameVariable(list.id)}Total }}">没有更多数据了</text>
+${""?left_pad(indent)}    <view class="load-more">
+${""?left_pad(indent)}      <text class="load-text" wx:if="{{ ${js.nameVariable(list.id)}Loading }}">正在加载更多...</text>
+${""?left_pad(indent)}      <text class="load-end" wx:elif="{{ ${js.nameVariable(list.id)}Rows.length == ${js.nameVariable(list.id)}Total }}">没有更多数据了</text>
 ${""?left_pad(indent)}    </view>
 ${""?left_pad(indent)}  </scroll-view>
 ${""?left_pad(indent)}  <${namespace}-empty wx:if="{{ ${js.nameVariable(list.id)}Rows.length == 0 }}" />
@@ -429,7 +456,7 @@ ${""?left_pad(indent)}</view>
 <!----------------------------------------------------------------------------->
 <#macro print_grid_view_layout grid indent=0>
   <#local url = valuebase.url(grid.value("data"))>
-${""?left_pad(indent)}<view>  
+${""?left_pad(indent)}<view<#if calc_widget_top(grid)??> style="position:relative;top:${calc_widget_top(grid)}rpx;"</#if>>  
 ${""?left_pad(indent)}  <scroll-view wx:if="{{ ${js.nameVariable(grid.id)}Rows.length != 0 }}" 
 ${""?left_pad(indent)}               scroll-y enhanced show-scrollbar="{{ false }}"
 ${""?left_pad(indent)}               bindscrolltolower="onReachBottom">
@@ -450,6 +477,10 @@ ${""?left_pad(indent)}                bindtap="handle${js.nameType(grid.id)}RowT
 ${""?left_pad(indent)}          </view>
 ${""?left_pad(indent)}        </view>
 ${""?left_pad(indent)}      </view>
+${""?left_pad(indent)}    </view>
+${""?left_pad(indent)}    <view class="load-more">
+${""?left_pad(indent)}      <text class="load-text" wx:if="{{ ${js.nameVariable(grid.id)}Loading }}">正在加载更多...</text>
+${""?left_pad(indent)}      <text class="load-end" wx:elif="{{ ${js.nameVariable(grid.id)}Rows.length == ${js.nameVariable(grid.id)}Total }}">没有更多数据了</text>
 ${""?left_pad(indent)}    </view>
 ${""?left_pad(indent)}  </scroll-view>
 ${""?left_pad(indent)}  <${namespace}-empty wx:if="{{ ${js.nameVariable(grid.id)}Rows.length == 0 }}" />
@@ -497,7 +528,7 @@ ${""?left_pad(indent)}</view>
 <!--                                   TABS                                  -->
 <!----------------------------------------------------------------------------->
 <#macro print_tabs_layout tabs indent=0>
-${""?left_pad(indent)}<view class="tabs">
+${""?left_pad(indent)}<view class="tabs<#if tabs.value("placement") == "top"> page-toolbar</#if>">
   <#list tabs.children as tab>
 ${""?left_pad(indent)}  <view 
 ${""?left_pad(indent)}    class="tab-item {{ selected${js.nameType(tabs.id)}Tab === ${tab?index} ? 'active' : '' }}" 
@@ -508,7 +539,7 @@ ${""?left_pad(indent)}  </view>
   </#list>
 ${""?left_pad(indent)}</view>
 <#list tabs.children as tab>
-${""?left_pad(indent)}<view wx:if="{{ selected${js.nameType(tabs.id)}Tab === ${tab?index} }}">
+${""?left_pad(indent)}<view class="py-6" wx:if="{{ selected${js.nameType(tabs.id)}Tab === ${tab?index} }}">
 <@print_widget_layout widget=tab.children[0] indent=indent+2 />
 ${""?left_pad(indent)}</view>  
   </#list>
@@ -594,5 +625,5 @@ ${""?left_pad(indent)}</view>
 <!----------------------------------------------------------------------------->
 <#macro print_object_header_layout header indent=0>
   <#local url = valuebase.url(header.value("data"))>
-<@guidbase4tile.print_tile_layout widget=header varname=js.nameVariable(url.resource) vertical=false indent=indent />
+<@guidbase4tile.print_tile_layout widget=header varname=js.nameVariable(url.resource) vertical=true indent=indent />
 </#macro>
