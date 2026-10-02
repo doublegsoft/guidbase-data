@@ -4,6 +4,7 @@
 <!--                                  INPUT                                  -->
 <!----------------------------------------------------------------------------->
 <#macro print_input_methods input indent>
+  <#if input.container.type != "entry_form" || input.container.type != "criteria_form"><#return></#if>
   <#if input.type == "multiselect">
 ${""?left_pad(indent)}
 ${""?left_pad(indent)}handle${js.nameType(input.id)}Tap: function (event) {
@@ -363,7 +364,7 @@ ${""?left_pad(indent)}${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_
 
 <#macro print_display_form_methods form indent=0>
   <#local url = valuebase.url(form.value("data"))>
-${""?left_pad(indent)}
+<#--  ${""?left_pad(indent)}
 ${""?left_pad(indent)}onPullDownRefresh: async function () {
 ${""?left_pad(indent)}  this.setData({
 ${""?left_pad(indent)}    page: 1,
@@ -382,7 +383,8 @@ ${""?left_pad(indent)}  this.setData({
 ${""?left_pad(indent)}    page: this.data.page + 1
 ${""?left_pad(indent)}  });
 ${""?left_pad(indent)}  this.loadDemoListRows(false);
-${""?left_pad(indent)}},  
+${""?left_pad(indent)}},    -->
+  <#if !url.resource?starts_with("$")>
 ${""?left_pad(indent)}
 ${""?left_pad(indent)}/**
 ${""?left_pad(indent)} * 加载【${form.title!""}】只读表单数据的界面函数
@@ -402,6 +404,7 @@ ${""?left_pad(indent)}  } finally {
 ${""?left_pad(indent)}    
 ${""?left_pad(indent)}  }
 ${""?left_pad(indent)}},
+  </#if>
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -795,6 +798,18 @@ ${""?left_pad(indent)}},
 <!--                                   CARD                                  -->
 <!----------------------------------------------------------------------------->
 
+<!----------------------------------------------------------------------------->
+<!--                               OBJECT HEADER                             -->
+<!----------------------------------------------------------------------------->
+<#macro print_object_header_variables header indent=0>
+  <#list header.children as input>
+${""?left_pad(indent)}${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
+  </#list>
+</#macro>
+
+<#macro print_object_header_methods header indent=0>
+
+</#macro>
 
 <!----------------------------------------------------------------------------->
 <!--                                   PAGE                                  -->
@@ -844,6 +859,8 @@ ${""?left_pad(indent)}const ${java.nameVariable(widget.id)}DialogOpen = ref(fals
 <@print_calendar_variables calendar=widget indent=indent />    
     <#elseif widget.type == "chart">
 <@print_chart_variables chart=widget indent=indent />
+    <#elseif widget.type == "object_header">
+<@print_object_header_variables header=widget indent=indent />
     </#if>
   </#list>
 </#macro>
@@ -956,8 +973,8 @@ ${""?left_pad(indent)}</view>
 <@print_list_selector_layout selector=widget indent=indent />    
   <#elseif widget.type == "selector_tile">
 <@print_selector_tile_layout selector=widget indent=indent />   
-  <#elseif widget.type == "card">
-<@print_card_layout card=widget indent=indent />   
+  <#elseif widget.type == "cards">
+<@print_cards_layout cards=widget indent=indent />   
   <#elseif widget.type == "object_header">
 <@print_object_header_layout header=widget indent=indent />   
   <#else>

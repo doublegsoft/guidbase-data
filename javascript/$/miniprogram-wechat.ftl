@@ -433,7 +433,7 @@ ${""?left_pad(indent)}</view>
 <!----------------------------------------------------------------------------->
 <#macro print_list_view_layout list indent=0>
   <#local url = valuebase.url(list.value("data"))>
-${""?left_pad(indent)}<view<#if calc_widget_top(list)??> style="position:relative;top:${calc_widget_top(list)}rpx;"</#if>>  
+${""?left_pad(indent)}<view class="<#if calc_widget_top(list)??>page-toolbar-offset</#if>">  
 ${""?left_pad(indent)}  <scroll-view wx:if="{{ ${js.nameVariable(list.id)}Rows.length != 0 }}" 
 ${""?left_pad(indent)}               scroll-y enhanced show-scrollbar="{{ false }}"
 ${""?left_pad(indent)}               bindscrolltolower="onReachBottom">
@@ -538,11 +538,13 @@ ${""?left_pad(indent)}    <view class="tab-underline" wx:if="{{selected${js.name
 ${""?left_pad(indent)}  </view>
   </#list>
 ${""?left_pad(indent)}</view>
+${""?left_pad(indent)}<view class="<#if guidbase.has_page_buttons(tabs.page)>page-footer-offset</#if>">
 <#list tabs.children as tab>
-${""?left_pad(indent)}<view class="py-6" wx:if="{{ selected${js.nameType(tabs.id)}Tab === ${tab?index} }}">
+${""?left_pad(indent)}  <view class="py-6" wx:if="{{ selected${js.nameType(tabs.id)}Tab === ${tab?index} }}">
 <@print_widget_layout widget=tab.children[0] indent=indent+2 />
-${""?left_pad(indent)}</view>  
+${""?left_pad(indent)}  </view>  
   </#list>
+${""?left_pad(indent)}</view>  
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -613,17 +615,20 @@ ${""?left_pad(indent)}</view>
 </#macro>
 
 <!----------------------------------------------------------------------------->
-<!--                                   CARD                                  -->
+<!--                                   CARDS                                 -->
 <!----------------------------------------------------------------------------->
-<#macro print_card_layout card indent=0>
-  <#local url = valuebase.url(card.value("data"))>
-<@guidbase4tile.print_tile_layout widget=card varname=js.nameVariable(url.resource) vertical=false indent=indent />
+<#macro print_cards_layout cards indent=0>
+${""?left_pad(indent)}<view class="grid-2 px-6 mb-6">
+  <#list cards.children as card>
+    <#local url = valuebase.url(card.value("data"))>
+<@guidbase4tile.print_tile_layout widget=card varname=js.nameVariable(url.resource) vertical=false indent=indent+2 />
+  </#list>
+${""?left_pad(indent)}</view>
 </#macro>
 
 <!----------------------------------------------------------------------------->
 <!--                              OBJECT HEADER                              -->
 <!----------------------------------------------------------------------------->
 <#macro print_object_header_layout header indent=0>
-  <#local url = valuebase.url(header.value("data"))>
-<@guidbase4tile.print_tile_layout widget=header varname=js.nameVariable(url.resource) vertical=true indent=indent />
+<@guidbase4tile.print_tile_layout widget=header varname="" vertical=true indent=indent />
 </#macro>

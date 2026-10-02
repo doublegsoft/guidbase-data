@@ -1,0 +1,46 @@
+<view class="container">
+  <!-- 消息滚动列表 -->
+  <scroll-view 
+    class="chat-messages" 
+    scroll-y 
+    scroll-into-view="{{scrollToView}}" 
+    scroll-with-animation
+  >
+    <view 
+      wx:for="{{messages}}" 
+      wx:key="id" 
+      id="{{item.id}}" 
+      class="message-wrap {{item.type}}"
+    >
+      <!-- 对方头像（自己的不显示或右侧显示） -->
+      <image 
+        wx:if="{{item.type === 'incoming'}}" 
+        class="avatar" 
+        src="https://i.pravatar.cc/100?img=12" 
+      />
+
+      <view class="message-content">
+        <view class="bubble">{{item.text}}</view>
+        <text class="time">{{item.time}}</text>
+      </view>
+    </view>
+    <!-- 用于自动滚到底部的占位节点 -->
+    <view id="bottom-anchor" style="height: 10rpx;"></view>
+  </scroll-view>
+
+  <!-- 底部操作与输入区 -->
+  <view class="chat-input-area">
+    <view class="input-box">
+      <input 
+        type="text" 
+        value="{{inputText}}" 
+        placeholder="输入消息..." 
+        confirm-type="send"
+        adjust-position="{{true}}" 
+        bindinput="onInput" 
+        bindconfirm="sendMessage"
+      />
+    </view>
+    <button class="send-btn" bindtap="sendMessage">发送</button>
+  </view>
+</view>

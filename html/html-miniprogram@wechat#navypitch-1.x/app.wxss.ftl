@@ -204,6 +204,15 @@ page {
   box-sizing: content-box;
 }
 
+.page-footer-offset {
+  padding-bottom: 160rpx;
+}
+
+.page-toolbar-offset {
+  position:relative;
+  top: 122rpx;
+}
+
 /* 底部安全区适配 */
 .safe-area-bottom {
   padding-bottom: constant(safe-area-inset-bottom);

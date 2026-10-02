@@ -1,8 +1,9 @@
 {
   "pages": [
 <#list app.pages![] as page>
-    "pages/${js.nameFile(page.id)}"<#if page?index != app.pages?size - 1>,</#if>
+    "pages/${js.nameFile(page.id)}",
 </#list>
+    "pages/chat/chat"
   ],
   "subpackages": [],
   "window": {

@@ -26,7 +26,7 @@ Page({
   <#list url.params as param>
     this.data.${js.nameVariable(param.name)} = options.${js.nameVariable(param.name)};
   </#list>
-    this.load${js.nameType(url.resource)}();
+    this.load${js.nameType(url.resource)}Data();
 </#if>
 <#assign visited_widgets = {}>      
 <#list page.widgets as widget>
@@ -49,7 +49,9 @@ Page({
   <#elseif widget.type == "list_view" || widget.type == "grid_view">
     this.load${js.nameType(widget.id)}Rows();
   <#elseif widget.type == "display_form" || widget.type == "entry_form">
+    <#if !widget.value("data")?starts_with("$")>
     this.load${js.nameType(widget.id)}Data();
+    </#if>
   </#if>
 </#list>
 <#--  <#list page.widgets as widget>
@@ -68,7 +70,7 @@ Page({
 <#if page.value("data") != "">
   <#assign url = valuebase.url(page.value("data"))>
       
-  load${js.nameType(url.resource)}: async function () {
+  load${js.nameType(url.resource)}Data: async function () {
     let params = {};    
     <#list url.params as param>
     params.${js.nameVariable(param.name)} = this.data.${js.nameVariable(param.name)};
@@ -77,6 +79,12 @@ Page({
       let ${js.nameVariable(url.resource)} = await sdk.fetch${js.nameType(url.resource)}(params);
       this.setData({
         ${js.nameVariable(url.resource)}: ${js.nameVariable(url.resource)},
+  <#list page.widgets as widget>
+    <#if widget.value("data") != "$" + url.resource><#continue></#if>
+    <#list widget.children as input>
+        ${js.nameVariable(input.id)}: ${js.nameVariable(url.resource)}.${js.nameVariable(input.id)},
+    </#list>
+  </#list>
       });
     } catch (error) {
       fb.error('发生错误', error.message || String(error))
