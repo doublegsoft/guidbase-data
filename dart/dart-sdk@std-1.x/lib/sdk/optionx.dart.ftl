@@ -23,7 +23,7 @@ Future<List<Option>> fetch${dart.nameType(modelbase.get_object_plural(dataObj))}
   query.limit = -1;
   final items = await find${dart.nameType(modelbase.get_object_plural(dataObj))}(query);
   return items.map((item) => Option(
-    label: item.${dart.nameVariable(enumVal.text)}.toString(),
+    text: item.${dart.nameVariable(enumVal.text)}.toString(),
     value: item.${dart.nameVariable(enumVal.code)}.toString(),
   )).toList();
 }
@@ -39,7 +39,7 @@ Future<List<Option>> fetch${dart.nameType(modelbase.get_object_plural(dataObj))}
   // TODO: set parent id
   final items = await find${dart.nameType(modelbase.get_object_plural(dataObj))}(query);
   return items.map((item) => Option(
-    label: item.${dart.nameVariable(enumVal.text)}.toString(),
+    text: item.${dart.nameVariable(enumVal.text)}.toString(),
     value: item.${dart.nameVariable(enumVal.code)}.toString(),
   )).toList();
 }
