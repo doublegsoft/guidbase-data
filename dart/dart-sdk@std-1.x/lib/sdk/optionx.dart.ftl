@@ -19,7 +19,7 @@ import '/model/dto.dart';
 /// Fetches options for widget `${widget.id}`
 ///
 Future<List<Option>> fetch${dart.nameType(modelbase.get_object_plural(dataObj))}AsOptions() async {
-  ${dart.nameType(dataObj.name)}Query query = new ${dart.nameType(dataObj.name)}Query();
+  ${dart.nameType(dataObj.name)}Query query = ${dart.nameType(dataObj.name)}Query();
   query.limit = -1;
   final items = await find${dart.nameType(modelbase.get_object_plural(dataObj))}(query);
   return items.map((item) => Option(
