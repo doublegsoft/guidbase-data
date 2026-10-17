@@ -34,7 +34,7 @@ Future<List<Option>> fetch${dart.nameType(modelbase.get_object_plural(dataObj))}
 /// Fetches cascaded options for widget `${widget.id}`
 ///
 Future<List<Option>> fetch${dart.nameType(modelbase.get_object_plural(dataObj))}AsOptions(dynamic parentId) async {
-  ${dart.nameType(dataObj.name)}Query query = new ${dart.nameType(dataObj.name)}Query();
+  ${dart.nameType(dataObj.name)}Query query = ${dart.nameType(dataObj.name)}Query();
   query.limit = -1;
   // TODO: set parent id
   final items = await find${dart.nameType(modelbase.get_object_plural(dataObj))}(query);
