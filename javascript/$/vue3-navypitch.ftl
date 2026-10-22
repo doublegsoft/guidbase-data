@@ -71,7 +71,7 @@ ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}    <div class="card-actions">
       <#list form.children as child>
         <#if child.type != "button"><#continue></#if>
-${""?left_pad(indent)}      <button class="btn btn-${guidbase.get_button_role(child)}" @click="${guidbase.guidbase.name_button_method(child)}">${child.title}</button> 
+${""?left_pad(indent)}      <button class="btn btn-${guidbase.get_button_variant(child)}" @click="${guidbase.guidbase.name_button_method(child)}">${child.title}</button> 
       </#list>
 ${""?left_pad(indent)}    </div>   
     </#if>
@@ -270,11 +270,11 @@ ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>  
   <#elseif widget.type == "button">    
     <#if widget.ancestor("paged_table")??>
-${""?left_pad(indent)}<button class="btn btn-sm btn-${guidbase.get_button_role(widget)}" @click="${guidbase.name_button_method(widget)}(row)">${widget.title}</button> 
+${""?left_pad(indent)}<button class="btn btn-sm btn-${guidbase.get_button_variant(widget)}" @click="${guidbase.name_button_method(widget)}(row)">${widget.title}</button> 
     <#elseif widget.container.type == "tab">
-${""?left_pad(indent)}<button class="btn-tab btn-${guidbase.get_button_role(widget)}" @click="${guidbase.name_button_method(widget)}">${widget.title}</button>   
+${""?left_pad(indent)}<button class="btn-tab btn-${guidbase.get_button_variant(widget)}" @click="${guidbase.name_button_method(widget)}">${widget.title}</button>   
     <#else>
-${""?left_pad(indent)}<button class="btn btn-${guidbase.get_button_role(widget)}" @click="${guidbase.name_button_method(widget)}">${widget.title}</button>
+${""?left_pad(indent)}<button class="btn btn-${guidbase.get_button_variant(widget)}" @click="${guidbase.name_button_method(widget)}">${widget.title}</button>
     </#if>
   <#elseif widget.type == "longtext">
 ${""?left_pad(indent)}<textarea class="form-input resize-v" data-test="${js.nameVariable(widget.id)}" 

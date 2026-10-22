@@ -35,9 +35,11 @@
             </td>
           </tr>
           <tr
-            v-for="row in displayData"
+            v-for="(row, rowIndex) in displayData"
             :key="String(row[idKey])"
+            :data-id="String(row[idKey])"
             :class="rowClasses(row)"
+            @click="onRowClick($event, row, rowIndex)"
           >
             <td
               v-for="col in columns"
@@ -45,8 +47,8 @@
               :class="tdClasses(col)"
               :style="colStyle(col)"
             >
-              <span v-if="col.render" v-html="col.render(row[col.key], row)"></span>
-              <template v-else>{{ row[col.key] }}</template>
+              <span v-if="col.render" v-html="col.render(getCellValue(row, col), row) ?? ''"></span>
+              <template v-else>{{ getCellValue(row, col) }}</template>
             </td>
           </tr>
         </tbody>
@@ -67,7 +69,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
-import PtPagination from './${namespace}-pagination.vue'
+import ${js.nameType(namespace)}Pagination from './${namespace}-pagination.vue'
 
 const props = defineProps({
   columns:      { type: Array,    required: true },
@@ -87,9 +89,11 @@ const props = defineProps({
   currentPage:  { type: Number,   default: 1 },
   pageSize:     { type: Number,   default: 20 },
   pageSizes:    { type: Array,    default: () => [20, 50, 100] },
+  // rowAction: 操作按钮回调映射 { handlerName: (row, index) => void }
+  rowAction:    { type: Object,   default: null },
 })
 
-const emit = defineEmits(['row-click', 'update:currentPage', 'update:pageSize'])
+const emit = defineEmits(['row-click', 'row-action', 'update:currentPage', 'update:pageSize'])
 
 const wrapRef = ref(null)
 const showLeftShadow  = ref(false)
@@ -120,6 +124,12 @@ watch(() => props.pageSize,    (v) => { pageSizeModel.value = v })
 const displayData = computed(() =>
   hasFetcher.value ? internalData.value : props.data
 )
+
+// 获取单元格数据，当为 undefined 时显示空字符串（保留 0 和 false）
+function getCellValue(row, col) {
+  const val = row[col.key]
+  return val === undefined ? '' : val
+}
 
 /**
  * 加载远端数据
@@ -180,6 +190,26 @@ onMounted(() => {
   nextTick(() => onScroll())
   if (hasFetcher.value) loadData()
 })
+
+// ── 行点击与操作按钮事件委托 ──
+function onRowClick(e, row, rowIndex) {
+  // 操作按钮点击 → 事件委托：v-html 中的 @click="handlerName" 作为 DOM 属性存在
+  const btn = e.target.closest('button, a')
+  if (btn) {
+    const actionName = btn.getAttribute('@click')
+    if (actionName) {
+      // 优先走 rowAction prop（直接调用）
+      if (props.rowAction && typeof props.rowAction[actionName] === 'function') {
+        props.rowAction[actionName](row, rowIndex)
+      }
+      // 同时 emit row-action 事件，支持 @row-action 监听
+      emit('row-action', { handler: actionName, row, index: rowIndex })
+      return
+    }
+  }
+  if (e.target.tagName.toLowerCase() === 'a' && e.target.dataset.action) return
+  emit('row-click', row)
+}
 
 // ── 计算固定列的 sticky 偏移 ──
 const leftOffsets  = computed(() => calcOffsets('left'))

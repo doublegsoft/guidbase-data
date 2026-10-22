@@ -380,7 +380,7 @@ ${""?left_pad(indent)}  :fetch-data="load${js.nameType(table.id)}Rows"
 ${""?left_pad(indent)}  :fetch-params="${js.nameVariable(table.value("object", table.id))}Crit"
 ${""?left_pad(indent)}  id-key="personId"
 ${""?left_pad(indent)}  :row-class-name="getRowClass"
-${""?left_pad(indent)}  @selection-change="handleSelection" />
+${""?left_pad(indent)}  @row-action="handle${js.nameType(table.id)}RowAction" />
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -427,7 +427,7 @@ ${""?left_pad(indent)}    <div :key="row.id || idx" style="display: flex; flex-d
     <#local buttons = grid.byType("buttons")[0]>
 ${""?left_pad(indent)}      <div class="tile-actions">
       <#list buttons.children as button>
-${""?left_pad(indent)}        <button class="pg-btn pg-btn--${guidbase.get_button_variant(button)} pg-btn--sm" @click.stop="${guidbase.name_button_method(button)}(row)">${button.title}</button>
+${""?left_pad(indent)}        <button class="${namespace}-btn ${namespace}-btn--${guidbase.get_button_variant(button)} ${namespace}-btn--sm" @click.stop="${guidbase.name_button_method(button)}(row)">${button.title}</button>
       </#list>
 ${""?left_pad(indent)}      </div>
   </#if>
@@ -540,6 +540,16 @@ const load${js.nameType(list.id)}Rows = async (params, pageNumber, pageSize) => 
 }
 </#macro>
 
+<#macro print_list_view_layout list indent=0>
+${""?left_pad(indent)}<div id="list_${js.nameVariable(list.id)}" class="${namespace}-list-view">
+${""?left_pad(indent)}  <template #default="{ row, index }">
+${""?left_pad(indent)}    <div :key="row.id || idx" style="display: flex; flex-direction: column; height: 100%;">
+<@print_tile_layout widget=list indent=indent+6 />
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}  </template>
+${""?left_pad(indent)}</div>
+</#macro>
+
 <!----------------------------------------------------------------------------->
 <!--                                  CHART                                  -->
 <!----------------------------------------------------------------------------->
@@ -550,13 +560,17 @@ ${""?left_pad(indent)} * ${js.nameVariable(chart.id)}【数据图表】相关变
 ${""?left_pad(indent)} */
 ${""?left_pad(indent)}const ${js.nameVariable(chart.id)}Data = ref([])
 ${""?left_pad(indent)}const ${js.nameVariable(chart.id)}Conf = computed(() =>
-  <#if chart.value("chart", "") == "pie">
+  <#if chart.value("plot") == "pie">
 ${""?left_pad(indent)}  createChart(${js.nameVariable(chart.id)}Data.value).pie().x('month').y('amount').sum().build()
-  <#elseif chart.value("chart", "") == "line">
+  <#elseif chart.value("plot") == "line">
 ${""?left_pad(indent)}  createChart(${js.nameVariable(chart.id)}Data.value).line().x('month').split('category').y('amount').avg().build()
-  <#elseif chart.value("chart", "") == "bar">
+  <#elseif chart.value("plot") == "bar">
 ${""?left_pad(indent)}  createChart(${js.nameVariable(chart.id)}Data.value).bar().x('month').split('category').y('amount').sum().build()
-  <#elseif chart.value("chart", "") == "stack">
+  <#elseif chart.value("plot") == "stack">
+${""?left_pad(indent)}  createChart(${js.nameVariable(chart.id)}Data.value).bar().x('month').split('category').y('amount').sum().stack().build()
+  <#elseif chart.value("plot") == "heat">
+${""?left_pad(indent)}  createChart(${js.nameVariable(chart.id)}Data.value).bar().x('month').split('category').y('amount').sum().stack().build()
+  <#elseif chart.value("plot") == "scatter">
 ${""?left_pad(indent)}  createChart(${js.nameVariable(chart.id)}Data.value).bar().x('month').split('category').y('amount').sum().stack().build()
   </#if>
 )
@@ -578,7 +592,12 @@ const load${js.nameType(chart.id)}Rows = async (params, pageNumber, pageSize) =>
 </#macro>
 
 <#macro print_chart_layout chart indent=0>
-${""?left_pad(indent)}<${namespace}-chart :option="${js.nameVariable(chart.id)}Conf" height="280px" />
+${""?left_pad(indent)}<div class="${namespace}-panel">
+  <#if chart.title?? && chart.title != "">
+${""?left_pad(indent)}  <div class="${namespace}-panel-head">${chart.title}</div>
+  </#if>
+${""?left_pad(indent)}  <${namespace}-chart :option="${js.nameVariable(chart.id)}Conf" height="320px" />
+${""?left_pad(indent)}</div>
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -717,6 +736,7 @@ import ${js.nameType(namespace)}Videoupload from '@/components/${namespace}-vide
   <#list page.widgets as widget>
     <#if widget.value("action") == ""><#continue></#if>
     <#local action = valuebase.action(widget.value("action"))>
+    <#if !action.type??><#continue></#if>
     <#if action.type.name() == "DRAWER" && !drawerImported>
       <#local drawerImported = true>
 import ${js.nameType(namespace)}Drawer from '@/components/${namespace}-drawer.vue'  
@@ -802,7 +822,7 @@ ${""?left_pad(indent)}const ${js.nameVariable(action.resource)}Open = ref(false)
     </#if>
   </#list>
   <#list page.widgets as widget>
-    <#if widget.type != "paged_table"><#continue></#if>
+    <#if widget.type != "paged_table" && widget.type != "fixed_table"><#continue></#if>
 ${""?left_pad(indent)}const ${js.nameVariable(widget.id)}RowActionHandlers = { 
     <#list widget.widgets as button>     
       <#if button.type != "button"><#continue></#if>
@@ -833,8 +853,11 @@ ${""?left_pad(indent)}}
   <#list page.widgets as widget>
     <#if widget.value("action") == ""><#continue></#if>
     <#local action = valuebase.action(widget.value("action"))>
+    <#if !action.type??><#continue></#if>
     <#if action.type.name() == "DRAWER">
-
+${""?left_pad(indent)}<${namespace}-drawer v-model="${js.nameVariable(action.resource)}Open" title="" size="lg">  
+${""?left_pad(indent)}  <${namespace}-${action.resource?replace("_","-")} />
+${""?left_pad(indent)}</${namespace}-drawer>
     <#elseif action.type.name() == "DIALOG">
 ${""?left_pad(indent)}<${namespace}-dialog v-model="${js.nameVariable(action.resource)}Open" title="" size="lg">  
 ${""?left_pad(indent)}  <${namespace}-${action.resource?replace("_","-")} />
@@ -870,6 +893,8 @@ ${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
       </#list>
     </#if>
 ${""?left_pad(indent)}</${namespace}-dialog>
+  <#elseif widget.type == "row">
+<@print_row_layout row=widget indent=indent />
   <#elseif widget.type == "tabs">
 <@print_tabs_layout tabs=widget indent=indent />
   <#elseif widget.type == "entry_form">

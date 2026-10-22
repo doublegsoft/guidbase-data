@@ -2,6 +2,26 @@
 <#include "vue3-default.ftl">
 <#include "vue3.ftl">
 <!----------------------------------------------------------------------------->
+<!--                                    ROW                                  -->
+<!----------------------------------------------------------------------------->
+<#macro print_row_layout row indent=0>
+  <#local spans = 0>
+  <#list row.children as child>
+    <#local span = child.value("span","1")?number>
+    <#local spans += span>
+  </#list>
+  <#local cols = 24 / spans>
+${""?left_pad(indent)}<div class="${namespace}-row">
+  <#list row.children as child>
+    <#local span = child.value("span","1")?number>
+${""?left_pad(indent)}  <div class="${namespace}-col-${cols * span}">
+<@print_widget_layout widget=child indent=indent+4 />
+${""?left_pad(indent)}  </div>
+  </#list>
+${""?left_pad(indent)}</div>
+</#macro>
+
+<!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
 <!----------------------------------------------------------------------------->
 <#macro print_tabs_layout tabs indent=0>
@@ -181,6 +201,11 @@ ${""?left_pad(indent)}</div>
 <!--                                LIST VIEW                                -->
 <!----------------------------------------------------------------------------->
 <#macro print_list_view_layout list indent=0>
+${""?left_pad(indent)}<div class="${namespace}-list-view">
+${""?left_pad(indent)}  <div v-for="(row, index) in ${js.nameVariable(list.id)}Rows" :key="index">
+<@print_tile_layout widget=list indent=indent+4 />
+${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}</div>
 </#macro>
 
 <!----------------------------------------------------------------------------->

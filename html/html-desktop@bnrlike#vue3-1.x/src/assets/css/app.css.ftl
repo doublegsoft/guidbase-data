@@ -663,6 +663,7 @@ html, body {
   padding: 7px 10px;
   flex-shrink: 0;
 }
+.${namespace}-form--1 { grid-template-columns: repeat(1, 1fr); }
 .${namespace}-form--2 { grid-template-columns: repeat(2, 1fr); }
 .${namespace}-form--3 { grid-template-columns: repeat(3, 1fr); }
 
@@ -777,6 +778,12 @@ html, body {
 .${namespace}-edit-bar::before { content: "✏"; margin-right: 2px; }
 
 .${namespace}-form-footer { 
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
+
   z-index: 100;
   padding: 8px 14px; 
   background: #fff; 

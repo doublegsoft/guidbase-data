@@ -59,7 +59,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import PtPagination from './${namespace}-pagination.vue'
+import ${js.nameType(namespace)}Pagination from './${namespace}-pagination.vue'
 
 const props = defineProps({
   data:         { type: Array,    default: () => [] },

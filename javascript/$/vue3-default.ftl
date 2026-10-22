@@ -1,6 +1,24 @@
 <#import "/$/guidbase.ftl" as guidbase>
 <#include "vue3.ftl">
 <!----------------------------------------------------------------------------->
+<!--                                    ROW                                  -->
+<!----------------------------------------------------------------------------->
+<#macro print_row_layout row indent=0>
+  <#local spans = 0>
+  <#list row.children as child>
+    <#local span = child.value("span","1")?number>
+    <#local spans += span>
+  </#list>
+  ${spans}
+  <#local cols = 24 / spans>
+${""?left_pad(indent)}<div class="${namespace}-row">
+  <#list row.children as child>
+    <#local span = child.value("span","1")?number>
+${""?left_pad(indent)}  <div class="${namespace}-col-${cols * span}"></div>
+  </#list>
+${""?left_pad(indent)}</div>
+</#macro>
+<!----------------------------------------------------------------------------->
 <!--                                   TABS                                  -->
 <!----------------------------------------------------------------------------->
 <#macro print_tabs_layout tabs indent=0>
@@ -204,6 +222,24 @@ ${""?left_pad(indent)}  <div style="margin-left: auto;">
   <#list buttons.children as child>
 <@print_widget_layout widget=child indent=indent+4 />
   </#list>    
+${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}</div>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                  CHART                                  -->
+<!----------------------------------------------------------------------------->
+<#macro print_chart_layout chart indent=0>
+  <#local chartId = js.nameVariable(chart.id)>
+  <#local height = chart.value("height", "300px")>
+  <#local width = chart.value("width", "100%")>
+${""?left_pad(indent)}<div class="${namespace}-chart-card">
+  <#if chart.title?? && chart.title != "">
+${""?left_pad(indent)}  <div class="${namespace}-panel-head">${chart.title}</div>
+  </#if>
+${""?left_pad(indent)}  <div ref="${chartId}Ref" 
+${""?left_pad(indent)}       class="${namespace}-chart-container" 
+${""?left_pad(indent)}       style="width:${width};height:${height};">
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
 </#macro>

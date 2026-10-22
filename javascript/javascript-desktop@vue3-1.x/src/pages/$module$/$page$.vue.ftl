@@ -18,6 +18,7 @@
 <#list page.widgets as button>
   <#if button.type != "button"><#continue></#if>
   <#assign action = valuebase.action(button.value("action"))>
+  <#if !action.type??><#continue></#if>
   <#if action.type.name() == "drawer">
   <${namespace}-drawer v-model="${js.nameVariable(action.resource)}Open">
     <${namespace}-${js.nameFile(action.resource)} />
