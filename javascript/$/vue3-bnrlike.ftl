@@ -1,6 +1,13 @@
 <#import "/$/guidbase.ftl" as guidbase>
 <#include "vue3-default.ftl">
 <#include "vue3.ftl">
+<#function get_var pvar widget property>
+  <#local ret = guidbase.name_widget_variable(guidbase.get_child_from_tile(widget, property))>
+  <#if pvar == "">
+    <#return ret>
+  </#if>
+  <#return pvar>
+</#function>
 <!----------------------------------------------------------------------------->
 <!--                                    ROW                                  -->
 <!----------------------------------------------------------------------------->
@@ -11,7 +18,7 @@
     <#local spans += span>
   </#list>
   <#local cols = 24 / spans>
-${""?left_pad(indent)}<div class="${namespace}-row">
+${""?left_pad(indent)}<div class="${namespace}-row ${namespace}-row--gap-sm">
   <#list row.children as child>
     <#local span = child.value("span","1")?number>
 ${""?left_pad(indent)}  <div class="${namespace}-col-${cols * span}">
@@ -167,28 +174,53 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <#macro print_display_form_layout form indent=0>
   <#local cols = form.value("cols", "3")>
-${""?left_pad(indent)}<div id="${js.nameVariable(form.id)}">  
+  <#local formId = js.nameVariable(form.id)>
+${""?left_pad(indent)}<div id="${formId}">
   <#list form.groups() as group>
     <#if group?index != 0>
-${""?left_pad(indent)}  <div class="${namespace}-divider"></div>    
+${""?left_pad(indent)}  <div class="${namespace}-divider"></div>
     </#if>
 ${""?left_pad(indent)}  <div class="${namespace}-panel">
 ${""?left_pad(indent)}    <div class="${namespace}-panel-head">${group}</div>
     <#local rows = form.rows(group, cols?number)>
     <#list rows as row>
-${""?left_pad(indent)}    <div class="${namespace}-fview ${namespace}-fview--${cols}">    
+${""?left_pad(indent)}    <div class="${namespace}-fview ${namespace}-fview--${cols}">
       <#list row as input>
-        <#local span = input.value("span","")>
+        <#local span = input.value("span", "")>
+        <#local inputId = js.nameVariable(input.id)>
+        <#local dataField = formId + "Data." + inputId>
+        <#local tagTheme = input.value("theme", input.value("tagType", "primary"))>
 ${""?left_pad(indent)}      <div class="${namespace}-fv<#if span != ""> ${namespace}-fv--span${span}</#if>">
 ${""?left_pad(indent)}        <div class="${namespace}-fv-label">${input.title}</div>
-${""?left_pad(indent)}        <div class="${namespace}-fv-val ${namespace}-fv-val--mono">{{ ${js.nameVariable(form.id)}Data.${js.nameVariable(input.id)} }}</div>
+        <#-- 1. 普通 Tags / Tag 类型 -->
+        <#if input.type?? && (input.type == "tags" || input.type == "tag")>
+${""?left_pad(indent)}        <div class="${namespace}-fv-val" style="gap: 6px; flex-wrap: wrap;">
+${""?left_pad(indent)}          <span
+${""?left_pad(indent)}            v-for="(tag, tagIdx) in (Array.isArray(${dataField}) ? ${dataField} : String(${dataField} || '').split(/[,，]/).map(s => s.trim()).filter(Boolean))"
+${""?left_pad(indent)}            :key="tagIdx"
+${""?left_pad(indent)}            :class="['${namespace}-tag', '${namespace}-tag--' + (typeof tag === 'object' && tag.type ? tag.type : '${tagTheme}')]"
+${""?left_pad(indent)}          >{{ typeof tag === 'object' && tag !== null ? (tag.label || tag.name || tag.title || tag.value) : tag }}</span>
+${""?left_pad(indent)}        </div>
+        <#-- 2. 多选下拉 multiselect 类型：单独处理 Option 对象，优先渲染 option.text -->
+        <#elseif input.type?? && input.type == "multiselect">
+${""?left_pad(indent)}        <div class="${namespace}-fv-val" style="gap: 6px; flex-wrap: wrap;">
+${""?left_pad(indent)}          <span
+${""?left_pad(indent)}            v-for="(opt, optIdx) in (Array.isArray(${dataField}) ? ${dataField} : (${dataField} ? [${dataField}] : []))"
+${""?left_pad(indent)}            :key="optIdx"
+${""?left_pad(indent)}            :class="['${namespace}-tag', '${namespace}-tag--${tagTheme}']"
+${""?left_pad(indent)}          >{{ typeof opt === 'object' && opt !== null ? (opt.text ?? opt.label ?? opt.value) : opt }}</span>
+${""?left_pad(indent)}        </div>
+        <#-- 3. 默认文本展示 -->
+        <#else>
+${""?left_pad(indent)}        <div class="${namespace}-fv-val ${namespace}-fv-val--mono">{{ ${dataField} }}</div>
+        </#if>
 ${""?left_pad(indent)}      </div>
       </#list>
-${""?left_pad(indent)}    </div>      
+${""?left_pad(indent)}    </div>
     </#list>
 ${""?left_pad(indent)}  </div>
   </#list>
-${""?left_pad(indent)}</div>  
+${""?left_pad(indent)}</div>
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -201,9 +233,187 @@ ${""?left_pad(indent)}</div>
 <!--                                LIST VIEW                                -->
 <!----------------------------------------------------------------------------->
 <#macro print_list_view_layout list indent=0>
-${""?left_pad(indent)}<div class="${namespace}-list-view">
-${""?left_pad(indent)}  <div v-for="(row, index) in ${js.nameVariable(list.id)}Rows" :key="index">
-<@print_tile_layout widget=list indent=indent+4 />
+${""?left_pad(indent)}<div class="${namespace}-panel ${namespace}-list-view">
+${""?left_pad(indent)}  <!-- 顶部 Title 栏 -->
+${""?left_pad(indent)}  <div class="${namespace}-panel-head<#if list.value('theme', '') != ''> ${namespace}-panel-head--${list.value('theme')}</#if>">
+${""?left_pad(indent)}    <span class="${namespace}-panel-title">${list.title!'待办事项'}</span>
+${""?left_pad(indent)}    <#if list.value("extraText", "") != "" || list.value("action", "") != "">
+${""?left_pad(indent)}    <span class="${namespace}-panel-extra">
+${""?left_pad(indent)}      <a class="${namespace}-link" @click="${js.nameVariable(list.id)}OnExtraClick">
+${""?left_pad(indent)}        ${list.value("extraText", "全部 ›")}
+${""?left_pad(indent)}      </a>
+${""?left_pad(indent)}    </span>
+${""?left_pad(indent)}    </#if>
+${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}  <!-- 紧凑列表项容器 -->
+${""?left_pad(indent)}  <div class="${namespace}-summary-list">
+${""?left_pad(indent)}    <div
+${""?left_pad(indent)}      v-for="(row, index) in ${js.nameVariable(list.id)}Rows"
+${""?left_pad(indent)}      :key="row.id || index"
+${""?left_pad(indent)}      class="${namespace}-summary-row"
+${""?left_pad(indent)}      @click="${js.nameVariable(list.id)}OnItemClick(row, index)"
+${""?left_pad(indent)}    >
+<@print_tile_layout widget=list indent=indent+6 />
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}    <!-- 空状态处理 -->
+${""?left_pad(indent)}    <div v-if="!${js.nameVariable(list.id)}Rows || ${js.nameVariable(list.id)}Rows.length === 0" class="${namespace}-empty-tip">
+${""?left_pad(indent)}      暂无数据
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}</div>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                MAP VIEW                                 -->
+<!----------------------------------------------------------------------------->
+<#macro print_map_view_layout map indent=0>
+  <#local mapId = js.nameVariable(map.id)>
+  <#local height = map.value("height", "260px")>
+${""?left_pad(indent)}<div id="${mapId}" class="${namespace}-panel ${namespace}-map-panel">
+${""?left_pad(indent)}  <!-- 顶部标题与地图图层控制栏 -->
+${""?left_pad(indent)}  <div class="${namespace}-panel-head">
+${""?left_pad(indent)}    <span>${map.title!'抵押物空间分布 / 地图全景'}</span>
+${""?left_pad(indent)}    <div class="${namespace}-panel-extra">
+${""?left_pad(indent)}      <!-- 图层切换 -->
+${""?left_pad(indent)}      <div class="${namespace}-map-layer-switch">
+${""?left_pad(indent)}        <button
+${""?left_pad(indent)}          type="button"
+${""?left_pad(indent)}          :class="['${namespace}-btn-xs', { active: ${mapId}Layer === 'vector' }]"
+${""?left_pad(indent)}          @click="${mapId}Layer = 'vector'"
+${""?left_pad(indent)}        >矢量</button>
+${""?left_pad(indent)}        <button
+${""?left_pad(indent)}          type="button"
+${""?left_pad(indent)}          :class="['${namespace}-btn-xs', { active: ${mapId}Layer === 'satellite' }]"
+${""?left_pad(indent)}          @click="${mapId}Layer = 'satellite'"
+${""?left_pad(indent)}        >卫星</button>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}      <button type="button" class="${namespace}-btn-xs" title="重置视角" @click="${mapId}ResetView">⟲</button>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}
+${""?left_pad(indent)}  <!-- 地图主视口容器 -->
+${""?left_pad(indent)}  <div
+${""?left_pad(indent)}    class="${namespace}-mapbox"
+${""?left_pad(indent)}    :class="'${namespace}-mapbox--' + ${mapId}Layer"
+${""?left_pad(indent)}    style="height: ${height};"
+${""?left_pad(indent)}    ref="${mapId}Ref"
+${""?left_pad(indent)}  >
+${""?left_pad(indent)}    <!-- 模拟地图地理元素层 (河流、干道) -->
+${""?left_pad(indent)}    <div class="${namespace}-map-river"></div>
+${""?left_pad(indent)}    <div class="${namespace}-map-road"></div>
+${""?left_pad(indent)}    <div class="${namespace}-map-road ${namespace}-map-road--cross"></div>
+${""?left_pad(indent)}
+${""?left_pad(indent)}    <!-- 地标点标记 (Markers) -->
+${""?left_pad(indent)}    <div
+${""?left_pad(indent)}      v-for="(marker, idx) in ${mapId}Markers"
+${""?left_pad(indent)}      :key="idx"
+${""?left_pad(indent)}      class="${namespace}-map-pin-wrap"
+${""?left_pad(indent)}      :class="{ active: ${mapId}ActiveIndex === idx }"
+${""?left_pad(indent)}      :style="{ left: marker.x + '%', top: marker.y + '%' }"
+${""?left_pad(indent)}      @click="${mapId}OnPinClick(marker, idx)"
+${""?left_pad(indent)}    >
+${""?left_pad(indent)}      <div class="${namespace}-map-pin">
+${""?left_pad(indent)}        <span class="${namespace}-map-pin-icon">📍</span>
+${""?left_pad(indent)}        <div class="${namespace}-map-pin-pulse"></div>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}      <div class="${namespace}-map-pin-label">{{ marker.title }}</div>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}
+${""?left_pad(indent)}    <!-- 点击标记弹出的浮层信息卡片 (Popup Card) -->
+${""?left_pad(indent)}    <div
+${""?left_pad(indent)}      v-if="${mapId}ActiveMarker"
+${""?left_pad(indent)}      class="${namespace}-map-popup"
+${""?left_pad(indent)}      :style="{ left: ${mapId}ActiveMarker.x + '%', top: ${mapId}ActiveMarker.y + '%' }"
+${""?left_pad(indent)}    >
+${""?left_pad(indent)}      <div class="${namespace}-map-popup-head">
+${""?left_pad(indent)}        <span class="${namespace}-map-popup-title">{{ ${mapId}ActiveMarker.title }}</span>
+${""?left_pad(indent)}        <button type="button" class="${namespace}-map-popup-close" @click="${mapId}ActiveMarker = null">×</button>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}      <div class="${namespace}-map-popup-body">
+${""?left_pad(indent)}        <div class="${namespace}-map-popup-row">
+${""?left_pad(indent)}          <span class="label">估值:</span>
+${""?left_pad(indent)}          <b class="val bold">¥ {{ ${mapId}ActiveMarker.valuation || '--' }}万</b>
+${""?left_pad(indent)}        </div>
+${""?left_pad(indent)}        <div class="${namespace}-map-popup-row">
+${""?left_pad(indent)}          <span class="label">状态:</span>
+${""?left_pad(indent)}          <span :class="['${namespace}-status', ${mapId}ActiveMarker.statusColor || 'blue']">{{ ${mapId}ActiveMarker.statusText || '正常' }}</span>
+${""?left_pad(indent)}        </div>
+${""?left_pad(indent)}        <div class="${namespace}-map-popup-row">
+${""?left_pad(indent)}          <span class="label">坐落:</span>
+${""?left_pad(indent)}          <span class="val text-muted">{{ ${mapId}ActiveMarker.address || '--' }}</span>
+${""?left_pad(indent)}        </div>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}
+${""?left_pad(indent)}    <!-- 右下角缩放控制按钮 -->
+${""?left_pad(indent)}    <div class="${namespace}-map-controls">
+${""?left_pad(indent)}      <button type="button" class="${namespace}-map-btn" @click="${mapId}ZoomIn">+</button>
+${""?left_pad(indent)}      <button type="button" class="${namespace}-map-btn" @click="${mapId}ZoomOut">-</button>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}
+${""?left_pad(indent)}    <!-- 底部状态说明条 -->
+${""?left_pad(indent)}    <div class="${namespace}-map-scalebar">
+${""?left_pad(indent)}      <span>坐标系: CGCS2000 | 标定物: {{ (${mapId}Markers || []).length }} 处</span>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}</div>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                               HERO CARD                                 -->
+<!----------------------------------------------------------------------------->
+<#macro print_hero_card_layout hero varname="row" indent=0>
+${""?left_pad(indent)}<div class="${namespace}-obj-head">
+  <#-- 1. 核心大头像/实体图标 (avatar) -->
+${""?left_pad(indent)}  <div class="${namespace}-obj-icon">
+  <#if guidbase.has_child_widget(hero, "avatar")>
+${""?left_pad(indent)}    <img :src="${js.nameVariable(hero.id)}Data.${js.nameVariable(guidbase.get_child_from_tile(hero, "avatar").id)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" />
+  <#elseif guidbase.has_child_widget(hero, "primary")>
+${""?left_pad(indent)}    <span>{{ ${js.nameVariable(hero.id)}Data.${js.nameVariable(guidbase.get_child_from_tile(hero, "primary").id)} }}</span>
+  </#if>
+${""?left_pad(indent)}  </div>
+
+  <#-- 2. 中间信息区 (标题、编码、三级描述信息、标签) -->
+${""?left_pad(indent)}  <div style="flex: 1; min-width: 0;">
+  <#if guidbase.has_child_widget(hero, "primary")>
+${""?left_pad(indent)}    <div class="${namespace}-obj-title">{{ ${js.nameVariable(hero.id)}Data.${js.nameVariable(guidbase.get_child_from_tile(hero, "primary").id)} }}</div>
+  </#if>
+  <#if guidbase.has_child_widget(hero, "secondary")>
+${""?left_pad(indent)}    <div class="${namespace}-obj-id">{{ ${js.nameVariable(hero.id)}Data.${js.nameVariable(guidbase.get_child_from_tile(hero, "secondary").id)} }}</div>
+  </#if>
+  <#if guidbase.has_child_widget(hero, "tertiary")>
+${""?left_pad(indent)}    <div class="${namespace}-obj-meta">
+${""?left_pad(indent)}      <span>{{ ${js.nameVariable(hero.id)}Data.${js.nameVariable(guidbase.get_child_from_tile(hero, "tertiary").id)} }}</span>
+${""?left_pad(indent)}    </div>
+  </#if>
+  <#if guidbase.has_child_widget(hero, "tags") || guidbase.has_child_widget(hero, "tag")>
+    <#local tagsWidget = guidbase.has_child_widget(hero, "tags")?then(guidbase.get_child_from_tile(hero, "tags"), guidbase.get_child_from_tile(hero, "tag"))>
+    <#local tagsField = js.nameVariable(hero.id) + "Data." + js.nameVariable(tagsWidget.id)>
+    <#local tagTheme = tagsWidget.value("theme", tagsWidget.value("tagType", "primary"))>
+${""?left_pad(indent)}    <div class="${namespace}-obj-tags" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
+${""?left_pad(indent)}      <span
+${""?left_pad(indent)}        v-for="(tag, tagIdx) in (Array.isArray(${tagsField}) ? ${tagsField} : String(${tagsField} || '').split(/[,，]/).map(s => s.trim()).filter(Boolean))"
+${""?left_pad(indent)}        :key="tagIdx"
+${""?left_pad(indent)}        :class="['${namespace}-tag', '${namespace}-tag--' + (typeof tag === 'object' && tag.type ? tag.type : '${tagTheme}')]"
+${""?left_pad(indent)}      >{{ typeof tag === 'object' && tag !== null ? (tag.label || tag.name || tag.title || tag.value) : tag }}</span>
+${""?left_pad(indent)}    </div>
+  </#if>
+${""?left_pad(indent)}  </div>
+  <#-- 3. 右侧状态指示与操作栏 -->
+${""?left_pad(indent)}  <div class="${namespace}-obj-status">
+  <#if guidbase.has_child_widget(hero, "status")>
+${""?left_pad(indent)}    <div class="${namespace}-status-chip ${namespace}-status-active">{{ ${js.nameVariable(hero.id)}Data.${js.nameVariable(guidbase.get_child_from_tile(hero, "status").id)} }}</div>
+  </#if>
+  <#list hero.children as widget>
+    <#if widget.type == "buttons">
+${""?left_pad(indent)}    <div class="${namespace}-obj-actions">
+      <#list widget.children as button>
+<@print_widget_layout widget=button indent=indent+6 />
+      </#list>
+${""?left_pad(indent)}    </div>
+      <#break>
+    </#if>
+  </#list>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
 </#macro>

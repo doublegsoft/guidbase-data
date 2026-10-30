@@ -36,8 +36,10 @@
                 <input type="checkbox" :checked="selectedIds.has(String(row[idKey]))" @change="toggleRow(String(row[idKey]), $event.target.checked)" style="width:14px;height:14px;accent-color:var(--p);cursor:pointer">
               </td>
               <td v-for="col in columns" :key="col.key" :style="{ textAlign: col.align || 'left' }">
-                <span v-if="col.render" v-html="col.render(row[col.key], row)"></span>
-                <template v-else>{{ row[col.key] }}</template>
+                <!-- 自定义 render 容错及传参保护 -->
+                <span v-if="col.render" v-html="col.render(formatCell(row[col.key]), row) ?? ''"></span>
+                <!-- 默认展示：为 undefined 或 null 时显示空字符串 -->
+                <template v-else>{{ formatCell(row[col.key]) }}</template>
               </td>
             </tr>
           </tbody>
@@ -92,6 +94,12 @@ const scrollContainer = ref(null)
 
 watch(() => props.currentPage, (v) => { currentPage.value = v })
 watch(() => props.pageSize,    (v) => { pageSize.value = v })
+
+// ── 单元格空值处理（undefined、null 或字符串 'undefined' 均返回空字符串） ──
+function formatCell(val) {
+  if (val === undefined || val === null || val === 'undefined') return ''
+  return val
+}
 
 // ── 远端数据模式 ──
 const isServerMode = computed(() => typeof props.fetchData === 'function')
@@ -224,17 +232,13 @@ function toggleRow(id, checked) {
 }
 
 function onRowClick(e, row, rowIndex) {
-  // 操作按钮点击 → 事件委托：v-html 中的 @click="handlerName" 不会被 Vue 编译，
-  // 但作为 DOM 属性存在，通过 getAttribute('@click') 提取 handler 名
   const btn = e.target.closest('button, a')
   if (btn) {
     const actionName = btn.getAttribute('@click')
     if (actionName) {
-      // 优先走 rowAction prop（直接调用，无需页面监听事件）
       if (props.rowAction && typeof props.rowAction[actionName] === 'function') {
         props.rowAction[actionName](row, rowIndex)
       }
-      // 同时 emit row-action 事件，兼容 @row-action 监听方式
       emit('row-action', { handler: actionName, row, index: rowIndex })
       return
     }
@@ -480,7 +484,7 @@ defineExpose({
 
 .${namespace}-drawer.${namespace}-drawer-closed { width: 0; border-left: none; }
 
-/* 抽屉内容（v-html 渲染，需要 :deep() 穿透） */
+/* 抽屉内容 */
 .${namespace}-drawer :deep(.${namespace}-dd-head) {
   background: var(--${namespace}-p);
   color: var(--${namespace}-bg);

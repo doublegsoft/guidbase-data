@@ -1541,17 +1541,284 @@ html, body {
   .${namespace}-col-xl-24 { flex: 0 0 100%;         max-width: 100%;         }
 }
 
+/* 地图卡片外层 */
+.${namespace}-map-panel {
+  margin-bottom: 9px;
+  position: relative;
+  border-radius: 2px;
+}
+
+/* 顶部微型按钮组 */
+.${namespace}-map-layer-switch {
+  display: inline-flex;
+  border: 1px solid var(--${namespace}-pbd, #d0d8e8);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-right: 6px;
+}
+.${namespace}-btn-xs {
+  height: 20px;
+  line-height: 18px;
+  padding: 0 7px;
+  font-size: 11px;
+  border: none;
+  background: #fff;
+  color: var(--${namespace}-muted, #5d6d7e);
+  cursor: pointer;
+}
+.${namespace}-btn-xs:hover {
+  background: var(--${namespace}-pb, #e8edf5);
+  color: var(--${namespace}-p, #1a4f8a);
+}
+.${namespace}-btn-xs.active {
+  background: var(--${namespace}-p, #1a4f8a);
+  color: #fff;
+}
+
+/* 地图视口画布容器 */
+.${namespace}-mapbox {
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  background-color: #eef2ec;
+  /* 现代 GIS 坐标栅格纹理 */
+  background-image: 
+    linear-gradient(0deg, rgba(220, 232, 221, 0.7) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(220, 232, 221, 0.7) 1px, transparent 1px);
+  background-size: 28px 28px;
+  transition: all 0.3s ease;
+}
+
+/* 卫星模式（暗深色科技感滤镜纹理） */
+.${namespace}-mapbox--satellite {
+  background-color: #172635;
+  background-image: 
+    linear-gradient(0deg, rgba(40, 60, 85, 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(40, 60, 85, 0.4) 1px, transparent 1px);
+}
+.${namespace}-mapbox--satellite .${namespace}-map-river {
+  background: #0f4b75;
+  border-color: #0b3756;
+}
+.${namespace}-mapbox--satellite .${namespace}-map-road {
+  background: #34495e;
+  border-color: #2c3e50;
+}
+
+/* 模拟地理水系与干道 */
+.${namespace}-map-river {
+  position: absolute;
+  left: 28%;
+  top: -20%;
+  height: 150%;
+  width: 48px;
+  background: #c6dff1;
+  transform: rotate(24deg);
+  border-left: 2px solid #b0d1e8;
+  border-right: 2px solid #b0d1e8;
+  pointer-events: none;
+}
+
+.${namespace}-map-road {
+  position: absolute;
+  height: 8px;
+  width: 120%;
+  left: -10%;
+  top: 48%;
+  background: #ffffff;
+  border-top: 1.5px solid #ded5be;
+  border-bottom: 1.5px solid #ded5be;
+  transform: rotate(-10deg);
+  pointer-events: none;
+}
+.${namespace}-map-road--cross {
+  top: 15%;
+  height: 6px;
+  transform: rotate(65deg);
+}
+
+/* 地标定位 Pin 容器与脉冲动画 */
+.${namespace}-map-pin-wrap {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.15s ease;
+}
+.${namespace}-map-pin-wrap:hover,
+.${namespace}-map-pin-wrap.active {
+  transform: translate(-50%, -105%) scale(1.1);
+  z-index: 20;
+}
+
+.${namespace}-map-pin {
+  position: relative;
+  font-size: 20px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+}
+
+/* 地标扩散脉冲光晕 */
+.${namespace}-map-pin-pulse {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-radius: 50%;
+  background: rgba(26, 79, 138, 0.7);
+  box-shadow: 0 0 0 rgba(26, 79, 138, 0.4);
+  animation: mapPinPulse 1.8s infinite;
+}
+@keyframes mapPinPulse {
+  0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.6); }
+  70% { transform: scale(2.4); box-shadow: 0 0 0 8px rgba(192, 57, 43, 0); }
+  100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(192, 57, 43, 0); }
+}
+
+.${namespace}-map-pin-label {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #c8d2dc;
+  border-radius: 2px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #2c3e50;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  margin-top: -2px;
+}
+
+/* 点击后弹出的信息卡片 (Popup Card) */
+.${namespace}-map-popup {
+  position: absolute;
+  z-index: 30;
+  transform: translate(-50%, -125%);
+  width: 210px;
+  background: #ffffff;
+  border: 1px solid var(--${namespace}-pbd, #d0d8e8);
+  border-radius: 3px;
+  box-shadow: 0 6px 18px rgba(28, 40, 51, 0.18);
+  padding: 0;
+  overflow: hidden;
+}
+.${namespace}-map-popup-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--${namespace}-pb, #e8edf5);
+  padding: 5px 8px;
+  border-bottom: 1px solid #d9dfe6;
+}
+.${namespace}-map-popup-title {
+  font-weight: 700;
+  color: var(--${namespace}-p, #1a4f8a);
+  font-size: 11px;
+}
+.${namespace}-map-popup-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #7f8c8d;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+}
+.${namespace}-map-popup-close:hover {
+  color: #c0392b;
+}
+
+.${namespace}-map-popup-body {
+  padding: 7px 9px;
+  font-size: 11px;
+}
+.${namespace}-map-popup-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.${namespace}-map-popup-row:last-child {
+  margin-bottom: 0;
+}
+.${namespace}-map-popup-row .label {
+  color: var(--${namespace}-muted, #5d6d7e);
+  width: 32px;
+  flex-shrink: 0;
+}
+.${namespace}-map-popup-row .val.bold {
+  color: #c0392b;
+  font-family: var(--${namespace}-mono, Consolas, monospace);
+  font-weight: 700;
+}
+
+/* 右下角控制小工具 */
+.${namespace}-map-controls {
+  position: absolute;
+  right: 9px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 15;
+}
+.${namespace}-map-btn {
+  width: 22px;
+  height: 22px;
+  background: #ffffff;
+  border: 1px solid #b9c5d2;
+  border-radius: 2px;
+  color: #34495e;
+  font-weight: bold;
+  font-size: 13px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.${namespace}-map-btn:hover {
+  background: var(--${namespace}-pb, #e8edf5);
+  color: var(--${namespace}-p, #1a4f8a);
+}
+
+/* 底部状态说明条 */
+.${namespace}-map-scalebar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 18px;
+  line-height: 18px;
+  background: rgba(255, 255, 255, 0.85);
+  border-top: 1px solid #dce3ea;
+  padding: 0 8px;
+  font-size: 10px;
+  color: #7f8c8d;
+}
+
 .tile {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 12px;
-  border: 1px solid var(--tile-border, #e8e8e8);
-  border-radius: var(--tile-radius, 8px);
+  /* 只保留左右和底边框 */
+  <#--  border-left: 1px solid var(--tile-border, #e8e8e8);
+  border-right: 1px solid var(--tile-border, #e8e8e8);
+  border-bottom: 1px solid var(--tile-border, #e8e8e8);  -->
   background: var(--tile-bg, #fff);
   font-size: 13px;
   color: var(--tile-color, #333);
   line-height: 1.4;
+}
+
+/* 仅第一个元素补全顶部边框 */
+.tile:first-child {
+  border-top: 1px solid var(--tile-border, #e8e8e8);
 }
 
 .tile-row {
@@ -2323,3 +2590,4 @@ html, body {
 .tile-multi-tag-end-node .tile-header {
   margin-bottom: 4px;
 }
+

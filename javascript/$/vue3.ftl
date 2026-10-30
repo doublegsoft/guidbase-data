@@ -222,7 +222,7 @@ ${""?left_pad(indent)}const ${js.nameVariable(form.id)}Rows = ref([])
 const load${js.nameType(form.id)}Rows = async () => {
   isLoading.value = true
   try {
-    const res = await sdk.fetch${js.nameType(inflector.pluralize(form.value("object", form.id)))}({}, 0, -1)
+    const res = await sdk.fetch${js.nameType(inflector.pluralize(form.value("data", form.id)))}({}, 0, -1)
     return res
   } catch (error) {
     fb.error('发生错误', error)
@@ -262,6 +262,24 @@ ${""?left_pad(indent)}  render: v => `<span style="font-family:Consolas,monospac
     <#elseif column.type == "number">
 ${""?left_pad(indent)}  align: 'right',    
 ${""?left_pad(indent)}  render: v => `<span style="font-family:Consolas,monospace;color:#5d6d7e">${r"${v}"}</span>`,
+    <#elseif column.type == "tags">
+${""?left_pad(indent)}  align: 'left',
+${""?left_pad(indent)}  render: v => {
+${""?left_pad(indent)}    if (!v && v !== 0) return '';
+${""?left_pad(indent)}    const list = Array.isArray(v)
+${""?left_pad(indent)}      ? v.map(item => (typeof item === 'object' && item !== null ? (item.label ?? item.name ?? item.title ?? item.value ?? '') : item))
+${""?left_pad(indent)}      : String(v).split(/[,，]/).map(s => s.trim());
+${""?left_pad(indent)}    return list.filter(Boolean).map(t => `<span style="display:inline-block;padding:2px 8px;margin:2px 4px 2px 0;font-size:12px;line-height:18px;color:#409eff;background:#ecf5ff;border:1px solid #d9ecff;border-radius:4px;white-space:nowrap;">${r"${t}"}</span>`).join('');
+${""?left_pad(indent)}  },
+    <#elseif column.type == "multiselect">
+${""?left_pad(indent)}  align: 'left',
+${""?left_pad(indent)}  render: v => {
+${""?left_pad(indent)}    if (!v && v !== 0) return '';
+${""?left_pad(indent)}    const list = Array.isArray(v)
+${""?left_pad(indent)}      ? v.map(item => (typeof item === 'object' && item !== null ? (item.label ?? item.name ?? item.title ?? item.value ?? '') : item))
+${""?left_pad(indent)}      : String(v).split(/[,，]/).map(s => s.trim());
+${""?left_pad(indent)}    return list.filter(Boolean).map(t => `<span style="display:inline-block;padding:2px 8px;margin:2px 4px 2px 0;font-size:12px;line-height:18px;color:#409eff;background:#ecf5ff;border:1px solid #d9ecff;border-radius:4px;white-space:nowrap;">${r"${t}"}</span>`).join('');
+${""?left_pad(indent)}  },
     <#elseif column.type == "buttons">
 ${""?left_pad(indent)}  align: 'center',
 ${""?left_pad(indent)}  render: (v, row) => {                                       
@@ -380,6 +398,81 @@ ${""?left_pad(indent)}  :fetch-data="load${js.nameType(table.id)}Rows"
 ${""?left_pad(indent)}  :fetch-params="${js.nameVariable(table.value("object", table.id))}Crit"
 ${""?left_pad(indent)}  id-key="personId"
 ${""?left_pad(indent)}  :row-class-name="getRowClass"
+${""?left_pad(indent)}  @row-action="handle${js.nameType(table.id)}RowAction" />
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                DATA TABLE                               -->
+<!----------------------------------------------------------------------------->
+<#macro print_data_table_variables table indent=0>
+${""?left_pad(indent)}
+${""?left_pad(indent)}// ${js.nameVariable(table.id)}可编辑数据表格相关变量
+${""?left_pad(indent)}const ${js.nameVariable(table.id)}Ref = ref(null)
+${""?left_pad(indent)}const ${js.nameVariable(table.id)}Cols = ref([{
+  <#list table.children as column>
+    <#if column?index != 0>
+${""?left_pad(indent)}},{    
+    </#if>
+    <#if column.id??>
+${""?left_pad(indent)}  key: '${js.nameVariable(column.id)}',
+    </#if>
+${""?left_pad(indent)}  title: '${column.title}',      
+${""?left_pad(indent)}  width: '${column.value("width","120")}px', 
+${""?left_pad(indent)}  type: '${column.type}',
+    <#if column.type == "date">
+${""?left_pad(indent)}  align: 'center',
+    <#elseif column.type == "number">
+${""?left_pad(indent)}  align: 'right',    
+    <#elseif column.type == "select">
+${""?left_pad(indent)}  align: 'left',
+${""?left_pad(indent)}  options: ${column.value("options", "[]")},
+    <#elseif column.type == "tags" || column.type == "multiselect">
+${""?left_pad(indent)}  align: 'left',
+${""?left_pad(indent)}  render: function(v) {
+${""?left_pad(indent)}    if (v === undefined || v === null || v === '') return '';
+${""?left_pad(indent)}    var list = Array.isArray(v)
+${""?left_pad(indent)}      ? v.map(function(item) { return (typeof item === 'object' && item !== null ? (item.label || item.name || item.title || item.value || '') : item); })
+${""?left_pad(indent)}      : String(v).split(/[,，]/).map(function(s) { return s.trim(); });
+${""?left_pad(indent)}    return list.filter(Boolean).map(function(t) {
+${""?left_pad(indent)}      return '<span style="display:inline-block;padding:2px 8px;margin:2px 4px 2px 0;font-size:12px;line-height:18px;color:#409eff;background:#ecf5ff;border:1px solid #d9ecff;border-radius:4px;white-space:nowrap;">' + t + '</span>';
+${""?left_pad(indent)}    }).join('');
+${""?left_pad(indent)}  },
+    <#else>
+${""?left_pad(indent)}  align: 'left',
+    </#if>
+  </#list>
+${""?left_pad(indent)}}])
+</#macro>
+
+<#macro print_data_table_methods table indent=0>
+  <#local url = valuebase.url(table.value("data"))>
+
+/**
+ * 加载【${table.title!""}】分页表格数据的界面函数
+ */
+const load${js.nameType(table.id)}Rows = async (params, pageNumber, pageSize) => {
+  isLoading.value = true
+  try {
+    const res = await sdk.fetch${js.nameType(inflector.pluralize(url.resource))}(params, (pageNumber - 1) * pageSize, pageSize)
+    return res;
+  } catch (error) {
+    fb.error('发生错误', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+</#macro>
+
+<#macro print_data_table_layout table indent=0>
+${""?left_pad(indent)}<${namespace}-datatable
+${""?left_pad(indent)}  ref="${js.nameVariable(table.id)}Ref"
+${""?left_pad(indent)}  style="flex:1"
+${""?left_pad(indent)}  id-key="${js.nameVariable(table.value("object","object"))}Id"
+${""?left_pad(indent)}  :columns="${js.nameVariable(table.id)}Cols"
+${""?left_pad(indent)}  :fetch-data="load${js.nameType(table.id)}Rows"
+${""?left_pad(indent)}  :fetch-params="${js.nameVariable(table.value("object", table.id))}Crit"
+${""?left_pad(indent)}  :row-class-name="getRowClass"
+${""?left_pad(indent)}  @selection-change="handle${js.nameType(table.id)}RowSelection" 
 ${""?left_pad(indent)}  @row-action="handle${js.nameType(table.id)}RowAction" />
 </#macro>
 
@@ -551,6 +644,79 @@ ${""?left_pad(indent)}</div>
 </#macro>
 
 <!----------------------------------------------------------------------------->
+<!--                                MAP VIEW                                 -->
+<!----------------------------------------------------------------------------->
+<#macro print_map_view_variables map indent=0>
+  <#local mapId = js.nameVariable(map.id)>
+
+${""?left_pad(indent)}// ${mapId} 地图相关变量
+${""?left_pad(indent)}const ${mapId}Ref = ref(null)
+${""?left_pad(indent)}const ${mapId}Layer = ref('vector') // 'vector' | 'satellite'
+${""?left_pad(indent)}const ${mapId}ActiveIndex = ref(null)
+${""?left_pad(indent)}const ${mapId}ActiveMarker = ref(null)
+
+${""?left_pad(indent)}// 地图标注点示例数据 (x, y 表示视口百分比或经纬度映射)
+${""?left_pad(indent)}const ${mapId}Markers = ref([
+${""?left_pad(indent)}  { x: 52, y: 38, title: '云栖科技园 A座', valuation: 2800, statusText: '已抵押', statusColor: 'orange', address: '杭州市西湖区云栖小镇1号' },
+${""?left_pad(indent)}  { x: 30, y: 62, title: '海晟综合物流园', valuation: 1200, statusText: '正常', statusColor: 'green', address: '宁波市北仑区进港路88号' },
+${""?left_pad(indent)}  { x: 74, y: 50, title: '启明智能制造基地', valuation: 3600, statusText: '待评估', statusColor: 'blue', address: '嘉兴市南湖区创新产业带' }
+${""?left_pad(indent)}])
+
+${""?left_pad(indent)}function ${mapId}OnPinClick(marker, idx) {
+${""?left_pad(indent)}  ${mapId}ActiveIndex.value = idx
+${""?left_pad(indent)}  ${mapId}ActiveMarker.value = marker
+${""?left_pad(indent)}}
+
+${""?left_pad(indent)}function ${mapId}ResetView() {
+${""?left_pad(indent)}  ${mapId}ActiveIndex.value = null
+${""?left_pad(indent)}  ${mapId}ActiveMarker.value = null
+${""?left_pad(indent)}}
+
+${""?left_pad(indent)}function ${mapId}ZoomIn() {
+${""?left_pad(indent)}  // 处理放大逻辑或联动第三方地图 API
+${""?left_pad(indent)}}
+
+${""?left_pad(indent)}function ${mapId}ZoomOut() {
+${""?left_pad(indent)}  // 处理缩小逻辑或联动第三方地图 API
+${""?left_pad(indent)}}
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                HERO CARD                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_hero_card_variables hero indent=0>
+
+${""?left_pad(indent)}// ${js.nameVariable(hero.id)}英雄卡片相关变量
+${""?left_pad(indent)}const ${js.nameVariable(hero.id)}Data = reactive({
+  <#list hero.children as input>
+    <#if input.id??>
+${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
+    </#if>
+  </#list>
+${""?left_pad(indent)}});
+</#macro>
+
+<#macro print_hero_card_methods hero indent=0>
+  <#local url = valuebase.url(hero.value("data"))>
+  <#local objname = url.resource>
+
+/**
+ * 加载【${hero.title!""}】只读表单数据的界面函数
+ */
+const load${js.nameType(hero.id)}Data = async () => {
+  isLoading.value = true
+  try {
+    const data = await sdk.fetch${js.nameType(objname)}()
+    Object.assign(${js.nameVariable(hero.id)}Data, data)
+  } catch (error) {
+    fb.error('发生错误', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+</#macro>
+
+<!----------------------------------------------------------------------------->
 <!--                                  CHART                                  -->
 <!----------------------------------------------------------------------------->
 <#macro print_chart_variables chart indent=0>
@@ -698,6 +864,8 @@ import { useFieldValidation } from '@/composables/useFieldValidation'
 import ${js.nameType(namespace)}Excelform from '@/components/${namespace}-excelform.vue'
     <#elseif widget.type == "paged_table">
 import ${js.nameType(namespace)}Pagedtable from '@/components/${namespace}-pagedtable.vue'
+    <#elseif widget.type == "data_table">
+import ${js.nameType(namespace)}Datatable from '@/components/${namespace}-datatable.vue'
     <#elseif widget.type == "fixed_table">
 import ${js.nameType(namespace)}Fixedtable from '@/components/${namespace}-fixedtable.vue'
     <#elseif widget.type == "paged_grid">
@@ -757,28 +925,34 @@ import ${js.nameType(namespace + "_" + action.resource)} from '@/pages/${js.name
 
 <#macro print_page_variables page indent=0>
   <#list page.widgets as widget>
-    <#if widget.type == 'tabs'>
+    <#if widget.type == "tabs">
 <@print_tabs_variables tabs=widget indent=indent />
-    <#elseif widget.type == 'entry_form'>
+    <#elseif widget.type == "entry_form">
 <@print_entry_form_variables form=widget indent=indent />
-    <#elseif widget.type == 'official_form'>
+    <#elseif widget.type == "official_form">
 <@print_official_form_variables form=widget indent=indent />
-    <#elseif widget.type == 'excel_form'>
+    <#elseif widget.type == "excel_form">
 <@print_excel_form_variables form=widget indent=indent />
-    <#elseif widget.type == 'criteria_form'>
+    <#elseif widget.type == "criteria_form">
 <@print_criteria_form_variables form=widget indent=indent />
-    <#elseif widget.type == 'display_form'>
+    <#elseif widget.type == "display_form">
 <@print_display_form_variables form=widget indent=indent />
-    <#elseif widget.type == 'paged_table'>
+    <#elseif widget.type == "paged_table">
 <@print_paged_table_variables table=widget indent=indent />
-    <#elseif widget.type == 'fixed_table'>
+    <#elseif widget.type == "data_table">
+<@print_data_table_variables table=widget indent=indent />
+    <#elseif widget.type == "fixed_table">
 <@print_fixed_table_variables table=widget indent=indent />
-    <#elseif widget.type == 'paged_grid'>
+    <#elseif widget.type == "paged_grid">
 <@print_paged_grid_variables grid=widget indent=indent />
-    <#elseif widget.type == 'time_grid'>
+    <#elseif widget.type == "time_grid">
 <@print_time_grid_variables grid=widget indent=indent />
-    <#elseif widget.type == 'list_view'>
+    <#elseif widget.type == "list_view">
 <@print_list_view_variables list=widget indent=indent />
+    <#elseif widget.type == "map_view">
+<@print_map_view_variables map=widget indent=indent />
+    <#elseif widget.type == "hero_card">
+<@print_hero_card_variables hero=widget indent=indent />
     <#elseif widget.type == "chart">
 <@print_chart_variables chart=widget indent=indent />
     <#elseif widget.type == "button">
@@ -797,27 +971,33 @@ ${""?left_pad(indent)}const ${js.nameVariable(action.resource)}Open = ref(false)
 
 <#macro print_page_methods page indent=0>
   <#list page.widgets as widget>
-    <#if widget.type == 'tabs'>
+    <#if widget.type == "tabs">
 <@print_tabs_methods tabs=widget indent=indent />
-    <#elseif widget.type == 'entry_form'>
+    <#elseif widget.type == "entry_form">
 <@print_entry_form_methods form=widget indent=indent />
-    <#elseif widget.type == 'display_form'>
+    <#elseif widget.type == "display_form">
 <@print_display_form_methods form=widget indent=indent />
-    <#elseif widget.type == 'excel_form'>
+    <#elseif widget.type == "excel_form">
 <@print_excel_form_methods form=widget indent=indent />
-    <#elseif widget.type == 'paged_table'>
+    <#elseif widget.type == "paged_table">
 <@print_paged_table_methods table=widget indent=indent />
-    <#elseif widget.type == 'fixed_table'>
+    <#elseif widget.type == "data_table">
+<@print_data_table_methods table=widget indent=indent />
+    <#elseif widget.type == "fixed_table">
 <@print_fixed_table_methods table=widget indent=indent />
-    <#elseif widget.type == 'paged_grid'>
+    <#elseif widget.type == "paged_grid">
 <@print_paged_grid_methods grid=widget indent=indent />
-    <#elseif widget.type == 'time_grid'>
+    <#elseif widget.type == "time_grid">
 <@print_time_grid_methods grid=widget indent=indent />
-    <#elseif widget.type == 'list_view'>
+    <#elseif widget.type == "list_view">
 <@print_list_view_methods list=widget indent=indent />
+    <#elseif widget.type == "map_view">
+<#-- TODO -->
+    <#elseif widget.type == "hero_card">
+<@print_hero_card_methods hero=widget indent=indent />
     <#elseif widget.type == "chart">
 <@print_chart_methods chart=widget indent=indent />
-    <#elseif widget.type == 'button'>
+    <#elseif widget.type == "button">
 <@print_button_methods button=widget indent=indent />
     </#if>
   </#list>
@@ -905,6 +1085,8 @@ ${""?left_pad(indent)}</${namespace}-dialog>
 <@print_excel_form_layout form=widget indent=indent />      
   <#elseif widget.type == "paged_table">
 <@print_paged_table_layout table=widget indent=indent />
+  <#elseif widget.type == "data_table">
+<@print_data_table_layout table=widget indent=indent />
   <#elseif widget.type == "fixed_table">
 <@print_fixed_table_layout table=widget indent=indent />
   <#elseif widget.type == "criteria_form">
@@ -915,6 +1097,10 @@ ${""?left_pad(indent)}</${namespace}-dialog>
 <@print_paged_grid_layout grid=widget indent=indent />
   <#elseif widget.type == "list_view">
 <@print_list_view_layout list=widget indent=indent />
+  <#elseif widget.type == "map_view">
+<@print_map_view_layout map=widget indent=indent />
+  <#elseif widget.type == "hero_card">
+<@print_hero_card_layout hero=widget indent=indent />
   <#elseif widget.type == "chart">
 <@print_chart_layout chart=widget indent=indent />
   <#elseif widget.type == "buttons">

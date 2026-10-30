@@ -47,7 +47,22 @@
               :class="tdClasses(col)"
               :style="colStyle(col)"
             >
+              <!-- 1. 自定义 render 渲染 -->
               <span v-if="col.render" v-html="col.render(getCellValue(row, col), row) ?? ''"></span>
+
+              <!-- 2. Tag 数组拆分显示 -->
+              <div v-else-if="isTagCell(row, col)" class="${namespace}-ft__tags">
+                <span
+                  v-for="(tag, tIdx) in getTags(row, col)"
+                  :key="tIdx"
+                  class="${namespace}-ft__tag"
+                  :style="getTagStyle(tag, col, tIdx)"
+                >
+                  {{ getTagLabel(tag) }}
+                </span>
+              </div>
+
+              <!-- 3. 普通文本 -->
               <template v-else>{{ getCellValue(row, col) }}</template>
             </td>
           </tr>
@@ -131,6 +146,76 @@ function getCellValue(row, col) {
   return val === undefined ? '' : val
 }
 
+// ── Tag 标签展示与配色 ──
+const TAG_PALETTE = [
+  { bg: '#e6f4ff', color: '#0958d9', border: '#91caff' }, // 蓝
+  { bg: '#f6ffed', color: '#389e0d', border: '#b7eb8f' }, // 绿
+  { bg: '#fff7e6', color: '#d46b08', border: '#ffd591' }, // 橙
+  { bg: '#f9f0ff', color: '#531dab', border: '#d3adf7' }, // 紫
+  { bg: '#e6fffb', color: '#08979c', border: '#87e8de' }, // 青
+  { bg: '#fff1f0', color: '#cf1322', border: '#ffa39e' }, // 红
+  { bg: '#feffe6', color: '#ad8b00', border: '#fffb8f' }, // 黄
+]
+
+function isTagCell(row, col) {
+  if (col.type === 'tag' || col.tag) return true
+  return Array.isArray(row[col.key])
+}
+
+function getTags(row, col) {
+  const val = row[col.key]
+  if (Array.isArray(val)) return val
+  if (typeof val === 'string' && val.trim()) {
+    return val.split(/[,，、|]/).map(s => s.trim()).filter(Boolean)
+  }
+  return []
+}
+
+function getTagLabel(tag) {
+  if (tag === null || tag === undefined) return ''
+  if (typeof tag === 'object') {
+    return tag.label ?? tag.text ?? tag.name ?? tag.title ?? tag.value ?? ''
+  }
+  return String(tag)
+}
+
+function getTagStyle(tag, col, index) {
+  const label = getTagLabel(tag)
+  // 1. 如果 tag 对象自身指定了 color
+  if (typeof tag === 'object' && tag !== null) {
+    if (tag.bg && tag.color) {
+      return { backgroundColor: tag.bg, color: tag.color, borderColor: tag.border || tag.bg }
+    }
+    if (tag.color && tag.color.startsWith('#')) {
+      return { backgroundColor: tag.color + '18', color: tag.color, borderColor: tag.color + '40' }
+    }
+  }
+  // 2. 如果列配置提供了 tagColor 函数
+  if (typeof col.tagColor === 'function') {
+    const res = col.tagColor(label, tag, index)
+    if (typeof res === 'object') return res
+    if (typeof res === 'string') return { backgroundColor: res + '18', color: res, borderColor: res + '40' }
+  }
+  // 3. 如果列配置提供了 tagColors 字典映射
+  if (col.tagColors && col.tagColors[label]) {
+    const res = col.tagColors[label]
+    if (typeof res === 'object') return res
+    return { backgroundColor: res + '18', color: res, borderColor: res + '40' }
+  }
+  // 4. 默认根据文字 Hash 分配固定配色（同名 Tag 保持颜色一致）
+  let hash = 0
+  for (let i = 0; i < label.length; i++) {
+    hash = (hash << 5) - hash + label.charCodeAt(i)
+    hash |= 0
+  }
+  const item = TAG_PALETTE[Math.abs(hash) % TAG_PALETTE.length]
+  return {
+    backgroundColor: item.bg,
+    color: item.color,
+    borderColor: item.border
+  }
+}
+
 /**
  * 加载远端数据
  * 调用 props.fetchData(fetchParams, pageNumber, pageSize)
@@ -193,16 +278,13 @@ onMounted(() => {
 
 // ── 行点击与操作按钮事件委托 ──
 function onRowClick(e, row, rowIndex) {
-  // 操作按钮点击 → 事件委托：v-html 中的 @click="handlerName" 作为 DOM 属性存在
   const btn = e.target.closest('button, a')
   if (btn) {
     const actionName = btn.getAttribute('@click')
     if (actionName) {
-      // 优先走 rowAction prop（直接调用）
       if (props.rowAction && typeof props.rowAction[actionName] === 'function') {
         props.rowAction[actionName](row, rowIndex)
       }
-      // 同时 emit row-action 事件，支持 @row-action 监听
       emit('row-action', { handler: actionName, row, index: rowIndex })
       return
     }
@@ -422,6 +504,27 @@ defineExpose({
 }
 .${namespace}-ft__td:last-child {
   border-right: none;
+}
+
+/* ── tags 标签展示 ── */
+.${namespace}-ft__tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  vertical-align: middle;
+  max-width: 100%;
+}
+.${namespace}-ft__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  font-size: 11px;
+  line-height: 18px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  box-sizing: border-box;
+  user-select: none;
 }
 
 /* ── stripe & hover ── */
