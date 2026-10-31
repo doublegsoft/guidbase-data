@@ -209,7 +209,6 @@ function toggle() {
 }
 
 function openPanel() {
-  // close other datepickers
   document.querySelectorAll('.${namespace}-dp--open').forEach(el => {
     if (el !== rootEl.value && el._bnrDpClose) el._bnrDpClose()
   })
@@ -221,25 +220,36 @@ function closePanel() {
   open.value = false
 }
 
+// ── 精准定位逻辑：空间不足向上弹出 ──
 function positionPanel() {
   if (!rootEl.value || !panelEl.value) return
-  const rect = rootEl.value.querySelector('.${namespace}-dp__trigger').getBoundingClientRect()
-  const pw = panelEl.value.offsetWidth || 260
-  const ph = panelEl.value.offsetHeight || 280
-  const spaceRight = window.innerWidth - rect.left
-  const spaceBelow = window.innerHeight - rect.bottom
+  const triggerEl = rootEl.value.querySelector('.${namespace}-dp__trigger')
+  if (!triggerEl) return
 
+  const rect = triggerEl.getBoundingClientRect()
+  // 确保能获取到真实高度，兜底 270px
+  const ph = (panelEl.value.offsetHeight && panelEl.value.offsetHeight > 50) ? panelEl.value.offsetHeight : 270
+  const pw = (panelEl.value.offsetWidth && panelEl.value.offsetWidth > 50) ? panelEl.value.offsetWidth : 224
+
+  const spaceBelow = window.innerHeight - rect.bottom
   const style = { position: 'fixed', zIndex: '99999' }
-  if (spaceBelow >= ph || spaceBelow >= 120) {
+
+  // 只要下方空间放不下整块面板，立即向上弹出
+  if (spaceBelow >= ph + 4) {
+    // 向下弹出
     style.top = (rect.bottom + 2) + 'px'
   } else {
-    style.bottom = (window.innerHeight - rect.top + 2) + 'px'
+    // 向上弹出：紧贴在输入框上方 2px 处
+    style.top = Math.max(8, rect.top - ph - 2) + 'px'
   }
-  if (spaceRight >= pw) {
+
+  // 水平定位：防右侧溢出
+  if (rect.left + pw <= window.innerWidth - 8) {
     style.left = rect.left + 'px'
   } else {
-    style.right = (window.innerWidth - rect.right) + 'px'
+    style.left = Math.max(8, rect.right - pw) + 'px'
   }
+
   panelStyle.value = style
 }
 
@@ -330,6 +340,7 @@ onBeforeUnmount(() => {
 
 defineExpose({ openPanel, closePanel, clear })
 </script>
+
 <style scoped>
 /* BNR Datepicker — ${namespace}-datepicker.css */
 /* Namespace: ${namespace}-dp */
@@ -385,13 +396,11 @@ defineExpose({ openPanel, closePanel, clear })
 
 .${namespace}-dp__panel {
   display: none;
-  position: absolute;
-  top: calc(100% + 2px);
-  left: 0;
+  position: fixed;
   background: var(--${namespace}-bg);
   border: 1px solid var(--${namespace}-primary-border, #d0d8e8);
   box-shadow: 0 4px 12px rgba(0,0,0,.12);
-  z-index: 9999;
+  z-index: 99999;
   width: 224px;
 }
 .${namespace}-dp--open .${namespace}-dp__panel { display: block; }

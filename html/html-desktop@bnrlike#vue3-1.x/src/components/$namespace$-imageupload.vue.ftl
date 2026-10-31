@@ -1,100 +1,100 @@
 <template>
   <div
-    class="ef-iu"
-    :class="{ 'ef-iu--disabled': disabled }"
+    class="${namespace}-iu"
+    :class="{ '${namespace}-iu--disabled': disabled }"
     @dragover.prevent="onDragOver"
     @dragleave.prevent="onDragLeave"
     @drop.prevent="onDrop"
   >
-    <label v-if="label" class="ef-field-label">{{ label }}</label>
+    <label v-if="label" class="${namespace}-field-label">{{ label }}</label>
 
     <!-- ── 缩略图网格 ──────────────────────────── -->
-    <div class="ef-iu__grid">
+    <div class="${namespace}-iu__grid">
       <div
         v-for="(item, idx) in items" :key="item.id"
-        class="ef-iu__cell"
+        class="${namespace}-iu__cell"
         :class="{
-          'ef-iu__cell--uploading': item.uploading,
-          'ef-iu__cell--error': item.error,
+          '${namespace}-iu__cell--uploading': item.uploading,
+          '${namespace}-iu__cell--error': item.error,
         }"
       >
         <!-- 缩略图 -->
         <img
           v-if="item.previewUrl"
           :src="item.previewUrl"
-          class="ef-iu__thumb"
+          class="${namespace}-iu__thumb"
           alt=""
           @click="previewItem(idx)"
         />
-        <div v-else class="ef-iu__thumb ef-iu__thumb--empty">🖼</div>
+        <div v-else class="${namespace}-iu__thumb ${namespace}-iu__thumb--empty">🖼</div>
 
         <!-- 悬停操作栏 -->
-        <div v-if="!disabled && !item.uploading" class="ef-iu__actions">
-          <span class="ef-iu__actions-preview" @click="previewItem(idx)" title="预览">🔍</span>
-          <span class="ef-iu__actions-del" @click="removeItem(idx)" title="删除">✕</span>
+        <div v-if="!disabled && !item.uploading" class="${namespace}-iu__actions">
+          <span class="${namespace}-iu__actions-preview" @click="previewItem(idx)" title="预览">🔍</span>
+          <span class="${namespace}-iu__actions-del" @click="removeItem(idx)" title="删除">✕</span>
         </div>
 
         <!-- 上传进度条 -->
-        <div v-if="item.uploading" class="ef-iu__progress-bar">
-          <div class="ef-iu__progress-fill" :style="{ width: item.progress + '%' }"></div>
+        <div v-if="item.uploading" class="${namespace}-iu__progress-bar">
+          <div class="${namespace}-iu__progress-fill" :style="{ width: item.progress + '%' }"></div>
         </div>
 
         <!-- 完成闪烁 -->
-        <div v-if="item.justDone" class="ef-iu__done-flash"></div>
+        <div v-if="item.justDone" class="${namespace}-iu__done-flash"></div>
 
         <!-- 错误标记 -->
-        <span v-if="item.error" class="ef-iu__error-mark" title="上传失败">!</span>
+        <span v-if="item.error" class="${namespace}-iu__error-mark" title="上传失败">!</span>
       </div>
 
       <!-- 添加按钮 -->
       <div
         v-if="items.length < maxCount && !disabled"
-        class="ef-iu__cell ef-iu__cell--add"
-        :class="{ 'ef-iu__cell--dragover': dragging }"
+        class="${namespace}-iu__cell ${namespace}-iu__cell--add"
+        :class="{ '${namespace}-iu__cell--dragover': dragging }"
         @click="triggerInput"
       >
-        <span class="ef-iu__add-icon">+</span>
-        <span class="ef-iu__add-text">{{ items.length === 0 ? placeholder : (items.length + '/' + maxCount) }}</span>
+        <span class="${namespace}-iu__add-icon">+</span>
+        <span class="${namespace}-iu__add-text">{{ items.length === 0 ? placeholder : (items.length + '/' + maxCount) }}</span>
       </div>
     </div>
 
-    <div v-if="hint" class="ef-iu__hint">{{ hint }}</div>
+    <div v-if="hint" class="${namespace}-iu__hint">{{ hint }}</div>
 
-    <input ref="inputRef" type="file" class="ef-iu__input" :accept="accept"
+    <input ref="inputRef" type="file" class="${namespace}-iu__input" :accept="accept"
            :multiple="maxCount > 1" @change="onFileChange" />
 
-    <!-- ── 预览灯箱 (匹配 ef-dialog 风格) ──────────── -->
+    <!-- ── 预览灯箱 (匹配 ${namespace}-dialog 风格) ──────────── -->
     <Teleport to="body">
-      <Transition name="ef-iu-lb">
-        <div v-if="previewVisible" class="ef-iu__lightbox" @click="closePreview">
+      <Transition name="${namespace}-iu-lb">
+        <div v-if="previewVisible" class="${namespace}-iu__lightbox" @click="closePreview">
           <!-- 遮罩 -->
-          <div class="ef-iu__lightbox-mask"></div>
+          <div class="${namespace}-iu__lightbox-mask"></div>
           <!-- 内容 -->
-          <div class="ef-iu__lightbox-body" @click.stop>
-            <div class="ef-iu__lightbox-head">
-              <span class="ef-iu__lightbox-title">图片预览</span>
-              <button class="ef-iu__lightbox-close" @click="closePreview">✕</button>
+          <div class="${namespace}-iu__lightbox-body" @click.stop>
+            <div class="${namespace}-iu__lightbox-head">
+              <span class="${namespace}-iu__lightbox-title">图片预览</span>
+              <button class="${namespace}-iu__lightbox-close" @click="closePreview">✕</button>
             </div>
-            <div class="ef-iu__lightbox-main">
+            <div class="${namespace}-iu__lightbox-main">
               <button
                 v-if="items.length > 1"
-                class="ef-iu__lightbox-nav ef-iu__lightbox-nav--prev"
+                class="${namespace}-iu__lightbox-nav ${namespace}-iu__lightbox-nav--prev"
                 :disabled="previewIndex <= 0"
                 @click="previewPrev"
               >‹</button>
               <img
                 :src="items[previewIndex]?.previewUrl"
-                class="ef-iu__lightbox-img"
+                class="${namespace}-iu__lightbox-img"
                 alt="预览"
               />
               <button
                 v-if="items.length > 1"
-                class="ef-iu__lightbox-nav ef-iu__lightbox-nav--next"
+                class="${namespace}-iu__lightbox-nav ${namespace}-iu__lightbox-nav--next"
                 :disabled="previewIndex >= items.length - 1"
                 @click="previewNext"
               >›</button>
             </div>
-            <div class="ef-iu__lightbox-foot">
+            <div class="${namespace}-iu__lightbox-foot">
               <span v-if="items.length > 1">{{ previewIndex + 1 }} / {{ items.length }}</span>
             </div>
           </div>
@@ -108,7 +108,7 @@
 import { ref, watch } from 'vue'
 
 let nextId = 1
-function genId() { return ${r"`img_${Date.now()}_${nextId++}`"} }
+function genId() { return 'img_' + Date.now() + '_' + (nextId++) }
 
 const props = defineProps({
   modelValue:  { type: Array, default: () => [] },
@@ -177,10 +177,10 @@ function onFileChange(e) {
 
 async function addFiles(files) {
   const remaining = props.maxCount - items.value.length
-  if (remaining <= 0) { emit('error', ${r"`最多上传 ${props.maxCount} 张图片`"}); return }
+  if (remaining <= 0) { emit('error', '最多上传 ' + props.maxCount + ' 张图片'); return }
   for (const file of files.slice(0, remaining)) {
-    if (!file.type.startsWith('image/')) { emit('error', ${r"`${file.name} 不是图片文件`"}); continue }
-    if (file.size > props.maxSizeMB * 1024 * 1024) { emit('error', ${r"`${file.name} 超过 ${props.maxSizeMB}MB 限制`"}); continue }
+    if (!file.type.startsWith('image/')) { emit('error', file.name + ' 不是图片文件'); continue }
+    if (file.size > props.maxSizeMB * 1024 * 1024) { emit('error', file.name + ' 超过 ' + props.maxSizeMB + 'MB 限制'); continue }
     const item = { id: genId(), previewUrl: '', url: '', uploading: true, progress: 0, error: false, file }
     items.value.push(item)
     const idx = items.value.length - 1
@@ -247,71 +247,81 @@ if (typeof window !== 'undefined') window.addEventListener('keydown', onKeydown)
    IMAGE UPLOAD — BNR Enterprise Style
    ══════════════════════════════════════════════ */
 
-.ef-iu { display: flex; flex-direction: column; gap: var(--ef-sp-xs); }
-.ef-iu--disabled { opacity: 0.45; pointer-events: none; }
+.${namespace}-iu { display: flex; flex-direction: column; gap: var(--${namespace}-sp-xs); }
+.${namespace}-iu--disabled { opacity: 0.45; pointer-events: none; }
 
-/* ── 缩略图网格 ─────────────────────────────── */
-.ef-iu__grid {
+/* ── Label 顶部对齐与留白 ────────────────────── */
+.${namespace}-field-label {
+  align-self: flex-start;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  line-height: 1.2;
+}
+
+/* ── 缩略图网格（保持 4 列横排，限宽控制大小） ── */
+.${namespace}-iu__grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 4px;
+  max-width: 280px; /* 控制整体宽度，保证 4 格横向排列且每格尺寸更小 */
+  width: 100%;
 }
 
-.ef-iu__cell {
+.${namespace}-iu__cell {
   position: relative;
   aspect-ratio: 1 / 1;
-  border: 1px solid var(--ef-border);
-  background: var(--ef-bg-page);
+  border: 1px solid var(--${namespace}-border);
+  background: var(--${namespace}-bg-page);
   overflow: hidden;
   transition: border-color 0.15s;
 }
-.ef-iu__cell:hover { border-color: var(--ef-primary); }
-.ef-iu__cell--error { border-color: var(--ef-danger) !important; }
+.${namespace}-iu__cell:hover { border-color: var(--${namespace}-primary); }
+.${namespace}-iu__cell--error { border-color: var(--${namespace}-danger) !important; }
 
-.ef-iu__thumb {
+.${namespace}-iu__thumb {
   width: 100%; height: 100%;
   object-fit: cover;
   display: block;
   cursor: pointer;
 }
-.ef-iu__thumb--empty {
+.${namespace}-iu__thumb--empty {
   display: flex; align-items: center; justify-content: center;
-  font-size: 24px; opacity: 0.2; cursor: default;
+  font-size: 20px; opacity: 0.2; cursor: default;
 }
 
 /* ── 悬停操作栏 ──────────────────────────────── */
-.ef-iu__actions {
+.${namespace}-iu__actions {
   position: absolute; top: 0; right: 0;
   display: flex;
   opacity: 0; transition: opacity 0.15s;
 }
-.ef-iu__cell:hover .ef-iu__actions { opacity: 1; }
+.${namespace}-iu__cell:hover .${namespace}-iu__actions { opacity: 1; }
 
-.ef-iu__actions-preview,
-.ef-iu__actions-del {
-  width: 22px; height: 20px;
+.${namespace}-iu__actions-preview,
+.${namespace}-iu__actions-del {
+  width: 20px; height: 18px;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 11px;
-  background: rgba(28,40,51,0.55); color: #fff;
+  cursor: pointer; font-size: 10px;
+  background: rgba(28,40,51,0.6); color: #fff;
   transition: background 0.12s;
 }
-.ef-iu__actions-preview:hover { background: var(--ef-primary); }
-.ef-iu__actions-del:hover { background: var(--ef-danger); }
+.${namespace}-iu__actions-preview:hover { background: var(--${namespace}-primary); }
+.${namespace}-iu__actions-del:hover { background: var(--${namespace}-danger); }
 
 /* ── 进度条 ─────────────────────────────────── */
-.ef-iu__progress-bar {
+.${namespace}-iu__progress-bar {
   position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
-  background: var(--ef-border-light);
+  background: var(--${namespace}-border-light);
 }
-.ef-iu__progress-fill {
-  height: 100%; background: var(--ef-primary);
+.${namespace}-iu__progress-fill {
+  height: 100%; background: var(--${namespace}-primary);
   transition: width 0.1s linear;
 }
 
 /* ── 完成闪烁 ───────────────────────────────── */
-.ef-iu__done-flash {
+.${namespace}-iu__done-flash {
   position: absolute; inset: 0;
-  border: 2px solid var(--ef-success);
+  border: 2px solid var(--${namespace}-success);
   animation: iu-flash 0.35s ease-out forwards;
   pointer-events: none;
 }
@@ -321,122 +331,123 @@ if (typeof window !== 'undefined') window.addEventListener('keydown', onKeydown)
 }
 
 /* ── 错误标记 ───────────────────────────────── */
-.ef-iu__error-mark {
-  position: absolute; top: 1px; left: 3px;
-  width: 16px; height: 16px; line-height: 16px; text-align: center;
-  background: var(--ef-danger); color: #fff;
-  font-size: 10px; font-weight: bold;
+.${namespace}-iu__error-mark {
+  position: absolute; top: 1px; left: 2px;
+  width: 14px; height: 14px; line-height: 14px; text-align: center;
+  background: var(--${namespace}-danger); color: #fff;
+  font-size: 9px; font-weight: bold;
 }
 
 /* ── 添加格 ─────────────────────────────────── */
-.ef-iu__cell--add {
-  border: 1px dashed var(--ef-border);
+.${namespace}-iu__cell--add {
+  border: 1px dashed var(--${namespace}-border);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 2px; cursor: pointer;
+  gap: 1px; cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
 }
-.ef-iu__cell--add:hover,
-.ef-iu__cell--dragover {
-  border-color: var(--ef-primary);
-  background: var(--ef-primary-bg);
+.${namespace}-iu__cell--add:hover,
+.${namespace}-iu__cell--dragover {
+  border-color: var(--${namespace}-primary);
+  background: var(--${namespace}-primary-bg);
 }
-.ef-iu__add-icon {
-  font-size: 22px; color: var(--ef-text-light); font-weight: 300; line-height: 1;
+.${namespace}-iu__add-icon {
+  font-size: 18px; color: var(--${namespace}-text-light); font-weight: 300; line-height: 1;
 }
-.ef-iu__cell--add:hover .ef-iu__add-icon,
-.ef-iu__cell--dragover .ef-iu__add-icon { color: var(--ef-primary); }
-.ef-iu__add-text {
-  font-size: 10px; color: var(--ef-text-light);
+.${namespace}-iu__cell--add:hover .${namespace}-iu__add-icon,
+.${namespace}-iu__cell--dragover .${namespace}-iu__add-icon { color: var(--${namespace}-primary); }
+.${namespace}-iu__add-text {
+  font-size: 9px; color: var(--${namespace}-text-light);
+  transform: scale(0.9);
 }
 
-.ef-iu__hint { font-size: 10px; color: var(--ef-text-light); }
-.ef-iu__input { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
+.${namespace}-iu__hint { font-size: 10px; color: var(--${namespace}-text-light); }
+.${namespace}-iu__input { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
 
 /* ══════════════════════════════════════════════
-   预览灯箱 — 匹配 ef-dialog 风格
+   预览灯箱 — 匹配 ${namespace}-dialog 风格
    ══════════════════════════════════════════════ */
-.ef-iu__lightbox {
+.${namespace}-iu__lightbox {
   position: fixed; inset: 0; z-index: 1100;
   display: flex; align-items: center; justify-content: center;
 }
-.ef-iu__lightbox-mask {
+.${namespace}-iu__lightbox-mask {
   position: absolute; inset: 0;
   background: rgba(0,0,0,0.5);
 }
-.ef-iu__lightbox-body {
+.${namespace}-iu__lightbox-body {
   position: relative;
-  width: 90vw; max-width: 960px;
-  max-height: 90vh;
-  background: var(--ef-bg);
-  border-radius: var(--ef-radius-md);
+  width: 80vw; max-width: 580px;
+  max-height: 80vh;
+  background: var(--${namespace}-bg);
+  border-radius: var(--${namespace}-radius-md);
   box-shadow: 0 8px 32px rgba(0,0,0,0.25);
   display: flex; flex-direction: column;
   z-index: 1;
 }
 
-/* 灯箱头部 — 匹配 ef-dialog-header */
-.ef-iu__lightbox-head {
+/* 灯箱头部 — 匹配 ${namespace}-dialog-header */
+.${namespace}-iu__lightbox-head {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px; flex-shrink: 0;
-  border-bottom: 2px solid var(--ef-primary);
+  padding: 8px 12px; flex-shrink: 0;
+  border-bottom: 2px solid var(--${namespace}-primary);
 }
-.ef-iu__lightbox-title {
-  font-size: 14px; font-weight: bold; color: var(--ef-primary);
+.${namespace}-iu__lightbox-title {
+  font-size: 13px; font-weight: bold; color: var(--${namespace}-primary);
 }
-.ef-iu__lightbox-close {
-  width: 26px; height: 26px; border: none; background: none;
-  cursor: pointer; font-size: 14px; color: var(--ef-text-light);
+.${namespace}-iu__lightbox-close {
+  width: 24px; height: 24px; border: none; background: none;
+  cursor: pointer; font-size: 13px; color: var(--${namespace}-text-light);
   display: flex; align-items: center; justify-content: center;
-  border-radius: var(--ef-radius-sm); transition: color 0.12s, background 0.12s;
+  border-radius: var(--${namespace}-radius-sm); transition: color 0.12s, background 0.12s;
 }
-.ef-iu__lightbox-close:hover { color: var(--ef-text); background: var(--ef-bg-page); }
+.${namespace}-iu__lightbox-close:hover { color: var(--${namespace}-text); background: var(--${namespace}-bg-page); }
 
 /* 灯箱主体 */
-.ef-iu__lightbox-main {
+.${namespace}-iu__lightbox-main {
   flex: 1; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
-  padding: 10px; position: relative;
-  min-height: 200px;
-  background: var(--ef-bg-page);
+  padding: 12px; position: relative;
+  min-height: 180px;
+  background: var(--${namespace}-bg-page);
 }
-.ef-iu__lightbox-img {
-  max-width: 100%; max-height: 65vh;
+.${namespace}-iu__lightbox-img {
+  max-width: 100%; max-height: 50vh;
   object-fit: contain;
   user-select: none;
 }
 
 /* 导航按钮 */
-.ef-iu__lightbox-nav {
+.${namespace}-iu__lightbox-nav {
   position: absolute; top: 50%; transform: translateY(-50%);
-  width: 32px; height: 48px;
-  border: 1px solid var(--ef-border); background: var(--ef-bg);
-  color: var(--ef-text); font-size: 22px; cursor: pointer;
+  width: 28px; height: 42px;
+  border: 1px solid var(--${namespace}-border); background: var(--${namespace}-bg);
+  color: var(--${namespace}-text); font-size: 20px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.12s, color 0.12s;
-  font-family: var(--ef-font);
+  font-family: var(--${namespace}-font);
 }
-.ef-iu__lightbox-nav:hover:not(:disabled) {
-  background: var(--ef-primary-bg); color: var(--ef-primary);
+.${namespace}-iu__lightbox-nav:hover:not(:disabled) {
+  background: var(--${namespace}-primary-bg); color: var(--${namespace}-primary);
 }
-.ef-iu__lightbox-nav:disabled { opacity: 0.25; cursor: not-allowed; }
-.ef-iu__lightbox-nav--prev { left: 8px; }
-.ef-iu__lightbox-nav--next { right: 8px; }
+.${namespace}-iu__lightbox-nav:disabled { opacity: 0.25; cursor: not-allowed; }
+.${namespace}-iu__lightbox-nav--prev { left: 8px; }
+.${namespace}-iu__lightbox-nav--next { right: 8px; }
 
 /* 灯箱底部 */
-.ef-iu__lightbox-foot {
-  padding: 6px 14px; border-top: 1px solid var(--ef-border-light);
-  text-align: center; font-size: 11px; color: var(--ef-text-muted);
+.${namespace}-iu__lightbox-foot {
+  padding: 5px 12px; border-top: 1px solid var(--${namespace}-border-light);
+  text-align: center; font-size: 11px; color: var(--${namespace}-text-muted);
 }
 
 /* 灯箱过渡 */
-.ef-iu-lb-enter-active,
-.ef-iu-lb-leave-active { transition: opacity 0.2s ease; }
-.ef-iu-lb-enter-from,
-.ef-iu-lb-leave-to { opacity: 0; }
-.ef-iu-lb-enter-active .ef-iu__lightbox-body {
+.${namespace}-iu-lb-enter-active,
+.${namespace}-iu-lb-leave-active { transition: opacity 0.2s ease; }
+.${namespace}-iu-lb-enter-from,
+.${namespace}-iu-lb-leave-to { opacity: 0; }
+.${namespace}-iu-lb-enter-active .${namespace}-iu__lightbox-body {
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
-.ef-iu-lb-enter-from .ef-iu__lightbox-body {
+.${namespace}-iu-lb-enter-from .${namespace}-iu__lightbox-body {
   transform: scale(0.95); opacity: 0;
 }
 </style>

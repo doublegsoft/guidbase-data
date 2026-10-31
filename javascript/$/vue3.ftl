@@ -41,15 +41,15 @@ ${""?left_pad(indent)}// 表单数据载体
 ${""?left_pad(indent)}const ${js.nameVariable(form.id)}Data = reactive({
   <#list form.inputs as input>
 ${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
+    <#if input.type == "cascade">
+${""?left_pad(indent)}  ${js.nameVariable(input.id)}OptionLabels: [],
+    </#if>
   </#list>
 ${""?left_pad(indent)}});
   <#list form.inputs as input>
     <#if pageVars[input.id]??><#continue></#if>
-    <#if (input.type == "select" || input.type == "multiselect") && !(input.value("data")!"")?starts_with("enum[")>
+    <#if input.type == "select" || input.type == "multiselect">
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
-      <#global pageVars += {input.id:input.id}>
-    <#elseif input.type == "select">
-${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
       <#global pageVars += {input.id:input.id}>
     </#if>
   </#list>
@@ -109,6 +109,7 @@ const { loading: is${js.nameType(form.id)}Submitting, run: handle${js.nameType(f
 <!--                              OFFICIAL FORM                              -->
 <!----------------------------------------------------------------------------->
 <#macro print_official_form_variables form indent=0>
+${""?left_pad(indent)}
 ${""?left_pad(indent)}// ${js.nameVariable(form.id)}表单校验规则
 const ${js.nameVariable(form.id)}Rules = [
   <#list form.inputs as input>  
@@ -125,7 +126,7 @@ ${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitiv
 ${""?left_pad(indent)}});
   <#list form.inputs as input>
     <#if pageVars[input.id]??><#continue></#if>
-    <#if (input.type == "select" || input.type == "multiselect") && !(input.value("data")!"")?starts_with("enum[")>
+    <#if input.type == "select" || input.type == "multiselect">
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
       <#global pageVars += {input.id:input.id}>
     <#elseif input.type == "select">
@@ -137,11 +138,58 @@ const ${js.nameVariable(form.id)}ErrorShow = ref(false)
 const ${js.nameVariable(form.id)}ErrorMessage = ref('')
 </#macro>
 
+<#macro print_official_form_methods form indent=0>
+  <#local url = valuebase.url(form.value("data"))>
+  <#local objname = url.resource>
+/**
+ * 加载【${form.title!""}】编辑表单数据的界面函数
+ */
+const load${js.nameType(form.id)}Data = async (params) => {
+  isLoading.value = true
+  try {
+    const data = await sdk.fetch${js.nameType(objname)}(params)
+    Object.assign(${js.nameVariable(form.id)}Data, data)
+  } catch (error) {
+    fb.error('发生错误', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+/**
+ * 保存【${form.title!""}】编辑表单数据
+ */
+const save${js.nameType(form.id)}Data = async () => {
+  if (!validate${js.nameType(form.id)}(${js.nameVariable(form.id)}Data)) {
+    const msgs = Object.entries(${js.nameVariable(form.id)}Errors)
+      .filter(([, msg]) => msg)
+      .map(([, msg]) => `· ${r"${msg}"}`)
+    ${js.nameVariable(form.id)}ErrorMessage.value = msgs.join('\n')
+    ${js.nameVariable(form.id)}ErrorShow.value = true
+    return
+  }
+  is${js.nameType(form.id)}Submitting.value = true
+  try {
+    const result = await sdk.save${js.nameType(form.value("object",form.id))}(${js.nameVariable(form.id)}Data)
+    if (result.success) {
+      fb.success('成功', '保存成功');
+    }
+  } catch (error) {
+    fb.error('发生错误', error)
+  } finally {
+    is${js.nameType(form.id)}Submitting.value = false
+  }
+}
+
+// 防止保存【${form.title!""}】编辑表单手抖的变量和函数
+const { loading: is${js.nameType(form.id)}Submitting, run: handle${js.nameType(form.id)}Save } = useAsyncLock(save${js.nameType(form.id)}Data)
+</#macro>
+
 <!----------------------------------------------------------------------------->
 <!--                              CRITERIA FORM                              -->
 <!----------------------------------------------------------------------------->
 <#macro print_criteria_form_variables form indent=0>
-
+${""?left_pad(indent)}
 ${""?left_pad(indent)}// 【${form.title!form.id}】查询表单相关变量
 ${""?left_pad(indent)}const ${js.nameVariable(form.id)}Crit = reactive({
   <#list form.inputs as input>
@@ -168,8 +216,18 @@ ${""?left_pad(indent)}// ${js.nameVariable(form.id)}只读表单相关变量
 ${""?left_pad(indent)}const ${js.nameVariable(form.id)}Data = reactive({
   <#list form.inputs as input>
 ${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
+    <#if input.type == "cascade">
+${""?left_pad(indent)}  ${js.nameVariable(input.id)}OptionLabels: [],
+    </#if>
   </#list>
 ${""?left_pad(indent)}});
+  <#list form.inputs as input>
+    <#if pageVars[input.id]??><#continue></#if>
+    <#if input.type == "select" || input.type == "multiselect">
+${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
+      <#global pageVars += {input.id:input.id}>
+    </#if>
+  </#list>
 </#macro>
 
 <#macro print_display_form_methods form indent=0>
@@ -975,6 +1033,8 @@ ${""?left_pad(indent)}const ${js.nameVariable(action.resource)}Open = ref(false)
 <@print_tabs_methods tabs=widget indent=indent />
     <#elseif widget.type == "entry_form">
 <@print_entry_form_methods form=widget indent=indent />
+    <#elseif widget.type == "official_form">
+<@print_official_form_methods form=widget indent=indent />
     <#elseif widget.type == "display_form">
 <@print_display_form_methods form=widget indent=indent />
     <#elseif widget.type == "excel_form">
@@ -1107,7 +1167,7 @@ ${""?left_pad(indent)}</${namespace}-dialog>
 <@print_buttons_layout buttons=widget indent=indent />
   <#elseif widget.type == "select">
     <#if (widget.value("data")!"")?starts_with("enum[")>
-${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="sdk.${js.nameVariable(widget.id)}Options" :clearable="true" v-model="${guidbase.name_input_variable(widget)}" />    
+${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options" :clearable="true" v-model="${guidbase.name_input_variable(widget)}" />    
     <#else>
 ${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options"  :clearable="true" v-model="${guidbase.name_input_variable(widget)}" />
     </#if>
@@ -1116,7 +1176,7 @@ ${""?left_pad(indent)}<${namespace}-datepicker data-test="${js.nameVariable(widg
   <#elseif widget.type == "time">
 ${""?left_pad(indent)}<${namespace}-timepicker data-test="${js.nameVariable(widget.id)}" v-model="${guidbase.name_input_variable(widget)}" />
   <#elseif widget.type == "cascade">
-${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(widget.id)}" :fetch-options="sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions" v-model="${guidbase.name_input_variable(widget)}" />
+${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(widget.id)}" :fetch-options="sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions" v-model:labels="${guidbase.name_input_variable(widget)}OptionLabels" v-model="${guidbase.name_input_variable(widget)}" />
   <#elseif widget.type == "multiselect">
 ${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options" v-model="${guidbase.name_input_variable(widget)}" />
   <#elseif widget.type == "avatar">

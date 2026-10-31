@@ -5,11 +5,11 @@
       <span v-if="idx > 0" class="${namespace}-cscd__sep">{{ separator }}</span>
       <div class="${namespace}-cscd__level" :class="{ '${namespace}-cscd__level--open': activeLevel === idx }">
         <div class="${namespace}-cscd__trigger"
-          :class="{ '${namespace}-cscd__trigger--ph': !level.value, '${namespace}-cscd__trigger--disabled': disabled }"
+          :class="{ '${namespace}-cscd__trigger--ph': !level.value && !level.label, '${namespace}-cscd__trigger--disabled': disabled }"
           @click.stop="toggleLevel(idx)"
           @keydown="onKeydownMulti"
           tabindex="0">
-          <span class="${namespace}-cscd__trigger-text">{{ level.label || (idx < placeholders.length ? placeholders[idx] : '请选择') }}</span>
+          <span class="${namespace}-cscd__trigger-text">{{ level.label || getPlaceholder(idx) }}</span>
         </div>
       </div>
     </template>
@@ -33,7 +33,7 @@
   <!-- ========== single 模式：一个 trigger + 多列面板 ========== -->
   <div v-else class="${namespace}-cscd ${namespace}-cscd--single" ref="rootEl">
     <div class="${namespace}-cscd__trigger ${namespace}-cscd__trigger--single"
-      :class="{ '${namespace}-cscd__trigger--ph': !hasValue, '${namespace}-cscd__trigger--disabled': disabled }"
+      :class="{ '${namespace}-cscd__trigger--ph': !hasValue && !hasCustomLabels, '${namespace}-cscd__trigger--disabled': disabled }"
       @click.stop="toggleSingle"
       @keydown="onKeydownSingle"
       tabindex="0">
@@ -68,17 +68,35 @@
 import { ref, computed, watch, onBeforeUnmount, nextTick, reactive } from 'vue'
 
 const props = defineProps({
-  modelValue:   { type: Array,    default: () => [] },
-  options:      { type: Array,    default: () => [] },
-  fetchOptions: { type: Function, default: null },   // async (parentValue) => Option[]
-  placeholder:  { type: String,   default: '请选择' },
-  placeholders: { type: Array,    default: () => [] },
-  disabled:     { type: Boolean,  default: false },
-  separator:    { type: String,   default: '/' },
-  variant:      { type: String,   default: 'single' },  // 'single' | 'multi'
+  modelValue:   { type: Array,          default: () => [] },
+  labels:       { type: [Array, String], default: () => [] }, // 新增：可作为默认展示标签或异步回显名称
+  options:      { type: Array,          default: () => [] },
+  fetchOptions: { type: Function,       default: null },      // async (parentValue) => Option[]
+  placeholder:  { type: String,         default: '请选择' },
+  placeholders: { type: Array,          default: () => [] },
+  disabled:     { type: Boolean,        default: false },
+  separator:    { type: String,         default: '/' },
+  variant:      { type: String,         default: 'single' },  // 'single' | 'multi'
 })
 
-const emit = defineEmits(['update:modelValue', 'change'])
+const emit = defineEmits(['update:modelValue', 'update:labels', 'change'])
+
+// 规范化外部传入的 labels 数组
+const customLabels = computed(() => {
+  if (Array.isArray(props.labels)) return props.labels.map(v => v != null ? String(v) : '')
+  if (typeof props.labels === 'string' && props.labels) {
+    return props.labels.split(/[,，/]/).map(s => s.trim()).filter(Boolean)
+  }
+  return []
+})
+
+const hasCustomLabels = computed(() => customLabels.value.some(Boolean))
+
+function getPlaceholder(idx) {
+  if (props.labels && customLabels.value[idx]) return customLabels.value[idx]
+  if (idx < props.placeholders.length) return props.placeholders[idx]
+  return '请选择'
+}
 
 // ═══════════════════════════════════════════
 // 统一数据缓存
@@ -158,7 +176,7 @@ function isLoadingCol(colIdx) {
 function initCache() {
   if (props.fetchOptions) {
     for (const k of Object.keys(optionCache)) { delete optionCache[k] }
-    loadLazyOptions(null) // 预加载根级
+    loadLazyOptions(null)
   } else {
     populateStaticCache()
   }
@@ -169,16 +187,27 @@ watch(() => props.fetchOptions, () => initCache())
 watch(() => props.options, () => { if (!props.fetchOptions) populateStaticCache() }, { deep: true })
 
 // ═══════════════════════════════════════════
-// 标签解析（从缓存中查找）
+// 标签解析（多层回退机制：真实选项标签 -> 传入的labels -> 原始值）
 // ═══════════════════════════════════════════
 function resolveLabels(path) {
   let parentKey = ROOT_KEY
   const labels = []
-  for (const v of path) {
+  const fallbacks = customLabels.value
+  for (let i = 0; i < path.length; i++) {
+    const v = path[i]
     const nodes = optionCache[parentKey] || []
     const opt = findOptInNodes(nodes, v)
-    if (opt) { labels.push(opt.label); parentKey = cacheKey(opt.value) }
-    else { labels.push(String(v)); parentKey = '__missing__' }
+    if (opt) {
+      labels.push(opt.label)
+      parentKey = cacheKey(opt.value)
+    } else if (fallbacks[i]) {
+      // 选项未就绪或异步加载期间，优先使用传入的 labels 作为真实回显！
+      labels.push(fallbacks[i])
+      parentKey = cacheKey(v)
+    } else {
+      labels.push(String(v))
+      parentKey = '__missing__'
+    }
   }
   return labels
 }
@@ -211,20 +240,35 @@ const levelStates = ref([])
 
 async function initLevels() {
   const path = (props.modelValue || []).filter(Boolean)
+  const fallbacks = customLabels.value
+
   if (!path.length) {
     if (!optionCache[ROOT_KEY] && props.fetchOptions) await loadLazyOptions(null)
-    levelStates.value = [{ value: null, label: null, options: optionCache[ROOT_KEY] || [], _parentValue: null }]
+    const initLen = Math.max(1, fallbacks.length)
+    const states = []
+    for (let i = 0; i < initLen; i++) {
+      states.push({
+        value: null,
+        label: fallbacks[i] || null, // 支持以传入的 labels 作为占位或默认值
+        options: i === 0 ? (optionCache[ROOT_KEY] || []) : [],
+        _parentValue: null
+      })
+    }
+    levelStates.value = states
     return
   }
+
   if (props.fetchOptions) await ensurePathLoaded(path)
   const labels = resolveLabels(path)
   const states = []
   let parentValue = null
   for (let i = 0; i <= path.length; i++) {
     const nodes = optionCache[cacheKey(parentValue)] || []
+    const val = i < path.length ? path[i] : null
+    const lbl = i < path.length ? (labels[i] || fallbacks[i] || null) : (fallbacks[i] || null)
     states.push({
-      value: i < path.length ? path[i] : null,
-      label: i < path.length ? (labels[i] || null) : null,
+      value: val,
+      label: lbl,
       options: nodes,
       _parentValue: parentValue,
     })
@@ -250,11 +294,14 @@ watch(() => props.modelValue, async (v) => {
   await initLevels()
 }, { deep: true })
 
+watch(() => props.labels, () => {
+  initLevels()
+}, { deep: true })
+
 watch(() => props.options, async () => {
   if (!props.fetchOptions) { populateStaticCache(); await initLevels() }
 }, { deep: true })
 
-// 缓存变化 → 同步更新 levelStates 中的 options
 watch(() => optionCache, () => {
   for (const ls of levelStates.value) {
     const key = cacheKey(ls._parentValue)
@@ -324,7 +371,14 @@ const open = ref(false)
 const hasValue = computed(() => (props.modelValue || []).length > 0)
 
 const displayText = computed(() => {
-  if (!hasValue.value) return props.placeholder
+  // 1. 无值时：优先使用传入的 labels 作为占位/默认值，否则使用 placeholder
+  if (!hasValue.value) {
+    if (hasCustomLabels.value) {
+      return customLabels.value.filter(Boolean).join(' ' + props.separator + ' ')
+    }
+    return props.placeholder
+  }
+  // 2. 有值时：解析真实 Label，异步未就绪时自动平滑回退到 props.labels
   const labels = resolveLabels(props.modelValue)
   return labels.join(' ' + props.separator + ' ')
 })
@@ -431,24 +485,29 @@ function positionPanelSingle() {
 
 function positionAt(rect) {
   const pw = panelEl.value.offsetWidth || 200
-  const ph = panelEl.value.offsetHeight || 240
+  const ph = (panelEl.value.offsetHeight && panelEl.value.offsetHeight > 50) ? panelEl.value.offsetHeight : 240
   const style = { position: 'fixed', zIndex: '99999' }
-  if ((window.innerHeight - rect.bottom) >= ph || (window.innerHeight - rect.bottom) >= 120) {
+
+  // 严格根据空间判断上下弹出，防止截断
+  if ((window.innerHeight - rect.bottom) >= ph + 4) {
     style.top = (rect.bottom + 2) + 'px'
   } else {
-    style.bottom = (window.innerHeight - rect.top + 2) + 'px'
+    style.top = Math.max(8, rect.top - ph - 2) + 'px'
   }
-  if ((window.innerWidth - rect.left) >= pw) {
-    style.right = (window.innerWidth - rect.right) + 'px'
-  } else {
+
+  if (rect.left + pw <= window.innerWidth - 8) {
     style.left = rect.left + 'px'
+  } else {
+    style.left = Math.max(8, rect.right - pw) + 'px'
   }
   panelStyle.value = style
 }
 
 function emitPath(path) {
+  const resolved = resolveLabels(path)
   emit('update:modelValue', path)
-  emit('change', path)
+  emit('update:labels', resolved)
+  emit('change', path, resolved)
 }
 
 // ═══════════════════════════════════════════
@@ -493,6 +552,7 @@ defineExpose({ closePanel })
 <style scoped>
 /* ═══ 通用 ═══ */
 .${namespace}-cscd {
+  display: inline-flex;
   align-items: center;
   gap: 2px;
   font-size: 12px;
@@ -536,7 +596,7 @@ defineExpose({ closePanel })
   height: 0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  border-top: 5px solid var(--${namespace}-text-muted);
+  border-top: 5px solid var(--${namespace}-text-muted, #5d6d7e);
   transform: translateY(-50%);
   pointer-events: none;
 }
@@ -549,14 +609,11 @@ defineExpose({ closePanel })
 .${namespace}-cscd__trigger--ph { color: var(--${namespace}-text-light, #909eac); }
 .${namespace}-cscd__trigger--disabled { background: #f5f7fa; color: var(--${namespace}-text-muted, #5d6d7e); cursor: not-allowed; }
 .${namespace}-cscd__trigger-text { overflow: hidden; text-overflow: ellipsis; flex: 1; }
-.${namespace}-cscd__arrow {
-  position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
-  font-size: 9px; color: var(--${namespace}-text-muted, #5d6d7e); pointer-events: none; flex-shrink: 0;
-}
 
 /* single trigger */
 .${namespace}-cscd--single .${namespace}-cscd__trigger--single {
   min-width: 160px;
+  width: 100%;
 }
 
 /* ═══ 面板通用 ═══ */

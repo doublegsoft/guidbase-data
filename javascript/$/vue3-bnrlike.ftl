@@ -70,7 +70,7 @@ ${""?left_pad(indent)}</div>
 <#macro print_entry_form_layout form indent=0>
   <#local cols = form.value("cols","3")>
   <#local groups = form.groups()>
-${""?left_pad(indent)}<div id="entry${js.nameType(form.id)}">
+${""?left_pad(indent)}<div id="entry${js.nameType(form.id)}"<#if guidbase.has_child_widget(form.page, "buttons")> style="padding-bottom:50px;"</#if>>
   <#list groups as group>
     <#local rows = form.rows(group, cols?number)>
     <#if group?index != 0>
@@ -81,8 +81,10 @@ ${""?left_pad(indent)}    <div class="${namespace}-panel-head">${group}</div>
 ${""?left_pad(indent)}    <div class="${namespace}-form ${namespace}-form--${cols}">
     <#list rows as row>
       <#list row as child>
-${""?left_pad(indent)}      <div class="${namespace}-field<#if child.value("span")??> ${namespace}-field--span${child.value("span")}</#if>">
-${""?left_pad(indent)}        <label class="${namespace}-field-label<#if (child.value("required")!"") == "true"> ${namespace}-field-label--required</#if>">${child.title}</label>
+        <#local cType = (child.type!child.value("type")!child.value("widget")!"")?lower_case>
+        <#local isTopAlign = ["avatar", "videos", "images", "longtext", "files"]?seq_contains(cType)>
+${""?left_pad(indent)}      <div class="${namespace}-field<#if child.value("span")??> ${namespace}-field--span${child.value("span")}</#if><#if isTopAlign> ${namespace}-field--top</#if>">
+${""?left_pad(indent)}        <label class="${namespace}-field-label<#if (child.value("required")!"") == "true"> ${namespace}-field-label--required</#if><#if isTopAlign> ${namespace}-field-label--top</#if>">${child.title}</label>
 <@print_widget_layout widget=child indent=indent+8 />
 ${""?left_pad(indent)}      </div>
       </#list>
@@ -103,11 +105,11 @@ ${""?left_pad(indent)}<div class="${namespace}-of">
 ${""?left_pad(indent)}  <div ref="${js.nameVariable(form.id)}Ref" class="${namespace}-of__container">
 ${""?left_pad(indent)}    <div class="${namespace}-of__header">
 ${""?left_pad(indent)}      <h1>${form.title}</h1>
-${""?left_pad(indent)}      <div class="${namespace}-of__meta">
+<#--  ${""?left_pad(indent)}      <div class="${namespace}-of__meta">
 ${""?left_pad(indent)}        <span>机密程度：{{ confidentialLevel }}</span>
 ${""?left_pad(indent)}        <span>流程编号：{{ flowNo }}</span>
 ${""?left_pad(indent)}        <span>申请日期：{{ applyDate }}</span>
-${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}      </div>  -->
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}
 ${""?left_pad(indent)}    <table class="${namespace}-of__table">
@@ -121,11 +123,9 @@ ${""?left_pad(indent)}        <td colspan="${child.value("span","1")?number * 2 
           <#if child.type == "date">
 ${""?left_pad(indent)}          <${namespace}-datepicker data-test="${js.nameVariable(child.id)}" v-model="${js.nameVariable(form.id)}Data.${js.nameVariable(child.id)}" plain />
           <#elseif child.type == "select">
-            <#if (child.value("data")!"")?starts_with("enum[")>
-${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(child.id)}" :options="sdk.${js.nameVariable(child.id)}Options" :clearable="true" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />    
-            <#else>
-${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options"  :clearable="true" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />
-            </#if>
+            <#--  <#if (child.value("data")!"")?starts_with("enum[")>  -->
+${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options" :clearable="true" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />
+            <#--  </#if>  -->
           <#elseif child.type == "multiselect">
 ${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />      
           <#elseif child.type == "tags">
@@ -173,9 +173,23 @@ ${""?left_pad(indent)}</div>
 <!--                               DISPLAY FORM                              -->
 <!----------------------------------------------------------------------------->
 <#macro print_display_form_layout form indent=0>
+  <#local optionable_widgets = {}>
+  <#list app.pages as p>
+    <#list p.widgets as widget>
+      <#if widget.type != "select" && widget.type != "multiselect" && widget.type != "cascade"><#continue></#if>
+      <#if widget.value("data") == ""><#continue></#if><#-- 没有定义数据源 -->
+      <#if widget.value("data")?contains(":")>
+        <#local opts = typebase.enumtype(widget.value("data"))>
+        <#local optionable_widgets += {widget.id:{"value":opts,"isRef":false}}>
+      <#else>
+        <#local ref = typebase.enumref(widget.value("data"))>
+        <#local optionable_widgets += {widget.id:{"value":ref,"isRef":true}}>
+      </#if>
+    </#list>
+  </#list>
   <#local cols = form.value("cols", "3")>
   <#local formId = js.nameVariable(form.id)>
-${""?left_pad(indent)}<div id="${formId}">
+${""?left_pad(indent)}<div id="${formId}"<#if guidbase.has_child_widget(form.page, "buttons")> style="padding-bottom:50px;"</#if>>
   <#list form.groups() as group>
     <#if group?index != 0>
 ${""?left_pad(indent)}  <div class="${namespace}-divider"></div>
@@ -190,10 +204,11 @@ ${""?left_pad(indent)}    <div class="${namespace}-fview ${namespace}-fview--${c
         <#local inputId = js.nameVariable(input.id)>
         <#local dataField = formId + "Data." + inputId>
         <#local tagTheme = input.value("theme", input.value("tagType", "primary"))>
-${""?left_pad(indent)}      <div class="${namespace}-fv<#if span != ""> ${namespace}-fv--span${span}</#if>">
-${""?left_pad(indent)}        <div class="${namespace}-fv-label">${input.title}</div>
-        <#-- 1. 普通 Tags / Tag 类型 -->
-        <#if input.type?? && (input.type == "tags" || input.type == "tag")>
+        <#local inputType = (input.type!input.value("type")!"")?lower_case>
+        <#local isTopAlign = ["avatar", "image", "images", "video", "videos", "file", "files", "attachment", "attachments", "longtext", "textarea"]?seq_contains(inputType)>
+${""?left_pad(indent)}      <div class="${namespace}-fv<#if span != ""> ${namespace}-fv--span${span}</#if><#if isTopAlign> ${namespace}-fv--top</#if>">
+${""?left_pad(indent)}        <div class="${namespace}-fv-label<#if isTopAlign> ${namespace}-fv-label--top</#if>">${input.title}</div>
+        <#if inputType == "tags" || inputType == "tag">
 ${""?left_pad(indent)}        <div class="${namespace}-fv-val" style="gap: 6px; flex-wrap: wrap;">
 ${""?left_pad(indent)}          <span
 ${""?left_pad(indent)}            v-for="(tag, tagIdx) in (Array.isArray(${dataField}) ? ${dataField} : String(${dataField} || '').split(/[,，]/).map(s => s.trim()).filter(Boolean))"
@@ -201,8 +216,44 @@ ${""?left_pad(indent)}            :key="tagIdx"
 ${""?left_pad(indent)}            :class="['${namespace}-tag', '${namespace}-tag--' + (typeof tag === 'object' && tag.type ? tag.type : '${tagTheme}')]"
 ${""?left_pad(indent)}          >{{ typeof tag === 'object' && tag !== null ? (tag.label || tag.name || tag.title || tag.value) : tag }}</span>
 ${""?left_pad(indent)}        </div>
-        <#-- 2. 多选下拉 multiselect 类型：单独处理 Option 对象，优先渲染 option.text -->
-        <#elseif input.type?? && input.type == "multiselect">
+        <#elseif inputType == "select">
+          <#if optionable_widgets[input.id]??>
+            <#if optionable_widgets[input.id].isRef>
+${""?left_pad(indent)}        <div class="${namespace}-fv-val ${namespace}-fv-val--mono">
+${""?left_pad(indent)}          <span class="'${namespace}-tag', '${namespace}-tag--primary">
+${""?left_pad(indent)}            {{ sdk.get${js.nameType(input.id)}OptionLabel(${dataField}, ${js.nameVariable(input.id)}Options) }}
+${""?left_pad(indent)}          </span>
+${""?left_pad(indent)}        </div>
+            <#else>
+${""?left_pad(indent)}        <div class="${namespace}-fv-val ${namespace}-fv-val--mono">
+${""?left_pad(indent)}          <span class="${namespace}-tag ${namespace}-tag--primary">
+${""?left_pad(indent)}            {{ sdk.get${js.nameType(input.id)}OptionLabel(${dataField}) }}
+${""?left_pad(indent)}          </span>
+${""?left_pad(indent)}        </div>
+            </#if>
+          <#else>
+${""?left_pad(indent)}        <div class="${namespace}-fv-val ${namespace}-fv-val--mono">{{ ${dataField} ?? '-' }}</div>
+          </#if>
+        <#elseif inputType == "multiselect">
+          <#if optionable_widgets[input.id]??>
+            <#if optionable_widgets[input.id].isRef>
+${""?left_pad(indent)}        <div class="${namespace}-fv-val" style="gap: 6px; flex-wrap: wrap;">
+${""?left_pad(indent)}          <span
+${""?left_pad(indent)}            v-for="(opt, optIdx) in (Array.isArray(${dataField}) ? ${dataField} : (${dataField} ? [${dataField}] : []))"
+${""?left_pad(indent)}            :key="optIdx"
+${""?left_pad(indent)}            :class="['${namespace}-tag', '${namespace}-tag--${tagTheme}']"
+${""?left_pad(indent)}          >{{ sdk.get${js.nameType(input.id)}OptionLabel(opt, ${js.nameVariable(input.id)}Options) }}</span>
+${""?left_pad(indent)}        </div>
+            <#else>
+${""?left_pad(indent)}        <div class="${namespace}-fv-val" style="gap: 6px; flex-wrap: wrap;">
+${""?left_pad(indent)}          <span
+${""?left_pad(indent)}            v-for="(opt, optIdx) in (Array.isArray(${dataField}) ? ${dataField} : (${dataField} ? [${dataField}] : []))"
+${""?left_pad(indent)}            :key="optIdx"
+${""?left_pad(indent)}            :class="['${namespace}-tag', '${namespace}-tag--${tagTheme}']"
+${""?left_pad(indent)}          >{{ sdk.get${js.nameType(input.id)}OptionLabel(opt) }}</span>
+${""?left_pad(indent)}        </div>
+            </#if>
+          <#else>
 ${""?left_pad(indent)}        <div class="${namespace}-fv-val" style="gap: 6px; flex-wrap: wrap;">
 ${""?left_pad(indent)}          <span
 ${""?left_pad(indent)}            v-for="(opt, optIdx) in (Array.isArray(${dataField}) ? ${dataField} : (${dataField} ? [${dataField}] : []))"
@@ -210,9 +261,77 @@ ${""?left_pad(indent)}            :key="optIdx"
 ${""?left_pad(indent)}            :class="['${namespace}-tag', '${namespace}-tag--${tagTheme}']"
 ${""?left_pad(indent)}          >{{ typeof opt === 'object' && opt !== null ? (opt.text ?? opt.label ?? opt.value) : opt }}</span>
 ${""?left_pad(indent)}        </div>
-        <#-- 3. 默认文本展示 -->
+          </#if>
+        <#elseif inputType == "cascade">
+${""?left_pad(indent)}        <div class="${namespace}-fv-val ${namespace}-fv-val--mono" style="gap: 6px; flex-wrap: wrap;">
+${""?left_pad(indent)}          <span class="${namespace}-tag ${namespace}-tag--${tagTheme}">
+${""?left_pad(indent)}          {{ Array.isArray(${dataField}OptionLabels) ? ${dataField}OptionLabels.join(' / ') : ${dataField}OptionLabels }}
+${""?left_pad(indent)}          </span>
+${""?left_pad(indent)}        </div>
+        <#elseif inputType == "image" || inputType == "images" || inputType == "avatar">
+${""?left_pad(indent)}        <div class="${namespace}-fv-val ${namespace}-fv-val--media">
+${""?left_pad(indent)}          <template v-if="Array.isArray(${dataField}) ? ${dataField}.length : ${dataField}">
+${""?left_pad(indent)}            <a
+${""?left_pad(indent)}              v-for="(img, imgIdx) in (Array.isArray(${dataField}) ? ${dataField} : [${dataField}])"
+${""?left_pad(indent)}              :key="imgIdx"
+${""?left_pad(indent)}              :href="typeof img === 'object' && img !== null ? (img.url || img.thumbnailUrl || img.previewUrl) : img"
+${""?left_pad(indent)}              target="_blank"
+${""?left_pad(indent)}              class="${namespace}-fv-img-box"
+${""?left_pad(indent)}            >
+${""?left_pad(indent)}              <img
+${""?left_pad(indent)}                :src="typeof img === 'object' && img !== null ? (img.url || img.thumbnailUrl || img.previewUrl) : img"
+${""?left_pad(indent)}                class="${namespace}-fv-img"
+${""?left_pad(indent)}                alt="图片"
+${""?left_pad(indent)}              />
+${""?left_pad(indent)}            </a>
+${""?left_pad(indent)}          </template>
+${""?left_pad(indent)}          <span v-else class="${namespace}-fv-empty">-</span>
+${""?left_pad(indent)}        </div>
+        <#-- 4. 视频展示 (video / videos) -->
+        <#elseif inputType == "video" || inputType == "videos">
+${""?left_pad(indent)}        <div class="${namespace}-fv-val ${namespace}-fv-val--media">
+${""?left_pad(indent)}          <template v-if="Array.isArray(${dataField}) ? ${dataField}.length : ${dataField}">
+${""?left_pad(indent)}            <div
+${""?left_pad(indent)}              v-for="(vid, vidIdx) in (Array.isArray(${dataField}) ? ${dataField} : [${dataField}])"
+${""?left_pad(indent)}              :key="vidIdx"
+${""?left_pad(indent)}              class="${namespace}-fv-vid-box"
+${""?left_pad(indent)}            >
+${""?left_pad(indent)}              <video
+${""?left_pad(indent)}                :src="typeof vid === 'object' && vid !== null ? (vid.url || vid.blobUrl) : vid"
+${""?left_pad(indent)}                class="${namespace}-fv-vid"
+${""?left_pad(indent)}                controls
+${""?left_pad(indent)}                preload="metadata"
+${""?left_pad(indent)}              />
+${""?left_pad(indent)}            </div>
+${""?left_pad(indent)}          </template>
+${""?left_pad(indent)}          <span v-else class="${namespace}-fv-empty">-</span>
+${""?left_pad(indent)}        </div>
+        <#-- 5. 文件下载列表 (file / files / attachment / attachments) -->
+        <#elseif inputType == "file" || inputType == "files" || inputType == "attachment" || inputType == "attachments">
+${""?left_pad(indent)}        <div class="${namespace}-fv-val ${namespace}-fv-val--files">
+${""?left_pad(indent)}          <template v-if="Array.isArray(${dataField}) ? ${dataField}.length : ${dataField}">
+${""?left_pad(indent)}            <a
+${""?left_pad(indent)}              v-for="(f, fIdx) in (Array.isArray(${dataField}) ? ${dataField} : [${dataField}])"
+${""?left_pad(indent)}              :key="fIdx"
+${""?left_pad(indent)}              :href="typeof f === 'object' && f !== null ? (f.url || '#') : f"
+${""?left_pad(indent)}              :download="typeof f === 'object' && f !== null ? (f.name || '') : ''"
+${""?left_pad(indent)}              target="_blank"
+${""?left_pad(indent)}              class="${namespace}-fv-file-item"
+${""?left_pad(indent)}            >
+${""?left_pad(indent)}              <span class="${namespace}-fv-file-icon">📎</span>
+${""?left_pad(indent)}              <span class="${namespace}-fv-file-name">{{ typeof f === 'object' && f !== null ? (f.name || f.title || f.url) : f }}</span>
+${""?left_pad(indent)}              <span v-if="typeof f === 'object' && f && f.size" class="${namespace}-fv-file-size">({{ Math.round(f.size / 1024) }} KB)</span>
+${""?left_pad(indent)}              <span class="${namespace}-fv-file-down" title="下载">↓</span>
+${""?left_pad(indent)}            </a>
+${""?left_pad(indent)}          </template>
+${""?left_pad(indent)}          <span v-else class="${namespace}-fv-empty">-</span>
+${""?left_pad(indent)}        </div>
+        <#-- 6. 多行长文本 (longtext / textarea) -->
+        <#elseif inputType == "longtext" || inputType == "textarea">
+${""?left_pad(indent)}        <div class="${namespace}-fv-val ${namespace}-fv-val--pre">{{ ${dataField} || '-' }}</div>
+        <#-- 7. 默认纯文本展示 -->
         <#else>
-${""?left_pad(indent)}        <div class="${namespace}-fv-val ${namespace}-fv-val--mono">{{ ${dataField} }}</div>
+${""?left_pad(indent)}        <div class="${namespace}-fv-val ${namespace}-fv-val--mono">{{ ${dataField} ?? '-' }}</div>
         </#if>
 ${""?left_pad(indent)}      </div>
       </#list>

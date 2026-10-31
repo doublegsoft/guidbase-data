@@ -1,45 +1,45 @@
 <template>
-  <div class="ef-fu" :class="{ 'ef-fu--disabled': disabled }"
+  <div class="${namespace}-fu" :class="{ '${namespace}-fu--disabled': disabled }"
        @dragover.prevent="dragging=true" @dragleave.prevent="dragging=false" @drop.prevent="onDrop">
-    <label v-if="label" class="ef-field-label">{{ label }}</label>
+    <label v-if="label" class="${namespace}-field-label">{{ label }}</label>
 
-    <div class="ef-fu__list" v-if="items.length > 0">
+    <div class="${namespace}-fu__list" v-if="items.length > 0">
       <div v-for="(item, idx) in items" :key="item.id"
-           class="ef-fu__item"
-           :class="{ 'ef-fu__item--uploading': item.uploading, 'ef-fu__item--error': item.error }">
-        <span class="ef-fu__item-icon">{{ fileIcon(item.file?.name || item.name) }}</span>
-        <div class="ef-fu__item-info">
-          <span class="ef-fu__item-name" :title="item.file?.name || item.name">
+           class="${namespace}-fu__item"
+           :class="{ '${namespace}-fu__item--uploading': item.uploading, '${namespace}-fu__item--error': item.error }">
+        <span class="${namespace}-fu__item-icon">{{ fileIcon(item.file?.name || item.name) }}</span>
+        <div class="${namespace}-fu__item-info">
+          <span class="${namespace}-fu__item-name" :title="item.file?.name || item.name">
             {{ truncate(item.file?.name || item.name, 28) }}
           </span>
-          <span class="ef-fu__item-meta">
+          <span class="${namespace}-fu__item-meta">
             {{ formatSize(item.file?.size || 0) }}
             <span v-if="item.uploading"> · 上传中 {{ Math.round(item.progress) }}%</span>
-            <span v-else-if="item.error" class="ef-fu__text--error"> · 失败</span>
-            <span v-else class="ef-fu__text--success"> · 已上传</span>
+            <span v-else-if="item.error" class="${namespace}-fu__text--error"> · 失败</span>
+            <span v-else class="${namespace}-fu__text--success"> · 已上传</span>
           </span>
         </div>
-        <div v-if="item.uploading" class="ef-fu__item-progress">
-          <div class="ef-fu__item-progress-bar" :style="{ width: item.progress + '%' }"></div>
+        <div v-if="item.uploading" class="${namespace}-fu__item-progress">
+          <div class="${namespace}-fu__item-progress-bar" :style="{ width: item.progress + '%' }"></div>
         </div>
-        <button v-if="!disabled && !item.uploading" class="ef-fu__item-delete"
+        <button v-if="!disabled && !item.uploading" class="${namespace}-fu__item-delete"
                 @click="removeItem(idx)" title="删除">✕</button>
-        <div v-if="item.justDone" class="ef-fu__item-pulse"></div>
+        <div v-if="item.justDone" class="${namespace}-fu__item-pulse"></div>
       </div>
     </div>
 
     <div v-if="items.length < maxCount && !disabled"
-         class="ef-fu__add"
-         :class="{ 'ef-fu__add--dragover': dragging }"
+         class="${namespace}-fu__add"
+         :class="{ '${namespace}-fu__add--dragover': dragging }"
          @click="triggerInput" role="button" tabindex="0"
          @keydown.enter="triggerInput" @keydown.space.prevent="triggerInput">
-      <span class="ef-fu__add-icon">+</span>
+      <span class="${namespace}-fu__add-icon">+</span>
       <span>{{ items.length === 0 ? placeholder : '继续添加文件' }}</span>
     </div>
 
-    <div v-if="hint && !disabled" class="ef-fu__hint">{{ hint }}</div>
+    <div v-if="hint && !disabled" class="${namespace}-fu__hint">{{ hint }}</div>
 
-    <input ref="inputRef" type="file" class="ef-fu__input" :accept="accept"
+    <input ref="inputRef" type="file" class="${namespace}-fu__input" :accept="accept"
            :multiple="maxCount > 1" @change="onFileChange" />
   </div>
 </template>
@@ -48,7 +48,7 @@
 import { ref, watch } from 'vue'
 
 let nextId = 1
-function genId() { return `file_${r"${"}Date.now()}_${r"${"}nextId++}` }
+function genId() { return 'file_' + Date.now() + '_' + (nextId++) }
 
 function truncate(name, max) {
   if (!name) return ''
@@ -64,7 +64,7 @@ function formatSize(bytes) {
   if (!bytes) return '0 B'
   const u = ['B','KB','MB','GB']; let i = 0; let s = bytes
   while (s >= 1024 && i < u.length-1) { s /= 1024; i++ }
-  return `${r"${"}s.toFixed(i>0?1:0)} ${r"${"}u[i]}`
+  return s.toFixed(i > 0 ? 1 : 0) + ' ' + u[i]
 }
 
 const FILE_ICONS = {
@@ -130,9 +130,9 @@ function onFileChange(e) { const files = Array.from(e.target?.files||[]); if (fi
 
 function addFiles(files) {
   const remaining = props.maxCount - items.value.length
-  if (remaining <= 0) { emit('error', `最多上传 ${r"${"}props.maxCount} 个文件`); return }
+  if (remaining <= 0) { emit('error', '最多上传 ' + props.maxCount + ' 个文件'); return }
   for (const file of files.slice(0, remaining)) {
-    if (file.size > props.maxSizeMB*1024*1024) { emit('error', `${r"${"}file.name} 超过 ${r"${"}props.maxSizeMB}MB 限制`); continue }
+    if (file.size > props.maxSizeMB*1024*1024) { emit('error', file.name + ' 超过 ' + props.maxSizeMB + 'MB 限制'); continue }
     const item = { id: genId(), name: file.name, url: '', uploading: true, progress: 0, error: false, file }
     items.value.push(item)
     simulateUpload(item)
@@ -174,66 +174,86 @@ function removeItem(idx) { items.value.splice(idx, 1); syncModel(); emit('remove
 
 <style scoped>
 /* ══════════════════════════════════════════════
-   FILE UPLOAD — BNR Style
+   FILE UPLOAD — BNR Style (紧凑型)
    ══════════════════════════════════════════════ */
 
-.ef-fu { display: flex; flex-direction: column; gap: 4px; }
-.ef-fu--disabled { opacity: 0.5; pointer-events: none; }
+.${namespace}-fu { display: flex; flex-direction: column; gap: 3px; }
+.${namespace}-fu--disabled { opacity: 0.5; pointer-events: none; }
 
-.ef-fu__list { display: flex; flex-direction: column; gap: 3px; }
+/* ── Label 顶部对齐与微边距 ──────────────────── */
+.${namespace}-field-label {
+  align-self: flex-start;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  line-height: 1.2;
+}
 
-.ef-fu__item {
+.${namespace}-fu__list { display: flex; flex-direction: column; gap: 2px; }
+
+/* ── 单项卡片（紧凑化） ──────────────────────── */
+.${namespace}-fu__item {
   position: relative;
-  display: flex; align-items: center; gap: 6px;
-  padding: 5px 7px; background: var(--ef-bg);
-  border: 1px solid var(--ef-border); border-radius: var(--ef-radius-sm);
-  transition: all 0.18s ease; overflow: hidden;
+  display: flex; align-items: center; gap: 5px;
+  padding: 2px 6px;
+  background: var(--${namespace}-bg);
+  border: 1px solid var(--${namespace}-border);
+  border-radius: var(--${namespace}-radius-sm, 2px);
+  transition: border-color 0.15s ease;
+  overflow: hidden;
+  min-height: 24px;
 }
-.ef-fu__item:hover { border-color: var(--ef-primary); }
-.ef-fu__item--error { border-color: var(--ef-danger); box-shadow: 0 0 0 2px var(--ef-danger-bg); }
+.${namespace}-fu__item:hover { border-color: var(--${namespace}-primary); }
+.${namespace}-fu__item--error { border-color: var(--${namespace}-danger); box-shadow: 0 0 0 1px var(--${namespace}-danger-bg); }
 
-.ef-fu__item-icon { font-size: 20px; flex-shrink: 0; }
-.ef-fu__item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.ef-fu__item-name {
-  font-size: 12px; font-weight: 500; color: var(--ef-text);
+.${namespace}-fu__item-icon { font-size: 14px; line-height: 1; flex-shrink: 0; }
+.${namespace}-fu__item-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0; }
+.${namespace}-fu__item-name {
+  font-size: 11px; font-weight: 500; color: var(--${namespace}-text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.2;
 }
-.ef-fu__item-meta { font-size: 10px; color: var(--ef-text-muted); }
-.ef-fu__text--success { color: var(--ef-success); }
-.ef-fu__text--error { color: var(--ef-danger); }
+.${namespace}-fu__item-meta { font-size: 9px; color: var(--${namespace}-text-muted); line-height: 1.2; }
+.${namespace}-fu__text--success { color: var(--${namespace}-success); }
+.${namespace}-fu__text--error { color: var(--${namespace}-danger); }
 
-.ef-fu__item-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--ef-bg-page); }
-.ef-fu__item-progress-bar { height: 100%; background: var(--ef-primary); transition: width 0.08s linear; border-radius: 0 1px 1px 0; }
+.${namespace}-fu__item-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 1.5px; background: var(--${namespace}-bg-page); }
+.${namespace}-fu__item-progress-bar { height: 100%; background: var(--${namespace}-primary); transition: width 0.08s linear; }
 
-.ef-fu__item-delete {
-  flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
-  background: transparent; border: none; cursor: pointer; font-size: 12px;
-  color: var(--ef-text-muted); transition: all 0.12s ease; font-family: var(--ef-font);
+/* ── 删除按钮微型化 ──────────────────────────── */
+.${namespace}-fu__item-delete {
+  flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%;
+  background: transparent; border: none; cursor: pointer; font-size: 10px;
+  color: var(--${namespace}-text-muted); transition: all 0.12s ease;
+  font-family: var(--${namespace}-font);
   display: flex; align-items: center; justify-content: center;
+  padding: 0; line-height: 1;
 }
-.ef-fu__item-delete:hover { background: var(--ef-danger-bg); color: var(--ef-danger); }
+.${namespace}-fu__item-delete:hover { background: var(--${namespace}-danger-bg); color: var(--${namespace}-danger); }
 
-.ef-fu__item-pulse {
-  position: absolute; inset: -2px; border-radius: var(--ef-radius-sm);
-  border: 2px solid var(--ef-primary);
-  animation: fu-pulse 0.4s ease-out forwards; pointer-events: none; z-index: 2;
+.${namespace}-fu__item-pulse {
+  position: absolute; inset: -1px; border-radius: var(--${namespace}-radius-sm, 2px);
+  border: 1px solid var(--${namespace}-primary);
+  animation: fu-pulse 0.35s ease-out forwards; pointer-events: none; z-index: 2;
 }
 @keyframes fu-pulse {
   0% { opacity:1; transform:scale(0.98); }
-  100% { opacity:0; transform:scale(1.04); }
+  100% { opacity:0; transform:scale(1.02); }
 }
 
-.ef-fu__add {
+/* ── 添加按钮（高度缩为标准 22px，对齐输入框） ── */
+.${namespace}-fu__add {
   display: flex; align-items: center; justify-content: center; gap: 4px;
-  padding: 6px; border: 1px dashed var(--ef-border); border-radius: var(--ef-radius-sm);
-  cursor: pointer; font-size: 12px; color: var(--ef-text-muted);
-  transition: all 0.18s ease; height: 28px;
+  padding: 0 8px; border: 1px dashed var(--${namespace}-border);
+  border-radius: var(--${namespace}-radius-sm, 2px);
+  cursor: pointer; font-size: 11px; color: var(--${namespace}-text-muted);
+  transition: all 0.15s ease;
+  height: 22px;
 }
-.ef-fu__add:hover, .ef-fu__add--dragover {
-  border-color: var(--ef-primary); background: var(--ef-primary-bg); color: var(--ef-primary);
+.${namespace}-fu__add:hover, .${namespace}-fu__add--dragover {
+  border-color: var(--${namespace}-primary); background: var(--${namespace}-primary-bg); color: var(--${namespace}-primary);
 }
-.ef-fu__add-icon { font-size: 16px; font-weight: 300; }
+.${namespace}-fu__add-icon { font-size: 13px; font-weight: 300; line-height: 1; }
 
-.ef-fu__hint { font-size: 10px; color: var(--ef-text-muted); }
-.ef-fu__input { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
+.${namespace}-fu__hint { font-size: 9px; color: var(--${namespace}-text-muted); line-height: 1.2; }
+.${namespace}-fu__input { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
 </style>

@@ -61,20 +61,54 @@ provide('dialogClose', () => {
 <@vue3.print_page_methods page=pageDef />
 
 onMounted(async () => {
-<#assign visited_widgets = {}>  
+<#-- 收集整理所有组件 -->
+<#assign optionable_widgets = {}>
+<#list app.pages as p>
+  <#list p.widgets as widget>
+    <#if widget.type != "select" && widget.type != "multiselect" && widget.type != "cascade"><#continue></#if>
+    <#if widget.value("data") == ""><#continue></#if><#-- 没有定义数据源 -->
+    <#if widget.value("data")?contains(":")>
+      <#assign opts = typebase.enumtype(widget.value("data"))>
+      <#assign optionable_widgets += {widget.id:{"value":opts,"isRef":false}}>
+    <#else>
+      <#assign ref = typebase.enumref(widget.value("data"))>
+      <#assign optionable_widgets += {widget.id:{"value":ref,"isRef":true}}>
+    </#if>
+  </#list>
+</#list>
+<#assign visited_widgets = {}>
+<#-- 前置加载各个选项枚举值 -->
 <#list page.widgets as widget>
   <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
-  <#if (widget.type == "select" || widget.type == "multiselect") && 
-       !(widget.value("data")!"")?starts_with("enum[")>
-    <#if widget.ancestor("entry_form")?? || widget.ancestor("criteria_form")??>
-  ${js.nameVariable(widget.id)}Options.value = await sdk.fetch${js.nameType(inflector.pluralize(widget.value("object",widget.id)))}AsOptions();
+  <#if !optionable_widgets[widget.id]??><#continue></#if>
+  <#assign optVal = optionable_widgets[widget.id]>
+  <#if widget.type == "select" || widget.type == "multiselect">
+    <#if optVal.isRef>
+  ${js.nameVariable(widget.id)}Options.value = await sdk.fetch${js.nameType(inflector.pluralize(optVal.value.name))}AsOptions();
+    <#else>
+  ${js.nameVariable(widget.id)}Options.value = sdk.${js.nameVariable(widget.id)}Options;
     </#if>
-  <#elseif widget.type == "entry_form" || widget.type == "display_form" || widget.type == "hero_card">
-  load${js.nameType(widget.id)}Data(props);
+  </#if>
+</#list>
+<#-- 加载页面主要的数据 -->
+<#assign visited_widgets = {}>
+<#list page.widgets as widget>
+  <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
+  <#if widget.type == "entry_form" || widget.type == "display_form" || widget.type == "official_form" || 
+       widget.type == "hero_card">
+  load${js.nameType(widget.id)}Data();
   <#elseif widget.type == "excel_form" || widget.type == "list_view">
   load${js.nameType(widget.id)}Rows();
   <#elseif widget.type == "chart">
   load${js.nameType(widget.id)}Rows();
+  </#if>
+</#list>
+<#-- 后置加载需要根据主要数据加载的选项值 -->
+<#list page.widgets as widget>
+  <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
+  <#if widget.type == "cascade" && widget.value("data") != "">
+    <#assign optRef = typebase.enumref(widget.value("data"))>
+  ${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}OptionLabels = await sdk.fetch${js.nameType(widget.id)}OptionLabels(${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)});
   </#if>
 </#list>
 })

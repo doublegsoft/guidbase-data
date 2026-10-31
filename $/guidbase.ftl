@@ -829,6 +829,9 @@
     <#if (child.options["property"]!"") == prop>
       <#return true>
     </#if>
+    <#if child.type == prop>
+      <#return true>
+    </#if>
   </#list>
   <#return false>
 </#function> 

@@ -635,6 +635,7 @@ html, body {
   display: flex;
   align-items: center;
   line-height: 1.4;
+  height: 100%;
 }
 .${namespace}-fv-val {
   flex: 1;
@@ -652,6 +653,182 @@ html, body {
 .${namespace}-fv-val--success { color: var(--${namespace}-success); font-weight: bold; }
 .${namespace}-fv-val--danger  { color: var(--${namespace}-danger);  font-weight: bold; }
 .${namespace}-fv-val--link    { color: var(--${namespace}-primary); cursor: pointer; text-decoration: underline; }
+
+/* ── 文件列表容器（移除居中，靠左自适应排列） ── */
+.${namespace}-fv-val--files {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start !important; /* 彻底去除居中，靠左对齐 */
+  gap: 3px;
+  width: 100%;
+}
+
+/* ── 文件项胶囊（去除 align-items: center） ──── */
+.${namespace}-fv-file-item {
+  display: inline-flex;
+  gap: 6px;
+  padding: 2px 8px;
+  background: var(--${namespace}-bg-page, #f4f6f9);
+  border: 1px solid var(--${namespace}-border-light, #e4e8f0);
+  border-radius: var(--${namespace}-radius-sm, 2px);
+  color: var(--${namespace}-text, #1c2833);
+  text-decoration: none;
+  font-size: 11px;
+  height: 22px;
+  line-height: 18px; /* 替代居中，保证文字基线垂直居中 */
+  box-sizing: border-box;
+  max-width: 100%;
+  transition: all 0.15s ease;
+}
+.${namespace}-fv-file-item:hover {
+  background: var(--${namespace}-primary-bg, #e8edf5);
+  border-color: var(--${namespace}-primary-border, #d0d8e8);
+  color: var(--${namespace}-primary, #1a4f8a);
+}
+.${namespace}-fv-file-icon {
+  font-size: 12px;
+  line-height: 18px;
+}
+.${namespace}-fv-file-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 18px;
+}
+.${namespace}-fv-file-size {
+  font-size: 10px;
+  color: var(--${namespace}-text-muted, #5d6d7e);
+  line-height: 18px;
+}
+.${namespace}-fv-file-down {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--${namespace}-primary, #1a4f8a);
+  margin-left: 2px;
+  line-height: 18px;
+}
+
+/* ── 顶部对齐控制 ────────────────────────────── */
+.${namespace}-fv--top {
+  align-items: flex-start !important;
+}
+.${namespace}-fv-label--top {
+  align-items: flex-start;
+  padding-top: 6px;
+  line-height: 1.2;
+}
+
+/* ── 空值灰色占位符 ──────────────────────────── */
+.${namespace}-fv-empty {
+  color: var(--${namespace}-text-light, #909eac);
+}
+
+/* ── 预格式化长文本 ──────────────────────────── */
+.${namespace}-fv-val--pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+/* ── 媒体网格容器（图片与视频） ──────────────── */
+.${namespace}-fv-val--media {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ── 图片小缩略图（紧凑精致，点击新标签看原图） ── */
+.${namespace}-fv-img-box {
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--${namespace}-border, #c8c8c8);
+  border-radius: var(--${namespace}-radius-sm, 2px);
+  overflow: hidden;
+  display: block;
+  background: var(--${namespace}-bg-page, #f4f6f9);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
+}
+.${namespace}-fv-img-box:hover {
+  border-color: var(--${namespace}-primary, #1a4f8a);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+.${namespace}-fv-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── 视频缩略图播放卡片 ──────────────────────── */
+.${namespace}-fv-vid-box {
+  width: 120px;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--${namespace}-border, #c8c8c8);
+  border-radius: var(--${namespace}-radius-sm, 2px);
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.${namespace}-fv-vid {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  outline: none;
+}
+
+/* ── 文件列表（高密度紧凑下载胶囊） ─────────── */
+.${namespace}-fv-val--files {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+}
+.${namespace}-fv-file-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  background: var(--${namespace}-bg-page, #f4f6f9);
+  border: 1px solid var(--${namespace}-border-light, #e4e8f0);
+  border-radius: var(--${namespace}-radius-sm, 2px);
+  color: var(--${namespace}-text, #1c2833);
+  text-decoration: none;
+  font-size: 11px;
+  height: 22px;
+  box-sizing: border-box;
+  max-width: 100%;
+  transition: all 0.15s ease;
+}
+.${namespace}-fv-file-item:hover {
+  background: var(--${namespace}-primary-bg, #e8edf5);
+  border-color: var(--${namespace}-primary-border, #d0d8e8);
+  color: var(--${namespace}-primary, #1a4f8a);
+}
+.${namespace}-fv-file-icon {
+  font-size: 12px;
+  line-height: 1;
+}
+.${namespace}-fv-file-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.${namespace}-fv-file-size {
+  font-size: 10px;
+  color: var(--${namespace}-text-muted, #5d6d7e);
+}
+.${namespace}-fv-file-down {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--${namespace}-primary, #1a4f8a);
+  margin-left: 2px;
+}
 
 /* ══════════════════════════════════════════════
    10. Form Grid  (编辑表单)
@@ -694,6 +871,15 @@ html, body {
 
 /* Required marker */
 .${namespace}-field-label--required::before { content: "* "; color: var(--${namespace}-danger); }
+
+.${namespace}-field--top {
+  align-items: flex-start; /* 容器项顶部对齐 */
+}
+
+.${namespace}-field-label--top {
+  align-self: flex-start;  /* Label 自身靠顶 */
+  padding-top: 6px;         /* 留出微小内边距，使文字基线与右侧控件的第一行完美平齐 */
+}
 
 /* Inputs */
 .${namespace}-input,
