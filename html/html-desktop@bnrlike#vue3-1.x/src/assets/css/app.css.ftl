@@ -1541,6 +1541,371 @@ html, body {
   text-align: center;
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   BNR Letter Form Component — .${namespace}-lt (纯 CSS 版本)
+   ══════════════════════════════════════════════════════════════════ */
+
+/* 1. 外层容器 */
+.${namespace}-lt {
+  background: var(--${namespace}-bg-page, #eaeef2);
+  padding: 24px 0 60px;
+  font-family: var(--${namespace}-font-sans, "Microsoft YaHei", sans-serif);
+  color: var(--${namespace}-text, #1c2833);
+}
+
+/* 2. 顶部工具栏 */
+.${namespace}-lt__toolbar {
+  width: 820px;
+  margin: 0 auto 16px;
+  background: var(--${namespace}-bg, #fff);
+  border: 1px solid var(--${namespace}-border, #c8c8c8);
+  padding: 6px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.${namespace}-lt__toolbar-left,
+.${namespace}-lt__toolbar-right {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.${namespace}-lt__toolbar-title {
+  font-weight: bold;
+  color: var(--${namespace}-primary, #1a4f8a);
+  margin-right: 8px;
+  font-size: 13px;
+}
+
+/* 3. 信笺纸张主体 (逼近 A4 竖版比例) */
+.${namespace}-lt__paper {
+  width: 820px;
+  min-height: 1060px;
+  margin: 0 auto;
+  background: var(--${namespace}-bg, #ffffff);
+  padding: 50px 65px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-top: 4px solid var(--${namespace}-primary, #1a4f8a);
+}
+
+/* 4. 信头 (Letterhead) */
+.${namespace}-lt__lh {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--${namespace}-primary, #1a4f8a);
+  margin-bottom: 28px;
+}
+
+.${namespace}-lt__lh-corp {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.${namespace}-lt__lh-logo {
+  width: 36px;
+  height: 36px;
+  background: var(--${namespace}-primary, #1a4f8a);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 15px;
+  border-radius: 2px;
+}
+
+.${namespace}-lt__lh-titles h2 {
+  font-size: 18px;
+  color: var(--${namespace}-primary, #1a4f8a);
+  letter-spacing: 1px;
+  line-height: 1.2;
+}
+
+.${namespace}-lt__lh-titles p {
+  font-size: 10px;
+  color: var(--${namespace}-text-light, #909eac);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 3px;
+}
+
+.${namespace}-lt__lh-meta {
+  text-align: right;
+  font-size: 11px;
+  color: var(--${namespace}-text-muted, #5d6d7e);
+  font-family: var(--${namespace}-mono, Consolas, monospace);
+  line-height: 1.8;
+}
+
+.${namespace}-lt__lh-meta-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* 5. 填空下划线输入项 */
+.${namespace}-lt__line-input {
+  border: none;
+  border-bottom: 1px solid var(--${namespace}-border, #c8c8c8);
+  outline: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--${namespace}-text, #1c2833);
+  background: transparent;
+  padding: 0 4px;
+  height: 22px;
+  transition: all 0.2s;
+}
+
+.${namespace}-lt__line-input:focus {
+  border-bottom-color: var(--${namespace}-primary, #1a4f8a);
+  background-color: rgba(26, 79, 138, 0.03);
+}
+
+.${namespace}-lt__line-input--recipient {
+  width: 320px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* 6. 信函内容区与事由 */
+.${namespace}-lt__content {
+  font-family: var(--${namespace}-font-letter, "FangSong", "仿宋", "STFangsong", serif);
+  font-size: 15px;
+  line-height: 2.2;
+  color: #222;
+  flex: 1;
+}
+
+.${namespace}-lt__subject {
+  text-align: center;
+  margin: 10px 0 24px;
+}
+
+.${namespace}-lt__subject-inner {
+  display: inline-block;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--${namespace}-text, #1c2833);
+  border-bottom: 2px solid var(--${namespace}-primary-border, #d0d8e8);
+  padding-bottom: 4px;
+  letter-spacing: 1.5px;
+}
+
+/* 7. 上款（致送受函人） */
+.${namespace}-lt__salutation {
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.${namespace}-lt__salutation-prefix {
+  flex-shrink: 0;
+}
+
+.${namespace}-lt__salutation-suffix {
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+
+/* 8. 正文文本域 (带淡灰信笺横线背景) */
+.${namespace}-lt__textarea {
+  width: 100%;
+  min-height: 280px;
+  border: none;
+  outline: none;
+  resize: vertical;
+  font-family: var(--${namespace}-font-letter, "FangSong", "仿宋", "STFangsong", serif);
+  font-size: 15px;
+  color: #222;
+  line-height: 32px;
+  background-color: transparent;
+  padding: 0;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 31px,
+    #e8ecf0 31px,
+    #e8ecf0 32px
+  );
+  background-attachment: local;
+  box-sizing: border-box;
+}
+
+/* 9. 扩展普通字段区 */
+.${namespace}-lt__general-fields {
+  margin: 16px 0;
+}
+
+.${namespace}-lt__general-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.${namespace}-lt__general-label {
+  color: var(--${namespace}-text-muted, #5d6d7e);
+}
+
+/* 10. 结语与祝词 */
+.${namespace}-lt__closing {
+  margin-top: 16px;
+  text-indent: 2em;
+  color: var(--${namespace}-text, #1c2833);
+}
+
+.${namespace}-lt__wish {
+  text-align: right;
+  padding-right: 60px;
+  margin-top: 6px;
+  font-weight: bold;
+}
+
+/* 11. 落款与签章区 */
+.${namespace}-lt__signoff-wrap {
+  margin-top: 40px;
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.${namespace}-lt__signoff {
+  width: 300px;
+  text-align: left;
+  font-size: 14px;
+  line-height: 2.2;
+  position: relative;
+  z-index: 2;
+}
+
+.${namespace}-lt__signoff-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.${namespace}-lt__signoff-row .${namespace}-lt__line-input {
+  flex: 1;
+}
+
+.${namespace}-lt__signoff-label {
+  flex-shrink: 0;
+  color: var(--${namespace}-text-muted, #5d6d7e);
+}
+
+/* 12. 真实红印公章 */
+.${namespace}-lt__seal {
+  position: absolute;
+  right: 25px;
+  top: -20px;
+  width: 105px;
+  height: 105px;
+  border: 2px solid var(--${namespace}-danger, #c0392b);
+  border-radius: 50%;
+  color: var(--${namespace}-danger, #c0392b);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.82;
+  transform: rotate(-12deg);
+  user-select: none;
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: inset 0 0 2px rgba(192, 57, 43, 0.3);
+}
+
+.${namespace}-lt__seal-star {
+  font-size: 20px;
+  line-height: 1;
+  margin: -2px 0 2px;
+}
+
+.${namespace}-lt__seal-corp {
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.${namespace}-lt__seal-type {
+  font-size: 10px;
+  font-weight: bold;
+  margin-top: 2px;
+  letter-spacing: 2px;
+}
+
+/* 13. 底部附件与信息栏 */
+.${namespace}-lt__footer {
+  border-top: 1px dashed var(--${namespace}-border-light, #e4e8f0);
+  padding-top: 18px;
+  margin-top: 40px;
+  font-size: 11px;
+  color: var(--${namespace}-text-muted, #5d6d7e);
+}
+
+.${namespace}-lt__annex-title {
+  font-weight: bold;
+  color: var(--${namespace}-text, #1c2833);
+  margin-bottom: 6px;
+}
+
+.${namespace}-lt__annex-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+}
+
+.${namespace}-lt__annex-index {
+  color: var(--${namespace}-text-light, #909eac);
+}
+
+.${namespace}-lt__bottom-bar {
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  color: var(--${namespace}-text-light, #909eac);
+  font-size: 10px;
+  border-top: 1px solid var(--${namespace}-border-light, #e4e8f0);
+  padding-top: 8px;
+}
+
+/* 14. 打印自适应 (Print Media) */
+@media print {
+  .${namespace}-lt {
+    background: #fff;
+    padding: 0;
+  }
+
+  .${namespace}-lt__toolbar {
+    display: none !important;
+  }
+
+  .${namespace}-lt__paper {
+    width: 100%;
+    border: none;
+    box-shadow: none;
+    padding: 30px;
+  }
+}
+
 /* ══════════════════════════════════════════════
    14. Print — 打印样式
    ══════════════════════════════════════════════ */

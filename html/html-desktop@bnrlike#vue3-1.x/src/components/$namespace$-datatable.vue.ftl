@@ -52,11 +52,11 @@
               <!-- 序号列 -->
               <th v-if="showIndex" style="width: 50px" class="${namespace}-tc">序号</th>
 
-              <!-- 业务数据列 -->
+              <!-- 业务数据列 (表头居中对齐) -->
               <th
                 v-for="(col, ci) in columns"
                 :key="col.key"
-                :style="{ width: col.width || '', textAlign: col.align || 'left' }"
+                :style="{ width: col.width || '', textAlign: col.headerAlign || col.titleAlign || 'center' }"
                 :class="{
                   '${namespace}-sortable': col.sortable,
                   '${namespace}-asc': sortKey === col.key && sortAsc,
@@ -69,7 +69,7 @@
               </th>
 
               <!-- 操作列 -->
-              <th v-if="showRowAction" style="width: 90px" class="${namespace}-tc">操作</th>
+              <th v-if="showRowAction" style="width: 95px" class="${namespace}-tc">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -181,7 +181,7 @@
                 </template>
               </td>
 
-              <!-- 操作列：删除单行（触发已有 Feedback 弹窗） -->
+              <!-- 操作列：常驻显眼的删除按钮 -->
               <td v-if="showRowAction" class="${namespace}-tc ${namespace}-action-cell" @click.stop>
                 <button
                   type="button"
@@ -189,7 +189,7 @@
                   title="删除此行"
                   @click="handleRemoveRow(rowIndex)"
                 >
-                  <svg class="${namespace}-action-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <svg class="${namespace}-action-icon" viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="3 6 5 6 21 6"></polyline>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                     <line x1="10" y1="11" x2="10" y2="17"></line>
@@ -311,7 +311,6 @@
 
 <script setup>
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
-// 正式引入已有的 Feedback 组件（根据项目规范自动替换命名空间）
 import FeedbackDialog from './${namespace}-feedback.vue'
 
 const props = defineProps({
@@ -412,7 +411,6 @@ const feedbackDialog = ref({
   resolve: null
 })
 
-// Promise 式唤起 Feedback 确认弹窗
 function confirm(title, message) {
   return new Promise(function(resolve) {
     feedbackDialog.value = {
@@ -425,7 +423,6 @@ function confirm(title, message) {
   })
 }
 
-// Feedback 关闭回调
 function onFeedbackClose(r) {
   if (feedbackDialog.value && typeof feedbackDialog.value.resolve === 'function') {
     feedbackDialog.value.resolve(r)
@@ -875,7 +872,6 @@ function addRow(customData = {}) {
 // ══════════════════ 结合 Feedback 组件的确认删除 ══════════════════
 // 1. 单行删除
 async function handleRemoveRow(index) {
-  // 调用 Feedback 确认弹窗（返回 Promise<boolean>）
   const ok = await confirm('确认删除', '确定要删除此行数据吗？此操作无法撤销。')
   if (ok) {
     removeRow(index)
@@ -898,7 +894,6 @@ async function handleDeleteSelected() {
   const count = selectedIds.value.size
   if (count === 0) return
 
-  // 调用 Feedback 确认弹窗
   const ok = await confirm('确认批量删除', '确定要删除已选中的 ' + count + ' 项数据吗？')
   if (ok) {
     deleteSelectedRows()
@@ -997,8 +992,9 @@ defineExpose({
 .${namespace}-btn {
   height: 28px;
   padding: 0 12px;
-  border-radius: 3px;
+  border-radius: 4px;
   font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -1007,7 +1003,7 @@ defineExpose({
   border: 1px solid var(--${namespace}-bd, #d9d9d9);
   background: var(--${namespace}-bg, #fff);
   color: var(--${namespace}-t, #333);
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
 .${namespace}-btn-primary {
@@ -1020,48 +1016,67 @@ defineExpose({
   border-color: var(--${namespace}-ph, #40a9ff);
 }
 
+/* 批量删除按钮 */
 .${namespace}-btn-danger {
   background: var(--${namespace}-rb, #ff4d4f);
   color: #fff;
   border-color: var(--${namespace}-rb, #ff4d4f);
+  box-shadow: 0 2px 4px rgba(255, 77, 79, 0.2);
 }
 .${namespace}-btn-danger:hover {
-  opacity: 0.88;
+  background: #d9363e;
+  border-color: #d9363e;
+  box-shadow: 0 3px 8px rgba(217, 54, 62, 0.35);
+  transform: translateY(-1px);
+}
+.${namespace}-btn-danger:active {
+  background: #b3242b;
+  border-color: #b3242b;
+  transform: translateY(0);
 }
 
-/* 行内删除操作按钮 */
+/* 行内操作列 */
 .${namespace}-action-cell {
-  padding: 0 4px !important;
+  padding: 0 6px !important;
 }
 
+/* 
+  删除按钮样式：
+  默认即显示明显的实心高亮红底 + 纯白文字 + 红色柔和阴影（原 hover 效果）；
+  当悬浮 hover 时，进一步加深颜色并放大阴影给予交互反馈。
+*/
 .${namespace}-btn-action-del {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  height: 24px;
-  padding: 0 8px;
+  height: 25px;
+  padding: 0 9px;
   font-size: 12px;
-  color: var(--${namespace}-rb, #ff4d4f);
-  background-color: var(--${namespace}-danger-bg, #fff1f0);
-  border: 1px solid var(--${namespace}-danger-bd, #ffccc7);
+  font-weight: 500;
+  color: #ffffff !important;
+  background-color: #ff4d4f !important;
+  border: 1px solid #ff4d4f !important;
   border-radius: 4px;
   cursor: pointer;
   outline: none;
+  box-shadow: 0 2px 5px rgba(255, 77, 79, 0.28);
   transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
   user-select: none;
 }
 
 .${namespace}-btn-action-del:hover {
-  color: #fff;
-  background-color: var(--${namespace}-rb, #ff4d4f);
-  border-color: var(--${namespace}-rb, #ff4d4f);
-  box-shadow: 0 2px 5px rgba(255, 77, 79, 0.25);
+  color: #ffffff !important;
+  background-color: #d9363e !important;
+  border-color: #d9363e !important;
+  box-shadow: 0 4px 10px rgba(217, 54, 62, 0.45);
+  transform: translateY(-1px);
 }
 
 .${namespace}-btn-action-del:active {
-  background-color: #d9363e;
-  border-color: #d9363e;
+  background-color: #b3242b !important;
+  border-color: #b3242b !important;
+  box-shadow: 0 1px 3px rgba(179, 36, 43, 0.4);
   transform: translateY(1px);
 }
 
@@ -1107,7 +1122,7 @@ defineExpose({
   color: var(--${namespace}-t, #333);
 }
 
-/* 表头样式（与标准分页表格一致） */
+/* 表头样式（标题默认居中对齐） */
 .${namespace}-table thead th {
   position: sticky;
   top: 0;
@@ -1116,7 +1131,7 @@ defineExpose({
   color: var(--${namespace}-p, #1890ff);
   padding: 8px 10px;
   font-weight: bold;
-  text-align: left;
+  text-align: center;
   white-space: nowrap;
   border-bottom: 1px solid var(--${namespace}-pbd, #e8e8e8);
   border-right: 1px solid var(--${namespace}-pbd, #e8e8e8);
@@ -1130,7 +1145,7 @@ defineExpose({
 .${namespace}-table thead th.${namespace}-asc .${namespace}-sort-icon::after { content: '▲'; opacity: 1; }
 .${namespace}-table thead th.${namespace}-desc .${namespace}-sort-icon::after { content: '▼'; opacity: 1; }
 
-/* 表体单元格：默认状态与分页表格完全一致 */
+/* 表体单元格 */
 .${namespace}-table tbody td {
   padding: 6px 10px;
   border-bottom: 1px solid var(--${namespace}-bl, #e8e8e8);
@@ -1411,7 +1426,7 @@ defineExpose({
 
 .${namespace}-date-clear-btn {
   font-size: 11px;
-  color: var(--${namespace}-tm, #999);
+  color: var(--${namespace}-rb, #ff4d4f);
   cursor: pointer;
   padding: 2px 4px;
   border-radius: 2px;

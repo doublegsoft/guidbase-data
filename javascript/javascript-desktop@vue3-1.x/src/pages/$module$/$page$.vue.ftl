@@ -7,6 +7,7 @@
 <#else>
 <#import "/$/vue3-default.ftl" as vue3>
 </#if>
+<#import "/$/guidbase.ftl" as guidbase>
 <#import "/$/guidbase4js.ftl" as guidbase4js>
 <#assign page = pageDef>
 <#global pageVars = {}>
@@ -106,8 +107,8 @@ onMounted(async () => {
 <#-- 后置加载需要根据主要数据加载的选项值 -->
 <#list page.widgets as widget>
   <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
-  <#if widget.type == "cascade" && widget.value("data") != "">
-    <#assign optRef = typebase.enumref(widget.value("data"))>
+  <#if widget.type == "cascade">
+    <#assign optRef = typebase.enumref(guidbase.get_data_by_id(widget.id))>
   ${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}OptionLabels = await sdk.fetch${js.nameType(widget.id)}OptionLabels(${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)});
   </#if>
 </#list>

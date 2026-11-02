@@ -128,6 +128,8 @@ ${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(child.
             <#--  </#if>  -->
           <#elseif child.type == "multiselect">
 ${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />      
+          <#elseif child.type == "cascade">
+${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(child.id)}" :fetch-options="sdk.fetch${js.nameType(child.value("data",child.id))}AsOptions" v-model:labels="${guidbase.name_input_variable(child)}OptionLabels" v-model="${guidbase.name_input_variable(child)}" plain />
           <#elseif child.type == "tags">
 ${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(child.id)}" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />      
           <#elseif child.type == "longtext">
@@ -154,6 +156,201 @@ ${""?left_pad(indent)}      </tr>
 ${""?left_pad(indent)}    </table>
 ${""?left_pad(indent)}  </div>
 ${""?left_pad(indent)}</div>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                               LETTER FORM                               -->
+<!----------------------------------------------------------------------------->
+<#macro print_letter_form_layout form indent>
+  <#-- 1. 基础配置与元数据提取 -->
+  <#local corpName    = form.value("corp_name", "中国建设银行股份有限公司上海分行")>
+  <#local corpSub     = form.value("corp_sub", "CHINA CONSTRUCTION BANK · BUSINESS CORRESPONDENCE")>
+  <#local logoText    = form.value("logo_text", "CCB")>
+  <#local sealCorp    = form.value("seal_corp", "中国建设银行上海分行")>
+  <#local sealType    = form.value("seal_type", "业务专用章")>
+  <#local closingText = form.value("closing", "专此函达。")>
+  <#local wishText    = form.value("wish", "顺祝 商祺！")>
+  <#local showToolbar = form.value("toolbar", "true") == "true">
+  <#local showSeal    = form.value("show_seal", "true") == "true">
+
+  <#-- 2. 扫描子字段并按信函业务语义分流 (支持 group 或 slot 或字段特征推断) -->
+  <#local metaChildren     = []> <#-- 函号、日期等信头元数据 -->
+  <#local recipientChild   = ""> <#-- 致送单位/受函人 -->
+  <#local bodyChild        = ""> <#-- 信函正文 -->
+  <#local signoffChildren  = []> <#-- 发函部门、签发代表、签章日期 -->
+  <#local annexChildren    = []> <#-- 附件清单 -->
+  <#local generalChildren  = []> <#-- 其他扩展字段 -->
+
+  <#list form.groups() as grp>
+    <#list form.rows(grp, 100) as row>
+      <#list row as child>
+        <#local slot = child.value("slot", grp?lower_case)>
+        <#local cid  = child.id?lower_case>
+
+        <#if slot == "meta" || slot == "header" || cid?contains("no") || cid?contains("code") || cid?contains("num")>
+          <#local metaChildren = metaChildren + [child]>
+        <#elseif slot == "recipient" || slot == "salutation" || cid?contains("recipient") || cid?contains("receiver") || cid?contains("to")>
+          <#local recipientChild = child>
+        <#elseif slot == "body" || slot == "content" || child.type == "longtext">
+          <#if !(bodyChild?is_hash)>
+            <#local bodyChild = child>
+          <#else>
+            <#local generalChildren = generalChildren + [child]>
+          </#if>
+        <#elseif slot == "signoff" || slot == "sign" || cid?contains("sign") || cid?contains("sender") || cid?contains("issuer") || cid?contains("dept")>
+          <#local signoffChildren = signoffChildren + [child]>
+        <#elseif slot == "annex" || slot == "attachment" || child.type == "file" || cid?contains("annex") || cid?contains("attach")>
+          <#local annexChildren = annexChildren + [child]>
+        <#else>
+          <#local generalChildren = generalChildren + [child]>
+        </#if>
+      </#list>
+    </#list>
+  </#list>
+${""?left_pad(indent)}<div class="${namespace}-lt">
+<#-- ── 顶部操作工具栏 ── -->
+<#if showToolbar>
+${""?left_pad(indent)}  <div class="${namespace}-lt__toolbar">
+${""?left_pad(indent)}    <div class="${namespace}-lt__toolbar-left">
+${""?left_pad(indent)}      <span class="${namespace}-lt__toolbar-title">${form.value("toolbar_title", "信函编辑器")}</span>
+${""?left_pad(indent)}      <button type="button" class="${namespace}-btn" @click="window.print()">打印信笺</button>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}    <div class="${namespace}-lt__toolbar-right">
+${""?left_pad(indent)}      <button type="button" class="${namespace}-btn" @click="$emit('draft')">存为草稿</button>
+${""?left_pad(indent)}      <button type="button" class="${namespace}-btn ${namespace}-btn--primary" @click="$emit('submit')">签发用印</button>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}  </div>
+</#if>
+<#-- ── 信函纸张主体 (A4 竖版比例纸张) ── -->
+${""?left_pad(indent)}  <div ref="${js.nameVariable(form.id)}Ref" class="${namespace}-lt__paper">
+${""?left_pad(indent)}    <!-- 1. 信头区 (Letterhead) -->
+${""?left_pad(indent)}    <div class="${namespace}-lt__lh">
+${""?left_pad(indent)}      <div class="${namespace}-lt__lh-corp">
+${""?left_pad(indent)}        <div class="${namespace}-lt__lh-logo">${logoText}</div>
+${""?left_pad(indent)}        <div class="${namespace}-lt__lh-titles">
+${""?left_pad(indent)}          <h2>${corpName}</h2>
+${""?left_pad(indent)}          <p>${corpSub}</p>
+${""?left_pad(indent)}        </div>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}      <div class="${namespace}-lt__lh-meta">
+<#list metaChildren as meta>
+${""?left_pad(indent)}        <div class="${namespace}-lt__lh-meta-item">
+${""?left_pad(indent)}          <span>${meta.title}：</span>
+<@print_letter_control child=meta form=form indent=indent+10 />
+${""?left_pad(indent)}        </div>
+</#list>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}    <!-- 2. 信函内容正体 (Letter Content) -->
+${""?left_pad(indent)}    <div class="${namespace}-lt__content">
+${""?left_pad(indent)}      <!-- 事由/标题 -->
+${""?left_pad(indent)}      <div class="${namespace}-lt__subject">
+${""?left_pad(indent)}        <span class="${namespace}-lt__subject-inner">${form.title}</span>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}      <!-- 上款 (致受函单位/人) -->
+<#if recipientChild?is_hash>
+${""?left_pad(indent)}      <div class="${namespace}-lt__salutation">
+${""?left_pad(indent)}        <span class="${namespace}-lt__salutation-prefix">致：</span>
+<@print_letter_control child=recipientChild form=form indent=indent+8 isRecipient=true />
+${""?left_pad(indent)}        <span class="${namespace}-lt__salutation-suffix">${form.value("salutation_suffix", "公鉴：")}</span>
+${""?left_pad(indent)}      </div>
+</#if>
+${""?left_pad(indent)}      <!-- 正文文本域 (支持信笺横线背景) -->
+<#if bodyChild?is_hash>
+${""?left_pad(indent)}      <div class="${namespace}-lt__body">
+${""?left_pad(indent)}        <textarea
+${""?left_pad(indent)}          class="${namespace}-lt__textarea"
+${""?left_pad(indent)}          :class="{ '${namespace}-lt__readonly': readonly }"
+${""?left_pad(indent)}          placeholder="${bodyChild.value("placeholder", "在此书写信函具体事项...")}"
+${""?left_pad(indent)}          v-model="${js.nameVariable(form.id)}Data.${js.nameVariable(bodyChild.id)}"
+${""?left_pad(indent)}          :readonly="readonly || ${bodyChild.value("readonly","false")}"></textarea>
+${""?left_pad(indent)}      </div>
+</#if>
+<#-- 附加普通扩展属性（若有） -->
+<#if generalChildren?size gt 0>
+${""?left_pad(indent)}      <div class="${namespace}-lt__general-fields">
+  <#list generalChildren as gField>
+${""?left_pad(indent)}        <div class="${namespace}-lt__general-item">
+${""?left_pad(indent)}          <span class="${namespace}-lt__general-label">${gField.title}：</span>
+<@print_letter_control child=gField form=form indent=indent+10 />
+${""?left_pad(indent)}        </div>
+  </#list>
+${""?left_pad(indent)}      </div>
+</#if>
+
+${""?left_pad(indent)}      <!-- 结语/祝词 -->
+${""?left_pad(indent)}      <div class="${namespace}-lt__closing">${closingText}</div>
+${""?left_pad(indent)}      <div class="${namespace}-lt__wish">${wishText}</div>
+
+${""?left_pad(indent)}      <!-- 落款与签印区 -->
+${""?left_pad(indent)}      <div class="${namespace}-lt__signoff-wrap">
+${""?left_pad(indent)}        <div class="${namespace}-lt__signoff">
+<#list signoffChildren as signField>
+${""?left_pad(indent)}          <div class="${namespace}-lt__signoff-row">
+${""?left_pad(indent)}            <span class="${namespace}-lt__signoff-label">${signField.title}：</span>
+<@print_letter_control child=signField form=form indent=indent+12 />
+${""?left_pad(indent)}          </div>
+</#list>
+${""?left_pad(indent)}        </div>
+
+<#if showSeal>
+${""?left_pad(indent)}        <!-- 真实红印印章模拟 -->
+${""?left_pad(indent)}        <div class="${namespace}-lt__seal">
+${""?left_pad(indent)}          <div class="${namespace}-lt__seal-star">★</div>
+${""?left_pad(indent)}          <div class="${namespace}-lt__seal-corp">${sealCorp}</div>
+${""?left_pad(indent)}          <div class="${namespace}-lt__seal-type">${sealType}</div>
+${""?left_pad(indent)}        </div>
+</#if>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}    </div>
+
+${""?left_pad(indent)}    <!-- 3. 底栏附件与备查信息 -->
+${""?left_pad(indent)}    <div class="${namespace}-lt__footer">
+<#if annexChildren?size gt 0>
+${""?left_pad(indent)}      <div class="${namespace}-lt__annex">
+${""?left_pad(indent)}        <div class="${namespace}-lt__annex-title">附件及清单：</div>
+  <#list annexChildren as aField>
+${""?left_pad(indent)}        <div class="${namespace}-lt__annex-item">
+${""?left_pad(indent)}          <span class="${namespace}-lt__annex-index">${aField_index + 1}.</span>
+<@print_letter_control child=aField form=form indent=indent+10 />
+${""?left_pad(indent)}        </div>
+  </#list>
+${""?left_pad(indent)}      </div>
+</#if>
+
+${""?left_pad(indent)}      <div class="${namespace}-lt__bottom-bar">
+${""?left_pad(indent)}        <span>${form.value("contact_info", "联系人：信函联络专员 / 电话：021-XXXXXXXX / 地址：国际金融中心大厦")}</span>
+${""?left_pad(indent)}        <span>第 1 页 / 共 1 页</span>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}</div>
+</#macro>
+
+<#-- =========================================================================
+  辅助宏：控件派发渲染 (统一采用 plain 极简无边框线装模式)
+========================================================================= -->
+<#macro print_letter_control child form indent isRecipient=false>
+  <#local modelPath = "${js.nameVariable(form.id)}Data.${js.nameVariable(child.id)}">
+  <#local readonlyExpr = "readonly || " + child.value("readonly", "false")>
+  <#if child.type == "date">
+${""?left_pad(indent)}<${namespace}-datepicker data-test="${js.nameVariable(child.id)}" v-model="${modelPath}" :readonly="${readonlyExpr}" plain />
+  <#elseif child.type == "select">
+${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options" :clearable="true" v-model="${modelPath}" :disabled="${readonlyExpr}" plain />
+  <#elseif child.type == "multiselect">
+${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options" v-model="${modelPath}" :disabled="${readonlyExpr}" plain />
+  <#elseif child.type == "cascade">
+${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(child.id)}" :fetch-options="sdk.fetch${js.nameType(child.value("data",child.id))}AsOptions" v-model:labels="${guidbase.name_input_variable(child)}OptionLabels" v-model="${guidbase.name_input_variable(child)}" :disabled="${readonlyExpr}" plain />
+  <#elseif child.type == "tags">
+${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(child.id)}" v-model="${modelPath}" :disabled="${readonlyExpr}" plain />
+  <#else>
+${""?left_pad(indent)}<input type="text"
+${""?left_pad(indent)}  class="${namespace}-lt__line-input<#if isRecipient> ${namespace}-lt__line-input--recipient</#if>"
+${""?left_pad(indent)}  :class="{ '${namespace}-lt__readonly': ${readonlyExpr} }"
+${""?left_pad(indent)}  placeholder="${child.value("placeholder", "请填写" + child.title)}"
+${""?left_pad(indent)}  v-model="${modelPath}"
+${""?left_pad(indent)}  :readonly="${readonlyExpr}" />
+  </#if>
 </#macro>
 
 <!----------------------------------------------------------------------------->

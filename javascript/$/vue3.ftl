@@ -89,14 +89,16 @@ const save${js.nameType(form.id)}Data = async () => {
     return
   }
   is${js.nameType(form.id)}Submitting.value = true
+  const hideLoading = fb.loading ? fb.loading('正在保存，请稍候...') : null
   try {
-    const result = await sdk.save${js.nameType(form.value("object",form.id))}(${js.nameVariable(form.id)}Data)
+    const result = await sdk.save${js.nameType(url.resource)}(${js.nameVariable(form.id)}Data)
     if (result.success) {
       fb.success('成功', '保存成功');
     }
   } catch (error) {
     fb.error('发生错误', error)
   } finally {
+    hideLoading?.()
     is${js.nameType(form.id)}Submitting.value = false
   }
 }
@@ -122,6 +124,9 @@ ${""?left_pad(indent)}// ${js.nameVariable(form.id)}表单相关变量
 ${""?left_pad(indent)}const ${js.nameVariable(form.id)}Data = reactive({
   <#list form.inputs as input>
 ${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
+    <#if input.type == "cascade">
+${""?left_pad(indent)}  ${js.nameVariable(input.id)}OptionLabels: [],
+    </#if>
   </#list>
 ${""?left_pad(indent)}});
   <#list form.inputs as input>
@@ -169,14 +174,16 @@ const save${js.nameType(form.id)}Data = async () => {
     return
   }
   is${js.nameType(form.id)}Submitting.value = true
+  const hideLoading = fb.loading ? fb.loading('正在保存，请稍候...') : null
   try {
-    const result = await sdk.save${js.nameType(form.value("object",form.id))}(${js.nameVariable(form.id)}Data)
+    const result = await sdk.save${js.nameType(url.resource)}(${js.nameVariable(form.id)}Data)
     if (result.success) {
       fb.success('成功', '保存成功');
     }
   } catch (error) {
     fb.error('发生错误', error)
   } finally {
+    hideLoading?.()
     is${js.nameType(form.id)}Submitting.value = false
   }
 }
@@ -1141,6 +1148,8 @@ ${""?left_pad(indent)}</${namespace}-dialog>
 <@print_entry_form_layout form=widget indent=indent />    
   <#elseif widget.type == "official_form">
 <@print_official_form_layout form=widget indent=indent />   
+  <#elseif widget.type == "letter_form">
+<@print_letter_form_layout form=widget indent=indent />   
   <#elseif widget.type == "excel_form">
 <@print_excel_form_layout form=widget indent=indent />      
   <#elseif widget.type == "paged_table">
@@ -1176,7 +1185,8 @@ ${""?left_pad(indent)}<${namespace}-datepicker data-test="${js.nameVariable(widg
   <#elseif widget.type == "time">
 ${""?left_pad(indent)}<${namespace}-timepicker data-test="${js.nameVariable(widget.id)}" v-model="${guidbase.name_input_variable(widget)}" />
   <#elseif widget.type == "cascade">
-${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(widget.id)}" :fetch-options="sdk.fetch${js.nameType(widget.value("object",widget.id))}AsOptions" v-model:labels="${guidbase.name_input_variable(widget)}OptionLabels" v-model="${guidbase.name_input_variable(widget)}" />
+    <#local enumRef = typebase.enumref(guidbase.get_data_by_id(widget.id))>
+${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(widget.id)}" :fetch-options="sdk.fetch${js.nameType(inflector.pluralize(enumRef.name))}AsOptions" v-model:labels="${guidbase.name_input_variable(widget)}OptionLabels" v-model="${guidbase.name_input_variable(widget)}" levels="3"/>
   <#elseif widget.type == "multiselect">
 ${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options" v-model="${guidbase.name_input_variable(widget)}" />
   <#elseif widget.type == "avatar">

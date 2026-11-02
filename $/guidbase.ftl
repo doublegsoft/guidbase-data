@@ -33,6 +33,31 @@
 
 <#--
  ###############################################################################
+ ### 根据组件 ID 获取数据源定义 (Get Data By Widget ID)
+ ### 
+ ### 该方法用于全局遍历应用中所有页面的下属组件，检索并返回指定组件 ID 对应
+ ### 的非空数据源（Data）定义。
+ ### 
+ ### 若在整个应用配置中未能匹配到对应 ID 且包含有效数据定义的组件，将中断模板
+ ### 渲染并报错提示，引导检查 Guidbase 模型定义。
+ ### 
+ ### @param id        待匹配的目标组件唯一标识符 (String)
+ ### @return          匹配组件所绑定的数据源定义内容 (String)
+ ###############################################################################
+ -->
+<#function get_data_by_id id>
+  <#list app.pages as page>
+    <#list page.widgets as widget>
+      <#if widget.id?? && widget.id == id && widget.value("data") != "">
+        <#return widget.value("data")>
+      </#if>
+    </#list>
+  </#list>
+  <#stop "在这个ID（" + id + "）下没有找到任何的Data定义，请检查Guidbase模型定义">
+</#function>
+
+<#--
+ ###############################################################################
  ### 生成组件数据加载方法名 (Generate Widget Load Method Name)
  ### 
  ### 根据组件类型（widget.type）和唯一标识（widget.id），生成符合命名规范的
