@@ -1906,6 +1906,113 @@ html, body {
   }
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   BNR KPI Card & Sparkline Component — .${namespace}-kpi
+   ══════════════════════════════════════════════════════════════════ */
+
+/* 1. KPI 基础卡片外壳 */
+.${namespace}-kpi-card {
+  background: var(--${namespace}-bg, #ffffff);
+  border: 1px solid var(--${namespace}-border-light, #e4e8f0);
+  border-radius: var(--${namespace}-radius-sm, 2px);
+  padding: 10px 12px 6px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.${namespace}-kpi-card:hover {
+  border-color: var(--${namespace}-primary-border, #d0d8e8);
+  box-shadow: 0 2px 8px rgba(26, 79, 138, 0.08);
+}
+
+/* 2. 头部：标题与趋势状态胶囊 */
+.${namespace}-kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.${namespace}-kpi-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--${namespace}-text-muted, #5d6d7e);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 3. 主体大数值与单位行 */
+.${namespace}-kpi-main {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+/* 核心数值：等宽无衬线，字号突出 */
+.${namespace}-kpi-num {
+  font-family: var(--${namespace}-mono, Consolas, "Courier New", monospace);
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--${namespace}-text, #1c2833);
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+/* 单位 */
+.${namespace}-kpi-unit {
+  font-size: 11px;
+  color: var(--${namespace}-text-light, #909eac);
+  user-select: none;
+}
+
+/* 4. 辅助对比与说明行 */
+.${namespace}-kpi-sub {
+  font-size: 11px;
+  color: var(--${namespace}-text-muted, #5d6d7e);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+/* 目标值小字 */
+.${namespace}-kpi-sub-target {
+  font-family: var(--${namespace}-mono, Consolas, "Courier New", monospace);
+  font-size: 10px;
+  color: var(--${namespace}-text-light, #909eac);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* 5. 底部 ECharts Sparkline 微型走势图挂载容器 */
+.${namespace}-echart-sparkline {
+  width: 100%;
+  height: 48px; /* 紧凑微型走势图基准高度 */
+  margin-top: auto;
+  border-top: 1px dashed var(--${namespace}-border-light, #e4e8f0);
+  padding-top: 4px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* 6. 可选操作按钮区（下钻/明细按钮） */
+.${namespace}-kpi-actions {
+  margin-top: 6px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  border-top: 1px solid var(--${namespace}-border-light, #e4e8f0);
+  padding-top: 4px;
+}
+
 /* ══════════════════════════════════════════════
    14. Print — 打印样式
    ══════════════════════════════════════════════ */

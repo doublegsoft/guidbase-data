@@ -33,6 +33,7 @@
 </template>
 <script setup>
 import { ref, reactive, computed, inject, provide, onMounted, onUnmounted } from 'vue'
+import * as echarts from 'echarts'
 <@vue3.print_page_imports page=pageDef />
 import sdk from '@/sdk/sdk.js'
 import { useFeedback } from '@/composables/useFeedback.js'
@@ -102,6 +103,8 @@ onMounted(async () => {
   load${js.nameType(widget.id)}Rows();
   <#elseif widget.type == "chart">
   load${js.nameType(widget.id)}Rows();
+  <#elseif widget.type == "kpi_chart">
+  load${js.nameType(widget.id)}Data();
   </#if>
 </#list>
 <#-- 后置加载需要根据主要数据加载的选项值 -->

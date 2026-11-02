@@ -70,7 +70,7 @@ ${""?left_pad(indent)}</div>
 <#macro print_entry_form_layout form indent=0>
   <#local cols = form.value("cols","3")>
   <#local groups = form.groups()>
-${""?left_pad(indent)}<div id="entry${js.nameType(form.id)}"<#if guidbase.has_child_widget(form.page, "buttons")> style="padding-bottom:50px;"</#if>>
+${""?left_pad(indent)}<div id="entry${js.nameType(form.id)}"<#if guidbase.has_child_widget(form.page, "buttons") && guidbase.is_last_widget(form)> style="padding-bottom:50px;"</#if>>
   <#list groups as group>
     <#local rows = form.rows(group, cols?number)>
     <#if group?index != 0>
@@ -129,7 +129,8 @@ ${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(child.
           <#elseif child.type == "multiselect">
 ${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />      
           <#elseif child.type == "cascade">
-${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(child.id)}" :fetch-options="sdk.fetch${js.nameType(child.value("data",child.id))}AsOptions" v-model:labels="${guidbase.name_input_variable(child)}OptionLabels" v-model="${guidbase.name_input_variable(child)}" plain />
+            <#local enumRef = typebase.enumref(guidbase.get_data_by_id(child.id))>
+${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(child.id)}" :fetch-options="sdk.fetch${js.nameType(inflector.pluralize(enumRef.name))}AsOptions" v-model:labels="${guidbase.name_input_variable(child)}OptionLabels" v-model="${guidbase.name_input_variable(child)}" levels="3" plain />
           <#elseif child.type == "tags">
 ${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(child.id)}" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />      
           <#elseif child.type == "longtext">
@@ -386,7 +387,7 @@ ${""?left_pad(indent)}</div>
   </#list>
   <#local cols = form.value("cols", "3")>
   <#local formId = js.nameVariable(form.id)>
-${""?left_pad(indent)}<div id="${formId}"<#if guidbase.has_child_widget(form.page, "buttons")> style="padding-bottom:50px;"</#if>>
+${""?left_pad(indent)}<div id="${formId}"<#if guidbase.has_child_widget(form.page, "buttons") && guidbase.is_last_widget(form)> style="padding-bottom:50px;"</#if>>
   <#list form.groups() as group>
     <#if group?index != 0>
 ${""?left_pad(indent)}  <div class="${namespace}-divider"></div>
@@ -731,6 +732,67 @@ ${""?left_pad(indent)}    </div>
     </#if>
   </#list>
 ${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}</div>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                KPI CHART                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_kpi_chart_layout kpi varname="row" indent=0>
+<#local kpiData = js.nameVariable(kpi.id) + "Data">
+<#local chartRef = js.nameVariable(kpi.id) + "ChartRef">
+${""?left_pad(indent)}<div class="${namespace}-kpi-card">
+  <#-- 1. 卡片顶部：指标标题与趋势胶囊 -->
+${""?left_pad(indent)}  <div class="${namespace}-kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+${""?left_pad(indent)}    <span class="${namespace}-kpi-title" style="font-size: 12px; font-weight: bold; color: var(--${namespace}-text-muted);">${kpi.title}</span>
+  <#-- 趋势角标 (支持 success / danger / neutral 等主题切换) -->
+  <#if guidbase.get_child_from_tile(kpi, "status")??>
+    <#local trendWidget = guidbase.get_child_from_tile(kpi, "status")>
+    <#local trendField = js.nameVariable(trendWidget.id)>
+    <#local trendTheme = trendWidget.value("theme", "success")>
+${""?left_pad(indent)}    <span :class="['${namespace}-tag', '${namespace}-tag--' + (trendType || '${trendTheme}')]">{{ ${kpiData}.${trendField} }}</span>
+  </#if>
+${""?left_pad(indent)}  </div>
+  <#-- 2. 核心大数值与单位行 -->
+${""?left_pad(indent)}  <div class="${namespace}-kpi-main" style="display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px;">
+  <#if guidbase.get_child_from_tile(kpi, "primary")??>
+    <#local valWidget = guidbase.get_child_from_tile(kpi, "primary")>
+${""?left_pad(indent)}    <span class="${namespace}-kpi-num" style="font-family: var(--${namespace}-mono); font-size: 22px; font-weight: bold; color: var(--${namespace}-text); line-height: 1;">{{ ${js.nameVariable(valWidget.id)} }}</span>
+  </#if>
+  <#if guidbase.has_child_widget(kpi, "secondary")>
+    <#local unitWidget = guidbase.get_child_from_tile(kpi, "secondary")>
+${""?left_pad(indent)}    <span class="${namespace}-kpi-unit" style="font-size: 11px; color: var(--${namespace}-text-light);">{{ ${kpiData}.${js.nameVariable(unitWidget.id)} }}</span>
+  <#elseif kpi.value("unit")??>
+${""?left_pad(indent)}    <span class="${namespace}-kpi-unit" style="font-size: 11px; color: var(--${namespace}-text-light);">${kpi.value("unit")}</span>
+  </#if>
+${""?left_pad(indent)}  </div>
+  <#-- 3. 辅助说明与子信息 (如环比、目标) -->
+  <#if guidbase.get_child_from_tile(kpi, "tertiary")??>
+    <#local subWidget = guidbase.get_child_from_tile(kpi, "tertiary")>
+${""?left_pad(indent)}  <div class="${namespace}-kpi-sub" style="font-size: 11px; color: var(--${namespace}-text-muted); display: flex; justify-content: space-between; margin-bottom: 6px;">
+${""?left_pad(indent)}    <span>{{ ${kpiData}.${js.nameVariable(subWidget.id)} }}</span>
+    <#if kpi.value("target")??>
+${""?left_pad(indent)}    <span style="font-family: var(--${namespace}-mono); color: var(--${namespace}-text-light);">6000</span>
+    </#if>
+${""?left_pad(indent)}  </div>
+  </#if>
+  <#-- 4. 底部微型图表挂载容器 (Chart 容器) -->
+${""?left_pad(indent)}  <${namespace}-sparkline 
+${""?left_pad(indent)}    :data="${kpiData}.plotData" 
+${""?left_pad(indent)}    type="${kpi.value("plot", "line")}" 
+${""?left_pad(indent)}    height="48px" 
+${""?left_pad(indent)}  />
+  <#-- 5. 操作按钮区 (如卡片自带下钻、配置按钮) -->
+  <#list kpi.children as widget>
+    <#if widget.type == "buttons">
+${""?left_pad(indent)}  <div class="${namespace}-kpi-actions" style="margin-top: 6px; display: flex; justify-content: flex-end; gap: 4px;">
+      <#list widget.children as button>
+<@print_widget_layout widget=button indent=indent+4 />
+      </#list>
+${""?left_pad(indent)}  </div>
+      <#break>
+    </#if>
+  </#list>
 ${""?left_pad(indent)}</div>
 </#macro>
 

@@ -1,5 +1,5 @@
 <template>
-  <div ref="chartRef" class="pt-chart" :style="{ height: height }"></div>
+  <div ref="chartRef" class="${namespace}-chart" :style="{ height: height }"></div>
 </template>
 
 <script setup>
@@ -68,7 +68,7 @@ defineExpose({
 </script>
 
 <style scoped>
-.pt-chart {
+.${namespace}-chart {
   width: 100%;
   flex-shrink: 0;
 }

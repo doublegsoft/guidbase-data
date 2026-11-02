@@ -849,6 +849,15 @@
   </#list>
 </#function>
 
+<#--
+ ###############################################################################
+ ### 检查磁贴是否包含指定属性或类型的子组件 (CHECK IF TILE CONTAINS CHILD WIDGET)
+ ### 
+ ### @param widget  父级（Tile）组件对象 (The parent Tile widget object)
+ ### @param prop    要匹配的目标属性名或组件类型 (The property name or widget type to match)
+ ### @return        包含返回 true，否则返回 false (True if matched child exists, false otherwise)
+ ###############################################################################
+ -->
 <#function has_child_widget widget prop>
   <#list widget.children as child>
     <#if (child.options["property"]!"") == prop>
@@ -856,6 +865,32 @@
     </#if>
     <#if child.type == prop>
       <#return true>
+    </#if>
+  </#list>
+  <#return false>
+</#function> 
+
+<#--
+ ###############################################################################
+ ### 判断组件是否为容器中的最后一个有效业务组件 (CHECK IF WIDGET IS LAST EFFECTIVE ONE)
+ ### 
+ ### 说明：如果处于容器末尾，或者处于倒数第二位但末尾组件为 "buttons" 按钮栏时，均视为最后一个组件。
+ ### (Note: Returns true if it is the last item, or the second to last when the last item is a "buttons" widget)
+ ### 
+ ### @param widget  待判断的目标组件对象 (The target widget object to evaluate)
+ ### @return        符合末尾条件返回 true，否则返回 false (True if it is the last effective widget, false otherwise)
+ ###############################################################################
+ -->
+<#function is_last_widget widget>
+  <#list widget.container.children as child>
+    <#if child.id?? && child.id == widget.id>
+      <#if child?index == widget.container.children?size - 1>
+        <#return true>
+      <#elseif child?index == widget.container.children?size - 2>
+        <#if widget.container.children?last.type == "buttons">
+          <#return true>
+        </#if>
+      </#if>
     </#if>
   </#list>
   <#return false>

@@ -54,8 +54,6 @@ ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
     </#if>
   </#list>
 ${""?left_pad(indent)}// 表单错误相关
-const ${js.nameVariable(form.id)}Error = ref(false)
-const ${js.nameVariable(form.id)}ErrorMessage = ref('')
 </#macro>
 
 <#macro print_entry_form_methods form indent=0>
@@ -82,10 +80,8 @@ const load${js.nameType(form.id)}Data = async (params) => {
 const save${js.nameType(form.id)}Data = async () => {
   if (!validate${js.nameType(form.id)}(${js.nameVariable(form.id)}Data)) {
     const msgs = Object.entries(${js.nameVariable(form.id)}Errors)
-      .filter(([, msg]) => msg)
-      .map(([, msg]) => `· ${r"${msg}"}`)
-    ${js.nameVariable(form.id)}ErrorMessage.value = msgs.join('\n')
-    ${js.nameVariable(form.id)}ErrorShow.value = true
+      .filter(([, msg]) => msg).map(([, msg]) => `· ${r"${msg}"}`)
+    fb.error('错误', msgs.join('\n'))
     return
   }
   is${js.nameType(form.id)}Submitting.value = true
@@ -131,16 +127,11 @@ ${""?left_pad(indent)}  ${js.nameVariable(input.id)}OptionLabels: [],
 ${""?left_pad(indent)}});
   <#list form.inputs as input>
     <#if pageVars[input.id]??><#continue></#if>
-    <#if input.type == "select" || input.type == "multiselect">
+    <#if input.type == "select" || input.type == "multiselect" || input.type == "cascade">
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
-      <#global pageVars += {input.id:input.id}>
-    <#elseif input.type == "select">
-${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
       <#global pageVars += {input.id:input.id}>
     </#if>
   </#list>
-const ${js.nameVariable(form.id)}ErrorShow = ref(false)
-const ${js.nameVariable(form.id)}ErrorMessage = ref('')
 </#macro>
 
 <#macro print_official_form_methods form indent=0>
@@ -167,10 +158,8 @@ const load${js.nameType(form.id)}Data = async (params) => {
 const save${js.nameType(form.id)}Data = async () => {
   if (!validate${js.nameType(form.id)}(${js.nameVariable(form.id)}Data)) {
     const msgs = Object.entries(${js.nameVariable(form.id)}Errors)
-      .filter(([, msg]) => msg)
-      .map(([, msg]) => `· ${r"${msg}"}`)
-    ${js.nameVariable(form.id)}ErrorMessage.value = msgs.join('\n')
-    ${js.nameVariable(form.id)}ErrorShow.value = true
+      .filter(([, msg]) => msg).map(([, msg]) => `· ${r"${msg}"}`)
+    fb.error('错误', msgs.join('\n'))
     return
   }
   is${js.nameType(form.id)}Submitting.value = true
@@ -205,11 +194,9 @@ ${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitiv
 ${""?left_pad(indent)}});
   <#list form.inputs as input>
     <#if pageVars[input.id]??><#continue></#if>
-    <#if (input.type == "select" || input.type == "multiselect")>
-      <#if !(input.value("data")!"")?starts_with("enum[")>    
+    <#if input.type == "select" || input.type == "multiselect" || input.type == "cascade"> 
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
         <#global pageVars += {input.id:input.id}>
-      </#if>
     </#if>
   </#list>
 </#macro>
@@ -782,6 +769,79 @@ const load${js.nameType(hero.id)}Data = async () => {
 </#macro>
 
 <!----------------------------------------------------------------------------->
+<!--                                KPI CHART                                -->
+<!----------------------------------------------------------------------------->
+
+<!----------------------------------------------------------------------------->
+<!--                         KPI CHART VARIABLES                             -->
+<!----------------------------------------------------------------------------->
+<#macro print_kpi_chart_variables kpi indent=0>
+  <#local varPrefix = js.nameVariable(kpi.id)>
+  <#local statusWidget = guidbase.has_child_widget(kpi, "status")?then(guidbase.get_child_from_tile(kpi, "status"), "")>
+  <#local statusTheme = (statusWidget != "")?then(statusWidget.value("theme", "success"), "success")>
+  <#local plotType = kpi.value("plot", "line")>
+${""?left_pad(indent)}// 【${kpi.title!(kpi.value("title", "KPI指标"))}】卡片业务响应式数据
+${""?left_pad(indent)}const ${varPrefix}Data = reactive({
+<#list kpi.children as input>
+  <#if input.id??>
+${""?left_pad(indent)}  ${js.nameVariable(input.id)}: ${guidbase4js.get_primitive_default_value(input)},
+  </#if>
+</#list>
+${""?left_pad(indent)}  trendType: '${statusTheme}',
+<#if plotType == "bar">
+${""?left_pad(indent)}  plotData: [2100, 3200, 2800, 4500, 3900, 5100, 5600] // 默认柱状走势数据
+<#else>
+${""?left_pad(indent)}  plotData: [68, 70, 72, 71, 75, 76, 78.4] // 默认折线走势数据
+</#if>
+${""?left_pad(indent)}});
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                          KPI CHART METHODS                              -->
+<!----------------------------------------------------------------------------->
+<#macro print_kpi_chart_methods kpi indent=0>
+  <#local typePrefix = js.nameType(kpi.id)>
+  <#local varPrefix = js.nameVariable(kpi.id)>
+  <#local hasUrl = kpi.value("data")??>
+
+/**
+ * 加载【${kpi.title!(kpi.value("title", "KPI指标"))}】业务数据
+ */
+const load${typePrefix}Data = async () => {
+<#if false>
+  <#local url = valuebase.url(kpi.value("data"))>
+  <#local objname = url.resource>
+  isLoading.value = true
+  try {
+    const data = await sdk.fetch${js.nameType(objname)}()
+    Object.assign(${varPrefix}Data, data)
+  } catch (error) {
+    fb.error('获取【${kpi.title!(kpi.value("title", "KPI指标"))}】数据失败', error)
+  } finally {
+    isLoading.value = false
+  }
+<#else>
+  // 无远程数据源绑定时，依据配置填充兜底与随机波动走势
+  try {
+  <#list kpi.children as input>
+    <#if input.id?? && input.value("default")??>
+    ${varPrefix}Data.${js.nameVariable(input.id)} = ${guidbase4js.get_primitive_default_value(input)}
+    </#if>
+  </#list>
+    // 生成近7项带随机微弱波动的走势数据，驱动图表自然呈现
+    const base = Number(${varPrefix}Data.value) || 100
+    ${varPrefix}Data.plotData = Array.from({ length: 7 }, (_, i) => {
+      const delta = (Math.random() - 0.45) * (base * 0.1)
+      return Number((base * 0.85 + (i * (base * 0.025)) + delta).toFixed(1))
+    })
+  } catch (e) {
+    console.warn('[KPI] 初始化本地默认数据异常:', e)
+  }
+</#if>
+}
+</#macro>
+
+<!----------------------------------------------------------------------------->
 <!--                                  CHART                                  -->
 <!----------------------------------------------------------------------------->
 <#macro print_chart_variables chart indent=0>
@@ -937,6 +997,8 @@ import ${js.nameType(namespace)}Fixedtable from '@/components/${namespace}-fixed
 import ${js.nameType(namespace)}Pagedgrid from '@/components/${namespace}-pagedgrid.vue'      
     <#elseif widget.type == "week_grid">
 import ${js.nameType(namespace)}Weekgrid from '@/components/${namespace}-weekgrid.vue'
+    <#elseif widget.type == "kpi_chart">
+import ${js.nameType(namespace)}Sparkline from '@/components/${namespace}-sparkline.vue'    
     <#elseif widget.type == "chart">
 import ${js.nameType(namespace)}Chart from '@/components/${namespace}-chart.vue'    
 import { createChart } from '@/sdk/charts'    
@@ -1018,6 +1080,8 @@ import ${js.nameType(namespace + "_" + action.resource)} from '@/pages/${js.name
 <@print_map_view_variables map=widget indent=indent />
     <#elseif widget.type == "hero_card">
 <@print_hero_card_variables hero=widget indent=indent />
+    <#elseif widget.type == "kpi_chart">
+<@print_kpi_chart_variables kpi=widget indent=indent />
     <#elseif widget.type == "chart">
 <@print_chart_variables chart=widget indent=indent />
     <#elseif widget.type == "button">
@@ -1062,6 +1126,8 @@ ${""?left_pad(indent)}const ${js.nameVariable(action.resource)}Open = ref(false)
 <#-- TODO -->
     <#elseif widget.type == "hero_card">
 <@print_hero_card_methods hero=widget indent=indent />
+    <#elseif widget.type == "kpi_chart">
+<@print_kpi_chart_methods kpi=widget indent=indent />
     <#elseif widget.type == "chart">
 <@print_chart_methods chart=widget indent=indent />
     <#elseif widget.type == "button">
@@ -1172,6 +1238,8 @@ ${""?left_pad(indent)}</${namespace}-dialog>
 <@print_hero_card_layout hero=widget indent=indent />
   <#elseif widget.type == "chart">
 <@print_chart_layout chart=widget indent=indent />
+  <#elseif widget.type == "kpi_chart">
+<@print_kpi_chart_layout kpi=widget indent=indent />
   <#elseif widget.type == "buttons">
 <@print_buttons_layout buttons=widget indent=indent />
   <#elseif widget.type == "select">
