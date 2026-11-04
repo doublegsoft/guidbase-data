@@ -28,12 +28,12 @@
                 {{ loading ? '加载中...' : '暂无数据' }}
               </td>
             </tr>
-            <tr v-for="(row, rowIndex) in pageData" :key="String(row[idKey])"
-              :data-id="String(row[idKey])"
-              :class="rowClasses(row)"
+            <tr v-for="(row, rowIndex) in pageData" :key="getRowKey(row, rowIndex)"
+              :data-id="getRowKey(row, rowIndex)"
+              :class="rowClasses(row, rowIndex)"
               @click="onRowClick($event, row, rowIndex)">
               <td class="${namespace}-tc" @click.stop>
-                <input type="checkbox" :checked="selectedIds.has(String(row[idKey]))" @change="toggleRow(String(row[idKey]), $event.target.checked)" style="width:14px;height:14px;accent-color:var(--p);cursor:pointer">
+                <input type="checkbox" :checked="selectedIds.has(getRowKey(row, rowIndex))" @change="toggleRow(row, rowIndex, $event.target.checked)" style="width:14px;height:14px;accent-color:var(--p);cursor:pointer">
               </td>
               <td v-for="col in columns" :key="col.key" :style="{ textAlign: col.align || 'left' }">
                 <!-- 自定义 render 容错及传参保护 -->
@@ -73,11 +73,8 @@ const props = defineProps({
   drawerRender: { type: Function, default: null },
   total:        { type: Number,   default: 0 },
   // ── 远端数据获取 ──
-  // fetchData: async (params, pageNumber, pageSize) => { data: [...], total: N }
   fetchData:    { type: Function, default: null },
-  // fetchParams: 传入 fetchData 的搜索条件参数
   fetchParams:  { type: Object,   default: () => ({}) },
-  // rowAction: 操作按钮回调映射 { handlerName: (row, index) => void }
   rowAction:    { type: Object,   default: null },
 })
 
@@ -95,7 +92,19 @@ const scrollContainer = ref(null)
 watch(() => props.currentPage, (v) => { currentPage.value = v })
 watch(() => props.pageSize,    (v) => { pageSize.value = v })
 
-// ── 单元格空值处理（undefined、null 或字符串 'undefined' 均返回空字符串） ──
+// ── 核心修复：安全主键解析函数（防止取到 undefined 导致所有行公用同一个 key 造成全选 Bug） ──
+function getRowKey(row, index) {
+  if (!row) return String(index)
+  const val = row[props.idKey]
+  if (val !== undefined && val !== null && val !== '') {
+    return String(val)
+  }
+  if (row.key !== undefined && row.key !== null) return String(row.key)
+  if (row._id !== undefined && row._id !== null) return String(row._id)
+  return 'row_idx_' + index
+}
+
+// ── 单元格空值处理 ──
 function formatCell(val) {
   if (val === undefined || val === null || val === 'undefined') return ''
   return val
@@ -109,7 +118,6 @@ const internalTotal = ref(0)
 const loading = ref(false)
 let reqId = 0
 
-// 服务端模式：使用内部数据；客户端模式：使用 props.data
 const serverData = computed(() => isServerMode.value ? internalData.value : props.data)
 
 const displayData = computed(() => {
@@ -134,8 +142,9 @@ const pageData = computed(() => {
 
 const paginationTotal = computed(() => isServerMode.value ? internalTotal.value : displayData.value.length)
 
+// ── 核心修复：全选判断逻辑（采用安全 key，不为空且每一项都选上方算全选） ──
 const isAllChecked = computed(() =>
-  pageData.value.length > 0 && pageData.value.every(r => selectedIds.value.has(String(r[props.idKey])))
+  pageData.value.length > 0 && pageData.value.every((r, idx) => selectedIds.value.has(getRowKey(r, idx)))
 )
 
 // ── 远端数据加载 ──
@@ -166,7 +175,6 @@ async function loadData() {
   }
 }
 
-// fetchParams 引用变化 → 回到第 1 页重新加载
 watch(() => props.fetchParams, () => {
   if (isServerMode.value) {
     currentPage.value = 1
@@ -175,7 +183,6 @@ watch(() => props.fetchParams, () => {
   }
 })
 
-// fetchData 函数变化 → 重新加载
 watch(() => props.fetchData, () => {
   if (isServerMode.value) loadData()
 })
@@ -185,9 +192,10 @@ onMounted(() => {
 })
 
 // ── 事件处理 ──
-function rowClasses(row) {
+function rowClasses(row, index) {
   const parts = []
-  if (selectedIds.value.has(String(row[props.idKey]))) parts.push('${namespace}-selected')
+  const key = getRowKey(row, index)
+  if (selectedIds.value.has(key)) parts.push('${namespace}-selected')
   if (props.rowClassName) parts.push(props.rowClassName(row))
   return parts
 }
@@ -215,19 +223,28 @@ function onPageChange({ currentPage: cp, pageSize: ps }) {
   }
 }
 
+// ── 核心修复：全选逻辑（使用新 Set 保证响应性） ──
 function toggleAll(checked) {
-  pageData.value.forEach(r => {
-    const id = String(r[props.idKey])
-    if (checked) selectedIds.value.add(id)
-    else selectedIds.value.delete(id)
+  const nextSet = new Set(selectedIds.value)
+  pageData.value.forEach((r, idx) => {
+    const key = getRowKey(r, idx)
+    if (checked) nextSet.add(key)
+    else nextSet.delete(key)
   })
+  selectedIds.value = nextSet
   notifySelection()
 }
 
-function toggleRow(id, checked) {
-  if (checked) selectedIds.value.add(id)
-  else selectedIds.value.delete(id)
-  selectedIds.value = new Set(selectedIds.value)
+// ── 核心修复：单选逻辑（使用安全 key，并生成新 Set 强制触发响应性） ──
+function toggleRow(row, index, checked) {
+  const key = getRowKey(row, index)
+  const nextSet = new Set(selectedIds.value)
+  if (checked) {
+    nextSet.add(key)
+  } else {
+    nextSet.delete(key)
+  }
+  selectedIds.value = nextSet
   notifySelection()
 }
 
@@ -278,7 +295,6 @@ function refresh() {
 
 defineExpose({
   refresh,
-  /** 内部加载状态 */
   loading,
   clearSelection: () => {
     selectedIds.value = new Set()

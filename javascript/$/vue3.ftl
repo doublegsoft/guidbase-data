@@ -53,7 +53,6 @@ ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])
       <#global pageVars += {input.id:input.id}>
     </#if>
   </#list>
-${""?left_pad(indent)}// 表单错误相关
 </#macro>
 
 <#macro print_entry_form_methods form indent=0>
@@ -248,7 +247,14 @@ const load${js.nameType(form.id)}Data = async () => {
 <!--                                EXCEL FORM                               -->
 <!----------------------------------------------------------------------------->
 <#macro print_excel_form_variables form indent=0>
-
+${""?left_pad(indent)}
+<#list form.inputs as input>
+    <#if pageVars[input.id]??><#continue></#if>
+    <#if input.type == "select" || input.type == "multiselect">
+${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
+      <#global pageVars += {input.id:input.id}>
+    </#if>
+  </#list>
 // ${form.title!form.id}所需变量
 ${""?left_pad(indent)}const ${js.nameVariable(form.id)}Cols = ref([{
   <#list form.children as column>
@@ -261,6 +267,22 @@ ${""?left_pad(indent)}  key:'${js.nameVariable(column.id)}',
 ${""?left_pad(indent)}  label:'${column.title}',
 ${""?left_pad(indent)}  type:'${column.type}',      
 ${""?left_pad(indent)}  width:${column.value("width","120")},
+    <#if column.type == "select" || column.type == "multiselect">
+${""?left_pad(indent)}  options: ${js.nameVariable(column.id)}Options,
+    <#elseif column.type == "cascade">
+      <#assign enumRef = typebase.enumref(guidbase.get_data_from_widget(column))>
+${""?left_pad(indent)}  levels: ${column.value("levels","3")},
+${""?left_pad(indent)}  fetchParams: function(row, rowIndex, col) {
+${""?left_pad(indent)}    return {
+${""?left_pad(indent)}      companyId: row.companyId, // 取当前行的另一个字段
+${""?left_pad(indent)}      status: 1
+${""?left_pad(indent)}    }
+${""?left_pad(indent)}  },
+${""?left_pad(indent)}  fetchOptions: async function(parentValue, row, rowIndex, col, extraParams) {
+${""?left_pad(indent)}    const res = await sdk.fetch${js.nameType(inflector.pluralize(enumRef.name))}AsOptions();
+${""?left_pad(indent)}    return res
+${""?left_pad(indent)}  },
+    </#if>
   </#list>
 ${""?left_pad(indent)}}])
 ${""?left_pad(indent)}const ${js.nameVariable(form.id)}Rows = ref([])
@@ -458,6 +480,13 @@ ${""?left_pad(indent)}  @row-action="handle${js.nameType(table.id)}RowAction" />
 <!----------------------------------------------------------------------------->
 <#macro print_data_table_variables table indent=0>
 ${""?left_pad(indent)}
+  <#list table.inputs as input>
+    <#if pageVars[input.id]??><#continue></#if>
+    <#if input.type == "select" || input.type == "multiselect">
+${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
+      <#global pageVars += {input.id:input.id}>
+    </#if>
+  </#list>
 ${""?left_pad(indent)}// ${js.nameVariable(table.id)}可编辑数据表格相关变量
 ${""?left_pad(indent)}const ${js.nameVariable(table.id)}Ref = ref(null)
 ${""?left_pad(indent)}const ${js.nameVariable(table.id)}Cols = ref([{
@@ -477,8 +506,11 @@ ${""?left_pad(indent)}  align: 'center',
 ${""?left_pad(indent)}  align: 'right',    
     <#elseif column.type == "select">
 ${""?left_pad(indent)}  align: 'left',
-${""?left_pad(indent)}  options: ${column.value("options", "[]")},
+${""?left_pad(indent)}  options: ${js.nameVariable(column.id)}Options,
     <#elseif column.type == "tags" || column.type == "multiselect">
+      <#if column.type == "multiselect">
+${""?left_pad(indent)}  options: ${js.nameVariable(column.id)}Options,
+      </#if>
 ${""?left_pad(indent)}  align: 'left',
 ${""?left_pad(indent)}  render: function(v) {
 ${""?left_pad(indent)}    if (v === undefined || v === null || v === '') return '';
@@ -1253,7 +1285,7 @@ ${""?left_pad(indent)}<${namespace}-datepicker data-test="${js.nameVariable(widg
   <#elseif widget.type == "time">
 ${""?left_pad(indent)}<${namespace}-timepicker data-test="${js.nameVariable(widget.id)}" v-model="${guidbase.name_input_variable(widget)}" />
   <#elseif widget.type == "cascade">
-    <#local enumRef = typebase.enumref(guidbase.get_data_by_id(widget.id))>
+    <#local enumRef = typebase.enumref(guidbase.get_data_from_widget(widget))>
 ${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(widget.id)}" :fetch-options="sdk.fetch${js.nameType(inflector.pluralize(enumRef.name))}AsOptions" v-model:labels="${guidbase.name_input_variable(widget)}OptionLabels" v-model="${guidbase.name_input_variable(widget)}" levels="3"/>
   <#elseif widget.type == "multiselect">
 ${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options" v-model="${guidbase.name_input_variable(widget)}" />

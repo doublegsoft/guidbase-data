@@ -129,7 +129,7 @@ ${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(child.
           <#elseif child.type == "multiselect">
 ${""?left_pad(indent)}<${namespace}-multiselect data-test="${js.nameVariable(child.id)}" :options="${js.nameVariable(child.id)}Options" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />      
           <#elseif child.type == "cascade">
-            <#local enumRef = typebase.enumref(guidbase.get_data_by_id(child.id))>
+            <#local enumRef = typebase.enumref(guidbase.get_data_from_widget(child))>
 ${""?left_pad(indent)}<${namespace}-cascadepicker data-test="${js.nameVariable(child.id)}" :fetch-options="sdk.fetch${js.nameType(inflector.pluralize(enumRef.name))}AsOptions" v-model:labels="${guidbase.name_input_variable(child)}OptionLabels" v-model="${guidbase.name_input_variable(child)}" levels="3" plain />
           <#elseif child.type == "tags">
 ${""?left_pad(indent)}<${namespace}-tagsinput data-test="${js.nameVariable(child.id)}" v-model="${js.nameVariable(child.container.id)}Data.${js.nameVariable(child.id)}" plain />      

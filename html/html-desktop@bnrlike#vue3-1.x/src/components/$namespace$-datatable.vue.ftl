@@ -36,7 +36,7 @@
       </div>
 
       <!-- 表格主体容器 -->
-      <div class="${namespace}-table-container" ref="scrollContainer" @scroll="onScroll">
+      <div class="${namespace}-table-container" ref="scrollContainer">
         <table class="${namespace}-table">
           <thead>
             <tr>
@@ -112,13 +112,16 @@
                 :ref="function(el) { setCellRef(el, rowIndex, colIndex) }"
                 :class="{
                   '${namespace}-cell-active': isCellActive(rowIndex, colIndex),
-                  '${namespace}-cell-editing': isInputEditing(rowIndex, col.key)
+                  '${namespace}-cell-editing': isCellEditing(rowIndex, col.key),
+                  '${namespace}-cell-ms': col.type === 'multiselect',
+                  '${namespace}-cell-tp': col.type === 'time' || col.type === 'timepicker',
+                  '${namespace}-cell-cscd': col.type === 'cascade' || col.type === 'cascader'
                 }"
                 :style="{ textAlign: col.align || 'left' }"
                 @click="onCellClick(rowIndex, colIndex)"
                 @dblclick.stop="startEdit(row, col, rowIndex, colIndex)"
               >
-                <!-- 1. Checkbox 开关类型 -->
+                <!-- 1. Checkbox 开关类型 (点击直接切换) -->
                 <div v-if="col.type === 'check' || col.type === 'checkbox'" class="${namespace}-tc" @click.stop>
                   <input
                     type="checkbox"
@@ -129,9 +132,9 @@
                   />
                 </div>
 
-                <!-- 2. 原地输入编辑态 (text / number) -->
+                <!-- 2. 原地输入编辑态 (text / number，双击触发) -->
                 <div
-                  v-else-if="isInputEditing(rowIndex, col.key)"
+                  v-else-if="isCellEditing(rowIndex, col.key) && (!col.type || col.type === 'text' || col.type === 'number')"
                   class="${namespace}-cell-editor"
                   @click.stop
                 >
@@ -151,7 +154,110 @@
                   />
                 </div>
 
-                <!-- 3. 常规只读状态（与分页表格完全一致） -->
+                <!-- 3. Dropdown 单选组件编辑态 (双击触发) -->
+                <div
+                  v-else-if="isCellEditing(rowIndex, col.key) && col.type === 'select'"
+                  class="${namespace}-cell-editor"
+                  @click.stop
+                >
+                  <Dropdown
+                    ref="activeEditorRef"
+                    :model-value="row[col.key]"
+                    :options="col.options || col.opts || []"
+                    :placeholder="col.placeholder || '请选择...'"
+                    :searchable="col.searchable ?? false"
+                    :clearable="col.clearable ?? true"
+                    :disabled="col.disabled"
+                    plain
+                    @update:model-value="(val) => onSelectChange(row, col, val, rowIndex)"
+                  />
+                </div>
+
+                <!-- 4. DatePicker 日期组件编辑态 (双击触发) -->
+                <div
+                  v-else-if="isCellEditing(rowIndex, col.key) && col.type === 'date'"
+                  class="${namespace}-cell-editor"
+                  @click.stop
+                >
+                  <DatePicker
+                    ref="activeEditorRef"
+                    :model-value="row[col.key]"
+                    :placeholder="col.placeholder || '请选择日期'"
+                    :format="col.format || 'YYYY-MM-DD'"
+                    :min-date="col.minDate"
+                    :max-date="col.maxDate"
+                    :disabled="col.disabled"
+                    plain
+                    @update:model-value="(val) => onDateChange(row, col, val, rowIndex)"
+                  />
+                </div>
+
+                <!-- 5. MultiSelect 多选组件编辑态 (双击触发) -->
+                <div
+                  v-else-if="isCellEditing(rowIndex, col.key) && col.type === 'multiselect'"
+                  class="${namespace}-cell-multiselect"
+                  @click.stop
+                >
+                  <MultiSelect
+                    ref="activeEditorRef"
+                    :model-value="normalizeMultiSelectValue(row[col.key])"
+                    :options="col.options || col.opts || []"
+                    :placeholder="col.placeholder || '请选择...'"
+                    :searchable="col.searchable ?? true"
+                    :disabled="col.disabled"
+                    :show-select-all="col.showSelectAll ?? true"
+                    :max-count="col.maxCount || 0"
+                    :max-tag-count="col.maxTagCount || 2"
+                    :value-key="col.valueKey || 'value'"
+                    :label-key="col.labelKey || 'label'"
+                    plain
+                    block
+                    @change="(vals) => onMultiSelectChange(row, col, vals, rowIndex)"
+                  />
+                </div>
+
+                <!-- 6. TimePicker 时间组件编辑态 (双击触发) -->
+                <div
+                  v-else-if="isCellEditing(rowIndex, col.key) && (col.type === 'time' || col.type === 'timepicker')"
+                  class="${namespace}-cell-time"
+                  @click.stop
+                >
+                  <TimePicker
+                    ref="activeEditorRef"
+                    :model-value="row[col.key] || ''"
+                    :placeholder="col.placeholder || '选择时间...'"
+                    :format="col.format || 'HH:mm'"
+                    :disabled="col.disabled"
+                    :min-time="col.minTime"
+                    :max-time="col.maxTime"
+                    @change="(val) => onTimeChange(row, col, val, rowIndex)"
+                  />
+                </div>
+
+                <!-- 7. Cascader 级联组件编辑态 (双击触发) -->
+                <div
+                  v-else-if="isCellEditing(rowIndex, col.key) && (col.type === 'cascade' || col.type === 'cascader')"
+                  class="${namespace}-cell-cascader"
+                  @click.stop
+                >
+                  <Cascader
+                    ref="activeEditorRef"
+                    :model-value="normalizeCascaderValue(row[col.key])"
+                    :labels="col.labelsKey ? row[col.labelsKey] : col.labels"
+                    :options="col.options || col.opts || []"
+                    :fetch-options="col.fetchOptions"
+                    :placeholder="col.placeholder || '请选择...'"
+                    :placeholders="col.placeholders"
+                    :levels="col.levels"
+                    :disabled="col.disabled"
+                    :separator="col.separator || '/'"
+                    :variant="col.variant || 'single'"
+                    plain
+                    @change="(path, labels) => onCascaderChange(row, col, path, labels, rowIndex)"
+                  />
+                </div>
+
+                <!-- 8. 统一只读显示状态 (未双击编辑时纯文本展示，支持 placeholder) -->
                 <template v-else>
                   <slot
                     v-if="$slots['cell-' + col.key]"
@@ -167,16 +273,63 @@
                     v-html="renderCustomContent(col, row, rowIndex)"
                   ></span>
 
-                  <span v-else-if="col.type === 'select'" class="${namespace}-cell-text">
-                    {{ getSelectLabel(col.options || col.opts, row[col.key]) }}
+                  <!-- select 只读 -->
+                  <span
+                    v-else-if="col.type === 'select'"
+                    class="${namespace}-cell-text"
+                    :class="{ '${namespace}-cell-placeholder': getSelectDisplayText(col, row[col.key]).isPlaceholder }"
+                  >
+                    {{ getSelectDisplayText(col, row[col.key]).text }}
                   </span>
 
+                  <!-- date 只读 -->
+                  <span
+                    v-else-if="col.type === 'date'"
+                    class="${namespace}-cell-text"
+                    :class="{ '${namespace}-cell-placeholder': getDateDisplayText(col, row[col.key]).isPlaceholder }"
+                  >
+                    {{ getDateDisplayText(col, row[col.key]).text }}
+                  </span>
+
+                  <!-- time 只读 -->
+                  <span
+                    v-else-if="col.type === 'time' || col.type === 'timepicker'"
+                    class="${namespace}-cell-text"
+                    :class="{ '${namespace}-cell-placeholder': getTimeDisplayText(col, row[col.key]).isPlaceholder }"
+                  >
+                    {{ getTimeDisplayText(col, row[col.key]).text }}
+                  </span>
+
+                  <!-- multiselect 只读 -->
+                  <span
+                    v-else-if="col.type === 'multiselect'"
+                    class="${namespace}-cell-text"
+                    :class="{ '${namespace}-cell-placeholder': getMultiSelectDisplayText(col, row[col.key]).isPlaceholder }"
+                  >
+                    {{ getMultiSelectDisplayText(col, row[col.key]).text }}
+                  </span>
+
+                  <!-- cascade 只读 -->
+                  <span
+                    v-else-if="col.type === 'cascade' || col.type === 'cascader'"
+                    class="${namespace}-cell-text"
+                    :class="{ '${namespace}-cell-placeholder': getCascaderDisplayText(col, row).isPlaceholder }"
+                  >
+                    {{ getCascaderDisplayText(col, row).text }}
+                  </span>
+
+                  <!-- number 只读 -->
                   <span v-else-if="col.type === 'number'" class="${namespace}-cell-text">
                     {{ fmtNum(row[col.key]) }}
                   </span>
 
-                  <span v-else class="${namespace}-cell-text">
-                    {{ formatCell(row[col.key]) }}
+                  <!-- text 常规只读 -->
+                  <span
+                    v-else
+                    class="${namespace}-cell-text"
+                    :class="{ '${namespace}-cell-placeholder': !hasValue(row[col.key]) && col.placeholder }"
+                  >
+                    {{ hasValue(row[col.key]) ? formatCell(row[col.key]) : (col.placeholder || '') }}
                   </span>
                 </template>
               </td>
@@ -214,93 +367,6 @@
       </div>
     </div>
 
-    <!-- ════════════════ 浮动下拉选择器面板 (Teleport) ════════════════ -->
-    <teleport to="body">
-      <div
-        v-if="dropOpen"
-        class="${namespace}-drop-panel"
-        :style="dropStyle"
-        @mousedown.stop
-      >
-        <div
-          v-for="opt in dropOptions"
-          :key="opt.value"
-          class="${namespace}-drop-item"
-          :class="{ active: isDropSelected(opt.value) }"
-          @mousedown.prevent.stop
-          @click.stop="commitDrop(opt.value)"
-        >
-          {{ opt.label }}
-        </div>
-      </div>
-    </teleport>
-
-    <!-- ════════════════ 浮动日历选择器面板 (Teleport) ════════════════ -->
-    <teleport to="body">
-      <div
-        v-if="dateOpen"
-        class="${namespace}-date-panel"
-        :style="dateStyle"
-        @mousedown.stop
-      >
-        <div class="${namespace}-date-head">
-          <div class="${namespace}-date-nav" @mousedown.prevent.stop @click.stop="dateStep(-1, true)">&laquo;</div>
-          <div class="${namespace}-date-nav" @mousedown.prevent.stop @click.stop="dateStep(-1, false)">&lsaquo;</div>
-          <div class="${namespace}-date-title" @mousedown.prevent.stop @click.stop="dateDrillUp">{{ dateTitle }}</div>
-          <div class="${namespace}-date-nav" @mousedown.prevent.stop @click.stop="dateStep(1, false)">&rsaquo;</div>
-          <div class="${namespace}-date-nav" @mousedown.prevent.stop @click.stop="dateStep(1, true)">&raquo;</div>
-        </div>
-
-        <template v-if="dateView === 'day'">
-          <div class="${namespace}-date-weekdays">
-            <div v-for="w in dateWeekdays" :key="w" class="${namespace}-date-wd">{{ w }}</div>
-          </div>
-          <div class="${namespace}-date-days">
-            <div
-              v-for="d in dateDayCells"
-              :key="d.ymd"
-              class="${namespace}-date-day"
-              :class="{
-                'is-other': d.isOther,
-                'is-weekend': d.isWeekend,
-                'is-today': d.isToday,
-                'is-selected': d.isSelected,
-              }"
-              @mousedown.prevent.stop
-              @click.stop="commitDate(d.ymd)"
-            >{{ d.day }}</div>
-          </div>
-        </template>
-
-        <div v-if="dateView === 'month'" class="${namespace}-date-my-grid">
-          <div
-            v-for="m in 12"
-            :key="m"
-            class="${namespace}-date-my-item"
-            :class="{ 'is-selected': isDateMonthSelected(m - 1) }"
-            @mousedown.prevent.stop
-            @click.stop="pickDateMonth(m - 1)"
-          >{{ m }}月</div>
-        </div>
-
-        <div v-if="dateView === 'year'" class="${namespace}-date-my-grid">
-          <div
-            v-for="yr in dateYearRange"
-            :key="yr"
-            class="${namespace}-date-my-item"
-            :class="{ 'is-selected': yr === dateSelectedYear }"
-            @mousedown.prevent.stop
-            @click.stop="pickDateYear(yr)"
-          >{{ yr }}</div>
-        </div>
-
-        <div class="${namespace}-date-footer">
-          <span class="${namespace}-date-today-btn" @mousedown.prevent.stop @click.stop="commitDateToday">今天</span>
-          <span class="${namespace}-date-clear-btn" @mousedown.prevent.stop @click.stop="clearDateValue">清除</span>
-        </div>
-      </div>
-    </teleport>
-
     <!-- ════════ 调用已有的 Feedback 确认组件 ════════ -->
     <FeedbackDialog
       :dialog="feedbackDialog"
@@ -312,6 +378,11 @@
 <script setup>
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import FeedbackDialog from './${namespace}-feedback.vue'
+import MultiSelect from './${namespace}-multiselect.vue'
+import TimePicker from './${namespace}-timepicker.vue'
+import Cascader from './${namespace}-cascadepicker.vue'
+import DatePicker from './${namespace}-datepicker.vue'
+import Dropdown from './${namespace}-dropdown.vue'
 
 const props = defineProps({
   data: {
@@ -377,7 +448,6 @@ const scrollContainer = ref(null)
 const tableRootRef = ref(null)
 
 const activeCell = ref({ r: -1, c: -1 })
-
 const cellRefs = ref({})
 function setCellRef(el, r, c) {
   if (el) {
@@ -385,24 +455,12 @@ function setCellRef(el, r, c) {
   }
 }
 
+// 当前处于双击编辑中的单元格
+const editCell = ref({ r: -1, c: -1, key: null, originalValue: null, type: null })
 const editInputRef = ref(null)
-const editCell = ref({ r: -1, c: -1, key: null, originalValue: null })
+const activeEditorRef = ref(null)
 
-// ══════════════════ 下拉选择浮层状态 ══════════════════
-const dropOpen = ref(false)
-const dropR = ref(-1)
-const dropC = ref(-1)
-const dropStyle = ref({})
-
-// ══════════════════ 日历选择浮层状态 ══════════════════
-const dateOpen = ref(false)
-const dateR = ref(-1)
-const dateC = ref(-1)
-const dateView = ref('day')
-const dateCursor = ref(new Date())
-const dateStyle = ref({})
-
-// ══════════════════ 驱动已有 Feedback 组件的核心状态 ══════════════════
+// ══════════════════ 驱动 Feedback 组件状态 ══════════════════
 const feedbackDialog = ref({
   show: false,
   type: 'confirm',
@@ -452,15 +510,17 @@ const totalColspan = computed(() => {
   return count
 })
 
+function hasValue(val) {
+  return val !== undefined && val !== null && val !== 'undefined' && val !== 'null' && val !== ''
+}
+
 function formatCell(val) {
-  if (val === undefined || val === null || val === 'undefined' || val === 'null') {
-    return ''
-  }
+  if (!hasValue(val)) return ''
   return val
 }
 
 function fmtNum(v) {
-  if (v === '' || v == null) return ''
+  if (!hasValue(v)) return ''
   return Number(v).toLocaleString()
 }
 
@@ -480,62 +540,211 @@ function normalizeOptions(options) {
 }
 
 function getSelectLabel(options, val) {
-  if (val === undefined || val === null || val === 'undefined') return ''
+  if (!hasValue(val)) return ''
   const list = normalizeOptions(options)
-  const item = list.find(function(o) { return o.value === val })
+  const item = list.find(function(o) { return String(o.value) === String(val) })
   return item ? item.label : formatCell(val)
+}
+
+// ══════════════════ 只读状态 Placeholder 解析 ══════════════════
+function getSelectDisplayText(col, val) {
+  const lbl = getSelectLabel(col.options || col.opts, val)
+  if (hasValue(lbl)) {
+    return { text: lbl, isPlaceholder: false }
+  }
+  return {
+    text: col.placeholder || '请选择...',
+    isPlaceholder: true
+  }
+}
+
+function getDateDisplayText(col, val) {
+  if (hasValue(val)) {
+    return { text: String(val), isPlaceholder: false }
+  }
+  return {
+    text: col.placeholder || '请选择日期...',
+    isPlaceholder: true
+  }
+}
+
+function getTimeDisplayText(col, val) {
+  if (hasValue(val)) {
+    return { text: String(val), isPlaceholder: false }
+  }
+  return {
+    text: col.placeholder || '选择时间...',
+    isPlaceholder: true
+  }
+}
+
+function getMultiSelectDisplayText(col, val) {
+  const vals = normalizeMultiSelectValue(val)
+  if (!vals.length) {
+    return { text: col.placeholder || '请选择...', isPlaceholder: true }
+  }
+  const opts = normalizeOptions(col.options || col.opts)
+  const valKey = col.valueKey || 'value'
+  const lblKey = col.labelKey || 'label'
+  const labels = vals.map(v => {
+    const item = opts.find(o => String(o[valKey] ?? o.value) === String(v))
+    return item ? (item[lblKey] ?? item.label) : v
+  })
+  return { text: labels.join(', '), isPlaceholder: false }
+}
+
+function getCascaderDisplayText(col, row) {
+  const sep = ' ' + (col.separator || '/') + ' '
+  if (col.labelsKey && hasValue(row[col.labelsKey])) {
+    const lblVal = row[col.labelsKey]
+    if (Array.isArray(lblVal)) return { text: lblVal.join(sep), isPlaceholder: false }
+    return { text: String(lblVal), isPlaceholder: false }
+  }
+  const path = normalizeCascaderValue(row[col.key])
+  if (!path.length) {
+    return { text: col.placeholder || '请选择...', isPlaceholder: true }
+  }
+  const labels = []
+  let currNodes = col.options || col.opts || []
+  for (const v of path) {
+    const found = Array.isArray(currNodes) ? currNodes.find(n => String(n.value) === String(v)) : null
+    if (found) {
+      labels.push(found.label)
+      currNodes = found.children || []
+    } else {
+      labels.push(String(v))
+      currNodes = []
+    }
+  }
+  return { text: labels.join(sep), isPlaceholder: false }
 }
 
 function isCellActive(r, c) {
   return activeCell.value.r === r && activeCell.value.c === c
 }
 
-function isInputEditing(r, key) {
+function isCellEditing(r, key) {
   return editCell.value.r === r && editCell.value.key === key
 }
 
 function onCellClick(r, c) {
   activeCell.value = { r: r, c: c }
-  if (dropOpen.value && (dropR.value !== r || dropC.value !== c)) closeDrop()
-  if (dateOpen.value && (dateR.value !== r || dateC.value !== c)) closeDate()
 }
 
+// ══════════════════ 数据更新处理函数 ══════════════════
+function onSelectChange(row, col, val, rowIndex) {
+  row[col.key] = val
+  emit('cell-change', { row: row, key: col.key, value: val, rowIndex: rowIndex })
+  emit('update:data', tableData.value)
+  emit('change', tableData.value)
+  closeActiveEditor()
+}
+
+function onDateChange(row, col, val, rowIndex) {
+  row[col.key] = val
+  emit('cell-change', { row: row, key: col.key, value: val, rowIndex: rowIndex })
+  emit('update:data', tableData.value)
+  emit('change', tableData.value)
+  closeActiveEditor()
+}
+
+function normalizeMultiSelectValue(val) {
+  if (Array.isArray(val)) return val
+  if (!hasValue(val)) return []
+  if (typeof val === 'string') {
+    return val.split(',').map(s => s.trim()).filter(Boolean)
+  }
+  return [val]
+}
+
+function onMultiSelectChange(row, col, vals, rowIndex) {
+  const isStringOutput = col.valueType === 'string' || (typeof row[col.key] === 'string' && !Array.isArray(row[col.key]))
+  const finalVal = isStringOutput ? vals.join(',') : vals
+  row[col.key] = finalVal
+  emit('cell-change', { row: row, key: col.key, value: finalVal, rowIndex: rowIndex })
+  emit('update:data', tableData.value)
+  emit('change', tableData.value)
+}
+
+function onTimeChange(row, col, val, rowIndex) {
+  row[col.key] = val
+  emit('cell-change', { row: row, key: col.key, value: val, rowIndex: rowIndex })
+  emit('update:data', tableData.value)
+  emit('change', tableData.value)
+  closeActiveEditor()
+}
+
+function normalizeCascaderValue(val) {
+  if (Array.isArray(val)) return val
+  if (!hasValue(val)) return []
+  if (typeof val === 'string') {
+    return val.split(/[,，/]/).map(s => s.trim()).filter(Boolean)
+  }
+  return [val]
+}
+
+function onCascaderChange(row, col, path, labels, rowIndex) {
+  const sep = col.separator || '/'
+  const isStringOutput = col.valueType === 'string' || (typeof row[col.key] === 'string' && !Array.isArray(row[col.key]))
+  const finalVal = isStringOutput ? path.join(sep) : path
+  row[col.key] = finalVal
+
+  if (col.labelsKey) {
+    row[col.labelsKey] = col.labelsType === 'string' ? labels.join(sep) : labels
+  }
+
+  emit('cell-change', { row: row, key: col.key, value: finalVal, labels: labels, rowIndex: rowIndex })
+  emit('update:data', tableData.value)
+  emit('change', tableData.value)
+  closeActiveEditor()
+}
+
+// ══════════════════ 核心：双击编辑与打开面板 ══════════════════
 function startEdit(row, col, r, c) {
   if (col.disabled || col.editable === false) return
-  closeDrop()
-  closeDate()
+
   finishInputEditNow()
+  if (col.type === 'check' || col.type === 'checkbox') return
 
-  if (col.type === 'select') {
-    openDrop(r, c)
-    return
-  }
-  if (col.type === 'date') {
-    openDate(r, c)
-    return
-  }
-  if (col.type === 'check' || col.type === 'checkbox') {
-    toggleCheckbox(row, col.key, !row[col.key], r)
-    return
-  }
-
-  editCell.value = { r: r, c: c, key: col.key, originalValue: row[col.key] }
+  // 激活当前单元格编辑状态
+  editCell.value = { r: r, c: c, key: col.key, originalValue: row[col.key], type: col.type }
   emit('cell-edit-start', { row: row, col: col, rowIndex: r })
 
   nextTick(function() {
+    // 文本/数字输入框自动获取焦点并全选
     if (editInputRef.value) {
       const el = Array.isArray(editInputRef.value) ? editInputRef.value[0] : editInputRef.value
       el?.focus?.()
       el?.select?.()
     }
+    // 独立组件：自动触发打开面板逻辑
+    if (activeEditorRef.value) {
+      const comp = Array.isArray(activeEditorRef.value) ? activeEditorRef.value[0] : activeEditorRef.value
+      if (typeof comp?.openPanel === 'function') {
+        comp.openPanel()
+      } else if (typeof comp?.open === 'function') {
+        comp.open()
+      } else if (typeof comp?.togglePanel === 'function') {
+        comp.togglePanel()
+      } else {
+        const trigger = comp?.$el?.querySelector?.(
+          '.${namespace}-dd-trigger, .${namespace}-dp__trigger, .${namespace}-cscd__trigger, .${namespace}-ms__trigger, .${namespace}-tp__trigger'
+        ) || comp?.$el
+        trigger?.click?.()
+      }
+    }
   })
+}
+
+function closeActiveEditor() {
+  editCell.value = { r: -1, c: -1, key: null, originalValue: null, type: null }
 }
 
 function finishInputEdit(row, col, r, val) {
   if (editCell.value.r !== r || editCell.value.key !== col.key) return
   const finalVal = (col.type === 'number' && val !== '') ? (Number(val) || 0) : val
   row[col.key] = finalVal
-  editCell.value = { r: -1, c: -1, key: null, originalValue: null }
+  closeActiveEditor()
   emit('cell-change', { row: row, key: col.key, value: finalVal, rowIndex: r })
   emit('update:data', tableData.value)
   emit('change', tableData.value)
@@ -559,7 +768,7 @@ function cancelInputEdit() {
     const row = tableData.value[editCell.value.r]
     if (row) row[editCell.value.key] = editCell.value.originalValue
   }
-  editCell.value = { r: -1, c: -1, key: null, originalValue: null }
+  closeActiveEditor()
 }
 
 function toggleCheckbox(row, key, checked, r) {
@@ -569,231 +778,26 @@ function toggleCheckbox(row, key, checked, r) {
   emit('change', tableData.value)
 }
 
-// ══════════════════ 下拉浮层逻辑 ══════════════════
-const dropOptions = computed(function() {
-  if (dropC.value < 0) return []
-  const col = props.columns[dropC.value]
-  return normalizeOptions(col?.options || col?.opts)
-})
-
-function isDropSelected(val) {
-  if (dropR.value < 0 || dropC.value < 0) return false
-  const key = props.columns[dropC.value]?.key
-  return tableData.value[dropR.value]?.[key] === val
-}
-
-function openDrop(r, c) {
-  dropR.value = r
-  dropC.value = c
-  dropOpen.value = true
-  nextTick(function() { positionPanel(r, c, 'drop') })
-}
-
-function closeDrop() {
-  dropOpen.value = false
-  dropR.value = -1
-  dropC.value = -1
-}
-
-function commitDrop(val) {
-  if (dropR.value < 0 || dropC.value < 0) return
-  const r = dropR.value
-  const col = props.columns[dropC.value]
-  tableData.value[r][col.key] = val
-  emit('cell-change', { row: tableData.value[r], key: col.key, value: val, rowIndex: r })
-  emit('update:data', tableData.value)
-  emit('change', tableData.value)
-  closeDrop()
-}
-
-// ══════════════════ 日历浮层逻辑 ══════════════════
-const dateWeekdays = ['日', '一', '二', '三', '四', '五', '六']
-
-function dateYmd(d) {
-  return d.getFullYear() + '-' +
-    String(d.getMonth() + 1).padStart(2, '0') + '-' +
-    String(d.getDate()).padStart(2, '0')
-}
-
-function dateParse(s) {
-  if (!s) return null
-  const n = String(s).replace(/\//g, '-').replace(/年|月/g, '-').replace(/日/g, '')
-  const d = new Date(n)
-  return isNaN(d.getTime()) ? null : d
-}
-
-const dateSelectedStr = computed(function() {
-  if (dateR.value < 0 || dateC.value < 0) return null
-  return tableData.value[dateR.value]?.[props.columns[dateC.value]?.key] ?? null
-})
-
-const dateSelectedYear = computed(function() {
-  const d = dateParse(dateSelectedStr.value)
-  return d ? d.getFullYear() : null
-})
-
-const dateTitle = computed(function() {
-  const y = dateCursor.value.getFullYear()
-  const m = dateCursor.value.getMonth()
-  if (dateView.value === 'day') return y + '年 ' + (m + 1) + '月'
-  if (dateView.value === 'month') return y + '年'
-  const base = Math.floor(y / 12) * 12
-  return base + ' — ' + (base + 11)
-})
-
-const dateDayCells = computed(function() {
-  const y = dateCursor.value.getFullYear()
-  const m = dateCursor.value.getMonth()
-  const today = dateYmd(new Date())
-  const sel = dateSelectedStr.value
-    ? (dateParse(dateSelectedStr.value) ? dateYmd(dateParse(dateSelectedStr.value)) : null)
-    : null
-
-  const sd = new Date(y, m, 1).getDay()
-  const dim = new Date(y, m + 1, 0).getDate()
-  const dip = new Date(y, m, 0).getDate()
-  const total = Math.ceil((sd + dim) / 7) * 7
-
-  const cells = []
-  for (let i = 0; i < total; i++) {
-    let date, isOther = false
-    if (i < sd) {
-      date = new Date(y, m - 1, dip - sd + 1 + i)
-      isOther = true
-    } else if (i >= sd + dim) {
-      date = new Date(y, m + 1, i - sd - dim + 1)
-      isOther = true
-    } else {
-      date = new Date(y, m, i - sd + 1)
-    }
-    const dw = date.getDay()
-    const ymdVal = dateYmd(date)
-    cells.push({
-      ymd: ymdVal,
-      day: date.getDate(),
-      isOther: isOther,
-      isWeekend: dw === 0 || dw === 6,
-      isToday: ymdVal === today,
-      isSelected: ymdVal === sel
-    })
+// ══════════════════ 点击页面外部时退出编辑态 ══════════════════
+function onGlobalMouseDown(e) {
+  // 如果点击的是各类浮层面板内部，不打断编辑交互
+  if (e?.target?.closest?.(
+    '.${namespace}-dd-panel, .${namespace}-dp__panel, .${namespace}-ms__panel, .${namespace}-tp__panel, .${namespace}-cscd__panel'
+  )) {
+    return
   }
-  return cells
-})
-
-const dateYearRange = computed(function() {
-  const base = Math.floor(dateCursor.value.getFullYear() / 12) * 12
-  return Array.from({ length: 12 }, function(_, i) { return base + i })
-})
-
-function isDateMonthSelected(m) {
-  const d = dateParse(dateSelectedStr.value)
-  if (!d) return false
-  return d.getFullYear() === dateCursor.value.getFullYear() && d.getMonth() === m
-}
-
-function openDate(r, c) {
-  dateR.value = r
-  dateC.value = c
-  dateOpen.value = true
-  const cur = dateParse(tableData.value[r]?.[props.columns[c]?.key])
-  dateCursor.value = cur ? new Date(cur.getFullYear(), cur.getMonth(), 1) : new Date()
-  dateCursor.value.setDate(1)
-  dateView.value = 'day'
-  nextTick(function() { positionPanel(r, c, 'date') })
-}
-
-function closeDate() {
-  dateOpen.value = false
-  dateR.value = -1
-  dateC.value = -1
-}
-
-function commitDate(ymd) {
-  if (dateR.value < 0 || dateC.value < 0) return
-  const r = dateR.value
-  const col = props.columns[dateC.value]
-  tableData.value[r][col.key] = ymd
-  emit('cell-change', { row: tableData.value[r], key: col.key, value: ymd, rowIndex: r })
-  emit('update:data', tableData.value)
-  emit('change', tableData.value)
-  closeDate()
-}
-
-function clearDateValue() { commitDate('') }
-function commitDateToday() { commitDate(dateYmd(new Date())) }
-
-function dateStep(dir, byYear) {
-  const cur = new Date(dateCursor.value)
-  if (dateView.value === 'day') {
-    byYear ? cur.setFullYear(cur.getFullYear() + dir) : cur.setMonth(cur.getMonth() + dir)
-  } else if (dateView.value === 'month') {
-    cur.setFullYear(cur.getFullYear() + dir)
-  } else {
-    cur.setFullYear(cur.getFullYear() + dir * 12)
-  }
-  dateCursor.value = cur
-}
-
-function dateDrillUp() {
-  if (dateView.value === 'day') dateView.value = 'month'
-  else if (dateView.value === 'month') dateView.value = 'year'
-}
-
-function pickDateMonth(m) {
-  dateCursor.value = new Date(dateCursor.value.getFullYear(), m, 1)
-  dateView.value = 'day'
-}
-
-function pickDateYear(yr) {
-  dateCursor.value = new Date(yr, dateCursor.value.getMonth(), 1)
-  dateView.value = 'month'
-}
-
-// ══════════════════ 定位计算 ══════════════════
-function positionPanel(r, c, type) {
-  const cell = cellRefs.value[r + '_' + c]
-  if (!cell) return
-  const rect = cell.getBoundingClientRect()
-
-  if (type === 'drop') {
-    const ph = Math.min(dropOptions.value.length * 32 + 8, 240)
-    let top = rect.bottom
-    if (top + ph > window.innerHeight) top = rect.top - ph
-    dropStyle.value = {
-      left: rect.left + 'px',
-      top: top + 'px',
-      minWidth: Math.max(rect.width, 100) + 'px'
-    }
-  } else if (type === 'date') {
-    const pw = 240, ph = 285
-    let left = rect.left
-    if (left + pw > window.innerWidth) left = Math.max(8, window.innerWidth - pw - 8)
-    let top = rect.bottom + 2
-    if (top + ph > window.innerHeight) top = rect.top - ph - 2
-    dateStyle.value = { left: left + 'px', top: top + 'px' }
-  }
-}
-
-function onScroll() {
-  if (dropOpen.value) positionPanel(dropR.value, dropC.value, 'drop')
-  if (dateOpen.value) positionPanel(dateR.value, dateC.value, 'date')
-}
-
-function onGlobalMouseDown() {
-  if (dropOpen.value || dateOpen.value) {
-    closeDrop()
-    closeDate()
+  finishInputEditNow()
+  if (editCell.value.r >= 0) {
+    closeActiveEditor()
   }
 }
 
 onMounted(function() {
   window.addEventListener('mousedown', onGlobalMouseDown)
-  window.addEventListener('resize', onScroll)
 })
 
 onUnmounted(function() {
   window.removeEventListener('mousedown', onGlobalMouseDown)
-  window.removeEventListener('resize', onScroll)
 })
 
 // ══════════════════ 基础行与多选逻辑 ══════════════════
@@ -847,7 +851,11 @@ function addRow(customData = {}) {
 
   const blankRow = {}
   props.columns.forEach(function(col) {
-    blankRow[col.key] = ''
+    if (col.type === 'multiselect' || col.type === 'cascade' || col.type === 'cascader') {
+      blankRow[col.key] = col.valueType === 'string' ? '' : []
+    } else {
+      blankRow[col.key] = ''
+    }
   })
 
   const newRow = {
@@ -869,8 +877,7 @@ function addRow(customData = {}) {
   }, 50)
 }
 
-// ══════════════════ 结合 Feedback 组件的确认删除 ══════════════════
-// 1. 单行删除
+// ══════════════════ 确认删除 ══════════════════
 async function handleRemoveRow(index) {
   const ok = await confirm('确认删除', '确定要删除此行数据吗？此操作无法撤销。')
   if (ok) {
@@ -889,7 +896,6 @@ function removeRow(index) {
   emit('row-remove', { row: removed, index: index })
 }
 
-// 2. 批量删除
 async function handleDeleteSelected() {
   const count = selectedIds.value.size
   if (count === 0) return
@@ -930,6 +936,11 @@ function toggleSort(key) {
     const vb = b[sortKey.value]
     if (typeof va === 'number' && typeof vb === 'number') {
       return sortAsc.value ? va - vb : vb - va
+    }
+    if (Array.isArray(va) || Array.isArray(vb)) {
+      const sa = Array.isArray(va) ? va.join(',') : String(va ?? '')
+      const sb = Array.isArray(vb) ? vb.join(',') : String(vb ?? '')
+      return sortAsc.value ? sa.localeCompare(sb) : sb.localeCompare(sa)
     }
     return sortAsc.value
       ? String(va ?? '').localeCompare(String(vb ?? ''))
@@ -1040,11 +1051,6 @@ defineExpose({
   padding: 0 6px !important;
 }
 
-/* 
-  删除按钮样式：
-  默认即显示明显的实心高亮红底 + 纯白文字 + 红色柔和阴影（原 hover 效果）；
-  当悬浮 hover 时，进一步加深颜色并放大阴影给予交互反馈。
-*/
 .${namespace}-btn-action-del {
   display: inline-flex;
   align-items: center;
@@ -1174,12 +1180,19 @@ defineExpose({
 .${namespace}-tc { text-align: center; }
 .${namespace}-index-cell { color: var(--${namespace}-tm, #888); font-size: 12px; }
 
-/* 未编辑时的纯文本展示 */
+/* 纯文本展示与占位符样式 */
 .${namespace}-cell-text {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: default;
+}
+
+.${namespace}-cell-placeholder {
+  color: var(--${namespace}-text-light, #bfbfbf) !important;
+  font-size: 12px;
+  user-select: none;
 }
 
 /* 激活编辑状态时的样式 */
@@ -1188,7 +1201,10 @@ defineExpose({
   background: var(--${namespace}-bg, #fff) !important;
 }
 
-.${namespace}-cell-editor {
+.${namespace}-cell-editor,
+.${namespace}-cell-multiselect,
+.${namespace}-cell-time,
+.${namespace}-cell-cascader {
   width: 100%;
   height: 100%;
   display: flex;
@@ -1207,6 +1223,18 @@ defineExpose({
   box-sizing: border-box;
   outline: none;
   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.15);
+}
+
+/* 独立组件嵌入时的宽度与触发框自适应 */
+.${namespace}-cell-editor :deep(.${namespace}-dd),
+.${namespace}-cell-editor :deep(.${namespace}-dp),
+.${namespace}-cell-time :deep(.${namespace}-tp),
+.${namespace}-cell-cascader :deep(.${namespace}-cscd) {
+  width: 100%;
+  min-width: 0;
+}
+.${namespace}-cell-cascader :deep(.${namespace}-cscd--single .${namespace}-cscd__trigger--single) {
+  min-width: 0;
 }
 
 .${namespace}-checkbox {
@@ -1228,212 +1256,5 @@ defineExpose({
   border-top: 1px solid var(--${namespace}-bd, #e8e8e8);
   font-size: 12px;
   color: var(--${namespace}-tm, #666);
-}
-</style>
-
-<!-- ════════ 全局浮层面板样式 (Teleport to body) ════════ -->
-<style>
-/* 浮动下拉菜单面板 */
-.${namespace}-drop-panel {
-  position: fixed;
-  z-index: 9999;
-  background: var(--${namespace}-bg, #fff);
-  border: 1px solid var(--${namespace}-p, #1890ff);
-  border-radius: 3px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  max-height: 220px;
-  overflow-y: auto;
-  box-sizing: border-box;
-}
-
-.${namespace}-drop-item {
-  padding: 6px 14px;
-  cursor: pointer;
-  font-size: 13px;
-  white-space: nowrap;
-  color: var(--${namespace}-t, #333);
-  transition: background 0.15s ease;
-}
-
-.${namespace}-drop-item:hover {
-  background: var(--${namespace}-primary-bg, #f5faff);
-}
-
-.${namespace}-drop-item.active {
-  background: rgba(24, 144, 255, 0.1);
-  font-weight: 600;
-  color: var(--${namespace}-p, #1890ff);
-}
-
-/* 浮动日历面板 */
-.${namespace}-date-panel {
-  position: fixed;
-  z-index: 9999;
-  background: var(--${namespace}-bg, #fff);
-  border: 1px solid var(--${namespace}-p, #1890ff);
-  border-radius: 4px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
-  width: 240px;
-  overflow: hidden;
-  font-family: inherit;
-  box-sizing: border-box;
-}
-
-.${namespace}-date-head {
-  background: linear-gradient(135deg, var(--${namespace}-primary-dark, #096dd9) 0%, var(--${namespace}-p, #1890ff) 100%);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  height: 30px;
-  padding: 0 4px;
-  gap: 2px;
-}
-
-.${namespace}-date-nav {
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border-radius: 2px;
-  font-size: 13px;
-  flex-shrink: 0;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.${namespace}-date-nav:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-}
-
-.${namespace}-date-title {
-  flex: 1;
-  text-align: center;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 2px;
-}
-
-.${namespace}-date-title:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.${namespace}-date-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  background: var(--${namespace}-primary-bg, #f5faff);
-  border-bottom: 1px solid var(--${namespace}-bl, #e8e8e8);
-}
-
-.${namespace}-date-wd {
-  text-align: center;
-  font-size: 11px;
-  font-weight: bold;
-  color: var(--${namespace}-p, #1890ff);
-  padding: 4px 0;
-}
-
-.${namespace}-date-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  padding: 4px;
-  gap: 2px;
-}
-
-.${namespace}-date-day {
-  text-align: center;
-  font-size: 11px;
-  padding: 4px 0;
-  cursor: pointer;
-  border-radius: 2px;
-  color: var(--${namespace}-t, #333);
-  line-height: 1.4;
-  transition: all 0.15s ease;
-}
-
-.${namespace}-date-day:hover {
-  background: var(--${namespace}-primary-bg, #e6f7ff);
-  color: var(--${namespace}-p, #1890ff);
-}
-
-.${namespace}-date-day.is-other {
-  color: var(--${namespace}-tl, #bbb);
-}
-
-.${namespace}-date-day.is-today {
-  font-weight: bold;
-  color: var(--${namespace}-p, #1890ff);
-  border: 1px solid var(--${namespace}-p, #1890ff);
-}
-
-.${namespace}-date-day.is-selected {
-  background: var(--${namespace}-p, #1890ff) !important;
-  color: #fff !important;
-  font-weight: bold;
-}
-
-.${namespace}-date-my-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  padding: 8px 6px;
-  gap: 4px;
-}
-
-.${namespace}-date-my-item {
-  text-align: center;
-  font-size: 12px;
-  padding: 6px 2px;
-  cursor: pointer;
-  border-radius: 3px;
-  color: var(--${namespace}-t, #333);
-  transition: all 0.15s ease;
-}
-
-.${namespace}-date-my-item:hover {
-  background: var(--${namespace}-primary-bg, #e6f7ff);
-  color: var(--${namespace}-p, #1890ff);
-}
-
-.${namespace}-date-my-item.is-selected {
-  background: var(--${namespace}-p, #1890ff);
-  color: #fff;
-  font-weight: bold;
-}
-
-.${namespace}-date-footer {
-  border-top: 1px solid var(--${namespace}-bl, #e8e8e8);
-  padding: 4px 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--${namespace}-bg-page, #fcfcfc);
-}
-
-.${namespace}-date-today-btn {
-  font-size: 11px;
-  color: var(--${namespace}-p, #1890ff);
-  cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 2px;
-}
-
-.${namespace}-date-today-btn:hover {
-  background: var(--${namespace}-primary-bg, #e6f7ff);
-}
-
-.${namespace}-date-clear-btn {
-  font-size: 11px;
-  color: var(--${namespace}-rb, #ff4d4f);
-  cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 2px;
-}
-
-.${namespace}-date-clear-btn:hover {
-  color: var(--${namespace}-rb, #ff4d4f);
-  background: var(--${namespace}-danger-bg, #fff1f0);
 }
 </style>

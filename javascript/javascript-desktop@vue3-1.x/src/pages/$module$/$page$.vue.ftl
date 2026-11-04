@@ -83,6 +83,9 @@ onMounted(async () => {
 <#list page.widgets as widget>
   <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
   <#if !optionable_widgets[widget.id]??><#continue></#if>
+  <#if widget.container.type == "fixed_table" || widget.container.type == "paged_table" || widget.container.type == "paged_grid">
+    <#continue>
+  </#if>
   <#assign optVal = optionable_widgets[widget.id]>
   <#if widget.type == "select" || widget.type == "multiselect">
     <#if optVal.isRef>
@@ -96,8 +99,8 @@ onMounted(async () => {
 <#assign visited_widgets = {}>
 <#list page.widgets as widget>
   <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
-  <#if widget.type == "entry_form" || widget.type == "display_form" || widget.type == "official_form" || 
-       widget.type == "hero_card">
+  <#if widget.type == "entry_form" || widget.type == "display_form" || 
+       widget.type == "official_form" || widget.type == "hero_card">
   load${js.nameType(widget.id)}Data();
   <#elseif widget.type == "excel_form" || widget.type == "list_view">
   load${js.nameType(widget.id)}Rows();
@@ -111,8 +114,11 @@ onMounted(async () => {
 <#list page.widgets as widget>
   <#if !widget.id?? || visited_widgets[widget.id]??><#continue></#if>
   <#if widget.type == "cascade">
-    <#assign optRef = typebase.enumref(guidbase.get_data_by_id(widget.id))>
+    <#if widget.container.type == "entry_form" || widget.container.type == "official_form" ||
+         widget.container.type == "display_form">
+      <#assign optRef = typebase.enumref(guidbase.get_data_from_widget(widget))>
   ${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)}OptionLabels = await sdk.fetch${js.nameType(widget.id)}OptionLabels(${js.nameVariable(widget.container.id)}Data.${js.nameVariable(widget.id)});
+    </#if>
   </#if>
 </#list>
 })

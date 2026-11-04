@@ -14,12 +14,19 @@
   flex-direction: column;
   gap: 6px;
   padding: 12px;
-  /* border: 1px solid var(--tile-border, #e8e8e8);
-  border-radius: var(--tile-radius, 8px); */
+  /* 只保留左右和底边框 */
+  <#--  border-left: 1px solid var(--tile-border, #e8e8e8);
+  border-right: 1px solid var(--tile-border, #e8e8e8);
+  border-bottom: 1px solid var(--tile-border, #e8e8e8);  -->
   background: var(--tile-bg, #fff);
   font-size: 13px;
   color: var(--tile-color, #333);
   line-height: 1.4;
+}
+
+/* 仅第一个元素补全顶部边框 */
+.tile:first-child {
+  border-top: 1px solid var(--tile-border, #e8e8e8);
 }
 
 <#--

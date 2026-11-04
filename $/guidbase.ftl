@@ -33,27 +33,35 @@
 
 <#--
  ###############################################################################
- ### 根据组件 ID 获取数据源定义 (Get Data By Widget ID)
+ ### 获取组件的数据源定义 (Get Data Source Definition from Widget)
  ### 
- ### 该方法用于全局遍历应用中所有页面的下属组件，检索并返回指定组件 ID 对应
- ### 的非空数据源（Data）定义。
+ ### 优先获取传入组件自身绑定的有效数据源（data）定义；
+ ### 若当前组件未直接定义 data，则基于其组件 ID 全局遍历应用中所有页面的下属组件，
+ ### 回溯检索具有相同 ID 且包含有效数据源定义的组件并返回其值。
  ### 
- ### 若在整个应用配置中未能匹配到对应 ID 且包含有效数据定义的组件，将中断模板
- ### 渲染并报错提示，引导检查 Guidbase 模型定义。
+ ### 异常中断场景：
+ ### 1. 当前组件未配置 data 且缺少 ID 属性。
+ ### 2. 全局遍历后仍未找到匹配该 ID 且包含有效 data 定义的组件。
  ### 
- ### @param id        待匹配的目标组件唯一标识符 (String)
- ### @return          匹配组件所绑定的数据源定义内容 (String)
+ ### @param widget    目标组件对象 (Object)
+ ### @return         匹配组件所绑定的数据源定义内容 (String)
  ###############################################################################
  -->
-<#function get_data_by_id id>
+<#function get_data_from_widget widget>
+  <#if widget.value("data") != "">
+    <#return widget.value("data")>
+  </#if>
+  <#if !widget.id??>
+    <#stop "组件没有定义ID，无法获取Data定义，请检查Guidbase模型定义">
+  </#if>
   <#list app.pages as page>
-    <#list page.widgets as widget>
-      <#if widget.id?? && widget.id == id && widget.value("data") != "">
-        <#return widget.value("data")>
+    <#list page.widgets as w>
+      <#if w.id?? && w.id == widget.id && w.value("data") != "">
+        <#return w.value("data")>
       </#if>
     </#list>
   </#list>
-  <#stop "在这个ID（" + id + "）下没有找到任何的Data定义，请检查Guidbase模型定义">
+  <#stop "在这个ID（" + widget.id + "）下没有找到任何的Data定义，请检查Guidbase模型定义">
 </#function>
 
 <#--

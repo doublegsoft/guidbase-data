@@ -1,11 +1,8 @@
 <template>
-  <!-- 登录页：直接渲染，不带布局 -->
   <router-view v-if="isLoginPage" />
-
-  <!-- 其他页面：带 sidebar 和 topbar -->
   <div v-else class="${namespace}-shell">
     <div class="${namespace}-topbar">
-      <div class="${namespace}-logo">⚡<em>某市供电公司</em> · 营销管理系统</div>
+      <div class="${namespace}-logo">⚡<em>某某企业</em> · 某某系统</div>
       <div
           v-for="m in modules" :key="m.key"
           class="${namespace}-tnav" :class="{ '${namespace}-active': activeModule === m.key }"
