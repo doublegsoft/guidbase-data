@@ -364,6 +364,12 @@ ${""?left_pad(indent)}<div id="criteria${js.nameType(form.id)}" class="${namespa
 <@print_widget_layout widget=widget indent=indent+2 />
     </#if>
   </#list>
+  <#list form.children as widget>
+    <#if widget.type != "buttons"><#continue></#if>
+    <#list widget.children as button>
+<@print_widget_layout widget=button indent=indent+2 />
+    </#list>
+  </#list>
 ${""?left_pad(indent)}</div>
 </#macro>
 

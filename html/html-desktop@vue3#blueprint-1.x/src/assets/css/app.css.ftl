@@ -123,6 +123,10 @@ html, body {
   gap: 14px;
 }
 
+.${namespace}-divider {
+  height: 16px;
+}
+
 /* 侧边栏：340px 稳固仪器控制台 */
 .${namespace}-sidebar {
   width: 340px;
@@ -859,7 +863,7 @@ html, body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px 24px;
-  padding: 16px 16px 64px 16px; /* 预留底部操作条安全高度 */
+  padding: 16px 16px 16px 16px; /* 预留底部操作条安全高度 */
 }
 .${namespace}-form--1 { grid-template-columns: 1fr; }
 .${namespace}-form--3 { grid-template-columns: repeat(3, 1fr); }
@@ -1182,6 +1186,111 @@ html, body {
   font-weight: 700;
   font-size: 12px;
   flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════
+   Switch 开关控件 (工业直角高对比度设计)
+   ══════════════════════════════════════════════ */
+.${namespace}-switch-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  min-height: 34px; /* 与普通 input 保持一致基线对齐 */
+}
+
+/* 隐藏原生 checkbox */
+.${namespace}-switch-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  pointer-events: none;
+}
+
+/* 开关外轨 (Track)：纯直角墨水线框/实心块 */
+.${namespace}-switch-track {
+  position: relative;
+  width: 44px;
+  height: 22px;
+  background: var(--${namespace}-bg, #f4f6fb);
+  border: 1.5px solid var(--${namespace}-ln, #d3dbef);
+  box-sizing: border-box;
+  transition: all 0.15s ease-in-out;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* 开关内部滑块 (Thumb)：白色实心正方形直角块 */
+.${namespace}-switch-track::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 16px;
+  height: 16px;
+  background: var(--${namespace}-ink, #0a2a9a);
+  border: 1px solid var(--${namespace}-ink, #0a2a9a);
+  box-sizing: border-box;
+  transition: all 0.15s ease-in-out;
+}
+
+/* Hover 物理微投影反馈 */
+.${namespace}-switch-wrap:hover .${namespace}-switch-track {
+  border-color: var(--${namespace}-pri, #0a2fb5);
+}
+
+/* ── 激活状态 (Checked / Active) ── */
+.${namespace}-switch-input:checked + .${namespace}-switch-track {
+  background: var(--${namespace}-pri, #0a2fb5);
+  border-color: var(--${namespace}-pri, #0a2fb5);
+}
+
+.${namespace}-switch-input:checked + .${namespace}-switch-track::after {
+  left: 23px; /* 滑块右移 */
+  background: #ffffff;
+  border-color: #ffffff;
+}
+
+/* 键盘焦点可访问性 */
+.${namespace}-switch-input:focus-visible + .${namespace}-switch-track {
+  outline: 2px solid var(--${namespace}-pri, #0a2fb5);
+  outline-offset: 2px;
+}
+
+/* 禁用状态 */
+.${namespace}-switch-wrap.is-disabled,
+.${namespace}-switch-input:disabled + .${namespace}-switch-track {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: var(--${namespace}-bg, #f4f6fb);
+}
+
+/* ── 开关右侧标签与描述文本 (1:1 还原截图) ── */
+.${namespace}-switch-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--${namespace}-ink, #0a2a9a);
+  line-height: 1;
+}
+
+/* 截图中浅灰色的技术协议代码小方块 (如: TLS) */
+.${namespace}-switch-badge {
+  display: inline-block;
+  padding: 2px 5px;
+  background: #d8dde6;
+  color: var(--${namespace}-ink, #0a2a9a);
+  font-family: var(--${namespace}-f, "IBM Plex Mono", monospace);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  border-radius: 0;
+  line-height: 1.2;
 }
 
 /* ══════════════════════════════════════════════

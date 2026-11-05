@@ -1,11 +1,15 @@
 <#if (designSystem!"") == "bnrlike">
-<#import "/$/vue3-bnrlike.ftl" as vue3>
+<#import "/$/vue3/vue3-bnrlike.ftl" as vue3>
+<#elseif (designSystem!"") == "blueprint">
+<#import "/$/vue3/vue3-blueprint.ftl" as vue3>
+<#elseif (designSystem!"") == "softwire">
+<#import "/$/vue3/vue3-softwire.ftl" as vue3>
 <#elseif (designSystem!"") == "navypitch">
-<#import "/$/vue3-navypitch.ftl" as vue3>
+<#import "/$/vue3/vue3-navypitch.ftl" as vue3>
 <#elseif (designSystem!"") == "tada">
-<#import "/$/vue3-tada.ftl" as vue3>
+<#import "/$/vue3/vue3-tada.ftl" as vue3>
 <#else>
-<#import "/$/vue3-default.ftl" as vue3>
+<#import "/$/vue3/vue3-default.ftl" as vue3>
 </#if>
 <#import "/$/guidbase.ftl" as guidbase>
 <#import "/$/guidbase4js.ftl" as guidbase4js>
