@@ -106,3 +106,27 @@ ${""?left_pad(indent)}  </div>
   </#list>
 ${""?left_pad(indent)}</div>
 </#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                              OFFICIAL FORM                              -->
+<!----------------------------------------------------------------------------->
+<#macro print_official_form_layout form indent>
+<@print_unsupported_widget_layout widget=form indent=indent />
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                               LETTER FORM                               -->
+<!----------------------------------------------------------------------------->
+<#macro print_letter_form_layout form indent>
+<@print_unsupported_widget_layout widget=form indent=indent />
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                               UNSUPPORTED                               -->
+<!----------------------------------------------------------------------------->
+<#macro print_unsupported_widget_layout widget indent=0>
+  <#local wType = (widget.type!widget.value("type")!widget.value("widget")!"unknown")>
+${""?left_pad(indent)}<div style="padding: 10px 14px; border-radius: 12px; background: var(--${namespace}-pn); box-shadow: var(--${namespace}-sis); color: var(--${namespace}-mu); font-family: var(--${namespace}-m); font-size: 12px;">
+${""?left_pad(indent)}  Unsupported widget: ${wType}
+${""?left_pad(indent)}</div>
+</#macro>

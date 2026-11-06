@@ -1275,6 +1275,128 @@ html, body {
   flex-shrink: 0;
 }
 
+/* ══════════════════════════════════════════════
+   19. Switch 切换开关组件 (BNR 高密度工单风格)
+   ══════════════════════════════════════════════ */
+
+/* 开关外层容器：高度 22px，与 .${namespace}-input 基准线严格对齐 */
+.${namespace}-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+}
+
+/* 隐藏原生 Checkbox */
+.${namespace}-switch-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  pointer-events: none;
+}
+
+/* 轨道 (Track)：高密度紧凑跑道胶囊 */
+.${namespace}-switch-track {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 16px;
+  background-color: #d8dce2;
+  border: 1px solid var(--${namespace}-border, #c8c8c8);
+  border-radius: 8px;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+/* 滑块 (Thumb)：纯白实体圆扣 + 微弱阴影 */
+.${namespace}-switch-track::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 12px;
+  height: 12px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── 激活状态 (Checked / 默认系统深蓝) ── */
+.${namespace}-switch-input:checked + .${namespace}-switch-track {
+  background-color: var(--${namespace}-primary, #1a4f8a);
+  border-color: var(--${namespace}-primary-dark, #15407a);
+}
+
+.${namespace}-switch-input:checked + .${namespace}-switch-track::after {
+  transform: translateX(18px);
+}
+
+/* ── 键盘焦点与悬停状态 ── */
+.${namespace}-switch:hover .${namespace}-switch-track {
+  border-color: var(--${namespace}-primary, #1a4f8a);
+}
+
+.${namespace}-switch-input:focus-visible + .${namespace}-switch-track {
+  box-shadow: 0 0 0 2px rgba(26, 79, 138, 0.2);
+}
+
+/* ── 禁用状态 (Disabled) ── */
+.${namespace}-switch.is-disabled,
+.${namespace}-switch-input:disabled + .${namespace}-switch-track {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background-color: #e4e8f0;
+  border-color: #c8d0d8;
+}
+
+.${namespace}-switch-input:disabled ~ .${namespace}-switch-label {
+  color: var(--${namespace}-text-disabled, #c8d0d8);
+  cursor: not-allowed;
+}
+
+/* ── 右侧状态文本标签 ── */
+.${namespace}-switch-label {
+  font-size: 12px;
+  color: var(--${namespace}-text, #1c2833);
+  line-height: 22px;
+  font-family: var(--${namespace}-font);
+}
+
+/* ── 变体 1: 成功绿变体 (--success) ── */
+.${namespace}-switch--success .${namespace}-switch-input:checked + .${namespace}-switch-track {
+  background-color: var(--${namespace}-success, #1e8449);
+  border-color: var(--${namespace}-success-dark, #196f3d);
+}
+
+/* ── 变体 2: 超紧凑微型尺寸 (--sm，适合表格内部或 20px 行高) ── */
+.${namespace}-switch--sm {
+  height: 20px;
+}
+.${namespace}-switch--sm .${namespace}-switch-track {
+  width: 28px;
+  height: 14px;
+  border-radius: 7px;
+}
+.${namespace}-switch--sm .${namespace}-switch-track::after {
+  width: 10px;
+  height: 10px;
+  top: 1px;
+  left: 1px;
+}
+.${namespace}-switch--sm .${namespace}-switch-input:checked + .${namespace}-switch-track::after {
+  transform: translateX(14px);
+}
+.${namespace}-switch--sm .${namespace}-switch-label {
+  font-size: 11px;
+}
+
 /* OfficialForm                          */
 /* Namespace: ${namespace}-of            */
 /* 国企公文表单：红头立项审批单               */

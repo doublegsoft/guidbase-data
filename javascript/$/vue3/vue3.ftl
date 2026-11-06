@@ -1280,6 +1280,12 @@ ${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget
     <#else>
 ${""?left_pad(indent)}<${namespace}-dropdown data-test="${js.nameVariable(widget.id)}" :options="${js.nameVariable(widget.id)}Options"  :clearable="true" v-model="${guidbase.name_input_variable(widget)}" />
     </#if>
+  <#elseif widget.type == "switch">
+${""?left_pad(indent)}<label class="${namespace}-switch ${namespace}-switch--success">
+${""?left_pad(indent)}  <input type="checkbox" class="${namespace}-switch-input" checked />
+${""?left_pad(indent)}  <span class="${namespace}-switch-track"></span>
+${""?left_pad(indent)}  <span class="${namespace}-switch-label">启用</span>
+${""?left_pad(indent)}</label>
   <#elseif widget.type == "date">
 ${""?left_pad(indent)}<${namespace}-datepicker data-test="${js.nameVariable(widget.id)}" v-model="${guidbase.name_input_variable(widget)}" />    
   <#elseif widget.type == "time">
