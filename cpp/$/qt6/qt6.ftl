@@ -1,0 +1,1 @@
+<#import "/$/guidbase.ftl" as guidbase>
