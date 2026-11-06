@@ -1,3 +1,6 @@
+<#if license??>
+${cpp.license(license)}
+</#if>
 #pragma once
 
 #include <QWidget>
@@ -9,13 +12,13 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QFrame>
 
-// ==========================================
-// 1. 日历弹窗面板 (DatePickerPopup)
-// ==========================================
+namespace ${namespace} {
+
 class DatePickerPopup : public QWidget {
   Q_OBJECT
-public:
+  public:
   enum ViewMode { DayView = 0, MonthView = 1, YearView = 2 };
 
   explicit DatePickerPopup(QWidget* parent = nullptr);
@@ -24,11 +27,11 @@ public:
   void setCurrentDate(const QDate& date);
   void showAt(const QPoint& globalPos, int triggerHeight);
 
-signals:
+  signals:
   void dateSelected(const QDate& date);
   void cleared();
 
-private slots:
+  private slots:
   void onStep(int dir, bool byYear);
   void onTitleClicked();
   void onDayClicked();
@@ -37,8 +40,9 @@ private slots:
   void onTodayClicked();
   void onClearClicked();
 
-private:
+  private:
   void initUi();
+  void applyStyles();
   void updateView();
   void refreshDayView();
   void refreshMonthView();
@@ -46,12 +50,13 @@ private:
   bool isDateDisabled(const QDate& d) const;
 
   ViewMode m_viewMode = DayView;
-  QDate m_cursorDate;    // 当前视图浏览的年月
-  QDate m_selectedDate;  // 选中的日期
+  QDate m_cursorDate;
+  QDate m_selectedDate;
   QDate m_minDate;
   QDate m_maxDate;
 
-  // UI 元素
+  QFrame* m_card;
+
   QPushButton* m_btnPrevYear;
   QPushButton* m_btnPrevMonth;
   QPushButton* m_btnTitle;
@@ -63,9 +68,9 @@ private:
   QWidget* m_monthPage;
   QWidget* m_yearPage;
 
-  QList<QPushButton*> m_dayButtons;   // 6行7列 = 42个单元格
-  QList<QPushButton*> m_monthButtons; // 12个月
-  QList<QPushButton*> m_yearButtons;  // 12年跨度
+  QList<QPushButton*> m_dayButtons;
+  QList<QPushButton*> m_monthButtons;
+  QList<QPushButton*> m_yearButtons;
 };
 
 // ==========================================
@@ -75,7 +80,7 @@ class DatePicker : public QWidget {
   Q_OBJECT
   Q_PROPERTY(QDate date READ date WRITE setDate NOTIFY dateChanged)
 
-public:
+  public:
   explicit DatePicker(QWidget* parent = nullptr);
 
   QDate date() const { return m_date; }
@@ -85,21 +90,27 @@ public:
   void setPlaceholder(const QString& text);
   void setDateRange(const QDate& minDate, const QDate& maxDate);
 
-signals:
+  signals:
   void dateChanged(const QDate& date);
 
-protected:
+  protected:
   void mousePressEvent(QMouseEvent* event) override;
+  void enterEvent(QEnterEvent* event) override;
+  void leaveEvent(QEvent* event) override;
 
-private:
+  private:
+  void applyStyles();
   void updateDisplay();
 
   QDate m_date;
   QString m_format = "yyyy-MM-dd";
   QString m_placeholder = "YYYY-MM-DD";
 
+  QFrame* m_container;
   QLabel* m_label;
   QToolButton* m_btnClear;
-  QToolButton* m_btnIcon;
+  QLabel* m_icon;
   DatePickerPopup* m_popup;
 };
+
+} // namespace
