@@ -16,6 +16,81 @@
 <!--                                ENTRY FORM                               -->
 <!----------------------------------------------------------------------------->
 <#macro print_entry_form_layout form indent=0>
+  <#local cols = form.value("cols","3")?number>
+  <#local groups = form.groups()>
+${""?left_pad(indent)}// ===================== 表单容器与主垂直布局 =====================
+${""?left_pad(indent)}QWidget* widget${cpp.nameType(form.id)} = new QWidget();
+${""?left_pad(indent)}QVBoxLayout* layout${cpp.nameType(form.id)} = new QVBoxLayout(widget${cpp.nameType(form.id)});
+${""?left_pad(indent)}layout${cpp.nameType(form.id)}->setContentsMargins(0, 0, 0, 0);
+${""?left_pad(indent)}layout${cpp.nameType(form.id)}->setSpacing(20);
+  <#list groups as group>
+    <#local groupName = group?index?string>
+${""?left_pad(indent)}// --------------------- 分组：${group!"默认分组"} ---------------------
+    ${""?left_pad(indent)}QGroupBox* group${groupName} = new QGroupBox("${group!""}");
+${""?left_pad(indent)}QGridLayout* groupLayout${groupName} = new QGridLayout(group${groupName});
+${""?left_pad(indent)}layout${cpp.nameType(form.id)}->addWidget(group${groupName});
+${""?left_pad(indent)}groupLayout${groupName}->setContentsMargins(20, 15, 20, 15);
+${""?left_pad(indent)}groupLayout${groupName}->setHorizontalSpacing(15);
+${""?left_pad(indent)}groupLayout${groupName}->setVerticalSpacing(18);
+    <#-- 根据列数动态设置标签列固定宽、输入框列自适应拉伸 -->
+    <#list 0..(cols - 1) as c>
+${""?left_pad(indent)}groupLayout${groupName}->setColumnMinimumWidth(${c * 2}, 80); // 标签列
+${""?left_pad(indent)}groupLayout${groupName}->setColumnStretch(${c * 2 + 1}, 1);   // 控件列
+    </#list>
+    <#local rows = form.rows(group, cols)>
+    <#list rows as row>
+      <#local rIdx = row_index>
+      <#list row as child>
+        <#local cIdx = child_index>
+        <#local labelCol = cIdx * 2>
+        <#local fieldCol = cIdx * 2 + 1>
+        <#local childName = cpp.nameType(child.id)>
+        <#local isRequired = child.required!false>
+        <#local colSpan = (child.colSpan!1)?number>
+${""?left_pad(indent)}// 控件: ${child.title}
+${""?left_pad(indent)}QLabel* lbl${childName} = new QLabel("<#if isRequired><font color=\"#F56C6C\">*</font> </#if>${child.title}");
+${""?left_pad(indent)}lbl${childName}->setObjectName("RowTitle");
+        <#-- 控件类型分支实例化 -->
+        <#if child.type == "date">
+${""?left_pad(indent)}QDateEdit* edit${childName} = new QDateEdit(QDate::currentDate());
+${""?left_pad(indent)}edit${childName}->setCalendarPopup(true);
+        <#elseif child.type == "time">
+${""?left_pad(indent)}QTimeEdit* edit${childName} = new QTimeEdit(QTime::currentTime());
+        <#elseif child.type == "select" || child.type == "combobox">
+${""?left_pad(indent)}QComboBox* edit${childName} = new QComboBox();
+        <#elseif child.type == "textarea" || child.type == "text_multiline">
+${""?left_pad(indent)}QTextEdit* edit${childName} = new QTextEdit();
+${""?left_pad(indent)}edit${childName}->setFixedHeight(70);
+        <#elseif child.type == "switch" || child.type == "checkbox">
+${""?left_pad(indent)}QCheckBox* edit${childName} = new QCheckBox("${child.placeholder!"启用"}");
+${""?left_pad(indent)}edit${childName}->setObjectName("ToggleSwitch");
+        <#elseif child.type == "number">
+${""?left_pad(indent)}QLineEdit* edit${childName} = new QLineEdit();
+          <#if child.unit?? && child.unit?has_content>
+${""?left_pad(indent)}// 带单位后缀: ${child.unit}
+          </#if>
+        <#else>
+${""?left_pad(indent)}QLineEdit* edit${childName} = new QLineEdit();
+          <#if child.placeholder?? && child.placeholder?has_content>
+${""?left_pad(indent)}edit${childName}->setPlaceholderText("${child.placeholder}");
+          </#if>
+        </#if>
+        <#if child.type == "textarea">
+${""?left_pad(indent)}groupLayout${groupName}->addWidget(lbl${childName}, ${rIdx}, ${labelCol}, Qt::AlignTop);
+        <#else>
+${""?left_pad(indent)}groupLayout${groupName}->addWidget(lbl${childName}, ${rIdx}, ${labelCol}, Qt::AlignVCenter);
+        </#if>
+        <#if (colSpan > 1)>
+          <#local actualGridColSpan = colSpan * 2 - 1>
+${""?left_pad(indent)}groupLayout${groupName}->addWidget(edit${childName}, ${rIdx}, ${fieldCol}, 1, ${actualGridColSpan});
+        <#else>
+${""?left_pad(indent)}groupLayout${groupName}->addWidget(edit${childName}, ${rIdx}, ${fieldCol});
+        </#if>
+      </#list>
+    </#list>
+  </#list>
+${""?left_pad(indent)}// 底部增加伸缩因子，防止表单项在窗口拉高时被纵向拉散
+${""?left_pad(indent)}layout${cpp.nameType(form.id)}->addStretch();
 </#macro>
 
 <!----------------------------------------------------------------------------->
@@ -239,29 +314,7 @@
 <!--                                  WIDGET                                 -->
 <!----------------------------------------------------------------------------->
 <#macro print_widget_layout widget indent=0>
-  <#if widget.type == "drawer"><#-- 作废，不要这么定义，虽然可以用 -->
-${""?left_pad(indent)}<${namespace}-drawer v-model="${js.nameVariable(widget.id)}Open" title="${widget.title}">
-    <#if widget.value("page","") != "">
-      <#local pagePath = widget.value("page")>
-${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
-    <#else>
-      <#list widget.children as child>
-<@print_widget_layout widget=child indent=indent+2 />    
-      </#list>
-    </#if>
-${""?left_pad(indent)}</${namespace}-drawer>
-  <#elseif widget.type == "dialog"><#-- 作废，不要这么定义，虽然可以用 -->
-${""?left_pad(indent)}<${namespace}-dialog v-model="${js.nameVariable(widget.id)}Open" title="${widget.title}" size="lg">  
-    <#if widget.value("page","") != "">
-      <#local pagePath = widget.value("page")>
-${""?left_pad(indent)}  <${js.nameFile(pagePath?replace("/", "_"))} />
-    <#else>
-      <#list widget.children as child>
-<@print_widget_layout widget=child indent=indent+2 />    
-      </#list>
-    </#if>
-${""?left_pad(indent)}</${namespace}-dialog>
-  <#elseif widget.type == "row">
+  <#if widget.type == "row">
 <@print_row_layout row=widget indent=indent />
   <#elseif widget.type == "tabs">
 <@print_tabs_layout tabs=widget indent=indent />

@@ -1,3 +1,5 @@
+<#import "/$/guidbase.ftl" as guidbase>
+<#import "/$/qt6/qt6-default.ftl" as qt6>
 <#if license??>
 ${cpp.license(license)}
 </#if>
@@ -11,9 +13,9 @@ ${cpp.license(license)}
 #include <QLabel>
 #include <QDebug>
 
-#include "${namespace}-datepicker.hpp"
+#include "component/${namespace}-datepicker.hpp"
 
-use namespace ${namespace};
+using namespace ${namespace};
 
 int main(int argc, char* argv[]) {
   QApplication app(argc, argv);
