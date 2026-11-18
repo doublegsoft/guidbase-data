@@ -36,7 +36,7 @@
 </#list>
 </template>
 <script setup>
-import { ref, reactive, computed, inject, provide, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, inject, provide, nextTick, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
 <@vue3.print_page_imports page=pageDef />
 import sdk from '@/sdk/sdk.js'

@@ -10,8 +10,13 @@
         <table class="${namespace}-table">
           <thead>
             <tr>
-              <th style="width:40px" class="${namespace}-tc">
-                <input type="checkbox" :checked="isAllChecked" @change="toggleAll($event.target.checked)" style="width:14px;height:14px;accent-color:var(--p);cursor:pointer">
+              <th class="${namespace}-tc ${namespace}-checkbox-col">
+                <input
+                  type="checkbox"
+                  class="${namespace}-checkbox"
+                  :checked="isAllChecked"
+                  @change="toggleAll($event.target.checked)"
+                >
               </th>
               <th v-for="col in columns" :key="col.key"
                 :style="{ width: col.width || '', textAlign: 'center' }"
@@ -32,8 +37,13 @@
               :data-id="getRowKey(row, rowIndex)"
               :class="rowClasses(row, rowIndex)"
               @click="onRowClick($event, row, rowIndex)">
-              <td class="${namespace}-tc" @click.stop>
-                <input type="checkbox" :checked="selectedIds.has(getRowKey(row, rowIndex))" @change="toggleRow(row, rowIndex, $event.target.checked)" style="width:14px;height:14px;accent-color:var(--p);cursor:pointer">
+              <td class="${namespace}-tc ${namespace}-checkbox-col" @click.stop>
+                <input
+                  type="checkbox"
+                  class="${namespace}-checkbox"
+                  :checked="selectedIds.has(getRowKey(row, rowIndex))"
+                  @change="toggleRow(row, rowIndex, $event.target.checked)"
+                >
               </td>
               <td v-for="col in columns" :key="col.key" :style="{ textAlign: col.align || 'left' }">
                 <!-- 自定义 render 容错及传参保护 -->
@@ -308,7 +318,9 @@ defineExpose({
   display: flex;
   flex: 1;
   height: 100%;
+  min-height: 0;
   overflow: hidden;
+  overscroll-behavior: none;
 }
 </style>
 
@@ -317,7 +329,11 @@ defineExpose({
 .${namespace}-page-table {
   flex: 1;
   display: flex;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
   overflow: hidden;
+  overscroll-behavior: none;
   background: var(--${namespace}-bg);
 }
 
@@ -325,6 +341,8 @@ defineExpose({
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  min-width: 0;
   overflow: hidden;
   position: relative;
 }
@@ -349,10 +367,12 @@ defineExpose({
 
 .${namespace}-table-container {
   flex: 1;
+  min-height: 0;
+  min-width: 0;
   overflow: auto;
   position: relative;
   background: var(--${namespace}-bg);
-  overscroll-behavior: contain;
+  overscroll-behavior: none;
   -webkit-overflow-scrolling: auto;
 }
 
@@ -371,10 +391,12 @@ defineExpose({
   top: 0;
   z-index: 10;
   background: var(--${namespace}-pb);
+  background-clip: padding-box;
   color: var(--${namespace}-p);
   padding: 8px 10px;
   font-weight: bold;
   text-align: left;
+  vertical-align: middle;
   white-space: nowrap;
   border-bottom: 1px solid var(--${namespace}-pbd);
   border-right: 1px solid var(--${namespace}-pbd);
@@ -382,6 +404,24 @@ defineExpose({
 
 .${namespace}-table thead th:first-child { border-left: 1px solid var(--${namespace}-pbd); }
 .${namespace}-table thead th:last-child { border-right: none; }
+
+/* 复选框列：始终水平居中 + 垂直居中 */
+.${namespace}-table thead th.${namespace}-checkbox-col,
+.${namespace}-table tbody td.${namespace}-checkbox-col {
+  width: 40px;
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.${namespace}-checkbox {
+  display: block;
+  margin: 0 auto;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--p);
+  cursor: pointer;
+}
 
 .${namespace}-table thead th.${namespace}-sortable { cursor: pointer; user-select: none; }
 .${namespace}-table thead th.${namespace}-sortable:hover { background: var(--${namespace}-ph); }
@@ -409,7 +449,12 @@ defineExpose({
 .${namespace}-table tbody tr.${namespace}-danger:hover td,
 .${namespace}-table tbody tr.${namespace}-warning:hover td { background: var(--${namespace}-primary-bg); }
 
-.${namespace}-tc { text-align: center; }
+.${namespace}-table th.${namespace}-tc,
+.${namespace}-table td.${namespace}-tc,
+.${namespace}-tc {
+  text-align: center;
+  vertical-align: middle;
+}
 
 /* 分页 — 穿透 PtPagination 子组件 */
 .${namespace}-list-area :deep(.${namespace}-pagination) {
@@ -530,6 +575,7 @@ defineExpose({
 .${namespace}-drawer :deep(.${namespace}-dd-body) {
   flex: 1;
   overflow-y: auto;
+  overscroll-behavior: none;
   padding: 0;
 }
 

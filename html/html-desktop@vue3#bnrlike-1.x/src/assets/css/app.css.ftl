@@ -135,6 +135,7 @@ html, body {
 .${namespace}-main {
   display: flex;
   flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -158,13 +159,13 @@ html, body {
   gap:8px; 
   padding:8px 14px; 
   background:#fff;
-  order-bottom:1px solid #d9d9d9; 
+  border-bottom:1px solid #d9d9d9; 
 }
 
-.pt-toolbar > .pt-dp,
-.pt-toolbar > .pt-dd,
-.pt-toolbar > .pt-input,
-.pt-toolbar > .pt-select {
+.${namespace}-toolbar > .${namespace}-dp,
+.${namespace}-toolbar > .${namespace}-dd,
+.${namespace}-toolbar > .${namespace}-input,
+.${namespace}-toolbar > .${namespace}-select {
   flex: 0 0 140px;
   min-width: 100px;
 }
@@ -201,6 +202,7 @@ html, body {
 /* Content area */
 .${namespace}-content {
   flex: 1;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -209,6 +211,7 @@ html, body {
 /* Page scroll area */
 .${namespace}-page {
   flex: 1;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -520,15 +523,18 @@ html, body {
 
 .${namespace}-tabs-content {
   flex: 1;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-.${namespace}-tabs-content div {
+.${namespace}-tabs-content > div {
   flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
-  min-height: 0;   
 }
 
 /* ══════════════════════════════════════════════
@@ -1089,6 +1095,32 @@ html, body {
 /* ══════════════════════════════════════════════
    13. Table
    ══════════════════════════════════════════════ */
+.${namespace}-page-table {
+  flex: 1 1 0%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.${namespace}-list-area {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.${namespace}-table-container {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.${namespace}-pagination {
+  flex-shrink: 0;
+}
+.${namespace}-drawer-closed {
+  display: none;
+}
+
 .${namespace}-table {
   width: 100%;
   border-collapse: collapse;
@@ -1096,6 +1128,9 @@ html, body {
   table-layout: fixed;
 }
 .${namespace}-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   padding: 5px 6px;
   font-weight: bold;
   color: var(--${namespace}-primary);

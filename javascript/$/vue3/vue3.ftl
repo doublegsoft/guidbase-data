@@ -195,7 +195,7 @@ ${""?left_pad(indent)}});
     <#if pageVars[input.id]??><#continue></#if>
     <#if input.type == "select" || input.type == "multiselect" || input.type == "cascade"> 
 ${""?left_pad(indent)}const ${js.nameVariable(input.id)}Options = ref([])    
-        <#global pageVars += {input.id:input.id}>
+      <#global pageVars += {input.id:input.id}>
     </#if>
   </#list>
 </#macro>
@@ -332,10 +332,10 @@ ${""?left_pad(indent)}  title:'${column.title}',
 ${""?left_pad(indent)}  width:'${column.value("width","120")}px', 
     <#if column.type == "date">
 ${""?left_pad(indent)}  align: 'center',
-${""?left_pad(indent)}  render: v => `<span style="font-family:Consolas,monospace;color:#5d6d7e">${r"${v}"}</span>`,
+${""?left_pad(indent)}  render: v => `<span style="font-family:var(--${namespace}-mono);color:var(--${namespace}-text-muted)">${r"${v}"}</span>`,
     <#elseif column.type == "number">
 ${""?left_pad(indent)}  align: 'right',    
-${""?left_pad(indent)}  render: v => `<span style="font-family:Consolas,monospace;color:#5d6d7e">${r"${v}"}</span>`,
+${""?left_pad(indent)}  render: v => `<span style="font-family:var(--${namespace}-mono);color:var(--${namespace}-text-muted)">${r"${v}"}</span>`,
     <#elseif column.type == "tags">
 ${""?left_pad(indent)}  align: 'left',
 ${""?left_pad(indent)}  render: v => {
@@ -343,7 +343,19 @@ ${""?left_pad(indent)}    if (!v && v !== 0) return '';
 ${""?left_pad(indent)}    const list = Array.isArray(v)
 ${""?left_pad(indent)}      ? v.map(item => (typeof item === 'object' && item !== null ? (item.label ?? item.name ?? item.title ?? item.value ?? '') : item))
 ${""?left_pad(indent)}      : String(v).split(/[,，]/).map(s => s.trim());
-${""?left_pad(indent)}    return list.filter(Boolean).map(t => `<span style="display:inline-block;padding:2px 8px;margin:2px 4px 2px 0;font-size:12px;line-height:18px;color:#409eff;background:#ecf5ff;border:1px solid #d9ecff;border-radius:4px;white-space:nowrap;">${r"${t}"}</span>`).join('');
+${""?left_pad(indent)}    return list.filter(Boolean).map(t => `<span class="${namespace}-tag ${namespace}-tag--primary" style="margin:1px 4px 1px 0;">${r"${t}"}</span>`).join('');
+${""?left_pad(indent)}  },
+    <#elseif column.type == "select">
+      <#assign dataExpr = guidbase.get_data_from_widget(column)>
+${""?left_pad(indent)}  align: 'left',
+${""?left_pad(indent)}  render: v => {
+${""?left_pad(indent)}    if (!v && v !== 0) return '';
+      <#if dataExpr?starts_with("enum[") && dataExpr?contains(":")>
+${""?left_pad(indent)}    v = sdk.get${js.nameType(column.id)}OptionLabel(v);      
+${""?left_pad(indent)}    return `<span class="${namespace}-tag ${namespace}-tag--primary" style="margin:1px 4px 1px 0;">${r"${v}"}</span>`;
+      <#else>
+${""?left_pad(indent)}    return `<span class="${namespace}-tag ${namespace}-tag--primary" style="margin:1px 4px 1px 0;">${r"${v}"}</span>`;
+      </#if>
 ${""?left_pad(indent)}  },
     <#elseif column.type == "multiselect">
 ${""?left_pad(indent)}  align: 'left',
@@ -352,7 +364,7 @@ ${""?left_pad(indent)}    if (!v && v !== 0) return '';
 ${""?left_pad(indent)}    const list = Array.isArray(v)
 ${""?left_pad(indent)}      ? v.map(item => (typeof item === 'object' && item !== null ? (item.label ?? item.name ?? item.title ?? item.value ?? '') : item))
 ${""?left_pad(indent)}      : String(v).split(/[,，]/).map(s => s.trim());
-${""?left_pad(indent)}    return list.filter(Boolean).map(t => `<span style="display:inline-block;padding:2px 8px;margin:2px 4px 2px 0;font-size:12px;line-height:18px;color:#409eff;background:#ecf5ff;border:1px solid #d9ecff;border-radius:4px;white-space:nowrap;">${r"${t}"}</span>`).join('');
+${""?left_pad(indent)}    return list.filter(Boolean).map(t => `<span class="${namespace}-tag ${namespace}-tag--primary" style="margin:1px 4px 1px 0;">${r"${t}"}</span>`).join('');
 ${""?left_pad(indent)}  },
     <#elseif column.type == "buttons">
 ${""?left_pad(indent)}  align: 'center',
@@ -393,10 +405,15 @@ const load${js.nameType(table.id)}Rows = async (params, pageNumber, pageSize) =>
 ${""?left_pad(indent)}<${namespace}-pagedtable
 ${""?left_pad(indent)}  ref="${js.nameVariable(table.id)}Ref"
 ${""?left_pad(indent)}  style="flex:1"
-${""?left_pad(indent)}  id-key="${js.nameVariable(table.value("object","object"))}Id"
+${""?left_pad(indent)}  id-key="${js.nameVariable(table.value("data","object"))}Id"
 ${""?left_pad(indent)}  :columns="${js.nameVariable(table.id)}Cols"
 ${""?left_pad(indent)}  :fetch-data="load${js.nameType(table.id)}Rows"
-${""?left_pad(indent)}  :fetch-params="${js.nameVariable(table.value("object", table.id))}Crit"
+  <#if table.value("data") != "">
+    <#local url = valuebase.url(table.value("data"))>
+    <#if url.params?size != 0 && url.params[0].type.name() == "OBJECT">
+${""?left_pad(indent)}  :fetch-params="${js.nameVariable(url.params[0].name)}Crit"
+    </#if>
+  </#if>
 ${""?left_pad(indent)}  :row-class-name="getRowClass"
 ${""?left_pad(indent)}  @selection-change="handle${js.nameType(table.id)}RowSelection" 
 ${""?left_pad(indent)}  @row-action="handle${js.nameType(table.id)}RowAction" />
@@ -766,10 +783,72 @@ ${""?left_pad(indent)}}
 </#macro>
 
 <!----------------------------------------------------------------------------->
+<!--                                  BPMN                                   -->
+<!----------------------------------------------------------------------------->
+<#macro print_bpmn_variables bpmn indent=0>
+${""?left_pad(indent)}const ${js.nameVariable(bpmn.id)}Xml = ref(`<?xml version="1.0" encoding="UTF-8"?>
+${""?left_pad(indent)}<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+${""?left_pad(indent)}  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+${""?left_pad(indent)}  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+${""?left_pad(indent)}  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+${""?left_pad(indent)}  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+${""?left_pad(indent)}  id="Definitions_1"
+${""?left_pad(indent)}  targetNamespace="http://bpmn.io/schema/bpmn">
+${""?left_pad(indent)}  <bpmn:process id="Process_1" isExecutable="true">
+${""?left_pad(indent)}    <bpmn:startEvent id="StartEvent_1" name="开始">
+${""?left_pad(indent)}      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+${""?left_pad(indent)}    </bpmn:startEvent>
+${""?left_pad(indent)}    <bpmn:userTask id="Activity_1" name="部门审批">
+${""?left_pad(indent)}      <bpmn:incoming>Flow_1</bpmn:incoming>
+${""?left_pad(indent)}      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+${""?left_pad(indent)}    </bpmn:userTask>
+${""?left_pad(indent)}    <bpmn:endEvent id="EndEvent_1" name="结束">
+${""?left_pad(indent)}      <bpmn:incoming>Flow_2</bpmn:incoming>
+${""?left_pad(indent)}    </bpmn:endEvent>
+${""?left_pad(indent)}    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Activity_1" />
+${""?left_pad(indent)}    <bpmn:sequenceFlow id="Flow_2" sourceRef="Activity_1" targetRef="EndEvent_1" />
+${""?left_pad(indent)}  </bpmn:process>
+${""?left_pad(indent)}  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+${""?left_pad(indent)}    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+${""?left_pad(indent)}      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+${""?left_pad(indent)}        <dc:Bounds x="160" y="160" width="36" height="36" />
+${""?left_pad(indent)}      </bpmndi:BPMNShape>
+${""?left_pad(indent)}      <bpmndi:BPMNShape id="Activity_1_di" bpmnElement="Activity_1">
+${""?left_pad(indent)}        <dc:Bounds x="260" y="138" width="100" height="80" />
+${""?left_pad(indent)}      </bpmndi:BPMNShape>
+${""?left_pad(indent)}      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+${""?left_pad(indent)}        <dc:Bounds x="430" y="160" width="36" height="36" />
+${""?left_pad(indent)}      </bpmndi:BPMNShape>
+${""?left_pad(indent)}      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+${""?left_pad(indent)}        <di:waypoint x="196" y="178" />
+${""?left_pad(indent)}        <di:waypoint x="260" y="178" />
+${""?left_pad(indent)}      </bpmndi:BPMNEdge>
+${""?left_pad(indent)}      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+${""?left_pad(indent)}        <di:waypoint x="360" y="178" />
+${""?left_pad(indent)}        <di:waypoint x="430" y="178" />
+${""?left_pad(indent)}      </bpmndi:BPMNEdge>
+${""?left_pad(indent)}    </bpmndi:BPMNPlane>
+${""?left_pad(indent)}  </bpmndi:BPMNDiagram>
+${""?left_pad(indent)}</bpmn:definitions>`);
+</#macro>
+
+<#macro print_bpmn_methods bpmn indent=0>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                  GANTT                                  -->
+<!----------------------------------------------------------------------------->
+<#macro print_gantt_variables gantt indent=0>
+</#macro>
+
+<#macro print_gantt_methods gantt indent=0>
+</#macro>
+
+<!----------------------------------------------------------------------------->
 <!--                                HERO CARD                                -->
 <!----------------------------------------------------------------------------->
 <#macro print_hero_card_variables hero indent=0>
-
+${""?left_pad(indent)}
 ${""?left_pad(indent)}// ${js.nameVariable(hero.id)}英雄卡片相关变量
 ${""?left_pad(indent)}const ${js.nameVariable(hero.id)}Data = reactive({
   <#list hero.children as input>
@@ -828,9 +907,6 @@ ${""?left_pad(indent)}  plotData: [68, 70, 72, 71, 75, 76, 78.4] // 默认折线
 ${""?left_pad(indent)}});
 </#macro>
 
-<!----------------------------------------------------------------------------->
-<!--                          KPI CHART METHODS                              -->
-<!----------------------------------------------------------------------------->
 <#macro print_kpi_chart_methods kpi indent=0>
   <#local typePrefix = js.nameType(kpi.id)>
   <#local varPrefix = js.nameVariable(kpi.id)>
@@ -970,7 +1046,8 @@ const ${guidbase.name_button_method(button)} = async () => {
   ${guidbase.name_input_variable(input)} = ${guidbase4js.get_primitive_default_value(input)};
       </#list>
     <#elseif method == "search"><#-- 重置 -->
-  ${js.nameVariable(widget.id)}Ref.value?.refresh()
+  await nextTick()  
+  await ${js.nameVariable(widget.id)}Ref.value?.refresh()
     <#elseif method == "save"><#-- 保存 -->
   // TODO: save${js.nameType(widget.id)}Data();
     <#elseif method == "add"><#-- 新增 -->
@@ -1029,8 +1106,12 @@ import ${js.nameType(namespace)}Fixedtable from '@/components/${namespace}-fixed
 import ${js.nameType(namespace)}Pagedgrid from '@/components/${namespace}-pagedgrid.vue'      
     <#elseif widget.type == "week_grid">
 import ${js.nameType(namespace)}Weekgrid from '@/components/${namespace}-weekgrid.vue'
+    <#elseif widget.type == "gantt">
+import ${js.nameType(namespace)}Gantt from '@/components/${namespace}-gantt.vue' 
+    <#elseif widget.type == "bpmn">
+import ${js.nameType(namespace)}Bpmn from '@/components/${namespace}-bpmn.vue' 
     <#elseif widget.type == "kpi_chart">
-import ${js.nameType(namespace)}Sparkline from '@/components/${namespace}-sparkline.vue'    
+import ${js.nameType(namespace)}Sparkline from '@/components/${namespace}-sparkline.vue' 
     <#elseif widget.type == "chart">
 import ${js.nameType(namespace)}Chart from '@/components/${namespace}-chart.vue'    
 import { createChart } from '@/sdk/charts'    
@@ -1067,8 +1148,8 @@ import ${js.nameType(namespace)}Videoupload from '@/components/${namespace}-vide
     <#if action.type.name() == "DRAWER" && !drawerImported>
       <#local drawerImported = true>
 import ${js.nameType(namespace)}Drawer from '@/components/${namespace}-drawer.vue'  
-      <#local dialogImported = true>
     <#elseif action.type.name() == "DIALOG" && !dialogImported>   
+      <#local dialogImported = true>
 import ${js.nameType(namespace)}Dialog from '@/components/${namespace}-dialog.vue'       
     </#if>
   </#list>
@@ -1077,7 +1158,9 @@ import ${js.nameType(namespace)}Dialog from '@/components/${namespace}-dialog.vu
     <#if widget.value("action") == ""><#continue></#if>
     <#local action = valuebase.action(widget.value("action"))>
     <#if action.type.name() == "DRAWER" || action.type.name() == "DIALOG">
-import ${js.nameType(namespace + "_" + action.resource)} from '@/pages/${js.nameFile(action.path)}.vue'      
+      <#if visited_types[action.path]??><#continue></#if>
+import ${js.nameType(namespace + "_" + action.resource)} from '@/pages/${js.nameFile(action.path)}.vue'
+      <#local visited_types += {action.path: widget} />
     </#if>
   </#list>
 </#macro>
@@ -1110,6 +1193,10 @@ import ${js.nameType(namespace + "_" + action.resource)} from '@/pages/${js.name
 <@print_list_view_variables list=widget indent=indent />
     <#elseif widget.type == "map_view">
 <@print_map_view_variables map=widget indent=indent />
+    <#elseif widget.type == "bpmn">
+<@print_bpmn_variables bpmn=widget indent=indent />
+    <#elseif widget.type == "gantt">
+<@print_gantt_variables gantt=widget indent=indent />
     <#elseif widget.type == "hero_card">
 <@print_hero_card_variables hero=widget indent=indent />
     <#elseif widget.type == "kpi_chart">
@@ -1121,11 +1208,14 @@ import ${js.nameType(namespace + "_" + action.resource)} from '@/pages/${js.name
     </#if>
   </#list>
   <#-- 集中处理action定义 -->
+  <#local visited_pages = {}>
   <#list page.widgets as widget>
     <#if widget.value("action") == ""><#continue></#if>
     <#local action = valuebase.action(widget.value("action"))>
     <#if action.type.name() == "DRAWER" || action.type.name() == "DIALOG">
+      <#if visited_pages[action.path]??><#continue></#if>
 ${""?left_pad(indent)}const ${js.nameVariable(action.resource)}Open = ref(false) 
+      <#local visited_pages += {action.path:widget}>
     </#if>
   </#list>
 </#macro>

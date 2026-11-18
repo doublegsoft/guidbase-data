@@ -672,6 +672,33 @@ ${""?left_pad(indent)}</div>
 </#macro>
 
 <!----------------------------------------------------------------------------->
+<!--                                  BPMN                                   -->
+<!----------------------------------------------------------------------------->
+<#macro print_bpmn_layout bpmn indent=0>
+${""?left_pad(indent)}<${namespace}-bpmn
+${""?left_pad(indent)}  ref="${js.nameVariable(bpmn.id)}Ref"
+${""?left_pad(indent)}  v-model="${js.nameVariable(bpmn.id)}Xml"
+${""?left_pad(indent)}  :read-only="true"
+${""?left_pad(indent)}  @loaded="onLoaded"
+${""?left_pad(indent)}  @error="onError"
+${""?left_pad(indent)}  @selection-changed="onSelectionChanged"
+  <#if guidbase.has_child_widget(bpmn.page, "buttons") && guidbase.is_last_widget(bpmn)>
+${""?left_pad(indent)}  style="margin-bottom: 35px;"
+  </#if>
+${""?left_pad(indent)}/>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                                 GANTT                                   -->
+<!----------------------------------------------------------------------------->
+<#macro print_gantt_layout gantt indent=0>
+${""?left_pad(indent)}<div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 2px dashed #d1d5db; border-radius: 8px; background: #f9fafb; color: #6b7280; text-align: center;">
+${""?left_pad(indent)}  <div style="font-size: 18px; font-weight: 600; color: #374151;">【GANTT】部件暂未实现</div>
+${""?left_pad(indent)}  <div style="font-size: 14px;">此处为部件占位区域，后续将接入该功能</div>
+${""?left_pad(indent)}</div>
+</#macro>
+
+<!----------------------------------------------------------------------------->
 <!--                               HERO CARD                                 -->
 <!----------------------------------------------------------------------------->
 <#macro print_hero_card_layout hero varname="row" indent=0>
@@ -992,6 +1019,10 @@ ${""?left_pad(indent)}</${namespace}-dialog>
 <@print_list_view_layout list=widget indent=indent />
   <#elseif widget.type == "map_view">
 <@print_map_view_layout map=widget indent=indent />
+  <#elseif widget.type == "bpmn">
+<@print_bpmn_layout bpmn=widget indent=indent />
+  <#elseif widget.type == "gantt">
+<@print_gantt_layout gantt=widget indent=indent />
   <#elseif widget.type == "hero_card">
 <@print_hero_card_layout hero=widget indent=indent />
   <#elseif widget.type == "chart">
