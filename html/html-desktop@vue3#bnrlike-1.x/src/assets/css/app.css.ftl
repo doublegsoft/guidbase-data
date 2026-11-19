@@ -2356,7 +2356,7 @@ html, body {
   .${namespace}-col-xl-24 { flex: 0 0 100%;         max-width: 100%;         }
 }
 
-/* 地图卡片外层 */
+<#--  /* 地图卡片外层 */
 .${namespace}-map-panel {
   margin-bottom: 9px;
   position: relative;
@@ -2614,6 +2614,6 @@ html, body {
   padding: 0 8px;
   font-size: 10px;
   color: #7f8c8d;
-}
+}  -->
 
 <#include "/$/tile.css.ftl">

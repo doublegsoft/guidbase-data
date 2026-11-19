@@ -749,9 +749,9 @@ ${""?left_pad(indent)}</div>
 <!----------------------------------------------------------------------------->
 <#macro print_map_view_variables map indent=0>
   <#local mapId = js.nameVariable(map.id)>
-
 ${""?left_pad(indent)}// ${mapId} 地图相关变量
 ${""?left_pad(indent)}const ${mapId}Ref = ref(null)
+${""?left_pad(indent)}let ${mapId}Map = null
 ${""?left_pad(indent)}const ${mapId}Layer = ref('vector') // 'vector' | 'satellite'
 ${""?left_pad(indent)}const ${mapId}ActiveIndex = ref(null)
 ${""?left_pad(indent)}const ${mapId}ActiveMarker = ref(null)
@@ -762,23 +762,34 @@ ${""?left_pad(indent)}  { x: 52, y: 38, title: '云栖科技园 A座', valuation
 ${""?left_pad(indent)}  { x: 30, y: 62, title: '海晟综合物流园', valuation: 1200, statusText: '正常', statusColor: 'green', address: '宁波市北仑区进港路88号' },
 ${""?left_pad(indent)}  { x: 74, y: 50, title: '启明智能制造基地', valuation: 3600, statusText: '待评估', statusColor: 'blue', address: '嘉兴市南湖区创新产业带' }
 ${""?left_pad(indent)}])
+</#macro>
 
-${""?left_pad(indent)}function ${mapId}OnPinClick(marker, idx) {
-${""?left_pad(indent)}  ${mapId}ActiveIndex.value = idx
-${""?left_pad(indent)}  ${mapId}ActiveMarker.value = marker
+<#macro print_map_view_methods map indent=0>
+  <#local mapId = js.nameVariable(map.id)>
+${""?left_pad(indent)}function flyTo(lat, lng) {
+${""?left_pad(indent)}  ${js.nameVariable(map.id)}?.flyTo([lat, lng], 13);
 ${""?left_pad(indent)}}
-
-${""?left_pad(indent)}function ${mapId}ResetView() {
-${""?left_pad(indent)}  ${mapId}ActiveIndex.value = null
-${""?left_pad(indent)}  ${mapId}ActiveMarker.value = null
-${""?left_pad(indent)}}
-
-${""?left_pad(indent)}function ${mapId}ZoomIn() {
-${""?left_pad(indent)}  // 处理放大逻辑或联动第三方地图 API
-${""?left_pad(indent)}}
-
-${""?left_pad(indent)}function ${mapId}ZoomOut() {
-${""?left_pad(indent)}  // 处理缩小逻辑或联动第三方地图 API
+${""?left_pad(indent)}
+${""?left_pad(indent)}function init${js.nameType(map.id)}Map() {
+${""?left_pad(indent)}  ${js.nameVariable(map.id)}Map = L.map(mapRef.value).setView([31.2304, 121.4737], 13);
+${""?left_pad(indent)}  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+${""?left_pad(indent)}    maxZoom: 20,
+${""?left_pad(indent)}    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+${""?left_pad(indent)}  }).addTo(${js.nameVariable(map.id)}Map);
+${""?left_pad(indent)}  // Initial marker
+${""?left_pad(indent)}  L.marker([31.2304, 121.4737])
+${""?left_pad(indent)}    .addTo(${js.nameVariable(map.id)}Map)
+${""?left_pad(indent)}    .bindPopup('<b>Shanghai</b>')
+${""?left_pad(indent)}    .openPopup();
+${""?left_pad(indent)}  // Click to add marker & display coordinates
+${""?left_pad(indent)}  ${js.nameVariable(map.id)}Map.on('click', (e) => {
+${""?left_pad(indent)}    const { lat, lng } = e.latlng;
+${""?left_pad(indent)}    clickedCoord.value = { lat, lng };
+${""?left_pad(indent)}    L.marker([lat, lng])
+${""?left_pad(indent)}      .addTo(${js.nameVariable(map.id)}Map)
+${""?left_pad(indent)}      .bindPopup(`Lat: ${r"${lat.toFixed(5)}"}<br>Lng: ${r"${lng.toFixed(5)}"}`)
+${""?left_pad(indent)}      .openPopup();
+${""?left_pad(indent)}  });
 ${""?left_pad(indent)}}
 </#macro>
 
@@ -976,13 +987,13 @@ ${""?left_pad(indent)}  createChart(${js.nameVariable(chart.id)}Data.value).bar(
 </#macro>
 
 <#macro print_chart_methods chart indent=0>
-
+  <#local url = valuebase.url(chart.value("data", chart.id))>
 /**
  * 加载数据的界面函数
  */
 const load${js.nameType(chart.id)}Rows = async (params, pageNumber, pageSize) => {
   try {
-    const res = await sdk.fetch${js.nameType(inflector.pluralize(chart.value("object",chart.id)))}(params, (pageNumber - 1) * pageSize, pageSize)
+    const res = await sdk.fetch${js.nameType(inflector.pluralize(url.resource))}AsChartData(params, (pageNumber - 1) * pageSize, pageSize)
     ${js.nameVariable(chart.id)}Data.value = res.data
   } catch (error) {
     fb.error('发生错误', error)
@@ -1106,6 +1117,12 @@ import ${js.nameType(namespace)}Fixedtable from '@/components/${namespace}-fixed
 import ${js.nameType(namespace)}Pagedgrid from '@/components/${namespace}-pagedgrid.vue'      
     <#elseif widget.type == "week_grid">
 import ${js.nameType(namespace)}Weekgrid from '@/components/${namespace}-weekgrid.vue'
+    <#elseif widget.type == "map_view">
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
     <#elseif widget.type == "gantt">
 import ${js.nameType(namespace)}Gantt from '@/components/${namespace}-gantt.vue' 
     <#elseif widget.type == "bpmn">
@@ -1245,7 +1262,7 @@ ${""?left_pad(indent)}const ${js.nameVariable(action.resource)}Open = ref(false)
     <#elseif widget.type == "list_view">
 <@print_list_view_methods list=widget indent=indent />
     <#elseif widget.type == "map_view">
-<#-- TODO -->
+<@print_map_view_methods map=widget indent=indent />
     <#elseif widget.type == "hero_card">
 <@print_hero_card_methods hero=widget indent=indent />
     <#elseif widget.type == "kpi_chart">

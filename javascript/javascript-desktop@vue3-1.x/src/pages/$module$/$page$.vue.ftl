@@ -112,6 +112,8 @@ onMounted(async () => {
   load${js.nameType(widget.id)}Rows();
   <#elseif widget.type == "kpi_chart">
   load${js.nameType(widget.id)}Data();
+  <#elseif widget.type == "map_view">
+  init${js.nameType(widget.id)}Map();
   </#if>
 </#list>
 <#-- 后置加载需要根据主要数据加载的选项值 -->

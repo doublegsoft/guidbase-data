@@ -579,14 +579,12 @@ ${""?left_pad(indent)}</div>
 <!--                                MAP VIEW                                 -->
 <!----------------------------------------------------------------------------->
 <#macro print_map_view_layout map indent=0>
-  <#local mapId = js.nameVariable(map.id)>
-  <#local height = map.value("height", "260px")>
+${""?left_pad(indent)}<div ref="${js.nameVariable(map.id)}Ref" style="height: 100%;"></div>
+  <#--  <#local height = map.value("height", "260px")>
 ${""?left_pad(indent)}<div id="${mapId}" class="${namespace}-panel ${namespace}-map-panel">
-${""?left_pad(indent)}  <!-- 顶部标题与地图图层控制栏 -->
 ${""?left_pad(indent)}  <div class="${namespace}-panel-head">
 ${""?left_pad(indent)}    <span>${map.title!'抵押物空间分布 / 地图全景'}</span>
 ${""?left_pad(indent)}    <div class="${namespace}-panel-extra">
-${""?left_pad(indent)}      <!-- 图层切换 -->
 ${""?left_pad(indent)}      <div class="${namespace}-map-layer-switch">
 ${""?left_pad(indent)}        <button
 ${""?left_pad(indent)}          type="button"
@@ -602,20 +600,15 @@ ${""?left_pad(indent)}      </div>
 ${""?left_pad(indent)}      <button type="button" class="${namespace}-btn-xs" title="重置视角" @click="${mapId}ResetView">⟲</button>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
-${""?left_pad(indent)}
-${""?left_pad(indent)}  <!-- 地图主视口容器 -->
 ${""?left_pad(indent)}  <div
 ${""?left_pad(indent)}    class="${namespace}-mapbox"
 ${""?left_pad(indent)}    :class="'${namespace}-mapbox--' + ${mapId}Layer"
 ${""?left_pad(indent)}    style="height: ${height};"
 ${""?left_pad(indent)}    ref="${mapId}Ref"
 ${""?left_pad(indent)}  >
-${""?left_pad(indent)}    <!-- 模拟地图地理元素层 (河流、干道) -->
 ${""?left_pad(indent)}    <div class="${namespace}-map-river"></div>
 ${""?left_pad(indent)}    <div class="${namespace}-map-road"></div>
 ${""?left_pad(indent)}    <div class="${namespace}-map-road ${namespace}-map-road--cross"></div>
-${""?left_pad(indent)}
-${""?left_pad(indent)}    <!-- 地标点标记 (Markers) -->
 ${""?left_pad(indent)}    <div
 ${""?left_pad(indent)}      v-for="(marker, idx) in ${mapId}Markers"
 ${""?left_pad(indent)}      :key="idx"
@@ -630,8 +623,6 @@ ${""?left_pad(indent)}        <div class="${namespace}-map-pin-pulse"></div>
 ${""?left_pad(indent)}      </div>
 ${""?left_pad(indent)}      <div class="${namespace}-map-pin-label">{{ marker.title }}</div>
 ${""?left_pad(indent)}    </div>
-${""?left_pad(indent)}
-${""?left_pad(indent)}    <!-- 点击标记弹出的浮层信息卡片 (Popup Card) -->
 ${""?left_pad(indent)}    <div
 ${""?left_pad(indent)}      v-if="${mapId}ActiveMarker"
 ${""?left_pad(indent)}      class="${namespace}-map-popup"
@@ -656,19 +647,15 @@ ${""?left_pad(indent)}          <span class="val text-muted">{{ ${mapId}ActiveMa
 ${""?left_pad(indent)}        </div>
 ${""?left_pad(indent)}      </div>
 ${""?left_pad(indent)}    </div>
-${""?left_pad(indent)}
-${""?left_pad(indent)}    <!-- 右下角缩放控制按钮 -->
 ${""?left_pad(indent)}    <div class="${namespace}-map-controls">
 ${""?left_pad(indent)}      <button type="button" class="${namespace}-map-btn" @click="${mapId}ZoomIn">+</button>
 ${""?left_pad(indent)}      <button type="button" class="${namespace}-map-btn" @click="${mapId}ZoomOut">-</button>
 ${""?left_pad(indent)}    </div>
-${""?left_pad(indent)}
-${""?left_pad(indent)}    <!-- 底部状态说明条 -->
 ${""?left_pad(indent)}    <div class="${namespace}-map-scalebar">
 ${""?left_pad(indent)}      <span>坐标系: CGCS2000 | 标定物: {{ (${mapId}Markers || []).length }} 处</span>
 ${""?left_pad(indent)}    </div>
 ${""?left_pad(indent)}  </div>
-${""?left_pad(indent)}</div>
+${""?left_pad(indent)}</div>  -->
 </#macro>
 
 <!----------------------------------------------------------------------------->
