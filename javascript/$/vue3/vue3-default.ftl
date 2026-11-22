@@ -659,10 +659,10 @@ ${""?left_pad(indent)}</div>  -->
 </#macro>
 
 <!----------------------------------------------------------------------------->
-<!--                                  BPMN                                   -->
+<!--                              BPMN DIAGRAM                               -->
 <!----------------------------------------------------------------------------->
-<#macro print_bpmn_layout bpmn indent=0>
-${""?left_pad(indent)}<${namespace}-bpmn
+<#macro print_bpmn_diagram_layout bpmn indent=0>
+${""?left_pad(indent)}<${namespace}-bpmndiagram
 ${""?left_pad(indent)}  ref="${js.nameVariable(bpmn.id)}Ref"
 ${""?left_pad(indent)}  v-model="${js.nameVariable(bpmn.id)}Xml"
 ${""?left_pad(indent)}  :read-only="true"
@@ -676,11 +676,131 @@ ${""?left_pad(indent)}/>
 </#macro>
 
 <!----------------------------------------------------------------------------->
-<!--                                 GANTT                                   -->
+<!--                               BPMN EDITOR                               -->
 <!----------------------------------------------------------------------------->
-<#macro print_gantt_layout gantt indent=0>
+<#macro print_bpmn_editor_layout bpmn indent=0>
+  <#local varId = js.nameVariable(bpmn.id)>
+${""?left_pad(indent)}<div class="${namespace}-bpmn-editor"<#if guidbase.has_child_widget(bpmn.page, "buttons") && guidbase.is_last_widget(bpmn)> style="margin-bottom: 35px;"</#if>>
+${""?left_pad(indent)}  <header class="${namespace}-bpmn-header">
+${""?left_pad(indent)}    <h1 class="${namespace}-bpmn-title">◇ ${bpmn.title!"流程编辑器"}</h1>
+${""?left_pad(indent)}    <div class="${namespace}-bpmn-group">
+${""?left_pad(indent)}      <button type="button" class="${namespace}-bpmn-btn" @click="${varId}LoadXml(${varId}EmptyXml)">新建</button>
+${""?left_pad(indent)}      <button type="button" class="${namespace}-bpmn-btn" @click="${varId}LoadXml(${varId}DemoXml)">示例</button>
+${""?left_pad(indent)}      <label class="${namespace}-bpmn-btn">打开<input type="file" accept=".bpmn,.xml" hidden @change="${varId}OnFileChange" /></label>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}    <div class="${namespace}-bpmn-group">
+${""?left_pad(indent)}      <button type="button" class="${namespace}-bpmn-btn" @click="${varId}Undo">撤销</button>
+${""?left_pad(indent)}      <button type="button" class="${namespace}-bpmn-btn" @click="${varId}Redo">重做</button>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}    <div class="${namespace}-bpmn-group">
+${""?left_pad(indent)}      <button type="button" class="${namespace}-bpmn-btn" @click="${varId}ZoomOut">－</button>
+${""?left_pad(indent)}      <button type="button" class="${namespace}-bpmn-btn" @click="${varId}ZoomFit">适应</button>
+${""?left_pad(indent)}      <button type="button" class="${namespace}-bpmn-btn" @click="${varId}ZoomIn">＋</button>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}    <span class="${namespace}-bpmn-status" :class="{ 'is-warn': ${varId}LintList.length > 0 }">
+${""?left_pad(indent)}      {{ ${varId}LintList.length ? '⚠ ' + ${varId}LintList.length + ' 项待检查' : '✓ 流程检查通过' }}
+${""?left_pad(indent)}    </span>
+${""?left_pad(indent)}  </header>
+${""?left_pad(indent)}  <div class="${namespace}-bpmn-main">
+${""?left_pad(indent)}    <div :ref="(el) => ${varId}BindCanvas(el)" class="${namespace}-bpmn-canvas"></div>
+${""?left_pad(indent)}    <aside class="${namespace}-bpmn-aside">
+${""?left_pad(indent)}      <div class="${namespace}-bpmn-tabs">
+${""?left_pad(indent)}        <button type="button" :class="{ on: ${varId}ActiveTab === 'props' }" @click="${varId}SwitchTab('props')">属性</button>
+${""?left_pad(indent)}        <button type="button" :class="{ on: ${varId}ActiveTab === 'xml' }" @click="${varId}SwitchTab('xml')">XML / 导出</button>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}      <div v-show="${varId}ActiveTab === 'props'" ref="${varId}PropsRef" class="${namespace}-bpmn-pane">
+${""?left_pad(indent)}        <template v-if="${varId}SelCount > 1">
+${""?left_pad(indent)}          <div class="${namespace}-bpmn-ro">已选择 {{ ${varId}SelCount }} 个元素</div>
+${""?left_pad(indent)}          <h3 class="${namespace}-bpmn-h3">批量设置颜色</h3>
+${""?left_pad(indent)}          <div class="${namespace}-bpmn-swatches">
+${""?left_pad(indent)}            <i v-for="(c, idx) in ${varId}Colors" :key="idx" :title="c.length ? '' : '默认'" :style="{ background: c[1] || 'var(--bpmn-panel)', borderColor: c[0] || 'var(--bpmn-line)' }" @click="${varId}SetColor(c)"></i>
+${""?left_pad(indent)}          </div>
+${""?left_pad(indent)}        </template>
+${""?left_pad(indent)}        <template v-else-if="${varId}Props.ready">
+${""?left_pad(indent)}          <label class="${namespace}-bpmn-field">类型<div class="${namespace}-bpmn-ro">{{ ${varId}Props.typeLabel }}</div></label>
+${""?left_pad(indent)}          <label class="${namespace}-bpmn-field">{{ ${varId}Props.isText ? '注释内容' : '名称' }}<input v-model="${varId}Props.name" @change="${varId}UpdateName" /></label>
+${""?left_pad(indent)}          <label class="${namespace}-bpmn-field">ID<input v-model="${varId}Props.id" @change="${varId}UpdateId" /></label>
+${""?left_pad(indent)}          <label v-if="!${varId}Props.isText" class="${namespace}-bpmn-field">说明<textarea v-model="${varId}Props.doc" @change="${varId}UpdateDoc"></textarea></label>
+${""?left_pad(indent)}          <template v-if="!${varId}Props.isRoot">
+${""?left_pad(indent)}            <h3 class="${namespace}-bpmn-h3">颜色</h3>
+${""?left_pad(indent)}            <div class="${namespace}-bpmn-swatches">
+${""?left_pad(indent)}              <i v-for="(c, idx) in ${varId}Colors" :key="idx" :title="c.length ? '' : '默认'" :style="{ background: c[1] || 'var(--bpmn-panel)', borderColor: c[0] || 'var(--bpmn-line)' }" @click="${varId}SetColor(c)"></i>
+${""?left_pad(indent)}            </div>
+${""?left_pad(indent)}          </template>
+${""?left_pad(indent)}        </template>
+${""?left_pad(indent)}        <div v-else class="${namespace}-bpmn-ro ${namespace}-bpmn-mute">暂无可编辑内容</div>
+${""?left_pad(indent)}        <h3 class="${namespace}-bpmn-h3">流程检查</h3>
+${""?left_pad(indent)}        <div v-if="!${varId}LintList.length" class="${namespace}-bpmn-ok">没有发现问题</div>
+${""?left_pad(indent)}        <div v-else>
+${""?left_pad(indent)}          <button v-for="(item, idx) in ${varId}LintList" :key="idx" type="button" class="${namespace}-bpmn-issue" @click="${varId}FocusElement(item.id)">• {{ item.msg }}</button>
+${""?left_pad(indent)}        </div>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}      <div v-show="${varId}ActiveTab === 'xml'" class="${namespace}-bpmn-pane">
+${""?left_pad(indent)}        <textarea v-model="${varId}Xml" class="${namespace}-bpmn-xml" spellcheck="false"></textarea>
+${""?left_pad(indent)}        <div class="${namespace}-bpmn-xml-actions">
+${""?left_pad(indent)}          <button type="button" class="${namespace}-bpmn-btn pri" @click="${varId}ApplyXml">应用修改</button>
+${""?left_pad(indent)}          <button type="button" class="${namespace}-bpmn-btn" @click="${varId}CopyXml">复制 XML</button>
+${""?left_pad(indent)}          <button type="button" class="${namespace}-bpmn-btn" @click="${varId}ExportSvg">导出 SVG</button>
+${""?left_pad(indent)}        </div>
+${""?left_pad(indent)}        <p class="${namespace}-bpmn-tip">编辑后点击「应用修改」重新渲染；内容会自动保存在本浏览器。</p>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}    </aside>
+${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}  <div class="${namespace}-bpmn-toast" :class="{ on: ${varId}ToastState.show }">{{ ${varId}ToastState.msg }}</div>
+${""?left_pad(indent)}</div>
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                               RICH EDITOR                               -->
+<!----------------------------------------------------------------------------->
+<#macro print_rich_editor_layout rich indent=0>
+  <#local varId = js.nameVariable(rich.id)>
+${""?left_pad(indent)}<div class="${namespace}-rich-editor"<#if guidbase.has_child_widget(rich.page, "buttons") && guidbase.is_last_widget(rich)> style="margin-bottom: 35px;"</#if>>
+${""?left_pad(indent)}  <header class="${namespace}-rich-header">
+${""?left_pad(indent)}    <h1 class="${namespace}-rich-title">✎ ${rich.title!"富文本编辑器"}</h1>
+${""?left_pad(indent)}    <div class="${namespace}-rich-group">
+${""?left_pad(indent)}      <button type="button" class="${namespace}-rich-btn" @click="${varId}Clear">清空</button>
+${""?left_pad(indent)}      <button type="button" class="${namespace}-rich-btn" @click="${varId}LoadDemo">示例</button>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}    <div class="${namespace}-rich-group">
+${""?left_pad(indent)}      <button type="button" class="${namespace}-rich-btn" @click="${varId}Undo">撤销</button>
+${""?left_pad(indent)}      <button type="button" class="${namespace}-rich-btn" @click="${varId}Redo">重做</button>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}    <div class="${namespace}-rich-group">
+${""?left_pad(indent)}      <button type="button" class="${namespace}-rich-btn" :class="{ pri: ${varId}Mode === 'edit' }" @click="${varId}SwitchMode('edit')">编辑</button>
+${""?left_pad(indent)}      <button type="button" class="${namespace}-rich-btn" :class="{ pri: ${varId}Mode === 'preview' }" @click="${varId}SwitchMode('preview')">预览</button>
+${""?left_pad(indent)}      <button type="button" class="${namespace}-rich-btn" :class="{ pri: ${varId}Mode === 'source' }" @click="${varId}SwitchMode('source')">HTML源码</button>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}    <div class="${namespace}-rich-group">
+${""?left_pad(indent)}      <button type="button" class="${namespace}-rich-btn" @click="${varId}CopyHtml">复制 HTML</button>
+${""?left_pad(indent)}      <button type="button" class="${namespace}-rich-btn" @click="${varId}ExportHtml">导出 HTML</button>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}    <span class="${namespace}-rich-stats">字数 {{ ${varId}Stats.words }} · 字符 {{ ${varId}Stats.chars }}</span>
+${""?left_pad(indent)}  </header>
+${""?left_pad(indent)}  <div class="${namespace}-rich-body">
+${""?left_pad(indent)}    <div v-show="${varId}Mode === 'edit'" class="${namespace}-rich-quill-wrap">
+${""?left_pad(indent)}      <div :ref="(el) => ${varId}BindEditor(el)" class="${namespace}-rich-quill"></div>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}    <div v-show="${varId}Mode === 'preview'" class="${namespace}-rich-preview ql-editor" v-html="${varId}Html || '<p style=color:#9ca3af>暂无内容</p>'"></div>
+${""?left_pad(indent)}    <div v-show="${varId}Mode === 'source'" class="${namespace}-rich-source">
+${""?left_pad(indent)}      <textarea v-model="${varId}SourceHtml" class="${namespace}-rich-textarea" spellcheck="false"></textarea>
+${""?left_pad(indent)}      <div class="${namespace}-rich-source-actions">
+${""?left_pad(indent)}        <button type="button" class="${namespace}-rich-btn pri" @click="${varId}ApplySource">应用 HTML 修改</button>
+${""?left_pad(indent)}      </div>
+${""?left_pad(indent)}    </div>
+${""?left_pad(indent)}  </div>
+${""?left_pad(indent)}  <input ref="${varId}ImageInputRef" type="file" accept="image/*" hidden @change="${varId}OnImageSelected" />
+${""?left_pad(indent)}  <div class="${namespace}-rich-toast" :class="{ on: ${varId}ToastState.show }">{{ ${varId}ToastState.msg }}</div>
+${""?left_pad(indent)}</div>
+</#macro>
+
+
+<!----------------------------------------------------------------------------->
+<!--                              GANTT TABLE                                -->
+<!----------------------------------------------------------------------------->
+<#macro print_gantt_table_layout table indent=0>
 ${""?left_pad(indent)}<div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 2px dashed #d1d5db; border-radius: 8px; background: #f9fafb; color: #6b7280; text-align: center;">
-${""?left_pad(indent)}  <div style="font-size: 18px; font-weight: 600; color: #374151;">【GANTT】部件暂未实现</div>
+${""?left_pad(indent)}  <div style="font-size: 18px; font-weight: 600; color: #374151;">【GANTT TABLE】部件暂未实现</div>
 ${""?left_pad(indent)}  <div style="font-size: 14px;">此处为部件占位区域，后续将接入该功能</div>
 ${""?left_pad(indent)}</div>
 </#macro>
@@ -996,6 +1116,8 @@ ${""?left_pad(indent)}</${namespace}-dialog>
 <@print_data_table_layout table=widget indent=indent />
   <#elseif widget.type == "fixed_table">
 <@print_fixed_table_layout table=widget indent=indent />
+  <#elseif widget.type == "gantt_table">
+<@print_gantt_table_layout gantt=widget indent=indent />
   <#elseif widget.type == "criteria_form">
 <@print_criteria_form_layout form=widget indent=indent />
   <#elseif widget.type == "display_form">
@@ -1006,10 +1128,12 @@ ${""?left_pad(indent)}</${namespace}-dialog>
 <@print_list_view_layout list=widget indent=indent />
   <#elseif widget.type == "map_view">
 <@print_map_view_layout map=widget indent=indent />
-  <#elseif widget.type == "bpmn">
-<@print_bpmn_layout bpmn=widget indent=indent />
-  <#elseif widget.type == "gantt">
-<@print_gantt_layout gantt=widget indent=indent />
+  <#elseif widget.type == "bpmn_diagram">
+<@print_bpmn_diagram_layout bpmn=widget indent=indent />
+  <#elseif widget.type == "bpmn_editor">
+<@print_bpmn_editor_layout bpmn=widget indent=indent />
+  <#elseif widget.type == "rich_editor">
+<@print_rich_editor_layout rich=widget indent=indent />
   <#elseif widget.type == "hero_card">
 <@print_hero_card_layout hero=widget indent=indent />
   <#elseif widget.type == "chart">

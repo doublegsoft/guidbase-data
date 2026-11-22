@@ -93,6 +93,7 @@ function switchModule(key) {
   activeId.value   = first.id
   activePath.value = first.path || ''
   breadPage.value  = first.label.replace(/^└\s*/, '')
+  if (first.path) router.push(first.path)
 }
 
 function selectItem(item) {

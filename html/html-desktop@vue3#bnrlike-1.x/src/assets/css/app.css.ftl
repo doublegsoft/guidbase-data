@@ -883,8 +883,8 @@ html, body {
 }
 
 .${namespace}-field-label--top {
-  align-self: flex-start;  /* Label 自身靠顶 */
-  padding-top: 6px;         /* 留出微小内边距，使文字基线与右侧控件的第一行完美平齐 */
+  align-self: flex-start;
+  /* padding-top: 6px; */
 }
 
 /* Inputs */
@@ -2356,264 +2356,153 @@ html, body {
   .${namespace}-col-xl-24 { flex: 0 0 100%;         max-width: 100%;         }
 }
 
-<#--  /* 地图卡片外层 */
-.${namespace}-map-panel {
-  margin-bottom: 9px;
-  position: relative;
-  border-radius: 2px;
-}
-
-/* 顶部微型按钮组 */
-.${namespace}-map-layer-switch {
-  display: inline-flex;
-  border: 1px solid var(--${namespace}-pbd, #d0d8e8);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-right: 6px;
-}
-.${namespace}-btn-xs {
-  height: 20px;
-  line-height: 18px;
-  padding: 0 7px;
-  font-size: 11px;
-  border: none;
-  background: #fff;
-  color: var(--${namespace}-muted, #5d6d7e);
-  cursor: pointer;
-}
-.${namespace}-btn-xs:hover {
-  background: var(--${namespace}-pb, #e8edf5);
-  color: var(--${namespace}-p, #1a4f8a);
-}
-.${namespace}-btn-xs.active {
-  background: var(--${namespace}-p, #1a4f8a);
-  color: #fff;
-}
-
-/* 地图视口画布容器 */
-.${namespace}-mapbox {
-  position: relative;
-  overflow: hidden;
-  user-select: none;
-  background-color: #eef2ec;
-  /* 现代 GIS 坐标栅格纹理 */
-  background-image: 
-    linear-gradient(0deg, rgba(220, 232, 221, 0.7) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(220, 232, 221, 0.7) 1px, transparent 1px);
-  background-size: 28px 28px;
-  transition: all 0.3s ease;
-}
-
-/* 卫星模式（暗深色科技感滤镜纹理） */
-.${namespace}-mapbox--satellite {
-  background-color: #172635;
-  background-image: 
-    linear-gradient(0deg, rgba(40, 60, 85, 0.4) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(40, 60, 85, 0.4) 1px, transparent 1px);
-}
-.${namespace}-mapbox--satellite .${namespace}-map-river {
-  background: #0f4b75;
-  border-color: #0b3756;
-}
-.${namespace}-mapbox--satellite .${namespace}-map-road {
-  background: #34495e;
-  border-color: #2c3e50;
-}
-
-/* 模拟地理水系与干道 */
-.${namespace}-map-river {
-  position: absolute;
-  left: 28%;
-  top: -20%;
-  height: 150%;
-  width: 48px;
-  background: #c6dff1;
-  transform: rotate(24deg);
-  border-left: 2px solid #b0d1e8;
-  border-right: 2px solid #b0d1e8;
-  pointer-events: none;
-}
-
-.${namespace}-map-road {
-  position: absolute;
-  height: 8px;
-  width: 120%;
-  left: -10%;
-  top: 48%;
-  background: #ffffff;
-  border-top: 1.5px solid #ded5be;
-  border-bottom: 1.5px solid #ded5be;
-  transform: rotate(-10deg);
-  pointer-events: none;
-}
-.${namespace}-map-road--cross {
-  top: 15%;
-  height: 6px;
-  transform: rotate(65deg);
-}
-
-/* 地标定位 Pin 容器与脉冲动画 */
-.${namespace}-map-pin-wrap {
-  position: absolute;
-  transform: translate(-50%, -100%);
-  cursor: pointer;
-  z-index: 10;
+.${namespace}-bpmn-editor {
+  --bpmn-bg: #f4f6f9;
+  --bpmn-panel: #fff;
+  --bpmn-ink: #1c2430;
+  --bpmn-mute: #6b7685;
+  --bpmn-line: #e1e5eb;
+  --bpmn-brand: #2f6fed;
+  --bpmn-bi: #fff;
+  --bpmn-warn: #b85400;
+  --bpmn-ok: #18794e;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  transition: transform 0.15s ease;
+  height: 100%;
+  min-height: 600px;
+  background: var(--bpmn-bg);
+  color: var(--bpmn-ink);
+  font: 14px/1.5 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
-.${namespace}-map-pin-wrap:hover,
-.${namespace}-map-pin-wrap.active {
-  transform: translate(-50%, -105%) scale(1.1);
-  z-index: 20;
+.${namespace}-bpmn-header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
+  padding: 8px 12px; background: var(--bpmn-panel); border-bottom: 1px solid var(--bpmn-line);
 }
-
-.${namespace}-map-pin {
-  position: relative;
-  font-size: 20px;
-  line-height: 1;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+.${namespace}-bpmn-title { font-size: 15px; margin: 0 6px 0 0; white-space: nowrap; }
+.${namespace}-bpmn-group { display: flex; gap: 4px; padding-right: 12px; border-right: 1px solid var(--bpmn-line); }
+.${namespace}-bpmn-group:last-of-type { border: 0; }
+.${namespace}-bpmn-btn {
+  display: inline-flex; align-items: center; font: inherit; color: var(--bpmn-ink);
+  background: transparent; border: 1px solid var(--bpmn-line); border-radius: 6px;
+  padding: 4px 10px; cursor: pointer; white-space: nowrap;
 }
-
-/* 地标扩散脉冲光晕 */
-.${namespace}-map-pin-pulse {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: 8px;
-  height: 8px;
-  margin-left: -4px;
-  border-radius: 50%;
-  background: rgba(26, 79, 138, 0.7);
-  box-shadow: 0 0 0 rgba(26, 79, 138, 0.4);
-  animation: mapPinPulse 1.8s infinite;
+.${namespace}-bpmn-btn:hover { border-color: var(--bpmn-brand); color: var(--bpmn-brand); }
+.${namespace}-bpmn-btn.pri { background: var(--bpmn-brand); border-color: var(--bpmn-brand); color: var(--bpmn-bi); }
+.${namespace}-bpmn-status { margin-left: auto; font-size: 13px; color: var(--bpmn-ok); }
+.${namespace}-bpmn-status.is-warn { color: var(--bpmn-warn); }
+.${namespace}-bpmn-main { flex: 1; min-height: 0; display: flex; }
+.${namespace}-bpmn-canvas {
+  flex: 1; min-width: 0; background: #fff;
+  background-image: radial-gradient(#d5dae2 1px, transparent 1px); background-size: 20px 20px;
 }
-@keyframes mapPinPulse {
-  0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.6); }
-  70% { transform: scale(2.4); box-shadow: 0 0 0 8px rgba(192, 57, 43, 0); }
-  100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(192, 57, 43, 0); }
+.${namespace}-bpmn-aside {
+  width: 300px; background: var(--bpmn-panel); border-left: 1px solid var(--bpmn-line);
+  display: flex; flex-direction: column; min-height: 0;
 }
-
-.${namespace}-map-pin-label {
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid #c8d2dc;
-  border-radius: 2px;
-  padding: 1px 6px;
-  font-size: 10px;
-  font-weight: 600;
-  color: #2c3e50;
-  white-space: nowrap;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-  margin-top: -2px;
+.${namespace}-bpmn-tabs { display: flex; border-bottom: 1px solid var(--bpmn-line); }
+.${namespace}-bpmn-tabs button {
+  flex: 1; border: 0; border-radius: 0; padding: 8px; background: transparent;
+  color: var(--bpmn-ink); cursor: pointer; font: inherit;
 }
-
-/* 点击后弹出的信息卡片 (Popup Card) */
-.${namespace}-map-popup {
-  position: absolute;
-  z-index: 30;
-  transform: translate(-50%, -125%);
-  width: 210px;
-  background: #ffffff;
-  border: 1px solid var(--${namespace}-pbd, #d0d8e8);
-  border-radius: 3px;
-  box-shadow: 0 6px 18px rgba(28, 40, 51, 0.18);
-  padding: 0;
-  overflow: hidden;
+.${namespace}-bpmn-tabs button.on { color: var(--bpmn-brand); box-shadow: inset 0 -2px var(--bpmn-brand); }
+.${namespace}-bpmn-pane { flex: 1; overflow: auto; padding: 12px; }
+.${namespace}-bpmn-field { display: block; margin-bottom: 10px; font-size: 12px; color: var(--bpmn-mute); }
+.${namespace}-bpmn-field input,
+.${namespace}-bpmn-field textarea {
+  width: 100%; box-sizing: border-box; margin-top: 3px; font: 14px/1.4 inherit;
+  color: var(--bpmn-ink); background: var(--bpmn-bg); border: 1px solid var(--bpmn-line);
+  border-radius: 6px; padding: 6px 8px;
 }
-.${namespace}-map-popup-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--${namespace}-pb, #e8edf5);
-  padding: 5px 8px;
-  border-bottom: 1px solid #d9dfe6;
+.${namespace}-bpmn-field textarea { resize: vertical; min-height: 64px; }
+.${namespace}-bpmn-xml {
+  width: 100%; box-sizing: border-box; height: 55vh; font: 12px/1.4 ui-monospace, Menlo, monospace;
+  white-space: pre; color: var(--bpmn-ink); background: var(--bpmn-bg);
+  border: 1px solid var(--bpmn-line); border-radius: 6px; padding: 6px 8px; resize: vertical;
 }
-.${namespace}-map-popup-title {
-  font-weight: 700;
-  color: var(--${namespace}-p, #1a4f8a);
-  font-size: 11px;
+.${namespace}-bpmn-xml-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.${namespace}-bpmn-tip { font-size: 12px; color: var(--bpmn-mute); margin-top: 8px; }
+.${namespace}-bpmn-ro { color: var(--bpmn-ink); font-size: 14px; padding: 4px 0; }
+.${namespace}-bpmn-mute { color: var(--bpmn-mute); }
+.${namespace}-bpmn-swatches { display: flex; gap: 8px; margin: 4px 0 12px; }
+.${namespace}-bpmn-swatches i { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid var(--bpmn-line); display: inline-block; }
+.${namespace}-bpmn-h3 { font-size: 12px; color: var(--bpmn-mute); margin: 14px 0 6px; font-weight: 600; }
+.${namespace}-bpmn-issue {
+  display: block; width: 100%; text-align: left; border: 0; background: transparent;
+  padding: 5px 0; color: var(--bpmn-warn); cursor: pointer; font: inherit;
 }
-.${namespace}-map-popup-close {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #7f8c8d;
-  font-size: 14px;
-  line-height: 1;
-  padding: 0 2px;
+.${namespace}-bpmn-ok { color: var(--bpmn-ok); font-size: 13px; }
+.${namespace}-bpmn-toast {
+  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
+  background: var(--bpmn-ink); color: var(--bpmn-bg); padding: 6px 14px;
+  border-radius: 8px; opacity: 0; transition: .2s; pointer-events: none; z-index: 99;
 }
-.${namespace}-map-popup-close:hover {
-  color: #c0392b;
+.${namespace}-bpmn-toast.on { opacity: 1; }
+@media (max-width: 760px) {
+  .${namespace}-bpmn-main { flex-direction: column; }
+  .${namespace}-bpmn-aside { width: auto; height: 280px; border-left: 0; border-top: 1px solid var(--bpmn-line); }
+  .${namespace}-bpmn-group { border: 0; }
 }
 
-.${namespace}-map-popup-body {
-  padding: 7px 9px;
-  font-size: 11px;
-}
-.${namespace}-map-popup-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 4px;
-}
-.${namespace}-map-popup-row:last-child {
-  margin-bottom: 0;
-}
-.${namespace}-map-popup-row .label {
-  color: var(--${namespace}-muted, #5d6d7e);
-  width: 32px;
-  flex-shrink: 0;
-}
-.${namespace}-map-popup-row .val.bold {
-  color: #c0392b;
-  font-family: var(--${namespace}-mono, Consolas, monospace);
-  font-weight: 700;
-}
-
-/* 右下角控制小工具 */
-.${namespace}-map-controls {
-  position: absolute;
-  right: 9px;
-  bottom: 24px;
+.${namespace}-rich-editor {
+  --rich-bg: #f4f6f9;
+  --rich-panel: #fff;
+  --rich-ink: #1c2430;
+  --rich-mute: #6b7685;
+  --rich-line: #e1e5eb;
+  --rich-brand: #2f6fed;
+  --rich-bi: #fff;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  z-index: 15;
+  height: 100%;
+  min-height: 520px;
+  background: var(--rich-panel);
+  border: 1px solid var(--rich-line);
+  border-radius: 8px;
+  overflow: hidden;
+  color: var(--rich-ink);
+  font: 14px/1.5 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
-.${namespace}-map-btn {
-  width: 22px;
-  height: 22px;
-  background: #ffffff;
-  border: 1px solid #b9c5d2;
-  border-radius: 2px;
-  color: #34495e;
-  font-weight: bold;
-  font-size: 13px;
-  line-height: 1;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+.${namespace}-rich-header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
+  padding: 8px 12px; background: var(--rich-panel); border-bottom: 1px solid var(--rich-line);
 }
-.${namespace}-map-btn:hover {
-  background: var(--${namespace}-pb, #e8edf5);
-  color: var(--${namespace}-p, #1a4f8a);
+.${namespace}-rich-title { font-size: 15px; margin: 0 4px 0 0; white-space: nowrap; }
+.${namespace}-rich-group { display: flex; gap: 4px; padding-right: 10px; border-right: 1px solid var(--rich-line); }
+.${namespace}-rich-group:last-of-type { border: 0; }
+.${namespace}-rich-btn {
+  display: inline-flex; align-items: center; font: inherit; color: var(--rich-ink);
+  background: transparent; border: 1px solid var(--rich-line); border-radius: 6px;
+  padding: 4px 10px; cursor: pointer; white-space: nowrap;
 }
+.${namespace}-rich-btn:hover { border-color: var(--rich-brand); color: var(--rich-brand); }
+.${namespace}-rich-btn.pri { background: var(--rich-brand); border-color: var(--rich-brand); color: var(--rich-bi); }
+.${namespace}-rich-stats { margin-left: auto; font-size: 12px; color: var(--rich-mute); white-space: nowrap; }
+.${namespace}-rich-body { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--rich-panel); }
+.${namespace}-rich-quill-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.${namespace}-rich-quill-wrap .ql-toolbar.ql-snow {
+  border: 0; border-bottom: 1px solid var(--rich-line); background: var(--rich-bg);
+}
+.${namespace}-rich-quill-wrap .ql-container.ql-snow {
+  border: 0; flex: 1; min-height: 0; overflow: auto; font-size: 15px;
+}
+.${namespace}-rich-quill-wrap .ql-editor { min-height: 360px; padding: 18px 24px; line-height: 1.75; }
+.${namespace}-rich-preview {
+  flex: 1; overflow: auto; padding: 20px 28px; background: var(--rich-panel); line-height: 1.75;
+}
+.${namespace}-rich-source { flex: 1; display: flex; flex-direction: column; padding: 12px; gap: 10px; background: var(--rich-bg); }
+.${namespace}-rich-textarea {
+  flex: 1; width: 100%; box-sizing: border-box; min-height: 360px;
+  font: 13px/1.5 ui-monospace, Menlo, monospace; color: var(--rich-ink);
+  background: var(--rich-panel); border: 1px solid var(--rich-line); border-radius: 6px;
+  padding: 10px 12px; resize: none;
+}
+.${namespace}-rich-source-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.${namespace}-rich-toast {
+  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
+  background: var(--rich-ink); color: var(--rich-bg); padding: 6px 14px;
+  border-radius: 8px; opacity: 0; transition: .2s; pointer-events: none; z-index: 99;
+}
+.${namespace}-rich-toast.on { opacity: 1; }
 
-/* 底部状态说明条 */
-.${namespace}-map-scalebar {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  height: 18px;
-  line-height: 18px;
-  background: rgba(255, 255, 255, 0.85);
-  border-top: 1px solid #dce3ea;
-  padding: 0 8px;
-  font-size: 10px;
-  color: #7f8c8d;
-}  -->
 
 <#include "/$/tile.css.ftl">

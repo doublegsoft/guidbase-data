@@ -794,9 +794,9 @@ ${""?left_pad(indent)}}
 </#macro>
 
 <!----------------------------------------------------------------------------->
-<!--                                  BPMN                                   -->
+<!--                               BPMN DIAGRAM                              -->
 <!----------------------------------------------------------------------------->
-<#macro print_bpmn_variables bpmn indent=0>
+<#macro print_bpmn_diagram_variables bpmn indent=0>
 ${""?left_pad(indent)}const ${js.nameVariable(bpmn.id)}Xml = ref(`<?xml version="1.0" encoding="UTF-8"?>
 ${""?left_pad(indent)}<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 ${""?left_pad(indent)}  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
@@ -843,8 +843,544 @@ ${""?left_pad(indent)}  </bpmndi:BPMNDiagram>
 ${""?left_pad(indent)}</bpmn:definitions>`);
 </#macro>
 
-<#macro print_bpmn_methods bpmn indent=0>
+<#macro print_bpmn_diagram_methods bpmn indent=0>
 </#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                               BPMN EDITOR                               -->
+<!----------------------------------------------------------------------------->
+<#macro print_bpmn_editor_variables bpmn indent=0>
+  <#local varId = js.nameVariable(bpmn.id)>
+${""?left_pad(indent)}// 【${bpmn.title!"流程编辑器"}】BPMN 流程编辑器相关变量
+${""?left_pad(indent)}const ${varId}Ns = 'xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI"'
+${""?left_pad(indent)}const ${varId}Wrap = (b) => '<?xml version="1.0" encoding="UTF-8"?><bpmn:definitions ' + ${varId}Ns + ' id="Defs" targetNamespace="http://bpmn.io/schema/bpmn">' + b + '</bpmn:definitions>'
+${""?left_pad(indent)}const ${varId}Sh = (id, x, y, w, h) => '<bpmndi:BPMNShape id="' + id + '_di" bpmnElement="' + id + '"><dc:Bounds x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"/></bpmndi:BPMNShape>'
+${""?left_pad(indent)}const ${varId}Ed = (id, pts) => '<bpmndi:BPMNEdge id="' + id + '_di" bpmnElement="' + id + '">' + pts.map((p) => '<di:waypoint x="' + p[0] + '" y="' + p[1] + '"/>').join('') + '</bpmndi:BPMNEdge>'
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}EmptyXml = ${varId}Wrap('<bpmn:process id="Process_1"><bpmn:startEvent id="S" name="开始"/></bpmn:process><bpmndi:BPMNDiagram id="D"><bpmndi:BPMNPlane id="P" bpmnElement="Process_1">' + ${varId}Sh('S', 200, 180, 36, 36) + '</bpmndi:BPMNPlane></bpmndi:BPMNDiagram>')
+${""?left_pad(indent)}const ${varId}DemoXml = ${varId}Wrap([
+${""?left_pad(indent)}  '<bpmn:process id="Leave" name="请假审批" isExecutable="false">',
+${""?left_pad(indent)}  '<bpmn:startEvent id="s" name="发起请假"/><bpmn:userTask id="t1" name="提交申请"/><bpmn:userTask id="t2" name="部门经理审批"/>',
+${""?left_pad(indent)}  '<bpmn:exclusiveGateway id="g" name="天数≥3？"/><bpmn:userTask id="t3" name="总监审批"/><bpmn:serviceTask id="t4" name="归档并通知"/><bpmn:endEvent id="e" name="结束"/>',
+${""?left_pad(indent)}  '<bpmn:sequenceFlow id="f1" sourceRef="s" targetRef="t1"/><bpmn:sequenceFlow id="f2" sourceRef="t1" targetRef="t2"/><bpmn:sequenceFlow id="f3" sourceRef="t2" targetRef="g"/>',
+${""?left_pad(indent)}  '<bpmn:sequenceFlow id="f4" name="是" sourceRef="g" targetRef="t3"/><bpmn:sequenceFlow id="f5" sourceRef="t3" targetRef="t4"/><bpmn:sequenceFlow id="f6" sourceRef="t4" targetRef="e"/><bpmn:sequenceFlow id="f7" name="否" sourceRef="g" targetRef="t4"/>',
+${""?left_pad(indent)}  '</bpmn:process>',
+${""?left_pad(indent)}  '<bpmndi:BPMNDiagram id="D"><bpmndi:BPMNPlane id="P" bpmnElement="Leave">',
+${""?left_pad(indent)}  ${varId}Sh('s', 152, 102, 36, 36), ${varId}Sh('t1', 240, 80, 100, 80), ${varId}Sh('t2', 390, 80, 100, 80),
+${""?left_pad(indent)}  ${varId}Sh('g', 545, 95, 50, 50), ${varId}Sh('t3', 650, 80, 100, 80), ${varId}Sh('t4', 800, 80, 100, 80), ${varId}Sh('e', 952, 102, 36, 36),
+${""?left_pad(indent)}  ${varId}Ed('f1', [[188, 120], [240, 120]]), ${varId}Ed('f2', [[340, 120], [390, 120]]), ${varId}Ed('f3', [[490, 120], [545, 120]]),
+${""?left_pad(indent)}  ${varId}Ed('f4', [[595, 120], [650, 120]]), ${varId}Ed('f5', [[750, 120], [800, 120]]), ${varId}Ed('f6', [[900, 120], [952, 120]]),
+${""?left_pad(indent)}  ${varId}Ed('f7', [[570, 145], [570, 230], [850, 230], [850, 160]]),
+${""?left_pad(indent)}  '</bpmndi:BPMNPlane></bpmndi:BPMNDiagram>'
+${""?left_pad(indent)}].join(''))
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}Dict = {
+${""?left_pad(indent)}  'Activate the hand tool': '抓手工具', 'Activate the lasso tool': '套索选择',
+${""?left_pad(indent)}  'Activate the create/remove space tool': '调整间距', 'Activate the global connect tool': '全局连线',
+${""?left_pad(indent)}  'Create StartEvent': '创建开始事件', 'Create EndEvent': '创建结束事件',
+${""?left_pad(indent)}  'Create Intermediate/Boundary Event': '创建中间/边界事件', 'Create Gateway': '创建网关',
+${""?left_pad(indent)}  'Create Task': '创建任务', 'Create expanded SubProcess': '创建子流程',
+${""?left_pad(indent)}  'Create Pool/Participant': '创建泳池/参与者', 'Create Group': '创建分组',
+${""?left_pad(indent)}  'Create DataObjectReference': '创建数据对象', 'Create DataStoreReference': '创建数据存储',
+${""?left_pad(indent)}  'Remove': '删除', 'Connect using Sequence/MessageFlow or Association': '连线',
+${""?left_pad(indent)}  'Append EndEvent': '追加结束事件', 'Append Gateway': '追加网关',
+${""?left_pad(indent)}  'Append Task': '追加任务', 'Append Intermediate/Boundary Event': '追加中间事件',
+${""?left_pad(indent)}  'Add Text Annotation': '添加文本注释', 'Change element': '更换类型',
+${""?left_pad(indent)}  'Task': '任务', 'User Task': '用户任务', 'Service Task': '服务任务',
+${""?left_pad(indent)}  'Script Task': '脚本任务', 'Manual Task': '手工任务', 'Send Task': '发送任务',
+${""?left_pad(indent)}  'Receive Task': '接收任务', 'Business Rule Task': '业务规则任务',
+${""?left_pad(indent)}  'Call Activity': '调用活动', 'Sub Process (collapsed)': '子流程（折叠）',
+${""?left_pad(indent)}  'Sub Process (expanded)': '子流程（展开）', 'Exclusive Gateway': '排他网关',
+${""?left_pad(indent)}  'Parallel Gateway': '并行网关', 'Inclusive Gateway': '包容网关',
+${""?left_pad(indent)}  'Event based Gateway': '事件网关', 'Start Event': '开始事件', 'End Event': '结束事件',
+${""?left_pad(indent)}  'Message Start Event': '消息开始事件', 'Timer Start Event': '定时开始事件',
+${""?left_pad(indent)}  'Message End Event': '消息结束事件', 'Terminate End Event': '终止结束事件',
+${""?left_pad(indent)}  'Default flow': '默认流', 'Conditional flow': '条件流', 'Sequence flow': '顺序流',
+${""?left_pad(indent)}  'Loop': '循环', 'Parallel Multi Instance': '并行多实例',
+${""?left_pad(indent)}  'Sequential Multi Instance': '串行多实例', 'Ad-hoc': '临时',
+${""?left_pad(indent)}  'Create': '创建', 'Append': '追加', 'Change type': '更换类型', 'Set color': '设置颜色', 'Delete': '删除'
+${""?left_pad(indent)}}
+${""?left_pad(indent)}const ${varId}Zh = (t, r) => (${varId}Dict[t] || t).replace(/{([^}]+)}/g, (m, k) => (r && r[k] != null ? r[k] : m))
+${""?left_pad(indent)}const ${varId}TypeMap = {
+${""?left_pad(indent)}  'bpmn:Process': '流程', 'bpmn:Collaboration': '协作', 'bpmn:Participant': '泳池',
+${""?left_pad(indent)}  'bpmn:StartEvent': '开始事件', 'bpmn:EndEvent': '结束事件',
+${""?left_pad(indent)}  'bpmn:IntermediateCatchEvent': '中间捕获事件', 'bpmn:IntermediateThrowEvent': '中间抛出事件',
+${""?left_pad(indent)}  'bpmn:BoundaryEvent': '边界事件', 'bpmn:Task': '任务', 'bpmn:UserTask': '用户任务',
+${""?left_pad(indent)}  'bpmn:ServiceTask': '服务任务', 'bpmn:ScriptTask': '脚本任务', 'bpmn:ManualTask': '手工任务',
+${""?left_pad(indent)}  'bpmn:SendTask': '发送任务', 'bpmn:ReceiveTask': '接收任务',
+${""?left_pad(indent)}  'bpmn:BusinessRuleTask': '业务规则任务', 'bpmn:CallActivity': '调用活动',
+${""?left_pad(indent)}  'bpmn:SubProcess': '子流程', 'bpmn:ExclusiveGateway': '排他网关',
+${""?left_pad(indent)}  'bpmn:ParallelGateway': '并行网关', 'bpmn:InclusiveGateway': '包容网关',
+${""?left_pad(indent)}  'bpmn:EventBasedGateway': '事件网关', 'bpmn:SequenceFlow': '顺序流',
+${""?left_pad(indent)}  'bpmn:MessageFlow': '消息流', 'bpmn:Association': '关联',
+${""?left_pad(indent)}  'bpmn:TextAnnotation': '文本注释', 'bpmn:DataObjectReference': '数据对象',
+${""?left_pad(indent)}  'bpmn:DataStoreReference': '数据存储', 'bpmn:Group': '分组'
+${""?left_pad(indent)}}
+${""?left_pad(indent)}const ${varId}Colors = [[], ['#2f6fed', '#e8f0ff'], ['#18794e', '#e3f6ec'], ['#b85400', '#fff1e0'], ['#c62828', '#fdeaea'], ['#6a3fc7', '#f0eafd']]
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}CanvasRef = ref(null)
+${""?left_pad(indent)}const ${varId}PropsRef = ref(null)
+${""?left_pad(indent)}let ${varId}Modeler = null
+${""?left_pad(indent)}let ${varId}Sel = []
+${""?left_pad(indent)}let ${varId}SaveTimer = null
+${""?left_pad(indent)}let ${varId}ToastTimer = null
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}Xml = ref(${varId}DemoXml)
+${""?left_pad(indent)}const ${varId}ActiveTab = ref('props')
+${""?left_pad(indent)}const ${varId}SelCount = ref(0)
+${""?left_pad(indent)}const ${varId}LintList = ref([])
+${""?left_pad(indent)}const ${varId}ToastState = reactive({ show: false, msg: '' })
+${""?left_pad(indent)}const ${varId}Props = reactive({
+${""?left_pad(indent)}  ready: false,
+${""?left_pad(indent)}  isRoot: true,
+${""?left_pad(indent)}  isText: false,
+${""?left_pad(indent)}  typeLabel: '',
+${""?left_pad(indent)}  name: '',
+${""?left_pad(indent)}  id: '',
+${""?left_pad(indent)}  originId: '',
+${""?left_pad(indent)}  doc: ''
+${""?left_pad(indent)}})
+</#macro>
+
+<#macro print_bpmn_editor_methods bpmn indent=0>
+  <#local varId = js.nameVariable(bpmn.id)>
+  <#local typeId = js.nameType(bpmn.id)>
+  <#local storageKey = "bpmn-editor-xml-" + varId>
+${""?left_pad(indent)}const ${varId}Get = (name) => ${varId}Modeler?.get(name)
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}ShowToast = (msg) => {
+${""?left_pad(indent)}  ${varId}ToastState.msg = msg
+${""?left_pad(indent)}  ${varId}ToastState.show = true
+${""?left_pad(indent)}  clearTimeout(${varId}ToastTimer)
+${""?left_pad(indent)}  ${varId}ToastTimer = setTimeout(() => { ${varId}ToastState.show = false }, 1800)
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}XmlOf = async () => {
+${""?left_pad(indent)}  if (!${varId}Modeler) return ${varId}Xml.value
+${""?left_pad(indent)}  return (await ${varId}Modeler.saveXML({ format: true })).xml
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}SaveStorage = async () => {
+${""?left_pad(indent)}  if (!${varId}Modeler) return
+${""?left_pad(indent)}  try {
+${""?left_pad(indent)}    localStorage.setItem('${storageKey}', await ${varId}XmlOf())
+${""?left_pad(indent)}  } catch (e) {}
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}RunLint = () => {
+${""?left_pad(indent)}  const registry = ${varId}Get('elementRegistry')
+${""?left_pad(indent)}  if (!registry) return
+${""?left_pad(indent)}  const els = registry.filter((e) => !e.labelTarget && e.businessObject && e.businessObject.$instanceOf && e.businessObject.$instanceOf('bpmn:FlowNode'))
+${""?left_pad(indent)}  const out = []
+${""?left_pad(indent)}  const nm = (e) => '「' + (e.businessObject.name || ${varId}TypeMap[e.type] || e.id) + '」'
+${""?left_pad(indent)}  if (!els.some((e) => e.type === 'bpmn:StartEvent')) out.push({ id: '', msg: '缺少开始事件' })
+${""?left_pad(indent)}  if (!els.some((e) => e.type === 'bpmn:EndEvent')) out.push({ id: '', msg: '缺少结束事件' })
+${""?left_pad(indent)}  els.forEach((e) => {
+${""?left_pad(indent)}    const b = e.businessObject
+${""?left_pad(indent)}    const i = (b.incoming || []).length
+${""?left_pad(indent)}    const o = (b.outgoing || []).length
+${""?left_pad(indent)}    if (e.type === 'bpmn:BoundaryEvent') {
+${""?left_pad(indent)}      if (!o) out.push({ id: e.id, msg: nm(e) + '没有出口' })
+${""?left_pad(indent)}    } else if (e.type === 'bpmn:StartEvent') {
+${""?left_pad(indent)}      if (!o) out.push({ id: e.id, msg: nm(e) + '没有出口' })
+${""?left_pad(indent)}    } else if (e.type === 'bpmn:EndEvent') {
+${""?left_pad(indent)}      if (!i) out.push({ id: e.id, msg: nm(e) + '没有入口' })
+${""?left_pad(indent)}    } else if (!i || !o) {
+${""?left_pad(indent)}      out.push({ id: e.id, msg: nm(e) + (i ? '没有出口' : o ? '没有入口' : '未连接') })
+${""?left_pad(indent)}    } else if (/Gateway$/.test(e.type) && i + o < 3) {
+${""?left_pad(indent)}      out.push({ id: e.id, msg: nm(e) + '分支不足' })
+${""?left_pad(indent)}    }
+${""?left_pad(indent)}  })
+${""?left_pad(indent)}  ${varId}LintList.value = out
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}SyncProps = () => {
+${""?left_pad(indent)}  ${varId}SelCount.value = ${varId}Sel.length
+${""?left_pad(indent)}  if (${varId}Sel.length > 1) {
+${""?left_pad(indent)}    ${varId}Props.ready = false
+${""?left_pad(indent)}    return
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  const el = ${varId}Sel[0] || ${varId}Get('canvas')?.getRootElement()
+${""?left_pad(indent)}  const bo = el && el.businessObject
+${""?left_pad(indent)}  if (!bo) {
+${""?left_pad(indent)}    ${varId}Props.ready = false
+${""?left_pad(indent)}    return
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  const isRoot = !${varId}Sel[0]
+${""?left_pad(indent)}  const isText = bo.$instanceOf('bpmn:TextAnnotation')
+${""?left_pad(indent)}  const doc = (bo.documentation && bo.documentation[0] && bo.documentation[0].text) || ''
+${""?left_pad(indent)}  ${varId}Props.ready = true
+${""?left_pad(indent)}  ${varId}Props.isRoot = isRoot
+${""?left_pad(indent)}  ${varId}Props.isText = isText
+${""?left_pad(indent)}  ${varId}Props.typeLabel = (isRoot ? '画布 · ' : '') + (${varId}TypeMap[bo.$type] || bo.$type)
+${""?left_pad(indent)}  ${varId}Props.name = (isText ? bo.text : bo.name) || ''
+${""?left_pad(indent)}  ${varId}Props.id = bo.id || ''
+${""?left_pad(indent)}  ${varId}Props.originId = bo.id || ''
+${""?left_pad(indent)}  ${varId}Props.doc = doc
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}LoadXml = async (xml, fit = true) => {
+${""?left_pad(indent)}  if (!${varId}Modeler) {
+${""?left_pad(indent)}    ${varId}Xml.value = xml
+${""?left_pad(indent)}    return false
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  try {
+${""?left_pad(indent)}    await ${varId}Modeler.importXML(xml)
+${""?left_pad(indent)}    if (fit) ${varId}Get('canvas').zoom('fit-viewport', 'auto')
+${""?left_pad(indent)}    ${varId}Sel = []
+${""?left_pad(indent)}    ${varId}SyncProps()
+${""?left_pad(indent)}    ${varId}RunLint()
+${""?left_pad(indent)}    return true
+${""?left_pad(indent)}  } catch (e) {
+${""?left_pad(indent)}    ${varId}ShowToast('导入失败：' + e.message)
+${""?left_pad(indent)}    return false
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}UpdateProp = (props) => {
+${""?left_pad(indent)}  const el = ${varId}Sel[0] || ${varId}Get('canvas')?.getRootElement()
+${""?left_pad(indent)}  if (el) ${varId}Get('modeling')?.updateProperties(el, props)
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}UpdateName = () => {
+${""?left_pad(indent)}  ${varId}UpdateProp(${varId}Props.isText ? { text: ${varId}Props.name } : { name: ${varId}Props.name })
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}UpdateId = () => {
+${""?left_pad(indent)}  const v = ${varId}Props.id.trim()
+${""?left_pad(indent)}  if (!/^[A-Za-z_][\w.\-]*$/.test(v)) {
+${""?left_pad(indent)}    ${varId}ShowToast('ID 需以字母或下划线开头')
+${""?left_pad(indent)}    ${varId}Props.id = ${varId}Props.originId
+${""?left_pad(indent)}    return
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  if (v !== ${varId}Props.originId && ${varId}Get('elementRegistry')?.get(v)) {
+${""?left_pad(indent)}    ${varId}ShowToast('ID 已存在')
+${""?left_pad(indent)}    ${varId}Props.id = ${varId}Props.originId
+${""?left_pad(indent)}    return
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  ${varId}Props.originId = v
+${""?left_pad(indent)}  ${varId}UpdateProp({ id: v })
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}UpdateDoc = () => {
+${""?left_pad(indent)}  const v = ${varId}Props.doc
+${""?left_pad(indent)}  ${varId}UpdateProp({ documentation: v ? [${varId}Get('bpmnFactory').create('bpmn:Documentation', { text: v })] : [] })
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}SetColor = (c) => {
+${""?left_pad(indent)}  if (!${varId}Sel.length || !${varId}Modeler) return
+${""?left_pad(indent)}  ${varId}Get('modeling')?.setColor(${varId}Sel, c.length ? { stroke: c[0], fill: c[1] } : { stroke: undefined, fill: undefined })
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}FocusElement = (id) => {
+${""?left_pad(indent)}  const el = id && ${varId}Get('elementRegistry')?.get(id)
+${""?left_pad(indent)}  if (el) {
+${""?left_pad(indent)}    ${varId}Get('selection')?.select(el)
+${""?left_pad(indent)}    ${varId}Get('canvas')?.scrollToElement(el)
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}Undo = () => ${varId}Get('commandStack')?.undo()
+${""?left_pad(indent)}const ${varId}Redo = () => ${varId}Get('commandStack')?.redo()
+${""?left_pad(indent)}const ${varId}ZoomFit = () => ${varId}Get('canvas')?.zoom('fit-viewport', 'auto')
+${""?left_pad(indent)}const ${varId}ZoomIn = () => {
+${""?left_pad(indent)}  const canvas = ${varId}Get('canvas')
+${""?left_pad(indent)}  if (canvas) canvas.zoom(canvas.zoom() * 1.25)
+${""?left_pad(indent)}}
+${""?left_pad(indent)}const ${varId}ZoomOut = () => {
+${""?left_pad(indent)}  const canvas = ${varId}Get('canvas')
+${""?left_pad(indent)}  if (canvas) canvas.zoom(canvas.zoom() / 1.25)
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}OnFileChange = (e) => {
+${""?left_pad(indent)}  const f = e.target.files?.[0]
+${""?left_pad(indent)}  if (!f) return
+${""?left_pad(indent)}  const r = new FileReader()
+${""?left_pad(indent)}  r.onload = () => ${varId}LoadXml(r.result)
+${""?left_pad(indent)}  r.readAsText(f)
+${""?left_pad(indent)}  e.target.value = ''
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}SwitchTab = async (tab) => {
+${""?left_pad(indent)}  ${varId}ActiveTab.value = tab
+${""?left_pad(indent)}  if (tab === 'xml' && ${varId}Modeler) ${varId}Xml.value = await ${varId}XmlOf()
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}CopyText = async (text) => {
+${""?left_pad(indent)}  try {
+${""?left_pad(indent)}    await navigator.clipboard.writeText(text)
+${""?left_pad(indent)}    ${varId}ShowToast('已复制')
+${""?left_pad(indent)}  } catch (e) {
+${""?left_pad(indent)}    ${varId}Xml.value = text
+${""?left_pad(indent)}    ${varId}ShowToast('复制失败，请从文本框手动复制')
+${""?left_pad(indent)}}
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}ApplyXml = async () => {
+${""?left_pad(indent)}  const ok = await ${varId}LoadXml(${varId}Xml.value, false)
+${""?left_pad(indent)}  if (ok) ${varId}ShowToast('已应用')
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}CopyXml = async () => ${varId}CopyText(await ${varId}XmlOf())
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}ExportSvg = async () => {
+${""?left_pad(indent)}  if (!${varId}Modeler) return
+${""?left_pad(indent)}  const { svg } = await ${varId}Modeler.saveSVG()
+${""?left_pad(indent)}  ${varId}Xml.value = svg
+${""?left_pad(indent)}  await ${varId}CopyText(svg)
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const init${typeId} = () => {
+${""?left_pad(indent)}  if (!${varId}CanvasRef.value || ${varId}Modeler) return
+${""?left_pad(indent)}  try {
+${""?left_pad(indent)}    ${varId}Modeler = new BpmnModeler({
+${""?left_pad(indent)}      container: ${varId}CanvasRef.value,
+${""?left_pad(indent)}      keyboard: { bindTo: document },
+${""?left_pad(indent)}      additionalModules: [{ translate: ['value', ${varId}Zh] }]
+${""?left_pad(indent)}    })
+${""?left_pad(indent)}    ${varId}Modeler.on('selection.changed', (e) => {
+${""?left_pad(indent)}      ${varId}Sel = e.newSelection
+${""?left_pad(indent)}      ${varId}SyncProps()
+${""?left_pad(indent)}    })
+${""?left_pad(indent)}    ${varId}Modeler.on('commandStack.changed', () => {
+${""?left_pad(indent)}      ${varId}RunLint()
+${""?left_pad(indent)}      clearTimeout(${varId}SaveTimer)
+${""?left_pad(indent)}      ${varId}SaveTimer = setTimeout(${varId}SaveStorage, 400)
+${""?left_pad(indent)}      if (!${varId}PropsRef.value?.contains(document.activeElement) && ${varId}Sel.length < 2) {
+${""?left_pad(indent)}        ${varId}SyncProps()
+${""?left_pad(indent)}      }
+${""?left_pad(indent)}    })
+${""?left_pad(indent)}    let initXml = ${varId}DemoXml
+${""?left_pad(indent)}    try {
+${""?left_pad(indent)}      initXml = localStorage.getItem('${storageKey}') || ${varId}DemoXml
+${""?left_pad(indent)}    } catch (e) {}
+${""?left_pad(indent)}    ${varId}LoadXml(initXml)
+${""?left_pad(indent)}  } catch (err) {
+${""?left_pad(indent)}    console.error('[bpmn-editor] 初始化失败:', err)
+${""?left_pad(indent)}    ${varId}ShowToast('流程编辑器初始化失败：' + (err?.message || err))
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}BindCanvas = (el) => {
+${""?left_pad(indent)}  ${varId}CanvasRef.value = el
+${""?left_pad(indent)}  if (el && !${varId}Modeler) {
+${""?left_pad(indent)}    init${typeId}()
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}}
+<#--  ${""?left_pad(indent)}
+${""?left_pad(indent)}onMounted(() => {
+${""?left_pad(indent)}  init${typeId}()
+${""?left_pad(indent)}})
+${""?left_pad(indent)}
+${""?left_pad(indent)}onBeforeUnmount(() => {
+${""?left_pad(indent)}  clearTimeout(${varId}SaveTimer)
+${""?left_pad(indent)}  clearTimeout(${varId}ToastTimer)
+${""?left_pad(indent)}  ${varId}Modeler?.destroy()
+${""?left_pad(indent)}  ${varId}Modeler = null
+${""?left_pad(indent)}})  -->
+</#macro>
+
+<!----------------------------------------------------------------------------->
+<!--                               RICH EDITOR                               -->
+<!----------------------------------------------------------------------------->
+<#macro print_rich_editor_variables rich indent=0>
+  <#local varId = js.nameVariable(rich.id)>
+${""?left_pad(indent)}// 【${rich.title!"富文本编辑器"}】Quill 富文本编辑器相关变量
+${""?left_pad(indent)}const ${varId}DemoHtml = [
+${""?left_pad(indent)}  '<h2>关于开展年度数字化转型专项工作的通知</h2>',
+${""?left_pad(indent)}  '<p>各部门、各分支机构：</p>',
+${""?left_pad(indent)}  '<p>为进一步提升企业流程化与业务数字化协同能力，现将相关事项通知如下：</p>',
+${""?left_pad(indent)}  '<ol><li><strong>统一规范：</strong>梳理核心业务节点，形成标准化闭环。</li>',
+${""?left_pad(indent)}  '<li><strong>系统落地：</strong>结合在线审批、表单与流程引擎提升流转效率。</li></ol>',
+${""?left_pad(indent)}  '<blockquote>请各单位于本月底前完成自查并提交书面汇报材料。</blockquote>'
+${""?left_pad(indent)}].join('')
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}EditorRef = ref(null)
+${""?left_pad(indent)}const ${varId}ImageInputRef = ref(null)
+${""?left_pad(indent)}let ${varId}Quill = null
+${""?left_pad(indent)}let ${varId}InnerUpdate = false
+${""?left_pad(indent)}let ${varId}SaveTimer = null
+${""?left_pad(indent)}let ${varId}ToastTimer = null
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}Html = ref(${varId}DemoHtml)
+${""?left_pad(indent)}const ${varId}SourceHtml = ref(${varId}DemoHtml)
+${""?left_pad(indent)}const ${varId}Mode = ref('edit') // 'edit' | 'preview' | 'source'
+${""?left_pad(indent)}const ${varId}Readonly = ref(${rich.value("readonly", "false")})
+${""?left_pad(indent)}const ${varId}Stats = reactive({ chars: 0, words: 0 })
+${""?left_pad(indent)}const ${varId}ToastState = reactive({ show: false, msg: '' })
+</#macro>
+
+<#macro print_rich_editor_methods rich indent=0>
+  <#local varId = js.nameVariable(rich.id)>
+  <#local typeId = js.nameType(rich.id)>
+  <#local storageKey = "rich-editor-html-" + varId>
+  <#local placeholderText = rich.value("placeholder", "请输入正文内容...")>
+${""?left_pad(indent)}const ${varId}ShowToast = (msg) => {
+${""?left_pad(indent)}  ${varId}ToastState.msg = msg
+${""?left_pad(indent)}  ${varId}ToastState.show = true
+${""?left_pad(indent)}  clearTimeout(${varId}ToastTimer)
+${""?left_pad(indent)}  ${varId}ToastTimer = setTimeout(() => { ${varId}ToastState.show = false }, 1800)
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}UpdateStats = () => {
+${""?left_pad(indent)}  if (!${varId}Quill) return
+${""?left_pad(indent)}  const raw = ${varId}Quill.getText() || ''
+${""?left_pad(indent)}  const clean = raw.replace(/\n$/, '')
+${""?left_pad(indent)}  ${varId}Stats.chars = clean.length
+${""?left_pad(indent)}  ${varId}Stats.words = clean.replace(/\s+/g, '').length
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}SaveStorage = () => {
+${""?left_pad(indent)}  try {
+${""?left_pad(indent)}    localStorage.setItem('${storageKey}', ${varId}Html.value)
+${""?left_pad(indent)}  } catch (e) {}
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}SetHtml = (html, resetHistory = false) => {
+${""?left_pad(indent)}  const next = html || ''
+${""?left_pad(indent)}  ${varId}Html.value = next
+${""?left_pad(indent)}  ${varId}SourceHtml.value = next
+${""?left_pad(indent)}  if (!${varId}Quill) return
+${""?left_pad(indent)}  ${varId}InnerUpdate = true
+${""?left_pad(indent)}  try {
+${""?left_pad(indent)}    if (!next) {
+${""?left_pad(indent)}      ${varId}Quill.setContents([], 'silent')
+${""?left_pad(indent)}    } else {
+${""?left_pad(indent)}      ${varId}Quill.clipboard.dangerouslyPasteHTML(next, 'silent')
+${""?left_pad(indent)}    }
+${""?left_pad(indent)}    if (resetHistory) ${varId}Quill.history?.clear()
+${""?left_pad(indent)}    ${varId}UpdateStats()
+${""?left_pad(indent)}    ${varId}SaveStorage()
+${""?left_pad(indent)}  } finally {
+${""?left_pad(indent)}    ${varId}InnerUpdate = false
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}Clear = () => {
+${""?left_pad(indent)}  ${varId}SetHtml('')
+${""?left_pad(indent)}  ${varId}ShowToast('已清空内容')
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}LoadDemo = () => {
+${""?left_pad(indent)}  ${varId}SetHtml(${varId}DemoHtml)
+${""?left_pad(indent)}  ${varId}ShowToast('已加载示例文档')
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}Undo = () => ${varId}Quill?.history?.undo()
+${""?left_pad(indent)}const ${varId}Redo = () => ${varId}Quill?.history?.redo()
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}SwitchMode = (mode) => {
+${""?left_pad(indent)}  if (mode === 'source') {
+${""?left_pad(indent)}    ${varId}SourceHtml.value = ${varId}Html.value
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  ${varId}Mode.value = mode
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}ApplySource = () => {
+${""?left_pad(indent)}  ${varId}SetHtml(${varId}SourceHtml.value)
+${""?left_pad(indent)}  ${varId}Mode.value = 'edit'
+${""?left_pad(indent)}  ${varId}ShowToast('已应用 HTML 修改')
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}CopyHtml = async () => {
+${""?left_pad(indent)}  try {
+${""?left_pad(indent)}    await navigator.clipboard.writeText(${varId}Html.value)
+${""?left_pad(indent)}    ${varId}ShowToast('HTML 已复制')
+${""?left_pad(indent)}  } catch (e) {
+${""?left_pad(indent)}    ${varId}Mode.value = 'source'
+${""?left_pad(indent)}    ${varId}SourceHtml.value = ${varId}Html.value
+${""?left_pad(indent)}    ${varId}ShowToast('复制失败，请从源码框手动复制')
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}ExportHtml = () => {
+${""?left_pad(indent)}  const doc = '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>${rich.title!"文档导出"}</title></head><body>' + ${varId}Html.value + '</body></html>'
+${""?left_pad(indent)}  const blob = new Blob([doc], { type: 'text/html;charset=utf-8' })
+${""?left_pad(indent)}  const url = URL.createObjectURL(blob)
+${""?left_pad(indent)}  const a = document.createElement('a')
+${""?left_pad(indent)}  a.href = url
+${""?left_pad(indent)}  a.download = '${varId}.html'
+${""?left_pad(indent)}  a.click()
+${""?left_pad(indent)}  URL.revokeObjectURL(url)
+${""?left_pad(indent)}  ${varId}ShowToast('已导出 HTML 文件')
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}OnImageSelected = (e) => {
+${""?left_pad(indent)}  const file = e.target.files?.[0]
+${""?left_pad(indent)}  if (!file || !${varId}Quill) return
+${""?left_pad(indent)}  const reader = new FileReader()
+${""?left_pad(indent)}  reader.onload = () => {
+${""?left_pad(indent)}    const range = ${varId}Quill.getSelection(true) || { index: ${varId}Quill.getLength() }
+${""?left_pad(indent)}    ${varId}Quill.insertEmbed(range.index, 'image', reader.result, 'user')
+${""?left_pad(indent)}    ${varId}Quill.setSelection(range.index + 1, 0, 'silent')
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}  reader.readAsDataURL(file)
+${""?left_pad(indent)}  e.target.value = ''
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const init${typeId} = () => {
+${""?left_pad(indent)}  if (!${varId}EditorRef.value || ${varId}Quill) return
+${""?left_pad(indent)}  try {
+${""?left_pad(indent)}    ${varId}Quill = new Quill(${varId}EditorRef.value, {
+${""?left_pad(indent)}      theme: 'snow',
+${""?left_pad(indent)}      readOnly: ${varId}Readonly.value,
+${""?left_pad(indent)}      placeholder: '${placeholderText}',
+${""?left_pad(indent)}      modules: {
+${""?left_pad(indent)}        history: { delay: 800, maxStack: 100, userOnly: true },
+${""?left_pad(indent)}        toolbar: {
+${""?left_pad(indent)}          container: [
+${""?left_pad(indent)}            [{ header: [1, 2, 3, false] }],
+${""?left_pad(indent)}            ['bold', 'italic', 'underline', 'strike'],
+${""?left_pad(indent)}            [{ color: [] }, { background: [] }],
+${""?left_pad(indent)}            [{ list: 'ordered' }, { list: 'bullet' }],
+${""?left_pad(indent)}            [{ indent: '-1' }, { indent: '+1' }, { align: [] }],
+${""?left_pad(indent)}            ['blockquote', 'code-block', 'link', 'image'],
+${""?left_pad(indent)}            ['clean']
+${""?left_pad(indent)}          ],
+${""?left_pad(indent)}          handlers: {
+${""?left_pad(indent)}            image: () => ${varId}ImageInputRef.value?.click()
+${""?left_pad(indent)}          }
+${""?left_pad(indent)}        }
+${""?left_pad(indent)}      }
+${""?left_pad(indent)}    })
+${""?left_pad(indent)}    let initHtml = ${varId}DemoHtml
+${""?left_pad(indent)}    try {
+${""?left_pad(indent)}      const cached = localStorage.getItem('${storageKey}')
+${""?left_pad(indent)}      if (cached !== null) initHtml = cached
+${""?left_pad(indent)}    } catch (e) {}
+${""?left_pad(indent)}    ${varId}SetHtml(initHtml, true)
+${""?left_pad(indent)}    ${varId}Quill.on('text-change', () => {
+${""?left_pad(indent)}      if (${varId}InnerUpdate || !${varId}Quill) return
+${""?left_pad(indent)}      const html = ${varId}Quill.root.innerHTML
+${""?left_pad(indent)}      ${varId}Html.value = html === '<p><br></p>' ? '' : html
+${""?left_pad(indent)}      ${varId}UpdateStats()
+${""?left_pad(indent)}      clearTimeout(${varId}SaveTimer)
+${""?left_pad(indent)}      ${varId}SaveTimer = setTimeout(${varId}SaveStorage, 400)
+${""?left_pad(indent)}    })
+${""?left_pad(indent)}  } catch (err) {
+${""?left_pad(indent)}    console.error('[rich-editor] 初始化失败:', err)
+${""?left_pad(indent)}    ${varId}ShowToast('富文本编辑器初始化失败：' + (err?.message || err))
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}}
+${""?left_pad(indent)}
+${""?left_pad(indent)}const ${varId}BindEditor = (el) => {
+${""?left_pad(indent)}  ${varId}EditorRef.value = el
+${""?left_pad(indent)}  if (el && !${varId}Quill) {
+${""?left_pad(indent)}    init${typeId}()
+${""?left_pad(indent)}  }
+${""?left_pad(indent)}}
+<#--  ${""?left_pad(indent)}
+${""?left_pad(indent)}onMounted(() => {
+${""?left_pad(indent)}  init${typeId}()
+${""?left_pad(indent)}})
+${""?left_pad(indent)}
+${""?left_pad(indent)}onBeforeUnmount(() => {
+${""?left_pad(indent)}  clearTimeout(${varId}SaveTimer)
+${""?left_pad(indent)}  clearTimeout(${varId}ToastTimer)
+${""?left_pad(indent)}  ${varId}Quill = null
+${""?left_pad(indent)}})  -->
+</#macro>
+
 
 <!----------------------------------------------------------------------------->
 <!--                                  GANTT                                  -->
@@ -892,10 +1428,6 @@ const load${js.nameType(hero.id)}Data = async () => {
 
 <!----------------------------------------------------------------------------->
 <!--                                KPI CHART                                -->
-<!----------------------------------------------------------------------------->
-
-<!----------------------------------------------------------------------------->
-<!--                         KPI CHART VARIABLES                             -->
 <!----------------------------------------------------------------------------->
 <#macro print_kpi_chart_variables kpi indent=0>
   <#local varPrefix = js.nameVariable(kpi.id)>
@@ -1113,6 +1645,8 @@ import ${js.nameType(namespace)}Pagedtable from '@/components/${namespace}-paged
 import ${js.nameType(namespace)}Datatable from '@/components/${namespace}-datatable.vue'
     <#elseif widget.type == "fixed_table">
 import ${js.nameType(namespace)}Fixedtable from '@/components/${namespace}-fixedtable.vue'
+    <#elseif widget.type == "gantt_table">
+import ${js.nameType(namespace)}Gantttable from '@/components/${namespace}-gantttable.vue' 
     <#elseif widget.type == "paged_grid">
 import ${js.nameType(namespace)}Pagedgrid from '@/components/${namespace}-pagedgrid.vue'      
     <#elseif widget.type == "week_grid">
@@ -1123,10 +1657,17 @@ import 'leaflet/dist/leaflet.css';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-    <#elseif widget.type == "gantt">
-import ${js.nameType(namespace)}Gantt from '@/components/${namespace}-gantt.vue' 
-    <#elseif widget.type == "bpmn">
-import ${js.nameType(namespace)}Bpmn from '@/components/${namespace}-bpmn.vue' 
+    <#elseif widget.type == "bpmn_diagram">
+import ${js.nameType(namespace)}Bpmndiagram from '@/components/${namespace}-bpmndiagram.vue' 
+    <#elseif widget.type == "bpmn_editor">
+import BpmnModeler from 'bpmn-js/lib/Modeler';
+import BpmnViewer from 'bpmn-js/lib/NavigatedViewer';
+import 'bpmn-js/dist/assets/diagram-js.css'
+import 'bpmn-js/dist/assets/bpmn-js.css'
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
+    <#elseif widget.type == "rich_editor">
+import Quill from 'quill'
+import 'quill/dist/quill.snow.css'
     <#elseif widget.type == "kpi_chart">
 import ${js.nameType(namespace)}Sparkline from '@/components/${namespace}-sparkline.vue' 
     <#elseif widget.type == "chart">
@@ -1210,8 +1751,12 @@ import ${js.nameType(namespace + "_" + action.resource)} from '@/pages/${js.name
 <@print_list_view_variables list=widget indent=indent />
     <#elseif widget.type == "map_view">
 <@print_map_view_variables map=widget indent=indent />
-    <#elseif widget.type == "bpmn">
-<@print_bpmn_variables bpmn=widget indent=indent />
+    <#elseif widget.type == "bpmn_diagram">
+<@print_bpmn_diagram_variables bpmn=widget indent=indent />
+    <#elseif widget.type == "bpmn_editor">
+<@print_bpmn_editor_variables bpmn=widget indent=indent />
+    <#elseif widget.type == "rich_editor">
+<@print_rich_editor_variables rich=widget indent=indent />
     <#elseif widget.type == "gantt">
 <@print_gantt_variables gantt=widget indent=indent />
     <#elseif widget.type == "hero_card">
@@ -1265,6 +1810,12 @@ ${""?left_pad(indent)}const ${js.nameVariable(action.resource)}Open = ref(false)
 <@print_map_view_methods map=widget indent=indent />
     <#elseif widget.type == "hero_card">
 <@print_hero_card_methods hero=widget indent=indent />
+    <#elseif widget.type == "bpmn_diagram">
+<@print_bpmn_diagram_methods bpmn=widget indent=indent />
+    <#elseif widget.type == "bpmn_editor">
+<@print_bpmn_editor_methods bpmn=widget indent=indent />
+    <#elseif widget.type == "rich_editor">
+<@print_rich_editor_methods rich=widget indent=indent />
     <#elseif widget.type == "kpi_chart">
 <@print_kpi_chart_methods kpi=widget indent=indent />
     <#elseif widget.type == "chart">
