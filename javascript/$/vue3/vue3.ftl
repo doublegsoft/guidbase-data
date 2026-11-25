@@ -1570,6 +1570,16 @@ const ${guidbase.name_button_method(button)} = async () => {
   <#if !guidbase.get_action_widget(button)??>
     <#if action.type.name() == "DIALOG" || action.type.name() == "DRAWER">
   ${js.nameVariable(action.resource)}Open.value = true    
+    <#elseif action.type.name() == "GOTO">
+  navigateWithCrumb({
+    label: '${button.title}',
+    path: '/${action.path?replace("_","-")}',
+    query: {
+      id: row?.id,              
+      code: row?.code
+    },
+    currentRoute: route
+  })
     </#if>
   <#else>
     <#local widget = guidbase.get_action_widget(button)>

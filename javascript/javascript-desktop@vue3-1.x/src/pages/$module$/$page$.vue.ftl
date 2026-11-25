@@ -37,10 +37,19 @@
 </template>
 <script setup>
 import { ref, reactive, computed, inject, provide, nextTick, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import * as echarts from 'echarts'
 <@vue3.print_page_imports page=pageDef />
 import sdk from '@/sdk/sdk.js'
 import { useFeedback } from '@/composables/useFeedback.js'
+
+defineOptions({
+  name: '${js.nameType(page.id)}'
+})
+
+const route = useRoute()
+const { navigateWithCrumb } = useBreadcrumb()
 
 // 数据加载状态，每页都必须有
 const fb = useFeedback()

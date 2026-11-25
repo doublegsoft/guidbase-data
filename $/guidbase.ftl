@@ -197,9 +197,9 @@
   <#elseif action.type?? && action.type.name() == "DIALOG">
     <#return "primary">
   <#elseif action.type?? && action.type.name() == "SHEET">
-    <#return "primary">    
+    <#return "warning">    
   <#elseif action.type?? && action.type.name() == "GOTO">
-    <#return "default">  
+    <#return "primary">  
   </#if>
   <#return "default">  
 </#function>

@@ -35,9 +35,20 @@
       <!-- Content -->
       <div class="${namespace}-content">
         <div class="${namespace}-breadcrumb">
-          <a>首页</a><span>/</span>
-          <a>{{ currentModuleLabel }}</a><span>/</span>
-          <span>{{ breadPage }}</span>
+          <a @click="switchModule(modules[0].key)">首页</a><span>/</span>
+          <a @click="switchModule(activeModule)">{{ currentModuleLabel }}</a><span>/</span>
+
+          <!-- C 页面：如果有下级页面 D，则 C 变成可点击返回；否则是当前末级 -->
+          <a v-if="extraCrumbs.length > 0" @click="backToRootPage(activePath)">{{ breadPage }}</a>
+          <span v-else>{{ breadPage }}</span>
+
+          <!-- 追加的 D / E ... 子页面包屑 -->
+          <template v-for="(crumb, idx) in extraCrumbs" :key="crumb.path">
+            <span>/</span>
+            <a v-if="idx < extraCrumbs.length - 1" @click="goToExtraCrumb(idx)">{{ crumb.label }}</a>
+            <span v-else>{{ crumb.label }}</span>
+          </template>
+
           <div v-if="showPrevNext" class="${namespace}-record-nav">
             <button class="${namespace}-rn-btn" :disabled="!hasPrev" @click="goPrev" title="上一条">
               <span class="${namespace}-rn-arrow ${namespace}-rn-arrow--left">◀</span>
@@ -51,7 +62,12 @@
           </div>
         </div>
         <div class="${namespace}-page">
-          <router-view />
+          <!-- 关键修改：用 keep-alive 包裹 router-view，只保活 cachedViews 里的 C -->
+          <router-view v-slot="{ Component }">
+            <keep-alive :include="cachedViews">
+              <component :is="Component" :key="route.fullPath" />
+            </keep-alive>
+          </router-view>
         </div>
       </div>
     </div>
@@ -60,9 +76,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useNavControl } from '@/composables/useNavControl'
+import { useBreadcrumb } from '@/composables/useBreadcrumb'
 import { MENUS, MODULE_LIST } from './menu.js'
 import router from './router'
 import { provideFeedback } from '@/composables/useFeedback.js'
@@ -86,6 +103,19 @@ const username     = ref(localStorage.getItem('username') || '张伟')
 
 const currentSections    = computed(() => MENUS[activeModule.value].sections)
 const currentModuleLabel = computed(() => MENUS[activeModule.value].label)
+
+const {
+  extraCrumbs,
+  cachedViews,
+  backToRootPage,
+  goToExtraCrumb,
+  resetCrumbs,
+  syncOnRouteChange
+} = useBreadcrumb()
+
+watch(() => route.fullPath, (newPath) => {
+  syncOnRouteChange(newPath, activePath.value)
+})
 
 function switchModule(key) {
   activeModule.value = key
